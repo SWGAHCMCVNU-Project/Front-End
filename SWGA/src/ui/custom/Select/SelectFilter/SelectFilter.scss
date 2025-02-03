@@ -1,0 +1,17 @@
+$font-weight: 600;
+
+@mixin font-color($color) {
+    color: $color;
+}
+
+.filter-label {
+    @include font-color(#4A5073);
+    font-weight: $font-weight;
+    margin-right: 10px;
+}
+
+.select-main-filter .ant-select-selection-placeholder {
+    @include font-color(#282a38);
+    font-weight: $font-weight;
+    margin-top: 1.5px;
+}

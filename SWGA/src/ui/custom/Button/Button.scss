@@ -1,0 +1,36 @@
+$color-btn: #fff;
+
+@mixin btn-back-color($background) {
+    background-color: $background;
+    color: $color-btn;
+}
+
+.btn-back {
+    @include btn-back-color(#2ECC71);
+    font-size: 1.4rem;
+
+    &:hover {
+        @include btn-back-color(#21b658);
+    }
+}
+
+.link-navigate {
+    color: $color-btn;
+
+    &:hover {
+        color: $color-btn;
+    }
+}
+
+.btn-login {
+    width: 100%;
+    height: 4.2rem;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.create-update-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+}

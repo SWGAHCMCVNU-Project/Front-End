@@ -1,0 +1,21 @@
+.custom-table {
+    width: 100%;
+    background-color: #f9fafb;
+    align-items: center;
+}
+
+.ant-table-pagination.ant-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-right: 20px;
+}
+
+.ant-pagination-prev .ant-pagination-item-link,
+.ant-pagination-next .ant-pagination-item-link {
+    color: black;
+}
+
+.ant-select-arrow {
+    color: black;
+}

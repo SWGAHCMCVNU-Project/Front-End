@@ -1,0 +1,86 @@
+$font-color-primary-placeholder: #6b7280;
+$background-color-primary-placeholder: white;
+$width-box: 100%;
+$border-radius-box: 5px;
+
+.input-product {
+    margin: 10px 20px 5px 20px;
+}
+
+.product-add-simple-infor {
+    width: $width-box;
+}
+
+.input-product-label {
+    font-weight: 600;
+    font-size: 1.4rem;
+}
+
+.placeholder-input-ecommerce {
+    border-radius: $border-radius-box;
+    color: #374151;
+    background-color: $background-color-primary-placeholder;
+    border: 1px solid #d1d5db;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+
+    &::placeholder {
+        font-weight: normal;
+        color: $font-color-primary-placeholder;
+    }
+
+    &:focus {
+        border: 1px solid var(--color-grey-600);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    &:hover {
+        border: 1px solid var(--color-grey-600);
+    }
+}
+
+.label-login-style {
+    font-weight: 600;
+}
+
+.placeholder-input-ecommerce-userName {
+    border-radius: $border-radius-box;
+    color: #374151;
+    background-color: $background-color-primary-placeholder;
+    border: 1px solid #d1d5db;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+
+    &::placeholder {
+        font-weight: normal;
+        color: $font-color-primary-placeholder;
+    }
+
+    &:focus {
+        border: 1px solid #2ecc71;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    &:hover {
+        border: 1px solid #2ecc71;
+    }
+}
+
+.placeholder-input-ecommerce-password  {
+    border-radius: $border-radius-box;
+    font-weight: normal;
+    color: $font-color-primary-placeholder;
+
+    &::placeholder {
+        font-weight: normal;
+        color: $font-color-primary-placeholder;
+    }
+}
+
+.placeholder-input-ecommerce-password .ant-input  {
+    font-weight: normal;
+    color: $font-color-primary-placeholder;
+
+    &::placeholder {
+        font-weight: normal;
+        color: $font-color-primary-placeholder;
+    }
+}
