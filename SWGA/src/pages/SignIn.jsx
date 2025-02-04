@@ -1,16 +1,16 @@
-import { Typography } from "antd";
-import { Button, Card, Col, Form, Layout, Row, Spin } from "antd";
+/* eslint-disable no-unused-vars */
+import { Flex, Heading, Icon, Text } from "@chakra-ui/react";
+import {  Button, Card, Col, Form, Layout, Row, Spin } from "antd";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc";
 import { NavLink, useNavigate } from "react-router-dom";
-import signinbg from "../assets/images/logoUB.png";
-// import { HSeparator } from "../components/layout/separator/Separator";
+import signinbg from "../assets/images/ảnh ví.png";
+import { HSeparator } from "../components/layout/separator/Separator";
 import ButtonText from "../ui/ButtonText";
 import { LoginButton } from "../ui/custom/Button/Button";
 import { CustomFormItemLogin } from "../ui/custom/Form/InputItem/CustomFormItem";
 
-const { Title, Text } = Typography;
 const { Footer, Content } = Layout;
 
 function SignIn() {
@@ -58,9 +58,9 @@ function SignIn() {
                 <img src={signinbg} alt="" />
               </div>
               <div>
-                <Title level={2} className="header-login">
+                <Heading className="header-login" fontSize='36px'>
                   Đăng nhập
-                </Title>
+                </Heading>
               </div>
               <div>
                 <Form
@@ -99,22 +99,25 @@ function SignIn() {
                     pass={true}
                   />
 
-                  <div style={{ 
-                    display: 'flex', 
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'flex-end',
-                    width: '100%'
-                  }}>
-                    <Text strong style={{ fontSize: '13px' }}>
-                      Bạn chưa có tài khoản?{' '}
-                      <NavLink to="/sign-up">
-                        <Text strong style={{ color: '#506690' }}>
+                  <Flex
+                    flexDirection='column'
+                    justifyContent='center'
+                    alignItems='end'
+                    maxW='100%'
+                  >
+                    <Text style={{ fontWeight: 600 }} fontSize='13px'>
+                      Bạn chưa có tài khoản?
+                      <NavLink to='/sign-up'>
+                        <Text
+                          color="#506690"
+                          as='span'
+                          ms='5px'
+                          fontWeight='600'>
                           Tạo tài khoản mới
                         </Text>
                       </NavLink>
                     </Text>
-                  </div>
+                  </Flex>
 
                   <LoginButton
                     isLoading={isLoading}
@@ -125,28 +128,36 @@ function SignIn() {
                 </Form>
               </div>
 
-              <div className="divider">
-                <Text style={{ margin: '0 14px', marginTop: '10px' }}>
+              <Flex key='flex-2' align='center' mb='25px'>
+                <HSeparator />
+                <Text color='black' mx='14px' marginTop='10px'>
                   Hoặc
                 </Text>
-              </div>
+                <HSeparator />
+              </Flex>
 
-              <Button
-                block
-                icon={<FcGoogle style={{ fontSize: '20px' }} />}
-                onClick={handleGoogleSignIn}
-                disabled={isLoadingGoogle || isLoading}
-                style={{ 
-                  backgroundColor: "#F0F8FF",
-                  height: '40px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '10px'
-                }}
+              <Flex
+                key='flex-3'
+                direction='column'
+                borderradius='15px'
               >
-                {isLoadingGoogle ? <Spin /> : 'Đăng Nhập với Google'}
-              </Button>
+                <Button
+                  block
+                  icon={<Icon as={FcGoogle} w='20px' h='20px' me='10px' />}
+                  onClick={handleGoogleSignIn}
+                  disabled={isLoadingGoogle || isLoading}
+                  style={{ 
+                    backgroundColor: "#F0F8FF",
+                    height: '40px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '10px'
+                  }}
+                >
+                  {isLoadingGoogle ? <Spin /> : 'Đăng Nhập với Google'}
+                </Button>
+              </Flex>
             </Col>
           </Row>
         </Content>

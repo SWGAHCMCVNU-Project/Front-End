@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import "antd/dist/reset.css";
 
 import { useState } from 'react'
@@ -6,6 +7,7 @@ import { Toaster } from "react-hot-toast";
 import "./assets/styles/App.scss";
 import "./assets/styles/responsive.scss";
 import SignIn from './pages/SignIn.jsx'
+import SignUp from './pages/SignUp.jsx'
 import Main from './components/layout/Main.jsx'
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -19,6 +21,9 @@ function App() {
      <Route
       path="/sign-in"
       exact element={<SignIn />}/>
+      <Route
+      path="/sign-up"
+      exact element={<SignUp />}/>
      <Route path="*" exact element={<Main/>} />
       
      </Routes>
