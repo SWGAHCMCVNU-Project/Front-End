@@ -27,10 +27,7 @@ import { MenuItem } from "./MenuItem";
 
 function Sidenav({ color }) {
   const { pathname } = useLocation();
-  const roleLogin = pathname.includes('admin') ? 'Admin' 
-                 : pathname.includes('brand') ? 'Brand'
-                 : pathname.includes('staff') ? 'Staff'
-                 : null;
+  const roleLogin = "Admin"; // Tạm thời để test
 
   const dashboard = [
     <svg
@@ -117,18 +114,17 @@ function Sidenav({ color }) {
     </svg>,
   ];
 
-  const menuItems = [
+  const commonMenuItems = [
     {
       type: "group",
       menuSideNav: [
         {
           key: "1",
-          linkURL: "/dashboard",
+          linkURL: roleLogin === "Admin" ? "/dashboard-admin" : "/dashboard-staff",
           pageName: "dashboard",
           color: color,
           iconPage: dashboard,
           labelPageName: "Thống kê",
-          allowedRoles: ["Admin", "Brand", "Staff"],
         },
         {
           key: "2",
@@ -137,8 +133,18 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <FontAwesomeIcon icon={faCalendarDays} />,
           labelPageName: "Chiến dịch",
-          allowedRoles: ["Admin", "Brand"],
         },
+      ],
+    },
+    {
+      type: "divider",
+    },
+  ];
+
+  const adminMenuItems = [
+    {
+      type: "group",
+      menuSideNav: [
         {
           key: "3",
           linkURL: "/activities",
@@ -146,7 +152,6 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <FontAwesomeIcon icon={faPersonWalking} />,
           labelPageName: "Hoạt động",
-          allowedRoles: ["Admin"],
         },
         {
           key: "4",
@@ -155,7 +160,6 @@ function Sidenav({ color }) {
           color: color,
           iconPage: billing,
           labelPageName: "Đơn hàng",
-          allowedRoles: ["Admin", "Staff"],
         },
         {
           key: "5",
@@ -164,7 +168,6 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <FontAwesomeIcon icon={faBell} />,
           labelPageName: "Yêu cầu",
-          allowedRoles: ["Admin"],
         },
       ],
     },
@@ -181,7 +184,6 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <FontAwesomeIcon icon={faUserGraduate} />,
           labelPageName: "Sinh viên",
-          allowedRoles: ["Admin"],
         },
         {
           key: "7",
@@ -190,7 +192,6 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <FontAwesomeIcon icon={faTrademark} />,
           labelPageName: "Thương hiệu",
-          allowedRoles: ["Admin"],
         },
         {
           key: "8",
@@ -199,7 +200,6 @@ function Sidenav({ color }) {
           color: color,
           iconPage: tables,
           labelPageName: "Sản phẩm",
-          allowedRoles: ["Admin"],
         },
         {
           key: "9",
@@ -208,7 +208,6 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <FontAwesomeIcon icon={faLocationDot} />,
           labelPageName: "Trạm nhận hàng",
-          allowedRoles: ["Admin", "Staff"],
         },
         {
           key: "10",
@@ -217,7 +216,6 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <FontAwesomeIcon icon={faUserTie} />,
           labelPageName: "Nhân viên",
-          allowedRoles: ["Admin"],
         },
       ],
     },
@@ -234,7 +232,6 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <FontAwesomeIcon icon={faBars} />,
           labelPageName: "Thể loại",
-          allowedRoles: ["Admin"],
         },
         {
           key: "12",
@@ -243,7 +240,6 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <FontAwesomeIcon icon={faBuildingColumns} />,
           labelPageName: "Đại học",
-          allowedRoles: ["Admin"],
         },
         {
           key: "13",
@@ -252,7 +248,6 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <FontAwesomeIcon icon={faGraduationCap} />,
           labelPageName: "Chuyên ngành",
-          allowedRoles: ["Admin"],
         },
         {
           key: "14",
@@ -261,10 +256,12 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <FontAwesomeIcon icon={faLocationCrosshairs} />,
           labelPageName: "Khu vực",
-          allowedRoles: ["Admin"],
         },
       ],
     },
+  ];
+
+  const brandMenuItems = [
     {
       type: "group",
       menuSideNav: [
@@ -275,7 +272,6 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <FontAwesomeIcon icon={faStore} />,
           labelPageName: "Cửa hàng",
-          allowedRoles: ["Brand"],
         },
         {
           key: "16",
@@ -284,7 +280,6 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <FontAwesomeIcon icon={faTicket} />,
           labelPageName: "Phiếu mẫu",
-          allowedRoles: ["Brand"],
         },
         {
           key: "17",
@@ -293,7 +288,6 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <HiMiniTicket />,
           labelPageName: "Phiếu ưu đãi",
-          allowedRoles: ["Brand"],
         },
         {
           key: "18",
@@ -302,30 +296,14 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <FontAwesomeIcon icon={faClockRotateLeft} />,
           labelPageName: "Lịch sử giao dịch",
-          allowedRoles: ["Brand"],
         },
       ],
     },
-    {
-      type: "divider",
-    },
-    {
-      type: "group",
-      menuSideNav: [
-        {
-          key: "19",
-          linkURL: "/profile",
-          pageName: "profile",
-          color: color,
-          iconPage: <ProfileOutlined />,
-          labelPageName: "Hồ Sơ",
-          allowedRoles: ["Admin", "Brand", "Staff"],
-        },
-      ],
-    },
-    {
-      type: "screen-logout",
-    },
+  ];
+
+  const currentMenuItems = [
+    ...commonMenuItems,
+    ...(roleLogin === "Admin" ? adminMenuItems : brandMenuItems),
   ];
 
   return (
@@ -341,47 +319,98 @@ function Sidenav({ color }) {
           src={logo}
           alt=""
         />
-        <span style={{ fontSize: "20px" }}>S_WALLET</span>
+        <span style={{ fontSize: "20px" }}>UNIBEAN</span>
       </div>
       <Divider />
       <Menu
         theme="light"
         mode="inline"
         key="menu-sidenav"
-        items={menuItems.flatMap((item, index) => {
+        className="custom-menu"
+        items={currentMenuItems.flatMap((item, index) => {
           if (item.type === "group") {
-            return item.menuSideNav
-              .filter((menuItem) => menuItem.allowedRoles.includes(roleLogin))
-              .map((menuItem) => ({
-                key: menuItem.key,
-                label: (
-                  <MenuItem
-                    linkURL={menuItem.linkURL}
-                    pageName={menuItem.pageName}
-                    color={menuItem.color}
-                    iconPage={menuItem.iconPage}
-                    labelPageName={menuItem.labelPageName}
-                  />
-                ),
-              }));
-          } else if (item.type === "divider" && roleLogin === "Admin") {
+            return item.menuSideNav.map((menuItem) => ({
+              key: menuItem.key,
+              label: (
+                <MenuItem
+                  linkURL={menuItem.linkURL}
+                  pageName={menuItem.pageName}
+                  color={color}
+                  iconPage={menuItem.iconPage}
+                  labelPageName={menuItem.labelPageName}
+                />
+              ),
+            }));
+          } else if (item.type === "divider") {
             return {
               key: `divider-${index}`,
               label: <Divider />,
             };
-          } else if (item.type === "screen-logout") {
-            return {
-              key: "screen-logout",
-              label: (
-                <NavLink to="/sign-in">
-                  <span className="icon">{signin}</span>
-                  <span className="label">Đăng xuất</span>
-                </NavLink>
-              ),
-            };
           }
+          return null;
         })}
       />
+
+      <style>
+        {`
+          /* Brand styles */
+          .brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+          }
+          
+          .brand img {
+            width: 35%;
+            height: 40%;
+            border-radius: 10px;
+            margin-right: 10px;
+          }
+          
+          .brand span {
+            font-size: 20px;
+            color: ${color};
+          }
+
+          /* Menu styles */
+          .menu-item-link {
+            text-decoration: none;
+          }
+
+          .menu-item-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          }
+
+          .icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 24px;
+          }
+
+          .label {
+            font-size: 14px;
+          }
+
+          /* Hover & Active states */
+          .custom-menu .ant-menu-item:hover {
+            color: ${color} !important;
+          }
+          .custom-menu .ant-menu-item-selected {
+            background-color: ${color} !important;
+            color: white !important;
+          }
+          .custom-menu .ant-menu-item-active {
+            color: ${color} !important;
+          }
+          .custom-menu .ant-menu-item::after {
+            border-right: 3px solid ${color} !important;
+          }
+        `}
+      </style>
     </>
   );
 }

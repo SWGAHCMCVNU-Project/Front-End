@@ -12,7 +12,7 @@ import DashBoard from "./pages/DashBoard";
 import DashboardAdmin from "./pages/Dashboard/DashboardAdmin.jsx";
 import DashboardStaff from "./pages/Dashboard/DashboardStaff.jsx";
 import DashboardBrand from "./pages/Dashboard/DashboardBrand.jsx";
-// import CampaignPage from "./pages/CampaignManagement/CampaignPage.jsx";
+import CampaignPage from "./pages/CampaignManagement/CampaignPage.jsx";
 // import CampaignDetailsPage from "./pages/CampaignManagement/CampaignDetailsPage.jsx";
 import Main from "./components/layout/Main.jsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -24,18 +24,20 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/sign-in" exact element={<SignIn />} />
+        <Route path="/sign-in" exact element={<SignIn />} />
           <Route path="/sign-up" exact element={<SignUp />} />
           <Route path="/dashboard" exact element={<DashBoard />} />
+        <Route path="/" element={<Main />}>
+          
           <Route path="/dashboard-admin" exact element={<DashboardAdmin />} />
           <Route path="/dashboard-staff" exact element={<DashboardStaff />} />
           <Route path="/dashboard-brand" exact element={<DashboardBrand />} />
-          {/* <Route path="/campaigns" element={<CampaignPage />} /> */}
+          <Route path="/campaigns" element={<CampaignPage />} />
           {/* <Route
             path="campaigns/:campaignId"
             element={ <CampaignDetailsPage/>}
           /> */}
-          <Route path="*" exact element={<Main />} />
+         </Route>
         </Routes>
       </BrowserRouter>
     </>
