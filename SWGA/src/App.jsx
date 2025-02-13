@@ -16,6 +16,8 @@ import CampaignPage from "./pages/CampaignManagement/CampaignPage.jsx";
 // import CampaignDetailsPage from "./pages/CampaignManagement/CampaignDetailsPage.jsx";
 import Brands from "./pages/BrandManagement/Brands.jsx";
 import Students from "./pages/StudentManagement/Students.jsx";
+import UniversityPage from "./pages/UniversityManagement/UniversityPage.jsx";
+import MajorPage from "./pages/MajorManagement/MajorPage.jsx";
 
 import Main from "./components/layout/Main.jsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -42,6 +44,8 @@ function App() {
           /> */}
            <Route path="/brands" exact element={<Brands />} />
            <Route path="/students" exact element={<Students />} />
+           <Route path="/universities" exact element={<UniversityPage />} />
+           <Route path="/majors" exact element={<MajorPage />} />
 
          </Route>
         </Routes>

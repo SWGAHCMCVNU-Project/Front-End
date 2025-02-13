@@ -154,10 +154,10 @@ function StudentRow({ student, displayedIndex }) {
   };
 
   const statusToTagName = {
-    Pending: "green",
-    Active: "cyan",
-    Inactive: "error",
-    Rejected: "orange",
+    "Chờ duyệt": "green",
+    "Hoạt động": "cyan", 
+    "Không hoạt động": "error",
+    "Từ chối": "orange"
   };
 
   const [isValidImage, setIsValidImage] = useState(true);
