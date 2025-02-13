@@ -1,0 +1,52 @@
+.campaign-row-tab {
+    margin-top: 15px;
+}
+
+.campaign-row-tabs {
+    margin-bottom: 10%;
+}
+
+.ant-tabs {
+    width: 100%;
+}
+
+.btn-nav-camp-details {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.campaign-image-layout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.campaign-flex-layout {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2rem;
+}
+
+.campaign-information-layout {
+    padding-right: 1.5rem;
+}
+
+.tab-options {
+    display: flex;
+    flex-direction: row;
+    border-radius: 20px;
+}
+
+.tab-option {
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.tab-option.active {
+    background-color: #2ecc71;
+    color: #ffffff;
+}
