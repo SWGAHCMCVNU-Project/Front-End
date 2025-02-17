@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import { HiPencil, HiTrash } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +11,8 @@ import Tag from "../../ui/Tag";
 import MyModal from "../../ui/custom/Modal/MyModal";
 import { formatPhoneNumber, handleValidImageURL } from "../../utils/helpers";
 import { useDeleteStudent } from "./useDeleteStudent";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
 
 const StudentContainer = styled.div`
   display: flex;
@@ -128,29 +131,20 @@ const StyledNavigateButton = styled.div`
   }
 `;
 
-function StudentRow({ student, displayedIndex }) {
-  const { isDeleting, deleteStudent } = useDeleteStudent();
-  const {
-    id: studentId,
-    avatar,
-    phone,
-    fullName,
-    email,
-    state,
-    stateName,
-    universityName,
-    campusName,
-    majorName,
-    code,
-  } = student;
+const StyledRow = styled.div`
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--color-grey-600);
+  font-family: "Sono";
+`;
 
-  const NavigateButton = ({ children }) => {
-    const navigate = useNavigate();
-    return (
-      <StyledNavigateButton onClick={() => navigate(`/students/${studentId}`)}>
-        {children}
-      </StyledNavigateButton>
-    );
+function StudentRow({ student, index }) {
+  const { isDeleting, deleteStudent } = useDeleteStudent();
+  const navigate = useNavigate();
+
+  const handleNameClick = (e) => {
+    e.stopPropagation();
+    navigate(`/students/${student.id}`);
   };
 
   const statusToTagName = {
@@ -163,64 +157,40 @@ function StudentRow({ student, displayedIndex }) {
   const [isValidImage, setIsValidImage] = useState(true);
 
   useEffect(() => {
-    handleValidImageURL(avatar)
+    handleValidImageURL(student.avatar)
       .then((isValid) => setIsValidImage(isValid))
       .catch(() => setIsValidImage(false));
-  }, [avatar]);
+  }, [student.avatar]);
 
   return (
-    <Table.Row>
-      <NavigateButton>
-        <StudentIndex>{displayedIndex}</StudentIndex>
-      </NavigateButton>
-
-      <NavigateButton>
-        <StudentContainer>
-          {isValidImage ? (
-            <Img src={avatar || ""} />
-          ) : (
-            <Img src={logoDefault} />
-          )}
-          <StackedFrame>
-            <StudentName>{fullName}</StudentName>
-            <StyledCode>{code}</StyledCode>
-          </StackedFrame>
-        </StudentContainer>
-      </NavigateButton>
-
-      <NavigateButton>
-        <Stacked>
-          <span>{email}</span>
-          <span>{formatPhoneNumber(phone)}</span>
-        </Stacked>
-      </NavigateButton>
-
-      <NavigateButton>
-        <Stacked>
-          <span>{universityName}</span>
-          <span>{campusName}</span>
-        </Stacked>
-      </NavigateButton>
-
-      <NavigateButton>
-        <StyledCenter>{majorName}</StyledCenter>
-      </NavigateButton>
-
-      <NavigateButton>
-        <Tag type={statusToTagName[state]}>{stateName}</Tag>
-      </NavigateButton>
-
+    <Table.Row onClick={() => navigate(`/students/${student.id}`)}>
+      <StyledRow>{index}</StyledRow>
+      <StudentContainer>
+        {isValidImage ? (
+          <Img src={student.avatar || ""} />
+        ) : (
+          <Img src={logoDefault} />
+        )}
+        <StackedFrame>
+          <StudentName onClick={handleNameClick} style={{cursor: 'pointer'}}>
+            {student.fullName}
+          </StudentName>
+          <StyledCode>{student.code}</StyledCode>
+        </StackedFrame>
+      </StudentContainer>
+      <Stacked>
+        <span>{formatPhoneNumber(student.phone)}</span>
+      </Stacked>
+      <Tag type={statusToTagName[student.state ? "Hoạt động" : "Không hoạt động"]}>
+        {student.state ? "Hoạt động" : "Không hoạt động"}
+      </Tag>
+      <div>
+        {format(new Date(student.dateCreated), "dd/MM/yyyy", {
+          locale: vi,
+        })}
+      </div>
       <StyledAction>
         <MyModal>
-          {/* <MyModal.Open opens="edit">
-            <StyledButton>
-              <HiPencil />
-            </StyledButton>
-          </MyModal.Open>
-          <MyModal.Window name="edit">
-            <CreateStudentForm studentToEdit={student} />
-          </MyModal.Window> */}
-
           <MyModal.Open opens="disable">
             <StyledButton>
               <HiTrash />
@@ -230,7 +200,7 @@ function StudentRow({ student, displayedIndex }) {
             <ConfirmDelete
               resourceName="sinh viên"
               disabled={isDeleting}
-              onConfirm={() => deleteStudent(studentId)}
+              onConfirm={() => deleteStudent(student.id)}
               confirmMessage="Bạn có chắc muốn vô hiệu hóa sinh viên này?"
             />
           </MyModal.Window>

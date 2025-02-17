@@ -1,32 +1,32 @@
 /* eslint-disable no-unused-vars */
-import React from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Spinner from "../ui/Spinner";
 
 const DashBoard = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  
-  // Nếu đang ở trang dashboard gốc, cho phép chọn role
-  if (location.pathname === '/dashboard') {
-    return (
-      <div style={{ padding: '20px', textAlign: 'center' }}>
-        <h2>Chọn loại Dashboard</h2>
-        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-          <button onClick={() => navigate('/dashboard-admin')}>
-            Admin Dashboard
-          </button>
-          <button onClick={() => navigate('/dashboard-staff')}>
-            Staff Dashboard
-          </button>
-          <button onClick={() => navigate('/dashboard-brand')}>
-            Brand Dashboard
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const user = JSON.parse(localStorage.getItem('user'));
+  const roleLogin = user?.role || "";
 
-  return ;
+  useEffect(() => {
+    // Điều hướng dựa vào role
+    switch(roleLogin) {
+      case "admin":
+        navigate("/dashboard-admin");
+        break;
+      case "staff":
+        navigate("/dashboard-staff");
+        break;
+      case "brand":
+        navigate("/dashboard-brand");
+        break;
+      default:
+        navigate("/sign-in");
+    }
+  }, [roleLogin, navigate]);
+
+  // Hiển thị spinner trong khi điều hướng
+  return <Spinner />;
 };
 
 export default DashBoard;

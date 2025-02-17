@@ -7,6 +7,7 @@ import { FcGoogle } from "react-icons/fc";
 import { NavLink, useNavigate } from "react-router-dom";
 import signinbg from "../assets/images/ảnh ví.png";
 import { HSeparator } from "../components/layout/separator/Separator";
+import { mockUsers } from "../features/auth/mockUsers";
 import ButtonText from "../ui/ButtonText";
 import { LoginButton } from "../ui/custom/Button/Button";
 import { CustomFormItemLogin } from "../ui/custom/Form/InputItem/CustomFormItem";
@@ -28,11 +29,38 @@ function SignIn() {
     try {
       await form.validateFields();
       setIsLoading(true);
-      setTimeout(() => {
-        toast.success("Đăng nhập thành công");
-        navigate("/dashboard");
+
+      // Kiểm tra credentials
+      const user = mockUsers.find(
+        u => u.userName === data.userName && u.password === data.password
+      );
+
+      if (user) {
+        // Lưu user vào localStorage
+        localStorage.setItem('user', JSON.stringify(user));
+        
+        setTimeout(() => {
+          toast.success("Đăng nhập thành công");
+          // Điều hướng dựa vào role
+          switch (user.role) {
+            case "admin":
+              navigate("/dashboard-admin");
+              break;
+            case "staff":
+              navigate("/dashboard-staff");
+              break;
+            case "brand":
+              navigate("/dashboard-brand");
+              break;
+            default:
+              navigate("/dashboard");
+          }
+          setIsLoading(false);
+        }, 1500);
+      } else {
+        toast.error("Tài khoản hoặc mật khẩu không đúng!");
         setIsLoading(false);
-      }, 1500);
+      }
     } catch (error) {
       console.log(error);
       setIsLoading(false);
@@ -62,84 +90,77 @@ function SignIn() {
                   Đăng nhập
                 </Heading>
               </div>
-              <div>
-                <Button type="link" onClick={() => navigate("/dashboard")}>
-                  Đi đến Dashboard
-                </Button>
-              </div>
-              <div>
-                <Form
-                  form={form}
-                  onSubmit={handleLogin}
-                  layout="vertical"
-                  className="row-col"
+              <Form
+                form={form}
+                onSubmit={handleLogin}
+                layout="vertical"
+                className="row-col"
+              >
+                <CustomFormItemLogin
+                  name="userName"
+                  label="Tài khoản"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng nhập tên tài khoản !",
+                    },
+                  ]}
+                  type="text"
+                  placeholder="Hãy điền tên tài khoản..."
+                  onChange={(e) =>
+                    setData({
+                      ...data,
+                      userName: e.target.value.replace(/\s/g, ""),
+                    })
+                  }
+                  disabled={isLoading || isLoadingGoogle}
+                />
+                <CustomFormItemLogin
+                  name="password"
+                  label="Mật khẩu"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng nhập mật khẩu !",
+                    },
+                  ]}
+                  type="password"
+                  placeholder="Hãy điền mật khẩu..."
+                  onChange={(e) =>
+                    setData({ ...data, password: e.target.value })
+                  }
+                  disabled={isLoading || isLoadingGoogle}
+                  pass={true}
+                />
+
+                <Flex
+                  flexDirection="column"
+                  justifyContent="center"
+                  alignItems="end"
+                  maxW="100%"
                 >
-                  <CustomFormItemLogin
-                    name="userName"
-                    label="Tài khoản"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Vui lòng nhập tên tài khoản !",
-                      },
-                    ]}
-                    type="text"
-                    placeholder="Hãy điền tên tài khoản..."
-                    onChange={(e) =>
-                      setData({
-                        ...data,
-                        userName: e.target.value.replace(/\s/g, ""),
-                      })
-                    }
-                    disabled={isLoading || isLoadingGoogle}
-                  />
-                  <CustomFormItemLogin
-                    name="password"
-                    label="Mật khẩu"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Vui lòng nhập mật khẩu !",
-                      },
-                    ]}
-                    type="password"
-                    placeholder="Hãy điền mật khẩu..."
-                    onChange={(e) =>
-                      setData({ ...data, password: e.target.value })
-                    }
-                    disabled={isLoading || isLoadingGoogle}
-                    pass={true}
-                  />
+                  <Text style={{ fontWeight: 600 }} fontSize="13px">
+                    Bạn chưa có tài khoản?
+                    <NavLink to="/sign-up">
+                      <Text
+                        color="#506690"
+                        as="span"
+                        ms="5px"
+                        fontWeight="600"
+                      >
+                        Tạo tài khoản mới
+                      </Text>
+                    </NavLink>
+                  </Text>
+                </Flex>
 
-                  <Flex
-                    flexDirection="column"
-                    justifyContent="center"
-                    alignItems="end"
-                    maxW="100%"
-                  >
-                    <Text style={{ fontWeight: 600 }} fontSize="13px">
-                      Bạn chưa có tài khoản?
-                      <NavLink to="/sign-up">
-                        <Text
-                          color="#506690"
-                          as="span"
-                          ms="5px"
-                          fontWeight="600"
-                        >
-                          Tạo tài khoản mới
-                        </Text>
-                      </NavLink>
-                    </Text>
-                  </Flex>
-
-                  <LoginButton
-                    isLoading={isLoading}
-                    onClick={handleLogin}
-                    label="Đăng nhập"
-                    disabled={isLoading || isLoadingGoogle}
-                  />
-                </Form>
-              </div>
+                <LoginButton
+                  isLoading={isLoading}
+                  onClick={handleLogin}
+                  label="Đăng nhập"
+                  disabled={isLoading || isLoadingGoogle}
+                />
+              </Form>
 
               <Flex key="flex-2" align="center" mb="25px">
                 <HSeparator />
@@ -172,7 +193,7 @@ function SignIn() {
         </Content>
       </Card>
       <Footer>
-        <Text className="copyright">Capstone Website Unibean</Text>
+        <Text className="copyright">S_WALLET</Text>
       </Footer>
     </Layout>
   );

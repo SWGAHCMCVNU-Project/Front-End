@@ -16,18 +16,30 @@ import {
   faTrademark,
   faUserGraduate,
   faUserTie,
+  faBullhorn,
+  faBox,
+  faListUl,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Divider, Menu } from "antd";
-import React from "react";
+import React, { useEffect } from "react";
 import { HiMiniTicket } from "react-icons/hi2";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/images/logo_justB.png";
 import { MenuItem } from "./MenuItem";
 
 function Sidenav({ color }) {
   const { pathname } = useLocation();
-  const roleLogin = "Admin"; // Tạm thời để test
+  const user = JSON.parse(localStorage.getItem('user'));
+  const roleLogin = user?.role || "";
+  const navigate = useNavigate();
+
+  // Nếu không có user hoặc role, redirect về trang login
+  useEffect(() => {
+    if (!user || !roleLogin) {
+      navigate('/sign-in');
+    }
+  }, [user, roleLogin]);
 
   const dashboard = [
     <svg
@@ -114,26 +126,21 @@ function Sidenav({ color }) {
     </svg>,
   ];
 
+  // Menu items chung cho tất cả roles
   const commonMenuItems = [
     {
       type: "group",
       menuSideNav: [
         {
           key: "1",
-          linkURL: roleLogin === "Admin" ? "/dashboard-admin" : "/dashboard-staff",
+          linkURL: `/${roleLogin === "admin" ? "dashboard-admin" : 
+                     roleLogin === "staff" ? "dashboard-staff" : 
+                     "dashboard-brand"}`,
           pageName: "dashboard",
           color: color,
           iconPage: dashboard,
           labelPageName: "Thống kê",
         },
-        // {
-        //   key: "2",
-        //   linkURL: "/campaigns",
-        //   pageName: "campaigns",
-        //   color: color,
-        //   iconPage: <FontAwesomeIcon icon={faCalendarDays} />,
-        //   labelPageName: "Chiến dịch",
-        // },
       ],
     },
     {
@@ -141,39 +148,8 @@ function Sidenav({ color }) {
     },
   ];
 
+  // Menu items cho admin
   const adminMenuItems = [
-    {
-      type: "group",
-      menuSideNav: [
-        // {
-        //   key: "3",
-        //   linkURL: "/activities",
-        //   pageName: "activities",
-        //   color: color,
-        //   iconPage: <FontAwesomeIcon icon={faPersonWalking} />,
-        //   labelPageName: "Hoạt động",
-        // },
-        // {
-        //   key: "4",
-        //   linkURL: "/orders",
-        //   pageName: "orders",
-        //   color: color,
-        //   iconPage: billing,
-        //   labelPageName: "Đơn hàng",
-        // },
-        // {
-        //   key: "5",
-        //   linkURL: "/requests",
-        //   pageName: "requests",
-        //   color: color,
-        //   iconPage: <FontAwesomeIcon icon={faBell} />,
-        //   labelPageName: "Yêu cầu",
-        // },
-      ],
-    },
-    {
-      type: "divider",
-    },
     {
       type: "group",
       menuSideNav: [
@@ -193,7 +169,31 @@ function Sidenav({ color }) {
           iconPage: <FontAwesomeIcon icon={faTrademark} />,
           labelPageName: "Thương hiệu",
         },
-      ],
+        {
+          key: "4",
+          linkURL: "/staffs",
+          pageName: "staffs",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faUserTie} />,
+          labelPageName: "Nhân viên",
+        },
+        {
+          key: "5",
+          linkURL: "/campaigns",
+          pageName: "campaigns",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faBullhorn} />,
+          labelPageName: "Chiến dịch",
+        },
+        {
+          key: "6",
+          linkURL: "/products",
+          pageName: "products",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faBox} />,
+          labelPageName: "Sản phẩm",
+        },
+      ]
     },
     {
       type: "divider",
@@ -202,7 +202,7 @@ function Sidenav({ color }) {
       type: "group",
       menuSideNav: [
         {
-          key: "4",
+          key: "7",
           linkURL: "/universities",
           pageName: "universities",
           color: color,
@@ -210,17 +210,50 @@ function Sidenav({ color }) {
           labelPageName: "Đại học",
         },
         {
-          key: "5",
+          key: "8",
           linkURL: "/majors",
           pageName: "majors",
           color: color,
           iconPage: <FontAwesomeIcon icon={faGraduationCap} />,
           labelPageName: "Chuyên ngành",
         },
-      ],
+        {
+          key: "9",
+          linkURL: "/areas",
+          pageName: "areas",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faLocationDot} />,
+          labelPageName: "Khu vực",
+        },
+        {
+          key: "10",
+          linkURL: "/categories",
+          pageName: "categories",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faListUl} />,
+          labelPageName: "Danh mục",
+        },
+      ]
     },
+    {
+      type: "divider",
+    },
+    {
+      type: "group",
+      menuSideNav: [
+        {
+          key: "11",
+          linkURL: "/transactions",
+          pageName: "transactions",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faClockRotateLeft} />,
+          labelPageName: "Lịch sử giao dịch",
+        },
+      ]
+    }
   ];
 
+  // Menu items cho brand
   const brandMenuItems = [
     {
       type: "group",
@@ -261,32 +294,57 @@ function Sidenav({ color }) {
     },
   ];
 
-  const currentMenuItems = [
-    ...commonMenuItems,
-    ...(roleLogin === "Admin" ? adminMenuItems : brandMenuItems),
+  // Menu items cho staff
+  const staffMenuItems = [
+    {
+      type: "group",
+      menuSideNav: [
+        {
+          key: "20",
+          linkURL: "/staff-students",
+          pageName: "staff-students",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faUserGraduate} />,
+          labelPageName: "Quản lý sinh viên",
+        },
+        {
+          key: "21",
+          linkURL: "/staff-transactions",
+          pageName: "staff-transactions",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faClockRotateLeft} />,
+          labelPageName: "Lịch sử giao dịch",
+        },
+      ],
+    },
   ];
+
+  // Lấy menu items dựa theo role
+  const getMenuItemsByRole = () => {
+    switch(roleLogin) {
+      case "admin":
+        return [...commonMenuItems, ...adminMenuItems];
+      case "brand":
+        return [...commonMenuItems, ...brandMenuItems];
+      case "staff":
+        return [...commonMenuItems, ...staffMenuItems];
+      default:
+        return commonMenuItems;
+    }
+  };
+
+  const currentMenuItems = getMenuItemsByRole();
 
   return (
     <>
-      <div className="brand" key="img-logo">
-        <img
-          style={{
-            width: "35%",
-            height: "40%",
-            borderRadius: 10,
-            marginRight: 10,
-          }}
-          src={logo}
-          alt=""
-        />
-        <span style={{ fontSize: "20px" }}>UNIBEAN</span>
+      <div className="brand">
+        <img src={logo} alt="" />
+        <span>S_WALLET</span>
       </div>
       <Divider />
       <Menu
         theme="light"
         mode="inline"
-        key="menu-sidenav"
-        className="custom-menu"
         items={currentMenuItems.flatMap((item, index) => {
           if (item.type === "group") {
             return item.menuSideNav.map((menuItem) => ({
