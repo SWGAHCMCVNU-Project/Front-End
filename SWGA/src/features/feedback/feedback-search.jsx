@@ -1,3 +1,4 @@
+// feedback-search.jsx
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useDebounced } from "../../../hooks/useDebounced";
@@ -5,14 +6,14 @@ import SearchBar from "../../../ui/SearchBar";
 import { NavigateCreateButton } from "../../../ui/custom/Button/Button";
 import styled from "styled-components";
 
-const ProductFilterHeader = styled.div`
+const FeedbackFilterHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
 `;
 
-function StoreSearch() {
+function FeedbackSearch() {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounced(searchTerm, 500);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -27,15 +28,15 @@ function StoreSearch() {
   }, [debouncedSearch, searchParams, setSearchParams]);
 
   return (
-    <ProductFilterHeader>
-      <div className="filtertabs-search-product">
-        <SearchBar onChange={setSearchTerm} placeholder="Tìm kiếm cửa hàng" />
+    <FeedbackFilterHeader>
+      <div className="filtertabs-search-feedback">
+        <SearchBar onChange={setSearchTerm} placeholder="Tìm kiếm phản hồi" />
       </div>
       <div>
-        <NavigateCreateButton navigateCreateURL="/stores/create" label="cửa hàng" />
+        <NavigateCreateButton navigateCreateURL="/feedback/create" label="phản hồi" />
       </div>
-    </ProductFilterHeader>
+    </FeedbackFilterHeader>
   );
 }
 
-export default StoreSearch;
+export default FeedbackSearch;

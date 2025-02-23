@@ -1,10 +1,11 @@
+// feedback-filter.jsx
 import { useEffect } from "react";
 import { StateOptions } from "../../../ui/custom/Filter/Radio/RadioOptions";
 import { SelectFilter } from "../../../ui/custom/Select/SelectFilter/SelectFilter";
-import { useAreaFilter } from "../../universities/UniversityDetailsPage/useAreaFilter";
-import StoreList from "./store-list";
-import { useStore } from "./useStore";
+import { useFeedbackCategory } from "./useFeedbackCategory";
+import { useFeedback } from "./useFeedback";
 import styled from "styled-components";
+import FeedbackList from "./feedback-list";
 
 const FilterTab = styled.div`
   display: flex;
@@ -19,8 +20,10 @@ const CustomSelectContainer = styled.div`
   gap: 0.5rem;
 `;
 
+// Ví dụ icon tương tự store
 const filters = [
   <svg
+    key={1}
     width="1.5em"
     height="1.5em"
     aria-hidden="true"
@@ -31,7 +34,6 @@ const filters = [
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 512 512"
     className="icon-add-date"
-    key={1}
   >
     <path
       fill="gray"
@@ -40,25 +42,25 @@ const filters = [
   </svg>
 ];
 
-function StoreFilter() {
-  const { areas } = useAreaFilter();
-  const { areasFilter, setAreasFilter, setAreasFilterValue, state, setState } = useStore();
+function FeedbackFilter() {
+  const { categories } = useFeedbackCategory();
+  const { categoryFilter, setCategoryFilter, setCategoryFilterValue, status, setStatus } = useFeedback();
 
   useEffect(() => {
-    if (areas) {
-      setAreasFilter(areas);
+    if (categories) {
+      setCategoryFilter(categories);
     }
-  }, [areas]);
+  }, [categories, setCategoryFilter]);
 
-  const handleChangeState = (selectedOptionState) => {
-    setState(selectedOptionState);
+  const handleChangeStatus = (selectedOptionStatus) => {
+    setStatus(selectedOptionStatus);
   };
 
   return (
     <>
       <FilterTab>
         <div>
-          <StateOptions state={state} onChange={handleChangeState} />
+          <StateOptions state={status} onChange={handleChangeStatus} />
         </div>
         <CustomSelectContainer>
           {filters}
@@ -66,20 +68,20 @@ function StoreFilter() {
             <SelectFilter
               width={500}
               label="Phân loại"
-              placeholder="Khu vực..."
-              optionFilter={areasFilter}
-              optionLabelFilter="areaName"
-              onChange={setAreasFilterValue}
-              onClear={setAreasFilterValue}
+              placeholder="Chọn loại phản hồi..."
+              optionFilter={categoryFilter}
+              optionLabelFilter="categoryName"
+              onChange={setCategoryFilterValue}
+              onClear={setCategoryFilterValue}
             />
           </div>
         </CustomSelectContainer>
       </FilterTab>
       <div>
-        <StoreList />
+        <FeedbackList />
       </div>
     </>
   );
 }
 
-export default StoreFilter;
+export default FeedbackFilter;

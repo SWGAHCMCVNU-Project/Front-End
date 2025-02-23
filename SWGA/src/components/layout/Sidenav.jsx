@@ -1,3 +1,4 @@
+// Sidenav.jsx
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { ProfileOutlined } from "@ant-design/icons";
@@ -19,6 +20,8 @@ import {
   faBullhorn,
   faBox,
   faListUl,
+  faUserGroup,
+  faFileInvoice,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Divider, Menu } from "antd";
@@ -141,6 +144,15 @@ function Sidenav({ color }) {
           iconPage: dashboard,
           labelPageName: "Thống kê",
         },
+        {
+          key: "2",
+          linkURL: "/campaigns",
+          pageName: "campaigns",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faBullhorn} />,
+          labelPageName: "Chiến dịch",
+          show: roleLogin === "admin" || roleLogin === "brand"
+        },
       ],
     },
     {
@@ -176,22 +188,6 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <FontAwesomeIcon icon={faUserTie} />,
           labelPageName: "Nhân viên",
-        },
-        {
-          key: "5",
-          linkURL: "/campaigns",
-          pageName: "campaigns",
-          color: color,
-          iconPage: <FontAwesomeIcon icon={faBullhorn} />,
-          labelPageName: "Chiến dịch",
-        },
-        {
-          key: "6",
-          linkURL: "/products",
-          pageName: "products",
-          color: color,
-          iconPage: <FontAwesomeIcon icon={faBox} />,
-          labelPageName: "Sản phẩm",
         },
       ]
     },
@@ -234,26 +230,10 @@ function Sidenav({ color }) {
           labelPageName: "Danh mục",
         },
       ]
-    },
-    {
-      type: "divider",
-    },
-    {
-      type: "group",
-      menuSideNav: [
-        {
-          key: "11",
-          linkURL: "/transactions",
-          pageName: "transactions",
-          color: color,
-          iconPage: <FontAwesomeIcon icon={faClockRotateLeft} />,
-          labelPageName: "Lịch sử giao dịch",
-        },
-      ]
     }
   ];
 
-  // Menu items cho brand
+  // Menu items cho brand (chỉ dành cho role "Brand")
   const brandMenuItems = [
     {
       type: "group",
@@ -265,6 +245,16 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <FontAwesomeIcon icon={faStore} />,
           labelPageName: "Cửa hàng",
+          children: [
+            {
+              key: "15-1",
+              linkURL: "/products",
+              pageName: "products",
+              color: color,
+              iconPage: <FontAwesomeIcon icon={faBox} />,
+              labelPageName: "Cập nhật sản phẩm",
+            }
+          ]
         },
         {
           key: "16",
@@ -284,11 +274,28 @@ function Sidenav({ color }) {
         },
         {
           key: "18",
+          linkURL: "/customers",
+          pageName: "customers",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faUserGroup} />,
+          labelPageName: "Khách hàng",
+        },
+        {
+          key: "19",
           linkURL: "/transactions",
           pageName: "transactions",
           color: color,
           iconPage: <FontAwesomeIcon icon={faClockRotateLeft} />,
           labelPageName: "Lịch sử giao dịch",
+        },
+        // Thêm menu Feedback cho role Brand
+        {
+          key: "feedback",
+          linkURL: "/feedback",
+          pageName: "feedback",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faBell} />,
+          labelPageName: "Phản hồi",
         },
       ],
     },
@@ -347,18 +354,20 @@ function Sidenav({ color }) {
         mode="inline"
         items={currentMenuItems.flatMap((item, index) => {
           if (item.type === "group") {
-            return item.menuSideNav.map((menuItem) => ({
-              key: menuItem.key,
-              label: (
-                <MenuItem
-                  linkURL={menuItem.linkURL}
-                  pageName={menuItem.pageName}
-                  color={color}
-                  iconPage={menuItem.iconPage}
-                  labelPageName={menuItem.labelPageName}
-                />
-              ),
-            }));
+            return item.menuSideNav
+              .filter(menuItem => menuItem.show === undefined || menuItem.show)
+              .map((menuItem) => ({
+                key: menuItem.key,
+                label: (
+                  <MenuItem
+                    linkURL={menuItem.linkURL}
+                    pageName={menuItem.pageName}
+                    color={color}
+                    iconPage={menuItem.iconPage}
+                    labelPageName={menuItem.labelPageName}
+                  />
+                ),
+              }));
           } else if (item.type === "divider") {
             return {
               key: `divider-${index}`,
