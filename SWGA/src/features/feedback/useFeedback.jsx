@@ -1,8 +1,7 @@
-// useFeedback.js
-import { useContext, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import PaginationContext from "../../../context/PaginationContext";
-import { useTablePagination } from "../../../hooks/useTablePagination";
+import PaginationContext from "../../context/PaginationContext";
+import { useTablePagination } from "../../hooks/useTablePagination";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { mockFeedback } from "./mockFeedback";
 
@@ -18,7 +17,7 @@ export function FeedbackProvider({ children }) {
   const [status, setStatus] = useState(null);
   const [categoryFilter, setCategoryFilter] = useState([]);
   const [categoryFilterValue, setCategoryFilterValue] = useState(null);
-  const [isModalVisible, setIsModalVisible] = useState(true);
+  const [isModalVisible, setIsModalVisible] = useState(false); // Đổi default thành false để tránh render ban đầu
 
   // Tìm kiếm
   const search = searchParams.get("search") !== "" ? searchParams.get("search") : null;
@@ -43,7 +42,7 @@ export function FeedbackProvider({ children }) {
     }
   });
 
-  const value = {
+  const value = useMemo(() => ({
     isLoading,
     isDeleting,
     feedbacks,
@@ -62,7 +61,18 @@ export function FeedbackProvider({ children }) {
     setCategoryFilterValue,
     isModalVisible,
     setIsModalVisible
-  };
+  }), [
+    isLoading,
+    isDeleting,
+    feedbacks,
+    status,
+    page,
+    limit,
+    sort,
+    categoryFilter,
+    categoryFilterValue,
+    isModalVisible
+  ]);
 
   return <PaginationContext.Provider value={value}>{children}</PaginationContext.Provider>;
 }

@@ -1,9 +1,8 @@
-// feedback-search.jsx
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useDebounced } from "../../../hooks/useDebounced";
-import SearchBar from "../../../ui/SearchBar";
-import { NavigateCreateButton } from "../../../ui/custom/Button/Button";
+import { useDebounced } from "../../hooks/useDebounced";
+import SearchBar from "../../ui/SearchBar";
+import { NavigateCreateButton } from "../../ui/custom/Button/Button";
 import styled from "styled-components";
 
 const FeedbackFilterHeader = styled.div`
@@ -19,13 +18,13 @@ function FeedbackSearch() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
+    console.log('Running useEffect in FeedbackSearch, debouncedSearch:', debouncedSearch);
     if (debouncedSearch !== "") {
-      searchParams.set("search", debouncedSearch);
+      setSearchParams({ search: debouncedSearch });
     } else {
-      searchParams.delete("search");
+      setSearchParams({});
     }
-    setSearchParams(searchParams);
-  }, [debouncedSearch, searchParams, setSearchParams]);
+  }, [debouncedSearch, setSearchParams]); // Loại bỏ searchParams khỏi dependencies
 
   return (
     <FeedbackFilterHeader>

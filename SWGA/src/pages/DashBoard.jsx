@@ -1,32 +1,34 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom"; // Thêm Navigate để redirect nếu không có role
 import Spinner from "../ui/Spinner";
+import DashboardAdmin from "./Dashboard/DashboardAdmin"; // Import các component dashboard
+import DashboardStaff from "./Dashboard/DashboardStaff";
+import DashboardBrand from "./Dashboard/DashboardBrand";
+import DashboardCampus from "./Dashboard/DashBoardCampus"; // Giả sử bạn đã tạo component này
 
 const DashBoard = () => {
-  const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem('user'));
+  const user = JSON.parse(localStorage.getItem("user"));
   const roleLogin = user?.role || "";
 
-  useEffect(() => {
-    // Điều hướng dựa vào role
-    switch(roleLogin) {
-      case "admin":
-        navigate("/dashboard-admin");
-        break;
-      case "staff":
-        navigate("/dashboard-staff");
-        break;
-      case "brand":
-        navigate("/dashboard-brand");
-        break;
-      default:
-        navigate("/sign-in");
-    }
-  }, [roleLogin, navigate]);
+  // Nếu không có role, redirect về sign-in
+  if (!roleLogin) {
+    return <Navigate to="/sign-in" replace />;
+  }
 
-  // Hiển thị spinner trong khi điều hướng
-  return <Spinner />;
+  // Hiển thị dashboard tương ứng với role
+  switch (roleLogin) {
+    case "admin":
+      return <DashboardAdmin />;
+    case "staff":
+      return <DashboardStaff />;
+    case "brand":
+      return <DashboardBrand />;
+    case "campus":
+      return <DashboardCampus />; // Thêm dashboard cho campus
+    default:
+      return <Navigate to="/sign-in" replace />;
+  }
 };
 
 export default DashBoard;

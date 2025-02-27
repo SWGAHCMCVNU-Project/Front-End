@@ -16,5 +16,11 @@ export const mockUsers = [
     password: "123456",
     role: "brand",
     fullName: "Brand User"
-  }
+  },
+  {
+    userName: "campus",
+    password: "123456",
+    role: "campus",
+    fullName: "Campus User"
+  },
 ]; 

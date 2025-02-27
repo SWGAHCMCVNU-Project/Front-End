@@ -32,29 +32,17 @@ function SignIn() {
 
       // Kiểm tra credentials
       const user = mockUsers.find(
-        u => u.userName === data.userName && u.password === data.password
+        (u) => u.userName === data.userName && u.password === data.password
       );
 
       if (user) {
         // Lưu user vào localStorage
-        localStorage.setItem('user', JSON.stringify(user));
-        
+        localStorage.setItem("user", JSON.stringify(user));
+
         setTimeout(() => {
           toast.success("Đăng nhập thành công");
-          // Điều hướng dựa vào role
-          switch (user.role) {
-            case "admin":
-              navigate("/dashboard-admin");
-              break;
-            case "staff":
-              navigate("/dashboard-staff");
-              break;
-            case "brand":
-              navigate("/dashboard-brand");
-              break;
-            default:
-              navigate("/dashboard");
-          }
+          // Điều hướng đến dashboard chung
+          navigate("/dashboard"); // Chỉ dùng một URL duy nhất
           setIsLoading(false);
         }, 1500);
       } else {
@@ -72,7 +60,7 @@ function SignIn() {
     setTimeout(() => {
       setIsLoadingGoogle(false);
       toast.success("Đăng nhập Google thành công");
-      navigate("/dashboard");
+      navigate("/dashboard"); // Chỉ dùng một URL duy nhất
     }, 1500);
   };
 

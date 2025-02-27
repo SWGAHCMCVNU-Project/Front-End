@@ -33,14 +33,14 @@ import { MenuItem } from "./MenuItem";
 
 function Sidenav({ color }) {
   const { pathname } = useLocation();
-  const user = JSON.parse(localStorage.getItem('user'));
+  const user = JSON.parse(localStorage.getItem("user"));
   const roleLogin = user?.role || "";
   const navigate = useNavigate();
 
   // Nếu không có user hoặc role, redirect về trang login
   useEffect(() => {
     if (!user || !roleLogin) {
-      navigate('/sign-in');
+      navigate("/sign-in");
     }
   }, [user, roleLogin]);
 
@@ -130,35 +130,34 @@ function Sidenav({ color }) {
   ];
 
   // Menu items chung cho tất cả roles
-  const commonMenuItems = [
-    {
-      type: "group",
-      menuSideNav: [
-        {
-          key: "1",
-          linkURL: `/${roleLogin === "admin" ? "dashboard-admin" : 
-                     roleLogin === "staff" ? "dashboard-staff" : 
-                     "dashboard-brand"}`,
-          pageName: "dashboard",
-          color: color,
-          iconPage: dashboard,
-          labelPageName: "Thống kê",
-        },
-        {
-          key: "2",
-          linkURL: "/campaigns",
-          pageName: "campaigns",
-          color: color,
-          iconPage: <FontAwesomeIcon icon={faBullhorn} />,
-          labelPageName: "Chiến dịch",
-          show: roleLogin === "admin" || roleLogin === "brand"
-        },
-      ],
-    },
-    {
-      type: "divider",
-    },
-  ];
+ // Menu items chung cho tất cả roles
+ const commonMenuItems = [
+  {
+    type: "group",
+    menuSideNav: [
+      {
+        key: "1",
+        linkURL: "/dashboard", // Chỉ giữ một link duy nhất
+        pageName: "dashboard",
+        color: color,
+        iconPage: dashboard,
+        labelPageName: "Thống kê",
+      },
+      {
+        key: "2",
+        linkURL: "/campaigns",
+        pageName: "campaigns",
+        color: color,
+        iconPage: <FontAwesomeIcon icon={faBullhorn} />,
+        labelPageName: "Chiến dịch",
+        show: roleLogin === "admin" || roleLogin === "brand",
+      },
+    ],
+  },
+  {
+    type: "divider",
+  },
+];
 
   // Menu items cho admin
   const adminMenuItems = [
@@ -189,7 +188,7 @@ function Sidenav({ color }) {
           iconPage: <FontAwesomeIcon icon={faUserTie} />,
           labelPageName: "Nhân viên",
         },
-      ]
+      ],
     },
     {
       type: "divider",
@@ -229,8 +228,8 @@ function Sidenav({ color }) {
           iconPage: <FontAwesomeIcon icon={faListUl} />,
           labelPageName: "Danh mục",
         },
-      ]
-    }
+      ],
+    },
   ];
 
   // Menu items cho brand (chỉ dành cho role "Brand")
@@ -253,8 +252,8 @@ function Sidenav({ color }) {
               color: color,
               iconPage: <FontAwesomeIcon icon={faBox} />,
               labelPageName: "Cập nhật sản phẩm",
-            }
-          ]
+            },
+          ],
         },
         {
           key: "16",
@@ -288,9 +287,8 @@ function Sidenav({ color }) {
           iconPage: <FontAwesomeIcon icon={faClockRotateLeft} />,
           labelPageName: "Lịch sử giao dịch",
         },
-        // Thêm menu Feedback cho role Brand
         {
-          key: "feedback",
+          key: "20",
           linkURL: "/feedback",
           pageName: "feedback",
           color: color,
@@ -307,7 +305,7 @@ function Sidenav({ color }) {
       type: "group",
       menuSideNav: [
         {
-          key: "20",
+          key: "21",
           linkURL: "/staff-students",
           pageName: "staff-students",
           color: color,
@@ -315,7 +313,7 @@ function Sidenav({ color }) {
           labelPageName: "Quản lý sinh viên",
         },
         {
-          key: "21",
+          key: "22",
           linkURL: "/staff-transactions",
           pageName: "staff-transactions",
           color: color,
@@ -326,15 +324,64 @@ function Sidenav({ color }) {
     },
   ];
 
+  const campusMenuItems = [
+    {
+      type: "group",
+      menuSideNav: [
+        {
+          key: "23",
+          linkURL: "/point-packages",
+          pageName: "point-packages",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faFileInvoice} />,
+          labelPageName: "Gói điểm",
+        },
+        {
+          key: "24",
+          linkURL: "/point-allocation",
+          pageName: "point-allocation",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faUserGroup} />,
+          labelPageName: "Phân bổ điểm",
+        },
+        {
+          key: "25",
+          linkURL: "/campus-initiatives",
+          pageName: "campus-initiatives",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faCalendarDays} />,
+          labelPageName: "Sáng kiến campus",
+        },
+        {
+          key: "26",
+          linkURL: "/lecturers",
+          pageName: "lecturers",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faUserTie} />, // Biểu tượng cho giảng viên
+          labelPageName: "Quản lý giảng viên",
+        },
+        {
+          key: "27",
+          linkURL: "/swallet-integration",
+          pageName: "swallet-integration",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faBox} />, // Biểu tượng cho tích hợp
+          labelPageName: "Tích hợp SWallet",
+        },
+      ],
+    },
+  ];
   // Lấy menu items dựa theo role
   const getMenuItemsByRole = () => {
-    switch(roleLogin) {
+    switch (roleLogin) {
       case "admin":
         return [...commonMenuItems, ...adminMenuItems];
       case "brand":
         return [...commonMenuItems, ...brandMenuItems];
       case "staff":
         return [...commonMenuItems, ...staffMenuItems];
+      case "campus":
+        return [...commonMenuItems, ...campusMenuItems];
       default:
         return commonMenuItems;
     }
@@ -355,7 +402,9 @@ function Sidenav({ color }) {
         items={currentMenuItems.flatMap((item, index) => {
           if (item.type === "group") {
             return item.menuSideNav
-              .filter(menuItem => menuItem.show === undefined || menuItem.show)
+              .filter(
+                (menuItem) => menuItem.show === undefined || menuItem.show
+              )
               .map((menuItem) => ({
                 key: menuItem.key,
                 label: (

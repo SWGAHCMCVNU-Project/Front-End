@@ -1,4 +1,3 @@
-// feedback-list.jsx
 import { Spin, Tag, Typography } from "antd";
 import { HiTrash } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";

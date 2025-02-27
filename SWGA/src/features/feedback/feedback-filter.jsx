@@ -1,7 +1,6 @@
-// feedback-filter.jsx
 import { useEffect } from "react";
-import { StateOptions } from "../../../ui/custom/Filter/Radio/RadioOptions";
-import { SelectFilter } from "../../../ui/custom/Select/SelectFilter/SelectFilter";
+import { StateOptions } from "../../ui/custom/Filter/Radio/RadioOptions";
+import { SelectFilter } from "../../ui/custom/Select/SelectFilter/SelectFilter";
 import { useFeedbackCategory } from "./useFeedbackCategory";
 import { useFeedback } from "./useFeedback";
 import styled from "styled-components";
@@ -47,10 +46,11 @@ function FeedbackFilter() {
   const { categoryFilter, setCategoryFilter, setCategoryFilterValue, status, setStatus } = useFeedback();
 
   useEffect(() => {
-    if (categories) {
+    console.log('Running useEffect in FeedbackFilter, categories:', categories, 'categoryFilter:', categoryFilter);
+    if (categories && categories.length > 0 && !categoryFilter.length) { // Chỉ set nếu categoryFilter rỗng và categories có dữ liệu
       setCategoryFilter(categories);
     }
-  }, [categories, setCategoryFilter]);
+  }, [categories]); // Loại bỏ setCategoryFilter khỏi dependencies
 
   const handleChangeStatus = (selectedOptionStatus) => {
     setStatus(selectedOptionStatus);

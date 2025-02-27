@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import "antd/dist/reset.css";
-
 import { useState } from "react";
 import {
   BrowserRouter,
@@ -15,12 +14,8 @@ import "./assets/styles/App.scss";
 import "./assets/styles/responsive.scss";
 import SignIn from "./pages/SignIn.jsx";
 import SignUp from "./pages/SignUp.jsx";
-import DashBoard from "./pages/DashBoard";
-import DashboardAdmin from "./pages/Dashboard/DashboardAdmin.jsx";
-import DashboardStaff from "./pages/Dashboard/DashboardStaff.jsx";
-import DashboardBrand from "./pages/Dashboard/DashboardBrand.jsx";
+import DashBoard from "./pages/DashBoard"; // Chỉ cần import DashBoard
 import CampaignPage from "./pages/CampaignManagement/CampaignPage.jsx";
-// import CampaignDetailsPage from "./pages/CampaignManagement/CampaignDetailsPage.jsx";
 import Brands from "./pages/BrandManagement/Brands.jsx";
 import Brand from "./pages/BrandManagement/Brand.jsx";
 import Students from "./pages/StudentManagement/Students.jsx";
@@ -34,42 +29,30 @@ import BrandTransactionPage from "./pages/BrandManagement/BrandTransaction.jsx";
 import VoucherItems from "./pages/VoucherItemManagement/VoucherItems.jsx";
 import FeedbackPage from "./pages/FeedbackManagement/Feedback.jsx";
 
-import Main from "./components/layout/Main.jsx";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import TransactionDetailPage from "./pages/BrandManagement/TransactionDetailPage";
+import Lecturers from "./pages/LectureManagement/Lecturers.jsx";
+import PackagePoint from "./pages/PackagePointManagement/PackagePoint.jsx";
+// import LecturersPoint from "./pages/LectureManagement/Lecture.jsx"
 
+
+
+
+
+import Main from "./components/layout/Main.jsx";
 // Mock service thay thế storageService
 const mockAuthService = {
   getToken: () => true, // luôn trả về đã đăng nhập
-  getRole: () => localStorage.getItem("role"), // Lấy role từ localStorage, không có mặc định
+  getRole: () => localStorage.getItem("role"), // Lấy role từ localStorage
 };
 
-function PrivateRoute({ children, allowedRoles = [] }) {
+function PrivateRoute({ children }) {
   const location = useLocation();
   const isAuthenticated = mockAuthService.getToken();
   const userRole = mockAuthService.getRole();
 
-  // Khi chưa có role hoặc chưa đăng nhập
-  if (!userRole) {
+  // Nếu không có role hoặc chưa đăng nhập, redirect về sign-in
+  if (!isAuthenticated || !userRole) {
     return <Navigate to="/sign-in" replace />;
-  }
-
-  // Nếu không có roles được chỉ định, cho phép tất cả roles truy cập
-  if (allowedRoles.length > 0 && !allowedRoles.includes(userRole)) {
-    // Redirect về dashboard tương ứng với role
-    switch (userRole) {
-      case "Admin":
-        return <Navigate to="/dashboard-admin" replace />;
-      case "Brand":
-        return <Navigate to="/dashboard-brand" replace />;
-      case "Manager":
-        return <Navigate to="/dashboard-manager" replace />;
-      case "Campus":
-        return <Navigate to="/dashboard-campus" replace />;
-      default:
-        return <Navigate to="/sign-in" replace />;
-    }
   }
 
   return children;
@@ -105,10 +88,10 @@ function RoleSwitcher() {
         <option value="none" disabled>
           Select Role
         </option>
-        <option value="Admin">Admin</option>
-        <option value="Brand">Brand</option>
-        <option value="Manager">Manager</option>
-        <option value="Campus">Campus</option>
+        <option value="admin">Admin</option>
+        <option value="brand">Brand</option>
+        <option value="staff">Staff</option>
+        <option value="campus">Campus</option>
       </select>
     </div>
   );
@@ -124,41 +107,22 @@ function App() {
         <Routes>
           <Route path="/sign-in" exact element={<SignIn />} />
           <Route path="/sign-up" exact element={<SignUp />} />
-          <Route path="/dashboard" exact element={<DashBoard />} />
           <Route path="/" element={<Main />}>
+            {/* Chỉ giữ một route dashboard duy nhất */}
             <Route
-              path="/dashboard-admin"
+              path="/dashboard"
               exact
               element={
-                <PrivateRoute allowedRoles={["Admin"]}>
-                  <DashboardAdmin />
+                <PrivateRoute>
+                  <DashBoard />
                 </PrivateRoute>
               }
             />
-            <Route
-              path="/dashboard-brand"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["Brand"]}>
-                  <DashboardBrand />
-                </PrivateRoute>
-              }
-            />
-            {/* <Route path="/dashboard-manager" exact element={
-              <PrivateRoute allowedRoles={["Manager"]}>
-                <DashboardManager />
-              </PrivateRoute>
-            } />
-            <Route path="/dashboard-campus" exact element={
-              <PrivateRoute allowedRoles={["Campus"]}>
-                <DashboardCampus />
-              </PrivateRoute>
-            } /> */}
             <Route
               path="/brands"
               exact
               element={
-                <PrivateRoute allowedRoles={["Admin"]}>
+                <PrivateRoute>
                   <Brands />
                 </PrivateRoute>
               }
@@ -166,15 +130,16 @@ function App() {
             <Route
               path="brands/:brandId"
               element={
-                <PrivateRoute allowedRoles={["Admin"]}>
+                <PrivateRoute>
                   <Brand />
                 </PrivateRoute>
               }
             />
             <Route
               path="/campaigns"
+              exact
               element={
-                <PrivateRoute allowedRoles={["Admin", "Brand"]}>
+                <PrivateRoute>
                   <CampaignPage />
                 </PrivateRoute>
               }
@@ -183,7 +148,7 @@ function App() {
               path="/students"
               exact
               element={
-                <PrivateRoute allowedRoles={["Admin"]}>
+                <PrivateRoute>
                   <Students />
                 </PrivateRoute>
               }
@@ -191,7 +156,7 @@ function App() {
             <Route
               path="students/:studentId"
               element={
-                <PrivateRoute allowedRoles={["Admin"]}>
+                <PrivateRoute>
                   <Student />
                 </PrivateRoute>
               }
@@ -200,7 +165,7 @@ function App() {
               path="/universities"
               exact
               element={
-                <PrivateRoute allowedRoles={["Admin"]}>
+                <PrivateRoute>
                   <UniversityPage />
                 </PrivateRoute>
               }
@@ -209,7 +174,7 @@ function App() {
               path="/majors"
               exact
               element={
-                <PrivateRoute allowedRoles={["Admin"]}>
+                <PrivateRoute>
                   <MajorPage />
                 </PrivateRoute>
               }
@@ -218,7 +183,7 @@ function App() {
               path="/stores"
               exact
               element={
-                <PrivateRoute allowedRoles={["Brand"]}>
+                <PrivateRoute>
                   <StorePage />
                 </PrivateRoute>
               }
@@ -227,7 +192,7 @@ function App() {
               path="/vouchers"
               exact
               element={
-                <PrivateRoute allowedRoles={["Brand"]}>
+                <PrivateRoute>
                   <Vouchers />
                 </PrivateRoute>
               }
@@ -236,7 +201,7 @@ function App() {
               path="/customers"
               exact
               element={
-                <PrivateRoute allowedRoles={["Brand"]}>
+                <PrivateRoute>
                   <CustomerPage />
                 </PrivateRoute>
               }
@@ -245,7 +210,7 @@ function App() {
               path="/transactions"
               exact
               element={
-                <PrivateRoute allowedRoles={["Brand"]}>
+                <PrivateRoute>
                   <BrandTransactionPage />
                 </PrivateRoute>
               }
@@ -253,7 +218,7 @@ function App() {
             <Route
               path="/transactions/:id"
               element={
-                <PrivateRoute allowedRoles={["Brand"]}>
+                <PrivateRoute>
                   <TransactionDetailPage />
                 </PrivateRoute>
               }
@@ -262,7 +227,7 @@ function App() {
               path="/voucher-items"
               exact
               element={
-                <PrivateRoute allowedRoles={["Brand"]}>
+                <PrivateRoute>
                   <VoucherItems />
                 </PrivateRoute>
               }
@@ -271,11 +236,38 @@ function App() {
               path="/feedback"
               exact
               element={
-                <PrivateRoute allowedRoles={["Brand"]}>
+                <PrivateRoute>
                   <FeedbackPage />
                 </PrivateRoute>
               }
             />
+            <Route
+              path="/lecturers" // Đổi từ /students
+              exact
+              element={
+                <PrivateRoute>
+                  <Lecturers /> 
+                </PrivateRoute>
+              }
+            />
+             <Route
+              path="/point-packages" // Đổi từ /students
+              exact
+              element={
+                <PrivateRoute>
+                  <PackagePoint /> 
+                </PrivateRoute>
+              }
+            />
+             {/* <Route
+              path="/lecturers/:id" // Đổi từ /students
+              exact
+              element={
+                <PrivateRoute>
+                <LecturersPoint/>
+                </PrivateRoute>
+              }
+            /> */}
           </Route>
         </Routes>
       </BrowserRouter>
