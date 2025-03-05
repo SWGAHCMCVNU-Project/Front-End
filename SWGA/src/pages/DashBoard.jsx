@@ -6,14 +6,20 @@ import DashboardAdmin from "./Dashboard/DashboardAdmin"; // Import các componen
 import DashboardStaff from "./Dashboard/DashboardStaff";
 import DashboardBrand from "./Dashboard/DashboardBrand";
 import DashboardCampus from "./Dashboard/DashBoardCampus"; // Giả sử bạn đã tạo component này
+import storageService from "../services/storageService"; // Import storageService
 
 const DashBoard = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const roleLogin = user?.role || "";
+  const roleLogin = storageService.getRoleLogin() || ""; // Lấy role từ storageService
 
   // Nếu không có role, redirect về sign-in
+  useEffect(() => {
+    if (!roleLogin) {
+      window.location.href = "/sign-in"; // Redirect ngay lập tức
+    }
+  }, [roleLogin]);
+
   if (!roleLogin) {
-    return <Navigate to="/sign-in" replace />;
+    return <Spinner />; // Hiển thị spinner trong khi kiểm tra
   }
 
   // Hiển thị dashboard tương ứng với role
@@ -25,7 +31,7 @@ const DashBoard = () => {
     case "brand":
       return <DashboardBrand />;
     case "campus":
-      return <DashboardCampus />; // Thêm dashboard cho campus
+      return <DashboardCampus />;
     default:
       return <Navigate to="/sign-in" replace />;
   }

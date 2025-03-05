@@ -1,16 +1,13 @@
 /* eslint-disable no-unused-vars */
-import { Flex, Heading, Icon, Text } from "@chakra-ui/react";
-import { Button, Card, Col, Form, Layout, Row, Spin } from "antd";
+import { Flex, Heading, Text } from "@chakra-ui/react";
+import { Button, Card, Col, Form, Layout, Row } from "antd";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-import { FcGoogle } from "react-icons/fc";
 import { NavLink, useNavigate } from "react-router-dom";
 import signinbg from "../assets/images/ảnh ví.png";
 import { HSeparator } from "../components/layout/separator/Separator";
-import { mockUsers } from "../features/auth/mockUsers";
-import ButtonText from "../ui/ButtonText";
-import { LoginButton } from "../ui/custom/Button/Button";
 import { CustomFormItemLogin } from "../ui/custom/Form/InputItem/CustomFormItem";
+import { loginAPI } from "../store/api/authenticateAPI";
 
 const { Footer, Content } = Layout;
 
@@ -20,48 +17,23 @@ function SignIn() {
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
-  const [form] = Form.useForm();
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin = async (values) => {
+    setIsLoading(true);
+
+    const credentials = {
+      userName: data.userName.trim(),
+      password: data.password,
+    };
+
     try {
-      await form.validateFields();
-      setIsLoading(true);
-
-      // Kiểm tra credentials
-      const user = mockUsers.find(
-        (u) => u.userName === data.userName && u.password === data.password
-      );
-
-      if (user) {
-        // Lưu user vào localStorage
-        localStorage.setItem("user", JSON.stringify(user));
-
-        setTimeout(() => {
-          toast.success("Đăng nhập thành công");
-          // Điều hướng đến dashboard chung
-          navigate("/dashboard"); // Chỉ dùng một URL duy nhất
-          setIsLoading(false);
-        }, 1500);
-      } else {
-        toast.error("Tài khoản hoặc mật khẩu không đúng!");
-        setIsLoading(false);
-      }
+      await loginAPI(credentials, navigate);
     } catch (error) {
-      console.log(error);
-      setIsLoading(false);
+      console.error("Login failed in SignIn:", error);
+      toast.error("Đăng nhập thất bại. Vui lòng kiểm tra console để xem chi tiết lỗi.");
     }
-  };
-
-  const handleGoogleSignIn = () => {
-    setIsLoadingGoogle(true);
-    setTimeout(() => {
-      setIsLoadingGoogle(false);
-      toast.success("Đăng nhập Google thành công");
-      navigate("/dashboard"); // Chỉ dùng một URL duy nhất
-    }, 1500);
+    setIsLoading(false);
   };
 
   return (
@@ -71,7 +43,7 @@ function SignIn() {
           <Row className="signin-row">
             <Col className="signin-form-login">
               <div className="sign-img">
-                <img src={signinbg} alt="" />
+                <img src={signinbg} alt="Sign In Background" />
               </div>
               <div>
                 <Heading className="header-login" fontSize="36px">
@@ -79,20 +51,13 @@ function SignIn() {
                 </Heading>
               </div>
               <Form
-                form={form}
-                onSubmit={handleLogin}
+                onFinish={handleLogin}
                 layout="vertical"
                 className="row-col"
               >
                 <CustomFormItemLogin
                   name="userName"
                   label="Tài khoản"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Vui lòng nhập tên tài khoản !",
-                    },
-                  ]}
                   type="text"
                   placeholder="Hãy điền tên tài khoản..."
                   onChange={(e) =>
@@ -101,23 +66,17 @@ function SignIn() {
                       userName: e.target.value.replace(/\s/g, ""),
                     })
                   }
-                  disabled={isLoading || isLoadingGoogle}
+                  disabled={isLoading}
                 />
                 <CustomFormItemLogin
                   name="password"
                   label="Mật khẩu"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Vui lòng nhập mật khẩu !",
-                    },
-                  ]}
                   type="password"
                   placeholder="Hãy điền mật khẩu..."
                   onChange={(e) =>
                     setData({ ...data, password: e.target.value })
                   }
-                  disabled={isLoading || isLoadingGoogle}
+                  disabled={isLoading}
                   pass={true}
                 />
 
@@ -142,40 +101,21 @@ function SignIn() {
                   </Text>
                 </Flex>
 
-                <LoginButton
-                  isLoading={isLoading}
-                  onClick={handleLogin}
-                  label="Đăng nhập"
-                  disabled={isLoading || isLoadingGoogle}
-                />
-              </Form>
-
-              <Flex key="flex-2" align="center" mb="25px">
-                <HSeparator />
-                <Text color="black" mx="14px" marginTop="10px">
-                  Hoặc
-                </Text>
-                <HSeparator />
-              </Flex>
-
-              <Flex key="flex-3" direction="column" borderradius="15px">
                 <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={isLoading}
+                  disabled={isLoading}
                   block
-                  icon={<Icon as={FcGoogle} w="20px" h="20px" me="10px" />}
-                  onClick={handleGoogleSignIn}
-                  disabled={isLoadingGoogle || isLoading}
                   style={{
-                    backgroundColor: "#F0F8FF",
+                    backgroundColor: "#1890ff",
                     height: "40px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "10px",
+                    marginTop: "10px",
                   }}
                 >
-                  {isLoadingGoogle ? <Spin /> : "Đăng Nhập với Google"}
+                  Đăng nhập
                 </Button>
-              </Flex>
+              </Form>
             </Col>
           </Row>
         </Content>
