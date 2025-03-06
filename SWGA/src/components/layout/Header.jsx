@@ -1,5 +1,17 @@
-import { Avatar, Badge, Col, Popover, Row, Typography } from "antd";
-import { Link } from "react-router-dom";
+import {
+  Avatar,
+  Badge,
+  Col,
+  Popover,
+  Row,
+  Typography,
+  notification
+} from "antd";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import avatarProfile from "../../assets/images/avatar-profile.png";
+import storageService from "../../services/storageService";
+import ButtonCustom from "../../ui/custom/Button/ButtonCustom";
 
 const profile = [
   <svg
@@ -40,6 +52,39 @@ const setting = [
 
 function Header() {
   const { Title } = Typography;
+  const navigate = useNavigate();
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    const user = storageService.getUser();
+    if (user) {
+      setUserData(user);
+      notification.success({
+        // message: 'Chào mừng!',
+        description: `Chào mừng ${user.userName || 'bạn'} đã quay trở lại!`,
+        placement: 'topRight',
+        duration: 3
+      });
+    }
+  }, []);
+
+  const handleLogOut = () => {
+    try {
+      storageService.removeAccessToken();
+      storageService.removeUser();
+      navigate("/sign-in");
+      notification.success({
+        message: 'Đăng xuất thành công',
+        placement: 'topRight',
+        duration: 2
+      });
+    } catch (error) {
+      notification.error({
+        message: 'Đăng xuất thất bại',
+        description: error.message,
+      });
+    }
+  };
 
   const menu = (
     <div className="setting-item-information">
@@ -47,17 +92,29 @@ function Header() {
         <Avatar
           className="avatar-setting-profile"
           shape="square"
-          src="https://via.placeholder.com/150"
+          src={avatarProfile}
         />
         <div>
-          <Title className="title-setting-name" level={5}>Guest User</Title>
+          <Title className="title-setting-name" level={5}>{userData?.userName || 'Guest User'}</Title>
           <div className="font-color-setting-description">
-            Visitor
+            {userData?.role === "admin" && "Quản trị viên"}
+            {userData?.role === "brand" && "Quản lí thương hiệu"}
+            {userData?.role === "staff" && "Nhân viên"}
+            {userData?.role === "campus" && "Quản lí trường học"}
           </div>
         </div>
       </Avatar.Group>
+      <div className="btn-logout-setting">
+        <ButtonCustom
+          type="primary"
+          className="btn-logout"
+          onClick={handleLogOut}
+        >
+          Đăng Xuất
+        </ButtonCustom>
+      </div>
     </div>
-  )
+  );
 
   return (
     <>
@@ -72,12 +129,78 @@ function Header() {
               {setting}
             </Popover>
           </Badge>
-          <Link to="/sign-in" className="btn-sign-in">
-            {profile}
-            <span>Đăng nhập</span>
-          </Link>
+          {userData ? (
+            <div className="welcome-text">
+              {profile}
+              <span className="ant-page-header-heading-title">
+                Chào mừng {userData.userName}
+              </span>
+            </div>
+          ) : (
+            <Link to="/sign-in" className="btn-sign-in">
+              {profile}
+              <span>Đăng nhập</span>
+            </Link>
+          )}
         </Col>
       </Row>
+
+      <style>{`
+        .header-control {
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          padding: 20px;
+          gap: 24px;
+        }
+        .setting-item-information {
+          min-width: 280px;
+          padding: 16px;
+        }
+        .avatar-setting-profile {
+          width: 45px;
+          height: 45px;
+        }
+        .title-setting-name {
+          margin: 0 !important;
+          font-size: 16px !important;
+        }
+        .font-color-setting-description {
+          color: #8c8c8c;
+          font-size: 13px;
+          margin-top: 4px;
+        }
+        .btn-logout-setting {
+          margin-top: 16px;
+          text-align: center;
+        }
+        .btn-logout {
+          width: 100%;
+          background-color: #ff4d4f;
+          border-color: #ff4d4f;
+        }
+        .btn-logout:hover {
+          background-color: #ff7875;
+          border-color: #ff7875;
+        }
+        .welcome-text {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 14px;
+          color: #111827;
+        }
+        .btn-sign-in {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: #111827;
+          text-decoration: none;
+        }
+        .btn-sign-in:hover {
+          color: #1890ff;
+        }
+      `}</style>
     </>
   );
 }

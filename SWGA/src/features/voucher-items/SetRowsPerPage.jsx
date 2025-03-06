@@ -2,7 +2,7 @@ import { useSearchParams } from "react-router-dom";
 import RowPerPage from "../../ui/RowPerPage";
 import TableOperations from "../../ui/TableOperations";
 
-function SetRowsPerPage({ pageSize, onLimitChange }) {
+function VoucherItemSetRowsPerPage({ pageSize, onLimitChange }) {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const handleLimitChange = (newLimit) => {
@@ -29,4 +29,4 @@ function SetRowsPerPage({ pageSize, onLimitChange }) {
   );
 }
 
-export default SetRowsPerPage;
+export default VoucherItemSetRowsPerPage;

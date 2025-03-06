@@ -1,18 +1,15 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import Button from "../../ui/Button";
 import Form from "../../ui/Form";
 import FormRow from "../../ui/FormRow";
-import SpinnerMini from "../../ui/SpinnerMini";
 import Textarea from "../../ui/Textarea";
-import { FormSelect } from "../../ui/custom/Select/SelectBox/SelectForm";
-// import { useEditStation } from "../stations/useEditStation";
-import ConfirmDownloadFile from "./ConfirmDownloadFile";
-import ModalDownloadFileItemForm from "./ModalDownloadFileItemForm";
-import { useCreateVoucherItem } from "./useCreateVoucherItem";
-import { useVouchersFilter } from "./useVouchersFilter";
+import { SelectForm } from "../../ui/custom/Select/SelectBox/SelectForm";
+import { useCreateVoucherItem } from "../../hooks/voucher-item/useCreateVoucherItem";
+import FileInput from "../../ui/FileInput";
+import storageService from "../../services/storageService";
 
 const InputPriceUnit = styled.input`
   width: 100%;
@@ -23,198 +20,168 @@ const InputPriceUnit = styled.input`
   box-shadow: var(--shadow-sm);
 `;
 
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: 1.2rem;
-  justify-content: space-between;
-  align-items: center;
-  width: 74%;
-`;
-
-function CreateVoucherItemForm({ stationToEdit = {}, onCloseModal }) {
+function CreateVoucherItemForm({ onCloseModal }) {
   const { isCreating, createVoucherItem } = useCreateVoucherItem();
-  const { isEditing, editStation } = useEditStation();
-
-  const { vouchersFilter } = useVouchersFilter();
-
   const queryClient = useQueryClient();
-  const [filename, setFilename] = useState(null);
-  const [responseData, setResponseData] = useState(null);
+  const [voucherImage, setVoucherImage] = useState(null);
+  const [typeId, setTypeId] = useState("");
 
-  const isWorking = isCreating || isEditing;
-  const { id: editId, ...editValues } = stationToEdit;
+  const { register, handleSubmit, reset, setValue, formState } = useForm({
+    defaultValues: {
+      state: true
+    }
+  });
+  const { errors } = formState;
 
-  const isEditSession = Boolean(editId);
+  const handleImageChange = (event) => {
+    const selectedFile = event.target.files[0];
+    setVoucherImage(selectedFile);
+  };
 
-  const validateQuantity = (value) => {
-    if (!value) return "Hãy nhập số lượng";
-    if (isNaN(value) || parseInt(value) <= 0)
-      return "Số lượng phải là số nguyên dương";
-    if (parseInt(value) >= 1000) return "Số lượng không được vượt quá 1000";
+  const validatePrice = (value) => {
+    if (!value) return "Hãy nhập giá";
+    if (isNaN(value) || parseInt(value) <= 0) return "Giá phải là số nguyên dương";
     return true;
   };
 
-  const { register, handleSubmit, reset, getValues, setValue, formState } =
-    useForm({
-      defaultValues: isEditSession ? editValues : {},
-    });
-  const { errors } = formState;
-  const [vouchersOptions, setVouchersOptions] = useState([]);
-  const [voucherError, setVoucherError] = useState("");
-
-  const getDataSelectBox = () => {
-    if (vouchersFilter?.result?.length > 0) {
-      setVouchersOptions(
-        vouchersFilter.result.map((voucher) => ({
-          value: voucher.id,
-          label: voucher.voucherName,
-        }))
-      );
-    }
+  const validateRate = (value) => {
+    if (!value) return "Hãy nhập tỉ lệ";
+    if (isNaN(value) || parseFloat(value) <= 0) return "Tỉ lệ phải là số dương";
+    return true;
   };
 
-  useEffect(() => {
-    getDataSelectBox();
-  }, [vouchersFilter]);
-
-  const handleVoucherOptions = (selectedOption) => {
-    setValue("voucherId", selectedOption, {
-      shouldDirty: true,
+  const handleTypeChange = (selectedOption) => {
+    setTypeId(selectedOption);
+    setValue("typeId", selectedOption, {
       shouldValidate: true,
+      shouldDirty: true
     });
-    setVoucherError("");
   };
 
   function onSubmit(data) {
-    if (!data.voucherId) {
-      setVoucherError("Vui lòng chọn ưu đãi");
-      return;
-    } else {
-      setVoucherError("");
+    const brandId = storageService.getLoginId();
+    const formData = new FormData();
+    formData.append("brandId", brandId);
+    formData.append("typeId", typeId);
+    formData.append("voucherName", data.voucherName);
+    formData.append("price", parseInt(data.price));
+    formData.append("rate", parseFloat(data.rate));
+    formData.append("condition", data.condition);
+    formData.append("description", data.description);
+    formData.append("state", true);
+    if (voucherImage) {
+      formData.append("image", voucherImage);
     }
 
-    if (isEditSession)
-      editStation(
-        { newStationData: { ...data }, id: editId },
-        {
-          onSuccess: (data) => {
-            reset();
-            onCloseModal?.();
-          },
-        }
-      );
-    else
-      createVoucherItem(
-        { ...data },
-        {
-          onSuccess: (data) => {
-            const cachedFilename = queryClient.getQueryData(["filename"]);
-            setFilename(cachedFilename);
-
-            const cachedResponseData = queryClient.getQueryData([
-              "responseData",
-            ]);
-            setResponseData(cachedResponseData);
-
-            if (cachedFilename && cachedFilename.includes("Result")) {
-              // onCloseModal?.();
-            }
-          },
-        }
-      );
+    createVoucherItem(formData, {
+      onSuccess: () => {
+        reset();
+        onCloseModal?.();
+      },
+    });
   }
-  function onError(errors) {
-    // console.log(errors);
-  }
-
-  const handleDownload = () => {
-    const url = window.URL.createObjectURL(new Blob([responseData]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", `${filename}.xlsx`);
-    link.click();
-  };
 
   return (
-    <>
-      <ButtonGroup>
-        {filename && filename.includes("Result") && (
-          <ModalDownloadFileItemForm>
-            <ModalDownloadFileItemForm.Window name="download-file-result">
-              <ConfirmDownloadFile
-                resourceName="kết quả"
-                disabled={isWorking}
-                onConfirm={handleDownload}
-              />
-            </ModalDownloadFileItemForm.Window>
-          </ModalDownloadFileItemForm>
-        )}
-      </ButtonGroup>
-      <Form
-        onSubmit={handleSubmit(onSubmit, onError)}
-        type={onCloseModal ? "modal" : "regular"}
-      >
-        <FormRow label="Ưu đãi" error={voucherError}>
-          {vouchersFilter && vouchersFilter.result ? (
-            <FormSelect
-              id="voucherId"
-              placeholder="Chọn ưu đãi"
-              disabled={isWorking}
-              onChange={handleVoucherOptions}
-              options={vouchersOptions}
-            />
-          ) : (
-            <SpinnerMini />
-          )}
-        </FormRow>
+    <Form onSubmit={handleSubmit(onSubmit)} type={onCloseModal ? "modal" : "regular"}>
+      <FormRow label="Loại ưu đãi" error={errors?.typeId?.message}>
+        <SelectForm
+          id="typeId"
+          placeholder="Chọn loại ưu đãi"
+          disabled={isCreating}
+          onChange={handleTypeChange}
+          options={[
+            { value: "type1", label: "Loại 1" },
+            { value: "type2", label: "Loại 2" }
+          ]}
+        />
+      </FormRow>
 
-        <FormRow label="Số lượng" error={errors?.quantity?.message}>
-          <InputPriceUnit
-            type="number"
-            id="quantity"
-            disabled={isWorking}
-            placeholder="Ví dụ: 10"
-            {...register("quantity", {
-              validate: validateQuantity,
-            })}
-          />
-        </FormRow>
+      <FormRow label="Tên phiếu ưu đãi" error={errors?.voucherName?.message}>
+        <input
+          type="text"
+          id="voucherName"
+          disabled={isCreating}
+          {...register("voucherName", {
+            required: "Hãy nhập tên phiếu ưu đãi",
+          })}
+        />
+      </FormRow>
 
-        <FormRow label="Mô tả" error={errors?.description?.message}>
-          <Textarea
-            type="number"
-            id="description"
-            disabled={isWorking}
-            defaultValue=""
-            {...register("description", {
-              required: "Hãy nhập mô tả",
-              maxLength: {
-                value: 1000,
-                message: "Mô tả tối đa 1000 kí tự",
-              },
-              validate: {
-                noWhiteSpace: (value) =>
-                  value.trim().length >= 3 || "Mô tả ít nhất 3 kí tự",
-              },
-            })}
-          />
-        </FormRow>
+      <FormRow label="Giá" error={errors?.price?.message}>
+        <InputPriceUnit
+          type="number"
+          id="price"
+          disabled={isCreating}
+          {...register("price", {
+            validate: validatePrice,
+          })}
+        />
+      </FormRow>
 
-        <FormRow>
-          <Button
-            $variations="secondary"
-            type="reset"
-            disabled={isWorking}
-            onClick={() => onCloseModal?.()}
+      <FormRow label="Tỉ lệ chuyển đổi" error={errors?.rate?.message}>
+        <InputPriceUnit
+          type="number"
+          step="0.1"
+          id="rate"
+          disabled={isCreating}
+          {...register("rate", {
+            validate: validateRate,
+          })}
+        />
+      </FormRow>
+
+      <FormRow label="Điều kiện" error={errors?.condition?.message}>
+        <Textarea
+          id="condition"
+          disabled={isCreating}
+          {...register("condition", {
+            required: "Hãy nhập điều kiện",
+          })}
+        />
+      </FormRow>
+
+      <FormRow label="Mô tả" error={errors?.description?.message}>
+        <Textarea
+          id="description"
+          disabled={isCreating}
+          {...register("description", {
+            required: "Hãy nhập mô tả",
+          })}
+        />
+      </FormRow>
+
+      <FormRow label="Hình ảnh" error={errors?.image?.message}>
+        <FileInput
+          id="image"
+          accept="image/*"
+          disabled={isCreating}
+          onChange={handleImageChange}
+        />
+        {voucherImage && (
+          <Button 
+            type="button" 
+            $variations="secondary" 
+            onClick={() => setVoucherImage(null)}
           >
-            Hủy bỏ
+            Xóa ảnh
           </Button>
-          <Button disabled={isWorking}>
-            {isEditSession ? "Chỉnh sửa phiếu ưu đãi" : "Tạo phiếu ưu đãi mới"}
-          </Button>
-        </FormRow>
-      </Form>
-    </>
+        )}
+      </FormRow>
+
+      <FormRow>
+        <Button
+          $variations="secondary"
+          type="reset"
+          disabled={isCreating}
+          onClick={() => onCloseModal?.()}
+        >
+          Hủy bỏ
+        </Button>
+        <Button disabled={isCreating}>
+          Tạo phiếu ưu đãi mới
+        </Button>
+      </FormRow>
+    </Form>
   );
 }
 

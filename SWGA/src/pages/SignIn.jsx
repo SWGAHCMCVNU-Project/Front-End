@@ -1,39 +1,40 @@
 /* eslint-disable no-unused-vars */
-import { Flex, Heading, Text } from "@chakra-ui/react";
-import { Button, Card, Col, Form, Layout, Row } from "antd";
-import React, { useState } from "react";
-import toast from "react-hot-toast";
-import { NavLink, useNavigate } from "react-router-dom";
-import signinbg from "../assets/images/ảnh ví.png";
-import { HSeparator } from "../components/layout/separator/Separator";
-import { CustomFormItemLogin } from "../ui/custom/Form/InputItem/CustomFormItem";
-import { loginAPI } from "../store/api/authenticateAPI";
+import { Flex, Heading, Text } from '@chakra-ui/react';
+import { Button, Card, Col, Form, Layout, Row } from 'antd';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+import { NavLink, useNavigate } from 'react-router-dom';
+import signinbg from '../assets/images/ảnh ví.png';
+import { HSeparator } from '../components/layout/separator/Separator';
+import { CustomFormItemLogin } from '../ui/custom/Form/InputItem/CustomFormItem';
+import authService from '../services/authService'; // Import service
 
 const { Footer, Content } = Layout;
 
 function SignIn() {
   const [data, setData] = useState({
-    userName: "",
-    password: "",
+    userName: '',
+    password: '',
   });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async (values) => {
+  const handleLogin = async () => {
     setIsLoading(true);
-
+  
     const credentials = {
       userName: data.userName.trim(),
       password: data.password,
     };
-
+  
     try {
-      await loginAPI(credentials, navigate);
+      await authService.login(credentials, navigate); // Gọi service
     } catch (error) {
-      console.error("Login failed in SignIn:", error);
-      toast.error("Đăng nhập thất bại. Vui lòng kiểm tra console để xem chi tiết lỗi.");
+      console.error('Login failed in SignIn:', error);
+      // Toast đã được xử lý trong authService, nhưng có thể thêm log chi tiết
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (
@@ -51,7 +52,7 @@ function SignIn() {
                 </Heading>
               </div>
               <Form
-                onFinish={handleLogin}
+                onFinish={handleLogin} // Gọi handleLogin trực tiếp
                 layout="vertical"
                 className="row-col"
               >
@@ -63,7 +64,7 @@ function SignIn() {
                   onChange={(e) =>
                     setData({
                       ...data,
-                      userName: e.target.value.replace(/\s/g, ""),
+                      userName: e.target.value.replace(/\s/g, ''),
                     })
                   }
                   disabled={isLoading}
@@ -108,9 +109,9 @@ function SignIn() {
                   disabled={isLoading}
                   block
                   style={{
-                    backgroundColor: "#1890ff",
-                    height: "40px",
-                    marginTop: "10px",
+                    backgroundColor: '#1890ff',
+                    height: '40px',
+                    marginTop: '10px',
                   }}
                 >
                   Đăng nhập

@@ -1,24 +1,19 @@
-export const ENDPOINTS = {
-    activity: {
-      base: '/Activity',
-      getAll: () => '/Activity', // GET danh sách hoạt động
-      create: () => '/Activity', // POST tạo mới hoạt động
-      update: (id) => `/Activity/${id}`, // PUT cập nhật hoạt động cụ thể
-    },
-    admin: {
-      base: '/Admin',
-      getAll: () => '/Admin', // GET danh sách admin
-      create: () => '/Admin', // POST tạo mới admin
-      getProfile: (id) => `/Admin/${id}`, // GET thông tin admin cụ thể
-      update: (id) => `/Admin/${id}`, // PUT cập nhật thông tin admin cụ thể
-    },
-    auth: {
-      base: '/Auth',
-      login: () => '/Auth/login',
-      verifyCode: () => '/Auth/verify-code'
-    },
-    account: {
-      base: '/Account',
-      registerBrand: () => '/Account/brandRegister'
-    }
+export const AUTH_ENDPOINTS = {
+    LOGIN: '/Auth/login',
+    LOGOUT: '/logout',
+  };
+  export const REGISTER_ENDPOINTS = {
+    RegisterBrand: '/Account/brandRegister',
+    LOGOUT: '/logout',
+  };
+  export const VOUCHER_ENDPOINTS = {
+    CREATE_VOUCHER: '/Voucher',
+    GET_ALL_VOUCHERS: '/Voucher',
+    GET_VOUCHER_BY_ID: '/Voucher/{id}'
+  };
+
+  export const VOUCHER_ITEM_ENDPOINTS = {
+    CREATE_VOUCHER_ITEM: '/VoucherItem',
+    GET_ALL_VOUCHER_ITEMS: '/VoucherItem',
+    GET_VOUCHER_ITEM_BY_ID: '/VoucherItem/{id}'
   };

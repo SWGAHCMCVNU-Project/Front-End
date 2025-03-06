@@ -11,8 +11,8 @@ import Input from "../../ui/Input";
 import Textarea from "../../ui/Textarea";
 import { RegisterButton } from "../../ui/custom/Button/Button";
 import { CustomFormRow } from "../../ui/custom/Form/InputItem/CustomFormItem";
-import { registerBrandAPI } from "../../store/api/registerAPI"; // Đảm bảo đường dẫn đúng
 import { toast } from "react-hot-toast";
+import registerService from "../../services/registerService";
 
 // Styled components (giữ nguyên)
 const StyledDataBox = styled.section`
@@ -99,19 +99,8 @@ function RegisterBrand() {
   const convertFileToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const base64String = reader.result;
-          if (base64String.includes('data:image') && base64String.includes('base64,')) {
-            resolve(base64String);
-          } else {
-            reject(new Error('Invalid image format'));
-          }
-        } catch (error) {
-          reject(error);
-        }
-      };
-      reader.onerror = (error) => reject(error);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
       reader.readAsDataURL(file);
     });
   };
@@ -129,15 +118,9 @@ function RegisterBrand() {
 
   const handleChangeCoverPhoto = async ({ file }) => {
     if (file) {
-      try {
-        const base64 = await convertFileToBase64(file);
-        console.log("Base64 image:", base64);
-        setCoverPhoto(file);
-        setCoverPhotoStorage(base64);
-      } catch (error) {
-        console.error("Error converting file to base64:", error);
-        toast.error("Không thể xử lý file ảnh. Vui lòng thử lại!");
-      }
+      const base64 = await convertFileToBase64(file);
+      setCoverPhoto(file);
+      setCoverPhotoStorage(base64);
     } else {
       setCoverPhoto(null);
       setCoverPhotoStorage(null);
@@ -155,42 +138,17 @@ function RegisterBrand() {
   };
 
   const onSubmit = async (data) => {
+    if (!coverPhotoStorage) {
+      toast.error("Vui lòng tải lên ảnh bìa!");
+      return;
+    }
+
     setIsLoading(true);
     try {
-      if (!coverPhotoStorage) {
-        toast.error("Vui lòng tải lên ảnh bìa!");
-        return;
-      }
-
-      const openingHoursObj = {
-        hours: parseInt(data.openingHours.split(':')[0]),
-        minutes: parseInt(data.openingHours.split(':')[1])
-      };
-
-      const closingHoursObj = {
-        hours: parseInt(data.closingHours.split(':')[0]),
-        minutes: parseInt(data.closingHours.split(':')[1])
-      };
-
-      const brandData = {
-        userName: data.userName,
-        password: data.password,
-        phone: data.phone,
-        email: data.email,
-        brandName: data.brandName,
-        acronym: data.acronym || "",
-        address: data.address,
-        coverPhoto: coverPhotoStorage,
-        link: data.link || "",
-        openingHours: openingHoursObj,
-        closingHours: closingHoursObj,
-        description: data.description || "",
-        state: true
-      };
-
-      await registerBrandAPI(brandData, navigate);
+      const brandData = registerService.formatBrandData(data, coverPhotoStorage);
+      await registerService.registerBrand(brandData, navigate);
     } catch (error) {
-      console.error("Register brand error:", error);
+      console.error("Register error:", error);
     } finally {
       setIsLoading(false);
     }

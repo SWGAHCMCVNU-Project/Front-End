@@ -1,33 +1,66 @@
-const storageService = {
-  setAccessToken: (token) => {
-    localStorage.setItem('accessToken', token);
+const StorageService = {
+  setAccessToken(token) {
+    localStorage.setItem('token', token);
   },
-  getAccessToken: () => {
-    return localStorage.getItem('accessToken');
+
+  getAccessToken() {
+    return localStorage.getItem('token');
   },
-  removeAccessToken: () => {
-    localStorage.removeItem('accessToken');
+
+  removeAccessToken() {
+    localStorage.removeItem('token');
   },
-  setRoleLogin: (role) => {
-    localStorage.setItem('role', role);
+
+  setUser(user) {
+    if (!user) {
+      console.warn('Attempted to store invalid user data:', user);
+      return;
+    }
+    localStorage.setItem('user', JSON.stringify(user));
   },
-  getRoleLogin: () => {
-    return localStorage.getItem('role');
+
+  getUser() {
+    const userStr = localStorage.getItem('user');
+    if (!userStr) return null;
+    
+    try {
+      return JSON.parse(userStr);
+    } catch (error) {
+      console.error('Error parsing user:', error);
+      return null;
+    }
   },
-  removeRoleLogin: () => {
-    localStorage.removeItem('role');
+
+  getUserRole() {
+    const user = this.getUser();
+    return user?.role || '';
   },
-  // Thêm các hàm liên quan đến registerForm
-  setRegisterForm: (formData) => {
-    localStorage.setItem('registerForm', JSON.stringify(formData));
+
+  setRoleLogin(role) {
+    localStorage.setItem('roleLogin', role);
   },
-  getRegisterForm: () => {
-    const formData = localStorage.getItem('registerForm');
-    return formData ? JSON.parse(formData) : null;
+
+  getRoleLogin() {
+    return localStorage.getItem('roleLogin') || '';
   },
-  removeRegisterForm: () => {
-    localStorage.removeItem('registerForm');
+
+  removeRoleLogin() {
+    localStorage.removeItem('roleLogin');
   },
+
+  isAuthenticated() {
+    return !!this.getAccessToken();
+  },
+
+  removeUser() {
+    localStorage.removeItem('user');
+  },
+
+  clearAll() {
+    this.removeAccessToken();
+    this.removeUser();
+    this.removeRoleLogin();
+  }
 };
 
-export default storageService;
+export default StorageService;

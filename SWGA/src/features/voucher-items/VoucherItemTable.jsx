@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import Empty from "../../ui/Empty";
 import Menus from "../../ui/Menus";
@@ -6,9 +6,9 @@ import Pagination from "../../ui/Pagination";
 import Spinner from "../../ui/Spinner";
 import StackedHeader from "../../ui/StackedHeader";
 import Table from "../../ui/Table";
-import SetRowsPerPage from "./SetRowsPerPage";
+import VoucherItemSetRowsPerPage from "./SetRowsPerPage";
 import VoucherItemRow from "./VoucherItemRow";
-import { useVoucherItems } from "./useVoucherItems";
+import { useVoucherItems } from "../../hooks/voucher-item/useVoucherItems";
 
 const StyledHeader = styled.div`
   display: flex;
@@ -27,28 +27,41 @@ const StyledButton = styled.div`
 `;
 
 function VoucherItemTable() {
-  const [limit, setLimit] = useState();
-  const [sortField, setSortField] = useState("Id");
-  const [sortOrder, setSortOrder] = useState("desc");
-  const { voucherItemsByBrandId, isLoading } = useVoucherItems(
-    limit,
-    sortField,
-    sortOrder
-  );
-  const [currentPage, setCurrentPage] = useState(1);
-  const onLimitChange = (newLimit) => {
-    setLimit(newLimit);
-    setCurrentPage(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Get values from URL or use defaults
+  const page = !searchParams.get("page") ? 1 : Number(searchParams.get("page"));
+  const size = !searchParams.get("size") ? 10 : Number(searchParams.get("size"));
+  const search = searchParams.get("search") || "";
+  const state = searchParams.get("state") === null ? null : searchParams.get("state") === "true";
+  const isAsc = searchParams.get("isAsc") === "true";
+
+  const { voucherItems, isLoading } = useVoucherItems({
+    page,
+    size,
+    search,
+    state,
+    isAsc
+  });
+
+  const handlePageChange = (newPage) => {
+    searchParams.set("page", newPage);
+    setSearchParams(searchParams);
+  };
+
+  const handleSizeChange = (newSize) => {
+    searchParams.set("size", newSize);
+    searchParams.set("page", 1);
+    setSearchParams(searchParams);
+  };
+
+  const handleSortChange = () => {
+    searchParams.set("isAsc", (!isAsc).toString());
+    setSearchParams(searchParams);
   };
 
   if (isLoading) return <Spinner />;
-  if (!voucherItemsByBrandId?.result?.length)
-    return <Empty resourceName="phiếu ưu đãi" />;
-
-  const handleStackedClick = (clickedColumn) => {
-    setSortField(clickedColumn);
-    setSortOrder((prevSortOrder) => (prevSortOrder === "asc" ? "desc" : "asc"));
-  };
+  if (!voucherItems?.items?.length) return <Empty resourceName="phiếu ưu đãi" />;
 
   return (
     <Menus>
@@ -57,45 +70,39 @@ function VoucherItemTable() {
           <StyledHeader>STT</StyledHeader>
           <StackedHeader
             label="Tên phiếu ưu đãi"
-            onClick={() => handleStackedClick("Id")}
-            $ascending={sortField === "Id" && sortOrder === "asc"}
-            $active={sortField === "Id"}
+            onClick={handleSortChange}
+            $ascending={isAsc}
+            $active={true}
           />
           <div>Chi phí</div>
           <StyledHeader>Ngày tạo</StyledHeader>
-
           <StyledHeader>Hành động</StyledHeader>
         </Table.Header>
 
         <Table.Body
-          data={voucherItemsByBrandId?.result}
+          data={voucherItems.items}
           render={(voucher, index) => (
             <StyledButton>
               <VoucherItemRow
                 key={voucher.id}
                 voucher={voucher}
-                index={index + 1}
-                displayedIndex={
-                  (voucherItemsByBrandId.currentPage - 1) *
-                    voucherItemsByBrandId.pageSize +
-                  index +
-                  1
-                }
+                displayedIndex={(voucherItems.page - 1) * voucherItems.size + index + 1}
               />
             </StyledButton>
           )}
         />
+
         <Table.Footer>
           <Pagination
-            count={voucherItemsByBrandId?.rowCount}
-            currentPage={currentPage}
-            pageSize={voucherItemsByBrandId?.pageSize}
-            pageCount={voucherItemsByBrandId?.pageCount}
-            totalCount={voucherItemsByBrandId?.totalCount}
+            count={voucherItems.total}
+            currentPage={voucherItems.page}
+            pageSize={voucherItems.size}
+            totalPages={voucherItems.totalPages}
+            onPageChange={handlePageChange}
           />
-          <SetRowsPerPage
-            pageSize={voucherItemsByBrandId?.pageSize}
-            onLimitChange={onLimitChange}
+          <VoucherItemSetRowsPerPage
+            pageSize={voucherItems.size}
+            onLimitChange={handleSizeChange}
           />
         </Table.Footer>
       </Table>

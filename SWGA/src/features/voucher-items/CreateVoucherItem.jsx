@@ -1,7 +1,7 @@
 import { Tabs } from "antd";
 import styled from "styled-components";
 import Heading from "../../ui/Heading";
-import CreateVoucherItemByTemplate from "./CreateVoucherItemByTemplate";
+// import CreateVoucherItemByTemplate from "./CreateVoucherItemByTemplate";
 import CreateVoucherItemForm from "./CreateVoucherItemForm";
 
 const HeadingGroup = styled.div`
@@ -18,11 +18,11 @@ function CreateVoucherItem({ onCloseModal }) {
       label: "Tạo",
       children: <CreateVoucherItemForm onCloseModal={onCloseModal} />,
     },
-    {
-      key: "insert-template",
-      label: "Nhập file theo mẫu",
-      children: <CreateVoucherItemByTemplate onCloseModal={onCloseModal} />,
-    },
+    // {
+    //   key: "insert-template",
+    //   label: "Nhập file theo mẫu",
+    //   children: <CreateVoucherItemByTemplate onCloseModal={onCloseModal} />,
+    // },
   ];
   return (
     <>

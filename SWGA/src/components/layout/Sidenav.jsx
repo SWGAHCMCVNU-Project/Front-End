@@ -27,8 +27,21 @@ import storageService from "../../services/storageService";
 import { MenuItem } from "./MenuItem";
 
 function Sidenav({ color }) {
+  const roleLogin = storageService.getUserRole();
   const navigate = useNavigate();
-  const roleLogin = storageService.getRoleLogin() || ""; // Lấy role từ storageService
+
+  // Ánh xạ role từ tiếng Việt sang tiếng Anh
+  const mapRoleToEnglish = (vietnameseRole) => {
+    const roleMapping = {
+      'Thương hiệu': 'brand',
+      'Quản trị viên': 'admin',
+      'Nhân viên': 'staff',
+      'Cơ sở': 'campus'
+    };
+    return roleMapping[vietnameseRole] || vietnameseRole;
+  };
+
+  const englishRole = mapRoleToEnglish(roleLogin);
 
   // Nếu không có role, redirect về trang login
   useEffect(() => {
@@ -37,11 +50,13 @@ function Sidenav({ color }) {
     }
   }, [roleLogin, navigate]);
 
+  // Dashboard icon
   const dashboard = [
     <svg
       width="20"
       height="20"
       viewBox="0 0 20 20"
+      fill="none"
       xmlns="http://www.w3.org/2000/svg"
       key="dashboard-logo"
     >
@@ -54,12 +69,13 @@ function Sidenav({ color }) {
         fill={color}
       ></path>
       <path
-        d="M14 9C13.4477 9 13 9.44771 13 10V16C13 16.5523 13.4477 17 14 17H16C16.5523 17 17 16.5523 17 16V10C17 9.44771 16.5523 9 16 9H14Z"
+        d="M13 10C13 9.44771 13.4477 9 14 9H16C16.5523 9 17 9.44771 17 10V16C17 16.5523 16.5523 17 16 17H14C13.4477 17 13 16.5523 13 16V10Z"
         fill={color}
       ></path>
     </svg>,
   ];
 
+  // Tables icon
   const tables = [
     <svg
       width="20"
@@ -67,7 +83,7 @@ function Sidenav({ color }) {
       viewBox="0 0 20 20"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      key="table-logo"
+      key="tables-logo"
     >
       <path
         d="M9 2C8.44772 2 8 2.44772 8 3C8 3.55228 8.44772 4 9 4H11C11.5523 4 12 3.55228 12 3C12 2.44772 11.5523 2 11 2H9Z"
@@ -82,6 +98,7 @@ function Sidenav({ color }) {
     </svg>,
   ];
 
+  // Billing icon
   const billing = [
     <svg
       width="20"
@@ -104,6 +121,7 @@ function Sidenav({ color }) {
     </svg>,
   ];
 
+  // Sign in icon
   const signin = [
     <svg
       width="20"
@@ -356,7 +374,7 @@ function Sidenav({ color }) {
         items={menuItems.flatMap((item, index) => {
           if (item.type === "group") {
             return item.menuSideNav
-              .filter((menuItem) => menuItem.allowedRoles.includes(roleLogin))
+              .filter((menuItem) => menuItem.allowedRoles.includes(englishRole))
               .map((menuItem) => ({
                 key: menuItem.key,
                 label: (
