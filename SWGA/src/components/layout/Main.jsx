@@ -7,29 +7,29 @@ import Sidenav from "./Sidenav";
 const { Header: AntHeader, Content, Sider } = Layout;
 
 // Định nghĩa các routes cần hiển thị Sidenav
-const SIDENAV_ROUTES = [
-  'dashboard-admin',
-  'dashboard-staff',
-  'dashboard-brand',
-  'campaigns',
-  'products',
-  'orders',
-  'activities',
-  'requests',
-  'students',
-  'brands',
-  'stations',
-  'staffs',
-  'categories',
-  'universities',
-  'majors',
-  'areas',
-  'stores',
-  'vouchers',
-  'voucher-items',
-  'transactions',
-  'profile'
-];
+// const SIDENAV_ROUTES = [
+//   'dashboard-admin',
+//   'dashboard-staff',
+//   'dashboard-brand',
+//   'campaigns',
+//   'products',
+//   'orders',
+//   'activities',
+//   'requests',
+//   'students',
+//   'brands',
+//   'stations',
+//   'staffs',
+//   'categories',
+//   'universities',
+//   'majors',
+//   'areas',
+//   'stores',
+//   'vouchers',
+//   'voucher-items',
+//   'transactions',
+//   'profile'
+// ];
 
 function Main() {
   const [visible, setVisible] = useState(false);

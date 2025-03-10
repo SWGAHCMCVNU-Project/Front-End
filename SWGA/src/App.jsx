@@ -1,57 +1,175 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import "antd/dist/reset.css";
+import 'antd/dist/reset.css';
+import { useState } from 'react';
+import { BrowserRouter, Route, Routes, Navigate, useLocation } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import './assets/styles/App.scss';
+import './assets/styles/responsive.scss';
+import SignIn from './pages/SignIn.jsx';
+import SignUp from './pages/SignUp.jsx';
+import DashBoard from './pages/DashBoard';
+import CampaignPage from './pages/CampaignManagement/CampaignPage.jsx';
+import Brands from './pages/BrandManagement/Brands.jsx';
+import Brand from './pages/BrandManagement/Brand.jsx';
+import Students from './pages/StudentManagement/Students.jsx';
+import Student from './pages/StudentManagement/Student.jsx';
+import UniversityPage from './pages/UniversityManagement/UniversityPage.jsx';
+import MajorPage from './pages/MajorManagement/MajorPage.jsx';
+import StorePage from './pages/StoreManagement/StorePage.jsx';
+import Vouchers1 from './pages/VoucherManagement1/Vouchers.jsx';
+// import VoucherDetail from './pages/VoucherManagement/VoucherDetail.jsx';
+import Vouchers from './pages/VoucherManagement/Vouchers.jsx';
+import Voucher from './pages/VoucherManagement/Voucher.jsx';
+import CustomerPage from './pages/CustomerManagement/CustomerPage.jsx';
+import BrandTransactionPage from './pages/BrandManagement/BrandTransaction.jsx';
+import FeedbackPage from './pages/FeedbackManagement/Feedback.jsx';
+import TransactionDetailPage from './pages/BrandManagement/TransactionDetailPage';
+import Lecturers from './pages/LectureManagement/Lecturers.jsx';
+import PackagePoint from './pages/PackagePointManagement/PackagePoint.jsx';
+import Main from './components/layout/Main.jsx';
+import storageService from './services/storageService';
+// import AccessDenied from './pages/AccessDenied/AccessDenied.jsx';
 
-import { useState } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Toaster } from "react-hot-toast";
-import "./assets/styles/App.scss";
-import "./assets/styles/responsive.scss";
-import SignIn from "./pages/SignIn.jsx";
-import SignUp from "./pages/SignUp.jsx";
-import DashBoard from "./pages/DashBoard";
-import DashboardAdmin from "./pages/Dashboard/DashboardAdmin.jsx";
-import DashboardStaff from "./pages/Dashboard/DashboardStaff.jsx";
-import DashboardBrand from "./pages/Dashboard/DashboardBrand.jsx";
-import CampaignPage from "./pages/CampaignManagement/CampaignPage.jsx";
-// import CampaignDetailsPage from "./pages/CampaignManagement/CampaignDetailsPage.jsx";
-import Brands from "./pages/BrandManagement/Brands.jsx";
-import Students from "./pages/StudentManagement/Students.jsx";
-import UniversityPage from "./pages/UniversityManagement/UniversityPage.jsx";
-import MajorPage from "./pages/MajorManagement/MajorPage.jsx";
+function PrivateRoute({ children, allowedRoles = [] }) {
+  const location = useLocation();
+  const isAuthenticated = !!storageService.getAccessToken();
+  const vietnameseRole = storageService.getUserRole();
 
-import Main from "./components/layout/Main.jsx";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+  // Ánh xạ role từ tiếng Việt sang tiếng Anh
+  const mapRoleToEnglish = (vietnameseRole) => {
+    const roleMapping = {
+      'Thương hiệu': 'brand',
+      'Quản trị viên': 'admin',
+      'Nhân viên': 'staff',
+      'Cơ sở': 'campus'
+    };
+    return roleMapping[vietnameseRole] || vietnameseRole;
+  };
+
+  const englishRole = mapRoleToEnglish(vietnameseRole);
+
+  if (!isAuthenticated || !vietnameseRole) {
+    return <Navigate to="/sign-in" state={{ from: location }} replace />;
+  }
+
+  if (allowedRoles.length > 0 && !allowedRoles.includes(englishRole)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+}
+
 function App() {
-  const [count, setCount] = useState(0);
+  const [roleLogin, setRoleLogin] = useState(storageService.getUserRole());
+
+  const handleLogin = async(newRoleLogin) => {
+    // Lưu trực tiếp role tiếng Việt từ API
+    storageService.setUserRole(newRoleLogin);
+    setRoleLogin(newRoleLogin);
+  };
 
   return (
     <>
       <BrowserRouter>
         <Routes>
-        <Route path="/sign-in" exact element={<SignIn />} />
+          <Route path="/sign-in" exact element={<SignIn onLogin={handleLogin} />} />
           <Route path="/sign-up" exact element={<SignUp />} />
-          <Route path="/dashboard" exact element={<DashBoard />} />
-        <Route path="/" element={<Main />}>
-          
-          <Route path="/dashboard-admin" exact element={<DashboardAdmin />} />
-          <Route path="/dashboard-staff" exact element={<DashboardStaff />} />
-          <Route path="/dashboard-brand" exact element={<DashboardBrand />} />
-          <Route path="/campaigns" element={<CampaignPage />} />
-          {/* <Route
-            path="campaigns/:campaignId"
-            element={ <CampaignDetailsPage/>}
-          /> */}
-           <Route path="/brands" exact element={<Brands />} />
-           <Route path="/students" exact element={<Students />} />
-           <Route path="/universities" exact element={<UniversityPage />} />
-           <Route path="/majors" exact element={<MajorPage />} />
-
-         </Route>
+          <Route path="/" element={<Main />}>
+            <Route path="/dashboard" exact element={<DashBoard />} />
+            <Route path="/brands" exact element={
+              <PrivateRoute allowedRoles={['admin', 'brand']}>
+                <Brands />
+              </PrivateRoute>
+            } />
+            <Route path="brands/:brandId" element={
+              <PrivateRoute allowedRoles={['admin', 'brand']}>
+                <Brand />
+              </PrivateRoute>
+            } />
+            <Route path="/campaigns" exact element={
+              <PrivateRoute allowedRoles={['admin', 'brand']}>
+                <CampaignPage />
+              </PrivateRoute>
+            } />
+            <Route path="/students" exact element={
+              <PrivateRoute allowedRoles={['admin']}>
+                <Students />
+              </PrivateRoute>
+            } />
+            <Route path="students/:studentId" element={
+              <PrivateRoute allowedRoles={['admin']}>
+                <Student />
+              </PrivateRoute>
+            } />
+            <Route path="/universities" exact element={
+              <PrivateRoute allowedRoles={['admin', 'campus']}>
+                <UniversityPage />
+              </PrivateRoute>
+            } />
+            <Route path="/majors" exact element={
+              <PrivateRoute allowedRoles={['admin']}>
+                <MajorPage />
+              </PrivateRoute>
+            } />
+            <Route path="/stores" exact element={
+              <PrivateRoute allowedRoles={['brand']}>
+                <StorePage />
+              </PrivateRoute>
+            } />
+            <Route path="/vouchers" exact element={
+              <PrivateRoute allowedRoles={['brand']}>
+                <Vouchers />
+              </PrivateRoute>
+            } />
+            {/* <Route path="/vouchers/:voucherId" element={checkAccess(['brand'], <VoucherDetail />)} /> */}
+            <Route path="/voucher/voucherId:" exact element={
+              <PrivateRoute allowedRoles={['brand']}>
+                <Voucher />
+              </PrivateRoute>
+            } />
+            <Route path="voucher1" element={
+              <PrivateRoute allowedRoles={['brand']}>
+                <Vouchers1 />
+              </PrivateRoute>
+            } />
+            <Route path="/customers" exact element={
+              <PrivateRoute allowedRoles={['brand']}>
+                <CustomerPage />
+              </PrivateRoute>
+            } />
+            <Route path="/transactions" exact element={
+              <PrivateRoute allowedRoles={['brand']}>
+                <BrandTransactionPage />
+              </PrivateRoute>
+            } />
+            <Route path="/transactions/:id" element={
+              <PrivateRoute allowedRoles={['brand']}>
+                <TransactionDetailPage />
+              </PrivateRoute>
+            } />
+            <Route path="/feedback" exact element={
+              <PrivateRoute allowedRoles={['brand']}>
+                <FeedbackPage />
+              </PrivateRoute>
+            } />
+            <Route path="/lecturers" exact element={
+              <PrivateRoute allowedRoles={['campus']}>
+                <Lecturers />
+              </PrivateRoute>
+            } />
+            <Route path="/point-packages" exact element={
+              <PrivateRoute allowedRoles={['campus']}>
+                <PackagePoint />
+              </PrivateRoute>
+            } />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Route>
         </Routes>
+        <Toaster />
       </BrowserRouter>
     </>
   );
 }
 
-export default App;
+export default App; 

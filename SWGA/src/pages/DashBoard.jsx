@@ -1,32 +1,39 @@
 /* eslint-disable no-unused-vars */
-import React from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useEffect } from 'react';
+import { Navigate, useNavigate } from 'react-router-dom';
+import Spinner from '../ui/Spinner';
+import DashboardAdmin from './Dashboard/DashboardAdmin';
+import DashboardStaff from './Dashboard/DashboardStaff';
+import DashboardBrand from './Dashboard/DashboardBrand';
+import DashboardCampus from './Dashboard/DashBoardCampus';
+import storageService from '../services/storageService';
 
 const DashBoard = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  
-  // Nếu đang ở trang dashboard gốc, cho phép chọn role
-  if (location.pathname === '/dashboard') {
-    return (
-      <div style={{ padding: '20px', textAlign: 'center' }}>
-        <h2>Chọn loại Dashboard</h2>
-        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-          <button onClick={() => navigate('/dashboard-admin')}>
-            Admin Dashboard
-          </button>
-          <button onClick={() => navigate('/dashboard-staff')}>
-            Staff Dashboard
-          </button>
-          <button onClick={() => navigate('/dashboard-brand')}>
-            Brand Dashboard
-          </button>
-        </div>
-      </div>
-    );
+  const roleLogin = storageService.getUserRole();
+
+  useEffect(() => {
+    if (!roleLogin) {
+      navigate('/sign-in', { replace: true });
+    }
+  }, [roleLogin, navigate]);
+
+  if (!roleLogin) {
+    return <Spinner />;
   }
 
-  return ;
+  switch (roleLogin) {
+    case 'admin':
+      return <DashboardAdmin />;
+    case 'staff':
+      return <DashboardStaff />;
+    case 'brand':
+      return <DashboardBrand />;
+    case 'campus':
+      return <DashboardCampus />;
+    default:
+      return <Navigate to="/sign-in" replace />;
+  }
 };
 
 export default DashBoard;

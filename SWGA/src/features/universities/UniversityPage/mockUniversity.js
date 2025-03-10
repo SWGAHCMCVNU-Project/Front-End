@@ -8,7 +8,29 @@ export const mockUniversities = {
       image: "https://example.com/fpt.jpg",
       dateCreated: "2024-01-15T07:00:00.000Z",
       state: true,
-      stateName: "Hoạt động"
+      stateName: "Hoạt động",
+      areas: [
+        {
+          id: 1,
+          areaName: "Quận 1"
+        },
+        {
+          id: 2,
+          areaName: "Quận 2"
+        },
+        {
+          id: 3,
+          areaName: "Quận 7"
+        },
+        {
+          id: 4,
+          areaName: "Quận 10"
+        },
+        {
+          id: 5,
+          areaName: "Bình Thạnh"
+        }
+      ]
     },
     {
       id: 2,
@@ -18,7 +40,21 @@ export const mockUniversities = {
       image: "https://example.com/rmit.jpg",
       dateCreated: "2024-01-16T07:00:00.000Z",
       state: true,
-      stateName: "Hoạt động"
+      stateName: "Hoạt động",
+      areas: [
+        {
+          id: 1,
+          areaName: "Quận 1"
+        },
+        {
+          id: 3,
+          areaName: "Quận 7"
+        },
+        {
+          id: 5,
+          areaName: "Bình Thạnh"
+        }
+      ]
     },
     {
       id: 3,
@@ -28,7 +64,17 @@ export const mockUniversities = {
       image: "https://example.com/vnu.jpg",
       dateCreated: "2024-01-17T07:00:00.000Z",
       state: false,
-      stateName: "Không hoạt động"
+      stateName: "Không hoạt động",
+      areas: [
+        {
+          id: 2,
+          areaName: "Quận 2"
+        },
+        {
+          id: 4,
+          areaName: "Quận 10"
+        }
+      ]
     }
   ],
   currentPage: 1,

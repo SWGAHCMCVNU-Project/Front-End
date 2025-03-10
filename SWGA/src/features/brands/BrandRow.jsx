@@ -1,4 +1,4 @@
-import { HiPencil, HiTrash } from "react-icons/hi2";
+import {  HiTrash } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Table from "../../ui/Table";
@@ -12,7 +12,6 @@ import {
   formattedHours,
   handleValidImageURL,
 } from "../../utils/helpers";
-import CreateBrandForm from "./CreateBrandForm";
 import { useDeleteBrand } from "./useDeleteBrand";
 
 const Station = styled.div`
@@ -203,14 +202,14 @@ function BrandRow({ brand, displayedIndex }) {
 
       <StyledAction>
         <Modal>
-          <Modal.Open opens="edit">
+          {/* <Modal.Open opens="edit">
             <StyledButton>
               <HiPencil />
             </StyledButton>
           </Modal.Open>
           <Modal.Window name="edit">
             <CreateBrandForm brandToEdit={brand} />
-          </Modal.Window>
+          </Modal.Window> */}
 
           <Modal.Open opens="delete">
             <StyledButton>

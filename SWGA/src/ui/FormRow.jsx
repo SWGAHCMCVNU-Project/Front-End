@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { AiFillExclamationCircle } from "react-icons/ai";
+import PropTypes from 'prop-types';
 
 const StyledFormRow = styled.div`
   display: grid;
@@ -54,10 +55,13 @@ const StyledIcon = styled.div`
   }
 `;
 
-export default function FormRow({ label, error, children }) {
+function FormRow({ label, error, children }) {
+  // Kiểm tra an toàn khi truy cập id
+  const childId = children?.props?.id || '';
+
   return (
     <StyledFormRow>
-      {label && <Label htmlFor={children.props.id}>{label}</Label>}
+      {label && <Label htmlFor={childId}>{label}</Label>}
       {children}
       {error && (
         <Error>
@@ -70,3 +74,11 @@ export default function FormRow({ label, error, children }) {
     </StyledFormRow>
   );
 }
+
+FormRow.propTypes = {
+  label: PropTypes.string,
+  error: PropTypes.string,
+  children: PropTypes.node
+};
+
+export default FormRow;
