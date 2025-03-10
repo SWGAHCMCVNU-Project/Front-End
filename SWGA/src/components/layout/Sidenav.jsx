@@ -302,8 +302,8 @@ function Sidenav({ color }) {
         },
         {
           key: "16",
-          linkURL: "/vouchers",
-          pageName: "vouchers",
+          linkURL: "/voucher-items",
+          pageName: "voucher-items",
           color: color,
           iconPage: <FontAwesomeIcon icon={faTicket} />,
           labelPageName: "Phiếu mẫu",
@@ -311,8 +311,8 @@ function Sidenav({ color }) {
         },
         {
           key: "17",
-          linkURL: "/voucher-items",
-          pageName: "voucher-items",
+          linkURL: "/vouchers",
+          pageName: "vouchers",
           color: color,
           iconPage: <HiMiniTicket />,
           labelPageName: "Phiếu ưu đãi",

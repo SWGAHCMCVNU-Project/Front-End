@@ -7,13 +7,21 @@ export const AUTH_ENDPOINTS = {
     LOGOUT: '/logout',
   };
   export const VOUCHER_ENDPOINTS = {
-    CREATE_VOUCHER: '/Voucher',
-    GET_ALL_VOUCHERS: '/Voucher',
-    GET_VOUCHER_BY_ID: '/Voucher/{id}'
+    CREATE: '/Voucher',
+    GET_ALL: '/Voucher',
+    GET_BY_ID: '/Voucher/{id}'
   };
 
-  export const VOUCHER_ITEM_ENDPOINTS = {
-    CREATE_VOUCHER_ITEM: '/VoucherItem',
-    GET_ALL_VOUCHER_ITEMS: '/VoucherItem',
-    GET_VOUCHER_ITEM_BY_ID: '/VoucherItem/{id}'
+  export const VOUCHER_TYPE_ENDPOINTS = {
+    GET_ALL: "/VoucherType",
+    GET_BY_ID: "/VoucherType/{id}",
+    CREATE: "/VoucherType",
   };
+  export const BRAND_ENDPOINTS = {
+    GET_ALL: "/Brand",
+    GET_BY_ID: "/Brand/{id}",
+    CREATE: "/Brand",
+    UPDATE: "/Brand/{id}",
+    CREATE_FOR_EXISTING_ACCOUNT: "/Brand/existingAccount"
+  };
+

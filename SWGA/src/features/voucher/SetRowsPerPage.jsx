@@ -1,18 +1,23 @@
 import { useSearchParams } from "react-router-dom";
 import RowPerPage from "../../ui/RowPerPage";
 import TableOperations from "../../ui/TableOperations";
+import PropTypes from "prop-types";
 
-function VoucherItemSetRowsPerPage({ pageSize, onLimitChange }) {
+function VoucherSetRowsPerPage({ pageSize, setPageSize }) {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const handleLimitChange = (newLimit) => {
-    if (Number(newLimit) !== pageSize) {
-      onLimitChange(newLimit);
-      searchParams.set("limit", newLimit);
-      searchParams.set("page", 1);
-      setSearchParams(searchParams);
+    const numLimit = Number(newLimit);
+    if (numLimit !== pageSize) {
+      setPageSize(numLimit);
+      
+      const params = new URLSearchParams(searchParams);
+      params.set("size", newLimit);
+      params.set("page", "1"); // Reset về trang 1 khi đổi size
+      setSearchParams(params, { replace: true });
     }
   };
+
   return (
     <TableOperations>
       <RowPerPage
@@ -29,4 +34,9 @@ function VoucherItemSetRowsPerPage({ pageSize, onLimitChange }) {
   );
 }
 
-export default VoucherItemSetRowsPerPage;
+VoucherSetRowsPerPage.propTypes = {
+  pageSize: PropTypes.number.isRequired,
+  setPageSize: PropTypes.func.isRequired
+};
+
+export default VoucherSetRowsPerPage;

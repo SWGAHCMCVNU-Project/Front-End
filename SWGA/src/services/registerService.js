@@ -12,11 +12,11 @@ class RegisterService {
         return result.data;
       } else {
         toast.error(result.data?.message || 'Đăng ký thất bại!');
-        throw new Error('Registration failed');
+        return null;
       }
     } catch (error) {
       toast.error('Đã có lỗi xảy ra khi đăng ký!');
-      throw error;
+      return null;
     }
   }
 

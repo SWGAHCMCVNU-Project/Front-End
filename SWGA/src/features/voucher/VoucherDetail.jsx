@@ -4,13 +4,13 @@ import styled from "styled-components";
 import Button from "../../ui/Button";
 import ButtonGroup from "../../ui/ButtonGroup";
 import ButtonText from "../../ui/ButtonText";
-import ConfirmDelete from "../../ui/ConfirmDelete";
+// import ConfirmDelete from "../../ui/ConfirmDelete";
 import Heading from "../../ui/Heading";
 import Modal from "../../ui/Modal";
 import Row from "../../ui/Row";
 import Spinner from "../../ui/Spinner";
 import VoucherDataBox from "./VoucherDataBox";
-import { useVoucherItem } from "../../hooks/voucher-item/useVoucherItem";
+import { useVoucher } from "../../hooks/voucher/useVoucher";
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -49,10 +49,10 @@ const StyledButton = styled.div`
 
 function VoucherDetail() {
   const navigate = useNavigate();
-  const { voucherItemId } = useParams();
+  const { voucherId } = useParams();
   const { campaignId } = useParams();
-  const { voucherItem, isLoading } = useVoucherItem();
-  const { isDeleting, deleteVoucherItem } = useDeleteVoucherItem();
+  const { voucher, isLoading } = useVoucher();
+  // const { isDeleting, deleteVoucherItem } = useDeleteVoucherItem();
 
   if (isLoading) return <Spinner />;
 
@@ -87,20 +87,20 @@ function VoucherDetail() {
                     </StyledContainerButton>
                   </Button>
                 </Modal.Open>
-                <Modal.Window name="delete">
+                {/* <Modal.Window name="delete">
                   <ConfirmDelete
                     resourceName="phiếu ưu đãi"
                     disabled={isDeleting}
                     onConfirm={() => deleteVoucherItem(voucherItemId)}
                   />
-                </Modal.Window>
+                </Modal.Window> */}
               </Modal>
             </ButtonGroup>
           </>
         )}
       </ButtonGroup>
 
-      <VoucherDataBox voucher={voucherItem} />
+      <VoucherDataBox voucher={voucher} />
     </Container>
   );
 }

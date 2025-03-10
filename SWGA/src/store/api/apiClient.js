@@ -14,16 +14,28 @@ apiClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // Log the full URL for debugging
+    console.log(`API Request: ${config.method.toUpperCase()} ${config.baseURL}${config.url}`);
+    
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    return Promise.reject(error);
+  }
 );
 
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    return response;
+  },
   (error) => {
-    const status = error.response?.status || 500;
-    return Promise.reject({ status, data: error.response?.data || error.message });
+    if (error.response && error.response.status === 401) {
+      // Handle 401 Unauthorized error (e.g., redirect to login)
+      storageService.clearAll();
+      window.location.href = '/sign-in';
+    }
+    return Promise.reject(error);
   }
 );
 

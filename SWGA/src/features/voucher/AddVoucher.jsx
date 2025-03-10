@@ -2,7 +2,7 @@ import { HiMiniPlus } from "react-icons/hi2";
 import styled from "styled-components";
 import Button from "../../ui/Button";
 import MyModal from "../../ui/custom/Modal/MyModal";
-import CreateVoucherItem from "./CreateVoucherItem";
+import CreateVoucher from "./CreateVoucher";
 
 const StyledContainerButton = styled.div`
   display: flex;
@@ -25,11 +25,11 @@ const StyledButton = styled.div`
   }
 `;
 
-export default function AddVoucherItem() {
+export default function AddVoucher() {
   return (
     <div>
       <MyModal>
-        <MyModal.Open opens="voucher-item-form">
+        <MyModal.Open opens="voucher-form">
           <Button>
             <StyledContainerButton>
               <StyledButton>
@@ -39,8 +39,8 @@ export default function AddVoucherItem() {
             </StyledContainerButton>
           </Button>
         </MyModal.Open>
-        <MyModal.Window name="voucher-item-form">
-          <CreateVoucherItem />
+        <MyModal.Window name="voucher-form">
+          <CreateVoucher />
         </MyModal.Window>
       </MyModal>
     </div>
