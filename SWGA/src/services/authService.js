@@ -10,61 +10,42 @@ const ROLE_MAPPING = {
 };
 
 class AuthService {
-  async login(credentials, navigate) {
+  async login(credentials) {
     try {
       const result = await loginAPI(credentials);
 
-      if (result.status === 200) {
-        const { token, role, accountId, brandId } = result.data;
+      if (result?.status === 200) {
+        const { token, role, accountId, brandId } = result.data || {};
 
         if (!token) {
-          toast.error('Không nhận được token từ server');
-          throw new Error('Token validation failed');
+          return { success: false, message: 'Không nhận được token từ server!' };
         }
 
-        // Lưu token
         storageService.setAccessToken(token);
 
-        // Map role từ tiếng Việt sang tiếng Anh
         const mappedRole = ROLE_MAPPING[role] || role;
+        const userData = { role: mappedRole, accountId };
+        if (brandId) userData.brandId = brandId;
 
-        // Tạo user object từ data nhận được
-        const userData = {
-          role: mappedRole,
-          accountId: accountId,
-          brandId: brandId || accountId // Nếu không có brandId, dùng accountId
-        };
-
-        // Lưu user data
         storageService.setUser(userData);
-        
-        // Lưu brandId nếu có
-        if (brandId) {
-          console.log("Saving brandId from login:", brandId);
-          storageService.setBrandId(brandId);
-        } else if (accountId && mappedRole === 'brand') {
-          console.log("Using accountId as brandId:", accountId);
-          storageService.setBrandId(accountId);
-        }
+        if (brandId) storageService.setBrandId(brandId);
 
-        toast.success('Đăng nhập thành công!');
-        navigate('/dashboard', { replace: true });
         return { success: true };
-      } else {
-        toast.error('Đăng nhập thất bại!');
-        throw new Error('Authentication failed');
-      }
+      } 
+
+      return { success: false, message: result?.data?.message || 'Sai tài khoản hoặc mật khẩu!' };
+      
     } catch (error) {
-      console.error('Authentication error occurred:', error);
-      toast.error('Đăng nhập thất bại!');
-      throw new Error('Authentication failed');
+      console.error('Lỗi đăng nhập:', error);
+      return { success: false, message: error.response?.data?.message || 'Không thể kết nối đến máy chủ!' };
     }
   }
 
   logout() {
     storageService.removeAccessToken();
     storageService.removeUser();
-    localStorage.removeItem("brandId");
+    storageService.removeBrandId();
+    toast.success('Đã đăng xuất thành công!');
   }
 }
 

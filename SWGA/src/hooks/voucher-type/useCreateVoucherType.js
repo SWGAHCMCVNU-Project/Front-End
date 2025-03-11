@@ -1,9 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
-import voucherTypeService from "../../services/voucherTypeService";
+import { createVoucherTypeAPI } from "../../store/api/voucherTypeApi";
 
 export function useCreateVoucherType() {
   const { mutate: createVoucherType, isLoading: isCreating, error } = useMutation({
-    mutationFn: (data) => voucherTypeService.createVoucherType(data),
+    mutationFn: (data) => createVoucherTypeAPI(data),
   });
 
   return { isCreating, createVoucherType, error };

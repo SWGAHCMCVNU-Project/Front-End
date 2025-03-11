@@ -9,9 +9,10 @@ export function useCreateVoucher() {
     mutationFn: createVoucherAPI,
     onSuccess: () => {
       toast.success("Tạo phiếu ưu đãi thành công");
-      queryClient.invalidateQueries({ queryKey: ["vouchers"] });
+      queryClient.invalidateQueries({ queryKey: ["vouchers"] }); // Invalidate query để làm mới danh sách voucher
     },
     onError: (err) => {
+      console.error("Mutation error:", err);
       toast.error(err.message || "Có lỗi xảy ra khi tạo phiếu ưu đãi");
     },
   });

@@ -20,22 +20,33 @@ function SignIn() {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
+    if (!data.userName.trim() || !data.password) {
+      toast.error('Vui lòng nhập tài khoản và mật khẩu!');
+      return;
+    }
+  
     setIsLoading(true);
   
-    const credentials = {
-      userName: data.userName.trim(),
-      password: data.password,
-    };
-  
     try {
-      await authService.login(credentials, navigate); // Gọi service
+      const response = await authService.login({
+        userName: data.userName.trim(),
+        password: data.password,
+      });
+  
+      if (response.success) {
+        navigate('/dashboard'); // Chỉ điều hướng khi login thành công
+      } else {
+        toast.error(response.message); // Chỉ hiển thị lỗi một lần
+      }
     } catch (error) {
-      console.error('Login failed in SignIn:', error);
-      // Toast đã được xử lý trong authService, nhưng có thể thêm log chi tiết
+      console.error('Lỗi đăng nhập:', error);
+      toast.error('Lỗi đăng nhập! Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
     }
   };
+  
+  
 
   return (
     <Layout className="layout-default layout-signin">

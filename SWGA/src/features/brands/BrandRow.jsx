@@ -1,18 +1,13 @@
-import {  HiTrash } from "react-icons/hi2";
+import { HiEye } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Table from "../../ui/Table";
 import Tag from "../../ui/Tag";
 import { useEffect, useState } from "react";
 import logoDefault from "../../assets/images/brand.png";
-import ConfirmDelete from "../../ui/ConfirmDelete";
 import Modal from "../../ui/Modal";
-import {
-  formatCurrency,
-  formattedHours,
-  handleValidImageURL,
-} from "../../utils/helpers";
-import { useDeleteBrand } from "./useDeleteBrand";
+import BrandDetailModal from "./BrandDetailModal";
+import { formatCurrency, formattedHours, handleValidImageURL } from "../../utils/helpers";
 
 const Station = styled.div`
   display: flex;
@@ -24,30 +19,24 @@ const Station = styled.div`
 `;
 
 const Img = styled.img`
-  display: block;
-  align-items: center;
-  width: ${(props) => (props.src ? "50px" : "38px")};
+  width: 50px;
   object-fit: cover;
-  object-position: center;
-  transform: scale(1.5) translateX(-7px);
   border-radius: 8px;
-  padding: 0.5rem 0.5rem;
-  margin-left: ${(props) => (props.src ? "2rem" : "0.5rem")};
+  padding: 0.5rem;
+  margin-left: 2rem;
   content: url(${(props) => (props.src ? props.src : logoDefault)});
 `;
 
 const StationName = styled.div`
+  white-space: nowrap; /* Không cắt chữ */
   overflow: hidden;
   text-overflow: ellipsis;
-  -webkit-line-clamp: 2;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
+  max-width: 200px; /* Tăng giới hạn */
 `;
 
 const StackedTime = styled.span`
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
   font-weight: 500;
 `;
 
@@ -60,10 +49,9 @@ const StackedTimeFrameBelow = styled.span`
 `;
 
 const StyledButton = styled.button`
-  text-align: left;
   background: none;
   border: none;
-  padding: 0.4rem 0.4rem;
+  padding: 0.4rem;
   font-size: 1.4rem;
   transition: all 0.2s;
 
@@ -74,25 +62,15 @@ const StyledButton = styled.button`
   }
 
   & svg {
-    width: 2.2rem;
-    height: 2.2rem;
-    color: var(--color-grey-400);
-    transition: all 0.3s;
+    width: 2.4rem;
+    height: 2.4rem;
+    color: var(--color-grey-600); /* Làm đậm */
   }
 
   & svg:hover {
     color: var(--color-green-600);
+    transform: scale(1.1); /* Phóng to nhẹ */
   }
-`;
-
-const StationIndex = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.6rem;
-  font-weight: 500;
-  color: var(--color-green-400);
-  gap: 0.3rem;
 `;
 
 const StyledAction = styled.div`
@@ -102,43 +80,9 @@ const StyledAction = styled.div`
   gap: 0.3rem;
 `;
 
-const StyledNavigateButton = styled.div`
-  background: none;
-  border: none;
-  cursor: pointer;
-
-  &:hover {
-    background-color: var(--color-grey-50);
-  }
-`;
-
 function BrandRow({ brand, displayedIndex }) {
-  const { isDeleting, deleteBrand } = useDeleteBrand();
-  const {
-    id: brandId,
-    openingHours,
-    closingHours,
-    brandName,
-    state,
-    totalIncome,
-    totalSpending,
-    logo,
-  } = brand;
-
-  const NavigateButton = ({ children }) => {
-    const navigate = useNavigate();
-    return (
-      <StyledNavigateButton onClick={() => navigate(`/brands/${brandId}`)}>
-        {children}
-      </StyledNavigateButton>
-    );
-  };
-
-  const statusToTagName = {
-    true: "cyan",
-    false: "error",
-  };
-
+  const { id: brandId, openingHours, closingHours, brandName, state, totalIncome, totalSpending, logo } = brand;
+  const navigate = useNavigate();
   const [isValidImage, setIsValidImage] = useState(true);
 
   useEffect(() => {
@@ -149,80 +93,45 @@ function BrandRow({ brand, displayedIndex }) {
 
   return (
     <Table.Row>
-      <NavigateButton>
-        <StationIndex>{displayedIndex}</StationIndex>
-      </NavigateButton>
-
-      <NavigateButton>
+      <div>{displayedIndex}</div> {/* Hiển thị số thứ tự */}
+      
+      <div onClick={() => navigate(`/brands/${brandId}`)}>
         <Station>
           <Img src={isValidImage ? logo || "" : logoDefault} />
           <StationName>{brandName}</StationName>
         </Station>
-      </NavigateButton>
+      </div>
 
-      <NavigateButton>
-        <StackedTime>
-          <span>
-            Mở cửa:{" "}
-            <StackedTimeFrameAbove>
-              {openingHours ? formattedHours(openingHours) : "Chưa cập nhật"}
-            </StackedTimeFrameAbove>
-          </span>
-          <span>
-            Đóng cửa:{" "}
-            <StackedTimeFrameBelow>
-              {closingHours ? formattedHours(closingHours) : "Chưa cập nhật"}
-            </StackedTimeFrameBelow>
-          </span>
-        </StackedTime>
-      </NavigateButton>
+      <StackedTime>
+        <span>
+          Mở cửa: <StackedTimeFrameAbove>{openingHours ? formattedHours(openingHours) : "Chưa có dữ liệu"}</StackedTimeFrameAbove>
+        </span>
+        <span>
+          Đóng cửa: <StackedTimeFrameBelow>{closingHours ? formattedHours(closingHours) : "Chưa có dữ liệu"}</StackedTimeFrameBelow>
+        </span>
+      </StackedTime>
 
-      <NavigateButton>
-        <StackedTime>
-          <span>
-            Tổng nhận:{" "}
-            <StackedTimeFrameAbove>
-              {formatCurrency(totalIncome)}
-            </StackedTimeFrameAbove>
-          </span>
-          <span>
-            Tổng chi:{" "}
-            <StackedTimeFrameBelow>
-              {formatCurrency(totalSpending)}
-            </StackedTimeFrameBelow>
-          </span>
-        </StackedTime>
-      </NavigateButton>
+      <StackedTime>
+        <span>
+          Tổng nhận: <StackedTimeFrameAbove>{formatCurrency(totalIncome)}</StackedTimeFrameAbove>
+        </span>
+        <span>
+          Tổng chi: <StackedTimeFrameBelow>{formatCurrency(totalSpending)}</StackedTimeFrameBelow>
+        </span>
+      </StackedTime>
 
-      <NavigateButton>
-        <Tag type={statusToTagName[state]}>
-          {state ? "Hoạt động" : "Không hoạt động"}
-        </Tag>
-      </NavigateButton>
+      <Tag type={state ? "cyan" : "error"}>{state ? "Hoạt động" : "Không hoạt động"}</Tag>
 
       <StyledAction>
         <Modal>
-          {/* <Modal.Open opens="edit">
+          {/* <Modal.Open opens="view">
             <StyledButton>
-              <HiPencil />
+              <HiEye />
             </StyledButton>
-          </Modal.Open>
-          <Modal.Window name="edit">
-            <CreateBrandForm brandToEdit={brand} />
+          </Modal.Open> */}
+          {/* <Modal.Window name="view">
+            <BrandDetailModal brand={brand} />
           </Modal.Window> */}
-
-          <Modal.Open opens="delete">
-            <StyledButton>
-              <HiTrash />
-            </StyledButton>
-          </Modal.Open>
-          <Modal.Window name="delete">
-            <ConfirmDelete
-              resourceName="thương hiệu"
-              disabled={isDeleting}
-              onConfirm={() => deleteBrand(brandId)}
-            />
-          </Modal.Window>
         </Modal>
       </StyledAction>
     </Table.Row>

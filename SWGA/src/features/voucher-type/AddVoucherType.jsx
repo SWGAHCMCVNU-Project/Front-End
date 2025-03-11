@@ -2,7 +2,7 @@ import { HiMiniPlus } from "react-icons/hi2";
 import styled from "styled-components";
 import Button from "../../ui/Button";
 import MyModal from "../../ui/custom/Modal/MyModal";
-import CreateVoucher from "./CreateVoucher";
+import CreateVoucherTypeForm from "./CreateVoucherTypeForm";
 
 const StyledContainerButton = styled.div`
   display: flex;
@@ -25,22 +25,22 @@ const StyledButton = styled.div`
   }
 `;
 
-export default function AddVoucher() {
+export default function AddVoucherType() {
   return (
     <div>
       <MyModal>
-        <MyModal.Open opens="voucher-form">
+        <MyModal.Open opens="voucher-type-form">
           <Button>
             <StyledContainerButton>
               <StyledButton>
                 <HiMiniPlus />
               </StyledButton>
-              Thêm phiếu ưu đãi
+              Thêm loại ưu đãi
             </StyledContainerButton>
           </Button>
         </MyModal.Open>
-        <MyModal.Window name="voucher-form">
-          <CreateVoucher />
+        <MyModal.Window name="voucher-type-form">
+          <CreateVoucherTypeForm onCloseModal={() => {}} />
         </MyModal.Window>
       </MyModal>
     </div>

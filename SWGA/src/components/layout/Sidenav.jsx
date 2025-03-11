@@ -162,15 +162,7 @@ function Sidenav({ color }) {
           labelPageName: "Chiến dịch",
           allowedRoles: ["admin", "brand"],
         },
-        {
-          key: "3",
-          linkURL: "/activities",
-          pageName: "activities",
-          color: color,
-          iconPage: <FontAwesomeIcon icon={faPersonWalking} />,
-          labelPageName: "Hoạt động",
-          allowedRoles: ["admin"],
-        },
+        
         {
           key: "4",
           linkURL: "/orders",
@@ -213,17 +205,9 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <FontAwesomeIcon icon={faTrademark} />,
           labelPageName: "Thương hiệu",
-          allowedRoles: ["admin", "brand"],
-        },
-        {
-          key: "8",
-          linkURL: "/products",
-          pageName: "products",
-          color: color,
-          iconPage: tables,
-          labelPageName: "Sản phẩm",
           allowedRoles: ["admin"],
         },
+        
         {
           key: "9",
           linkURL: "/stations",
@@ -233,15 +217,7 @@ function Sidenav({ color }) {
           labelPageName: "Trạm nhận hàng",
           allowedRoles: ["admin", "staff"],
         },
-        {
-          key: "10",
-          linkURL: "/staffs",
-          pageName: "staffs",
-          color: color,
-          iconPage: <FontAwesomeIcon icon={faUserTie} />,
-          labelPageName: "Nhân viên",
-          allowedRoles: ["admin"],
-        },
+       
       ],
     },
     {
@@ -250,15 +226,7 @@ function Sidenav({ color }) {
     {
       type: "group",
       menuSideNav: [
-        {
-          key: "11",
-          linkURL: "/categories",
-          pageName: "categories",
-          color: color,
-          iconPage: <FontAwesomeIcon icon={faBars} />,
-          labelPageName: "Thể loại",
-          allowedRoles: ["admin"],
-        },
+        
         {
           key: "12",
           linkURL: "/universities",
@@ -268,15 +236,7 @@ function Sidenav({ color }) {
           labelPageName: "Đại học",
           allowedRoles: ["admin", "campus"],
         },
-        {
-          key: "13",
-          linkURL: "/majors",
-          pageName: "majors",
-          color: color,
-          iconPage: <FontAwesomeIcon icon={faGraduationCap} />,
-          labelPageName: "Chuyên ngành",
-          allowedRoles: ["admin"],
-        },
+        
         {
           key: "14",
           linkURL: "/areas",
@@ -302,11 +262,11 @@ function Sidenav({ color }) {
         },
         {
           key: "16",
-          linkURL: "/voucher-items",
-          pageName: "voucher-items",
+          linkURL: "/voucher-type",
+          pageName: "voucher-type",
           color: color,
           iconPage: <FontAwesomeIcon icon={faTicket} />,
-          labelPageName: "Phiếu mẫu",
+          labelPageName: "Thể loại",
           allowedRoles: ["brand"],
         },
         {
@@ -315,7 +275,7 @@ function Sidenav({ color }) {
           pageName: "vouchers",
           color: color,
           iconPage: <HiMiniTicket />,
-          labelPageName: "Phiếu ưu đãi",
+          labelPageName: "Phiếu mẫu",
           allowedRoles: ["brand"],
         },
         {

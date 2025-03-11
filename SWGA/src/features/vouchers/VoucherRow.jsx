@@ -1,14 +1,10 @@
-import { HiEye, HiPencil, HiTrash } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Table from "../../ui/Table";
 import Tag from "../../ui/Tag";
-import { useEffect, useState } from "react";
+import { HiEye, HiPencil } from "react-icons/hi2";
 import logoDefault from "../../assets/images/brand.png";
-import ConfirmDelete from "../../ui/ConfirmDelete";
-import Modal from "../../ui/Modal";
-import { handleValidImageURL } from "../../utils/helpers";
-import { useDeleteVoucher } from "./useDeleteVoucher";
+import { useEffect, useState } from "react";
 
 const Station = styled.div`
   display: flex;
@@ -34,7 +30,6 @@ const Img = styled.img`
 `;
 
 const StationName = styled.div`
-  //show 1 line
   overflow: hidden;
   text-overflow: ellipsis;
   -webkit-line-clamp: 2;
@@ -78,108 +73,44 @@ const StyledAction = styled.div`
   justify-content: center;
 `;
 
-const StyledNavigateButton = styled.div`
-  background: none;
-  border: none;
-  cursor: pointer;
-
-  &:hover {
-    background-color: var(--color-grey-50);
-  }
-`;
-
 function VoucherRow({ voucher, displayedIndex }) {
   const navigate = useNavigate();
-  const { isDeleting, deleteVoucher } = useDeleteVoucher();
-  const {
-    id: voucherId,
-    image,
-    dateCreated,
-    openingHours,
-    closingHours,
-    phone,
-    status,
-    typeName,
-    voucherName,
-    email,
-    state,
-    totalIncome,
-    totalSpending,
-    greenWalletImage,
-    coverPhoto,
-    logo,
-  } = voucher;
-
-  const NavigateButton = ({ children }) => {
-    const navigate = useNavigate();
-    return (
-      <StyledNavigateButton onClick={() => navigate(`/vouchers/${voucherId}`)}>
-        {children}
-      </StyledNavigateButton>
-    );
-  };
+  const { id: voucherId, image, voucherName, state } = voucher;
 
   const statusToTagName = {
     true: "cyan",
     false: "error",
   };
 
-  const handleEditClick = () => {
-    navigate(`/vouchers/edit/${voucherId}`, {
-      state: { voucherToEdit: voucher },
-    });
-  };
-
   const [isValidImage, setIsValidImage] = useState(true);
 
   useEffect(() => {
-    handleValidImageURL(image)
-      .then((isValid) => setIsValidImage(isValid))
-      .catch(() => setIsValidImage(false));
+    const checkImage = async () => {
+      try {
+        const response = await fetch(image);
+        setIsValidImage(response.ok);
+      } catch {
+        setIsValidImage(false);
+      }
+    };
+    if (image) checkImage();
   }, [image]);
 
   return (
     <Table.Row>
-      <NavigateButton>
-        <StationIndex>{displayedIndex}</StationIndex>
-      </NavigateButton>
-
-      <NavigateButton>
-        <Station isNullImage={image === null}>
-          <Img src={isValidImage ? image || "" : logoDefault} />
-          <StationName isNullImage={image === null}>{voucherName}</StationName>
-        </Station>
-      </NavigateButton>
-
-      <NavigateButton>
-        <Tag type={statusToTagName[state]}>
-          {state ? "Hoạt động" : "Không hoạt động"}
-        </Tag>
-      </NavigateButton>
-
+      <StationIndex>{displayedIndex}</StationIndex>
+      <Station>
+        <Img src={isValidImage ? image : logoDefault} alt={voucherName} />
+        <StationName>{voucherName}</StationName>
+      </Station>
+      <Tag type={statusToTagName[state]}>{state ? "Hoạt động" : "Không hoạt động"}</Tag>
       <StyledAction>
         <StyledButton onClick={() => navigate(`/vouchers/${voucherId}`)}>
           <HiEye />
         </StyledButton>
-
-        <StyledButton onClick={handleEditClick}>
+        <StyledButton onClick={() => navigate(`/vouchers/edit/${voucherId}`, { state: { voucherToEdit: voucher } })}>
           <HiPencil />
         </StyledButton>
-
-        <Modal>
-          <Modal.Open opens="delete">
-            <StyledButton>
-              <HiTrash />
-            </StyledButton>
-          </Modal.Open>
-          <Modal.Window name="delete">
-            <ConfirmDelete
-              resourceName="voucher"
-              disabled={isDeleting}
-              onConfirm={() => deleteVoucher(voucherId)}
-            />
-          </Modal.Window>
-        </Modal>
       </StyledAction>
     </Table.Row>
   );

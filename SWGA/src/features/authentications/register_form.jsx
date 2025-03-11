@@ -160,18 +160,12 @@ function RegisterBrand() {
 
   return (
     <>
-      <div className="sign-up-header">
-        <Col className="signup-img">
-          <img src={signupbg} alt="" />
-        </Col>
-        <HeaderLogin>
-          <div className="header-login">
+     
+      <div className="header-login">
             <Title style={{ color: "#15803d" }}>
               Đăng Kí Tài Khoản Thương Hiệu
             </Title>
           </div>
-        </HeaderLogin>
-      </div>
       <div className="btn-header-signup">
         <ButtonText onClick={moveBack}>← Quay lại đăng nhập</ButtonText>
       </div>

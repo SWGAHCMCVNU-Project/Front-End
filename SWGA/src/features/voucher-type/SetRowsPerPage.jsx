@@ -7,12 +7,13 @@ function SetRowsPerPage({ pageSize, onLimitChange }) {
 
   const handleLimitChange = (newLimit) => {
     if (Number(newLimit) !== pageSize) {
-      onLimitChange(newLimit);
-      searchParams.set("limit", newLimit);
+      onLimitChange(Number(newLimit));
+      searchParams.set("size", newLimit);
       searchParams.set("page", 1);
       setSearchParams(searchParams);
     }
   };
+
   return (
     <TableOperations>
       <RowPerPage

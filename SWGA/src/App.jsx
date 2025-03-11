@@ -17,7 +17,7 @@ import Student from './pages/StudentManagement/Student.jsx';
 import UniversityPage from './pages/UniversityManagement/UniversityPage.jsx';
 import MajorPage from './pages/MajorManagement/MajorPage.jsx';
 import StorePage from './pages/StoreManagement/StorePage.jsx';
-import Vouchers1 from './pages/VoucherManagement1/Vouchers.jsx';
+import VoucherType from './pages/VoucherType/VoucherType.jsx';
 // import VoucherDetail from './pages/VoucherManagement/VoucherDetail.jsx';
 import Vouchers from './pages/VoucherManagement/Vouchers.jsx';
 import Voucher from './pages/VoucherManagement/Voucher.jsx';
@@ -29,6 +29,7 @@ import Lecturers from './pages/LectureManagement/Lecturers.jsx';
 import PackagePoint from './pages/PackagePointManagement/PackagePoint.jsx';
 import Main from './components/layout/Main.jsx';
 import storageService from './services/storageService';
+import VoucherCreatePage from './pages/VoucherManagement/VoucherCreatePage.jsx';
 // import AccessDenied from './pages/AccessDenied/AccessDenied.jsx';
 
 function PrivateRoute({ children, allowedRoles = [] }) {
@@ -122,15 +123,20 @@ function App() {
                 <Vouchers />
               </PrivateRoute>
             } />
+              <Route path="/vouchers/create" exact element={
+              <PrivateRoute allowedRoles={['brand']}>
+                <VoucherCreatePage />
+              </PrivateRoute>
+            } />
             {/* <Route path="/vouchers/:voucherId" element={checkAccess(['brand'], <VoucherDetail />)} /> */}
             <Route path="/voucher/voucherId:" exact element={
               <PrivateRoute allowedRoles={['brand']}>
                 <Voucher />
               </PrivateRoute>
             } />
-            <Route path="voucher1" element={
+            <Route path="/voucher-type" element={
               <PrivateRoute allowedRoles={['brand']}>
-                <Vouchers1 />
+                <VoucherType />
               </PrivateRoute>
             } />
             <Route path="/customers" exact element={

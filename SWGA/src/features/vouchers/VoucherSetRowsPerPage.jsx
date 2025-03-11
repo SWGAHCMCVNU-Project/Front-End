@@ -36,7 +36,7 @@ function VoucherSetRowsPerPage({ pageSize, setPageSize }) {
 
 VoucherSetRowsPerPage.propTypes = {
   pageSize: PropTypes.number.isRequired,
-  setPageSize: PropTypes.func.isRequired
+  setPageSize: PropTypes.func.isRequired,
 };
 
 export default VoucherSetRowsPerPage;

@@ -5,17 +5,14 @@ import coverPhotoBrandDefault from "../../assets/images/coupon.png";
 import greenBean from "../../assets/images/dauxanh.png";
 import DataItem from "../../ui/DataItem";
 import Heading from "../../ui/Heading";
-import { formatCurrency, handleValidImageURL } from "../../utils/helpers";
-
+import { formatCurrency } from "../../utils/helpers";
 import { useEffect, useState } from "react";
 import DataItemDes from "../brands/DataItemDes";
 
 const StyledStationDataBox = styled.section`
-  /* Box */
   background-color: var(--color-grey-0);
   border: 1px solid var(--color-grey-100);
   border-radius: var(--border-radius-md);
-
   overflow: hidden;
 `;
 
@@ -69,13 +66,6 @@ const StyleGreenWallet = styled.div`
   font-size: 16px;
 `;
 
-const StyleRedWallet = styled.div`
-  color: var(--color-red-700);
-  display: inline-block;
-  font-weight: bold;
-  font-size: 16px;
-`;
-
 const Footer = styled.footer`
   padding: 0 4rem 1.6rem 4rem;
   font-size: 1.2rem;
@@ -89,7 +79,6 @@ const Flag = styled.img`
   display: block;
   border: ${(props) => (props.src ? "1px solid var(--color-grey-100)" : null)};
 
-  // If image is empty or null, use logoDefault
   content: url(${(props) => (props.src ? props.src : coverPhotoBrandDefault)});
 `;
 
@@ -99,7 +88,7 @@ const StyledTotalBean = styled.div`
   align-items: center;
 `;
 
-const TagCampaignState = styled.span`
+const TagState = styled.span`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -110,7 +99,7 @@ const TagCampaignState = styled.span`
   padding: 0.2rem;
   border-radius: 5px;
   margin: 0 auto;
-  width: 120px;
+  width: 160px;
 
   color: var(--color-${(props) => props.type}-700);
   background-color: var(--color-${(props) => props.type}-100);
@@ -119,125 +108,86 @@ const TagCampaignState = styled.span`
 
 function VoucherDataBox({ voucher }) {
   const {
-    id: voucherItemId,
-    typeName,
-    voucherImage,
-    dateCreated,
     voucherName,
+    typeName,
+    image,
+    dateCreated,
     state,
     description,
     condition,
     price,
     rate,
-    voucherCode,
-    campaignName,
-    campaignState,
-    campaignStateName,
   } = voucher;
 
-  const campaignStateToTagName = {
-    Pending: "green",
-    Rejected: "tag-orange",
-    Active: "cyan",
-    Inactive: "error",
-    Finished: "tag-blue",
-    Closed: "red",
-    Cancelled: "tag-volcano",
+  const statusToTagName = {
+    true: "cyan",
+    false: "error",
   };
+
   const [isValidCoverPhoto, setIsValidCoverPhoto] = useState(true);
 
   useEffect(() => {
-    handleValidImageURL(voucherImage)
-      .then((isValid) => setIsValidCoverPhoto(isValid))
-      .catch(() => setIsValidCoverPhoto(false));
-  }, [voucherImage]);
+    const checkImage = async () => {
+      try {
+        const response = await fetch(image);
+        setIsValidCoverPhoto(response.ok);
+      } catch {
+        setIsValidCoverPhoto(false);
+      }
+    };
+    if (image) checkImage();
+  }, [image]);
 
-  const convertHTMLToJSX = (htmlContent) => {
-    return <div dangerouslySetInnerHTML={{ __html: htmlContent }} />;
-  };
+  const convertHTMLToJSX = (htmlContent) => (
+    <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+  );
 
   return (
     <StyledStationDataBox>
       <Section>
         <Guest>
           <Flag
-            src={isValidCoverPhoto ? voucherImage || "" : ""}
+            src={isValidCoverPhoto ? image : coverPhotoBrandDefault}
             alt={`Image of ${voucherName}`}
           />
-
           <Infor>
             <HeadingGroup>
               <Heading as="h1">{voucherName}</Heading>
+              <TagState type={statusToTagName[state]}>
+                {state ? "Hoạt động" : "Không hoạt động"}
+              </TagState>
             </HeadingGroup>
-
-            <DataItem label="Mã code:">
-              <StyleGreenWallet>{voucherCode}</StyleGreenWallet>
-            </DataItem>
-
             <StyledTotalBean>
               <DataItem label="Giá voucher:">
                 <StyleGreenWallet>
-                  {price ? formatCurrency(price) : "Chưa xác định"}{" "}
-                  {price ? (
-                    <StyledImageBean src={greenBean} alt="dau xanh" />
-                  ) : null}
+                  {formatCurrency(price)} <StyledImageBean src={greenBean} alt="dau xanh" />
                 </StyleGreenWallet>
               </DataItem>
               |
               <DataItem label="Tỉ lệ chuyển đổi:">
-                <StyleGreenWallet>
-                  {rate ? <span>x{rate} </span> : "Chưa xác định"}
-                </StyleGreenWallet>
+                <StyleGreenWallet>x{rate}</StyleGreenWallet>
               </DataItem>
             </StyledTotalBean>
-
             <DataItem label="Thể loại:">
-              <StyleGreenWallet>{typeName} </StyleGreenWallet>
+              <StyleGreenWallet>{typeName}</StyleGreenWallet>
             </DataItem>
-
-            {campaignName ? (
-              <DataItem label="Chiến dịch sở hữu phiếu:">
-                <StyleRedWallet>{campaignName}</StyleRedWallet>
-              </DataItem>
-            ) : (
-              <DataItem label="Chiến dịch sở hữu phiếu:">
-                Chưa thêm vào chiến dịch
-              </DataItem>
-            )}
-
-            {campaignStateName ? (
-              <DataItem label="Trạng thái chiến dịch:">
-                <TagCampaignState type={campaignStateToTagName[campaignState]}>
-                  {campaignStateName}
-                </TagCampaignState>
-              </DataItem>
-            ) : null}
-
             {description ? (
-              <DataItemDes label="Mô tả voucher:">
-                {convertHTMLToJSX(description)}
-              </DataItemDes>
+              <DataItemDes label="Mô tả voucher:">{convertHTMLToJSX(description)}</DataItemDes>
             ) : (
               <DataItem label="Mô tả:">Chưa cập nhật</DataItem>
             )}
-
             {condition ? (
-              <DataItemDes label="Điều kiện:">
-                {convertHTMLToJSX(condition)}
-              </DataItemDes>
+              <DataItemDes label="Điều kiện:">{convertHTMLToJSX(condition)}</DataItemDes>
             ) : (
               <DataItem label="Điều kiện:">Chưa cập nhật</DataItem>
             )}
           </Infor>
         </Guest>
       </Section>
-
       <Footer>
         <p>
           Ngày tạo:{" "}
-          {format(addHours(new Date(dateCreated), 7), "dd MMM yyyy, p", {
-            locale: vi,
-          })}
+          {format(addHours(new Date(dateCreated), 7), "dd MMM yyyy, p", { locale: vi })}
         </p>
       </Footer>
     </StyledStationDataBox>
