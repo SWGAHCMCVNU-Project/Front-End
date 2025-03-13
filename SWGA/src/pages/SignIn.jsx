@@ -7,11 +7,12 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import signinbg from '../assets/images/ảnh ví.png';
 import { HSeparator } from '../components/layout/separator/Separator';
 import { CustomFormItemLogin } from '../ui/custom/Form/InputItem/CustomFormItem';
-import authService from '../services/authService'; // Import service
+import authService from '../services/authService';
+import storageService from '../services/storageService';
 
 const { Footer, Content } = Layout;
 
-function SignIn() {
+function SignIn({ onLogin }) { // Nhận prop onLogin từ App
   const [data, setData] = useState({
     userName: '',
     password: '',
@@ -20,18 +21,35 @@ function SignIn() {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
+    if (!data.userName.trim() || !data.password) {
+      toast.error('Vui lòng nhập tài khoản và mật khẩu!');
+      return;
+    }
+
     setIsLoading(true);
-  
-    const credentials = {
-      userName: data.userName.trim(),
-      password: data.password,
-    };
-  
+
     try {
-      await authService.login(credentials, navigate); // Gọi service
+      const response = await authService.login({
+        userName: data.userName.trim(),
+        password: data.password,
+      });
+
+      if (response.success) {
+        const { role } = response.data;
+
+        // Gọi onLogin để cập nhật role trong App
+        if (onLogin) {
+          onLogin(role);
+        }
+
+        // toast.success('Đăng nhập thành công!');
+        navigate('/dashboard');
+      } else {
+        toast.error(response.message);
+      }
     } catch (error) {
-      console.error('Login failed in SignIn:', error);
-      // Toast đã được xử lý trong authService, nhưng có thể thêm log chi tiết
+      console.error('Lỗi đăng nhập:', error);
+      toast.error('Lỗi đăng nhập! Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
     }
@@ -52,7 +70,7 @@ function SignIn() {
                 </Heading>
               </div>
               <Form
-                onFinish={handleLogin} // Gọi handleLogin trực tiếp
+                onFinish={handleLogin}
                 layout="vertical"
                 className="row-col"
               >

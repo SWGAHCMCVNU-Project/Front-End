@@ -24,4 +24,11 @@ export const AUTH_ENDPOINTS = {
     UPDATE: "/Brand/{id}",
     CREATE_FOR_EXISTING_ACCOUNT: "/Brand/existingAccount"
   };
+  export const AREA_ENDPOINTS = {
+    CREATE: '/Area/areas',
+    GET_ALL: '/Area/areas',
+    GET_BY_ID: '/Area/areas/{id}',
+    UPDATE: "/Area/areas/{id}"
+  };
+  
 

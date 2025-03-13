@@ -1,37 +1,42 @@
 import { Affix, Layout } from "antd";
+import { jwtDecode } from "jwt-decode";
 import { useEffect, useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import storageService from "../../services/storageService";
 import Header from "./Header";
 import Sidenav from "./Sidenav";
 
 const { Header: AntHeader, Content, Sider } = Layout;
 
-// Định nghĩa các routes cần hiển thị Sidenav
-// const SIDENAV_ROUTES = [
-//   'dashboard-admin',
-//   'dashboard-staff',
-//   'dashboard-brand',
-//   'campaigns',
-//   'products',
-//   'orders',
-//   'activities',
-//   'requests',
-//   'students',
-//   'brands',
-//   'stations',
-//   'staffs',
-//   'categories',
-//   'universities',
-//   'majors',
-//   'areas',
-//   'stores',
-//   'vouchers',
-//   'voucher-items',
-//   'transactions',
-//   'profile'
-// ];
-
 function Main() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = storageService.getAccessToken();
+    const nameLogin = storageService.getNameLogin();
+
+    if (token) {
+      try {
+        const tokenDecode = jwtDecode(token);
+        const currentTime = Math.floor(Date.now() / 1000);
+
+        if (currentTime > tokenDecode.exp) {
+          storageService.clearAll(); // Sử dụng clearAll thay vì xóa từng cái
+          navigate('/sign-in');
+        } else if (nameLogin === "" || nameLogin === null) {
+          storageService.clearAll();
+          navigate('/sign-in');
+        }
+      } catch (error) {
+        storageService.clearAll();
+        navigate('/sign-in');
+      }
+    } else {
+      storageService.clearAll();
+      navigate('/sign-in');
+    }
+  }, [navigate]);
+
   const [visible, setVisible] = useState(false);
   const [placement, setPlacement] = useState("right");
   const [sidenavColor, setSidenavColor] = useState("#ff6b00");
@@ -43,21 +48,21 @@ function Main() {
   const handleSidenavColor = (color) => setSidenavColor(color);
   const handleFixedNavbar = (type) => setFixed(type);
 
-  let { pathname } = useLocation();
-  pathname = pathname.replace("/", "");
+  const { pathname } = useLocation();
+  const cleanPathname = pathname.replace("/", "");
 
   useEffect(() => {
-    if (pathname === "rtl") {
+    if (cleanPathname === "rtl") {
       setPlacement("left");
     } else {
       setPlacement("right");
     }
-  }, [pathname]);
+  }, [cleanPathname]);
 
   return (
     <Layout
-      className={`layout-dashboard ${pathname === "profile" ? "layout-profile" : ""} 
-      ${pathname === "rtl" ? "layout-dashboard-rtl" : ""}`}
+      className={`layout-dashboard ${cleanPathname === "profile" ? "layout-profile" : ""} 
+      ${cleanPathname === "rtl" ? "layout-dashboard-rtl" : ""}`}
     >
       <Sider
         breakpoint="lg"
@@ -81,8 +86,8 @@ function Main() {
             <AntHeader className={`${fixed ? "ant-header-fixed" : ""}`}>
               <Header
                 onPress={openDrawer}
-                name={pathname}
-                subName={pathname}
+                name={cleanPathname}
+                subName={cleanPathname}
                 handleSidenavColor={handleSidenavColor}
                 handleSidenavType={handleSidenavType}
                 handleFixedNavbar={handleFixedNavbar}
@@ -93,8 +98,8 @@ function Main() {
           <AntHeader className={`${fixed ? "ant-header-fixed" : ""}`}>
             <Header
               onPress={openDrawer}
-              name={pathname}
-              subName={pathname}
+              name={cleanPathname}
+              subName={cleanPathname}
               handleSidenavColor={handleSidenavColor}
               handleSidenavType={handleSidenavType}
               handleFixedNavbar={handleFixedNavbar}

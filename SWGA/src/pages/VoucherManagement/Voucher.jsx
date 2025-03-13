@@ -1,4 +1,4 @@
-import VoucherDetail from "../../features/voucher/VoucherDetail";
+import VoucherDetail from "../../features/vouchers/VoucherDetail";
 
 export default function Voucher() {
   return (

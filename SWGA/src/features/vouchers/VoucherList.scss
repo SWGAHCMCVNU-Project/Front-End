@@ -37,7 +37,6 @@ $primaryColor: #f36522;
 }
 
 .content-item {
-  width: 100%;
   margin-bottom: 0px;
 }
 
@@ -47,7 +46,9 @@ $primaryColor: #f36522;
   height: 55px;
   font-weight: 700;
   color: #000000;
+
   border-bottom: 0.5px solid var(--color-green-400);
+  padding: 5px 16px;
   // show 2 line
   overflow: hidden;
   text-overflow: ellipsis;
@@ -55,43 +56,43 @@ $primaryColor: #f36522;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   padding: 8px 16px;
+  display: flex;
+  align-items: start;
+  justify-content: center;
 }
 
 .price-item-discount {
+  display: flex;
+  align-items: center;
+  gap: 15px;
   padding: 8px 16px;
+  row-gap: 8px;
 }
 
 .container-price-brand {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
+  gap: 3.5rem;
 }
 
 .container-amount-item {
   display: flex;
-  justify-content: center;
+  gap: 4.5rem;
   width: 100%;
-  margin-bottom: 1rem;
 }
 
 .container-item {
   display: flex;
   align-items: center;
+  margin-bottom: 1.5rem;
+  margin-left: auto;
+  padding: 0 20px;
 }
 
 .sale-price-green-bean {
   color: #2ecc71;
   font-weight: bold;
   font-size: 16px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-
-  img {
-    width: 20px; // Giảm kích thước đậu
-    height: 20px;
-  }
+  text-align: center;
 }
 
 .sub-title {
@@ -99,17 +100,20 @@ $primaryColor: #f36522;
 }
 
 .finish-day {
-  text-align: right;
+  padding-left: 4px;
+  padding-right: 4px;
 }
 
 .styled-day-finish {
   color: #2ecc71;
   font-size: 16px;
   font-weight: 600;
+  text-align: center;
 }
 
 .price-voucher {
-  text-align: left;
+  padding-left: 4px;
+  padding-right: 4px;
 }
 
 .discount-item {
@@ -123,14 +127,15 @@ $primaryColor: #f36522;
   text-align: center;
   justify-content: center;
   width: 50px;
-  padding: 2px;
+  padding-top: 2px;
+  padding-bottom: 2px;
 }
-
 .itemOldPrice {
   font-size: 15px;
   text-decoration: line-through;
   filter: opacity(0.35);
-  margin: 0;
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 
 .content-item .bottom-item {

@@ -1,8 +1,10 @@
 import styled from "styled-components";
-import VoucherTableOperations from "../../features/voucher/VoucherTableOperations";
+import FilterOperations from "../../features/vouchers/FilterOperations";
+import VoucherTable from "../../features/vouchers/VoucherTable";
+import VoucherTableOperations from "../../features/vouchers/VoucherTableOperations";
 import Heading from "../../ui/Heading";
 import Row from "../../ui/Row";
-import VoucherTable from "../../features/voucher/VoucherTable";
+import VoucherList from "../../features/vouchers/VoucherList";
 
 const Container = styled.div`
   margin: 0 auto 3rem;
@@ -15,13 +17,13 @@ function Vouchers() {
   return (
     <>
       <Container>
-        <Heading as="h1">Danh sách các phiếu ưu đãi của thương hiệu</Heading>
+        <Heading as="h1">Danh sách các ưu đãi của thương hiệu</Heading>
         <Row type="horizontal">
-          <div></div>
+          <FilterOperations />
           <VoucherTableOperations />
         </Row>
         <Row>
-          <VoucherTable />
+          <VoucherList />
         </Row>
       </Container>
     </>

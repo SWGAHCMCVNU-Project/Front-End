@@ -11,7 +11,7 @@ export const loginAPI = async (credentials) => {
   } catch (error) {
     return {
       status: error.status || 500,
-      data: { message: 'Authentication failed' }
+      data: { message: 'Lỗi tài khoản hoặc mật khẩu, xin vui lòng nhập lại' }
     };
   }
 };

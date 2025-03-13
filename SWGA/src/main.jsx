@@ -1,3 +1,7 @@
+
+if (typeof global === "undefined") {
+  window.global = window;
+}
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { StrictMode } from "react";

@@ -34,12 +34,7 @@ function DashboardAdmin() {
     <Container>
       <Row type="horizontal">
         <Heading as="h1">Thống kê tổng quan</Heading>
-        <Button 
-          icon={<ArrowLeftOutlined />} 
-          onClick={() => navigate(-1)}
-        >
-          Back
-        </Button>
+        
       </Row>
       <DashboardLayout/>
     </Container>

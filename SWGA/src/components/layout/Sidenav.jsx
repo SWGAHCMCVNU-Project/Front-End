@@ -27,25 +27,12 @@ import storageService from "../../services/storageService";
 import { MenuItem } from "./MenuItem";
 
 function Sidenav({ color }) {
-  const roleLogin = storageService.getUserRole();
+  const roleLogin = storageService.getRoleLogin(); // Sử dụng getRoleLogin thay vì getUserRole
   const navigate = useNavigate();
 
-  // Ánh xạ role từ tiếng Việt sang tiếng Anh
-  const mapRoleToEnglish = (vietnameseRole) => {
-    const roleMapping = {
-      'Thương hiệu': 'brand',
-      'Quản trị viên': 'admin',
-      'Nhân viên': 'staff',
-      'Cơ sở': 'campus'
-    };
-    return roleMapping[vietnameseRole] || vietnameseRole;
-  };
-
-  const englishRole = mapRoleToEnglish(roleLogin);
-
-  // Nếu không có role, redirect về trang login
+  // Nếu không có role hoặc token, redirect về trang login
   useEffect(() => {
-    if (!roleLogin) {
+    if (!storageService.getAccessToken() || !roleLogin) {
       navigate("/sign-in");
     }
   }, [roleLogin, navigate]);
@@ -151,7 +138,7 @@ function Sidenav({ color }) {
           color: color,
           iconPage: dashboard,
           labelPageName: "Thống kê",
-          allowedRoles: ["admin", "brand", "staff", "campus"], // Ánh xạ từ roleLogin
+          allowedRoles: ["admin", "brand", "staff", "campus"],
         },
         {
           key: "2",
@@ -161,15 +148,6 @@ function Sidenav({ color }) {
           iconPage: <FontAwesomeIcon icon={faCalendarDays} />,
           labelPageName: "Chiến dịch",
           allowedRoles: ["admin", "brand"],
-        },
-        {
-          key: "3",
-          linkURL: "/activities",
-          pageName: "activities",
-          color: color,
-          iconPage: <FontAwesomeIcon icon={faPersonWalking} />,
-          labelPageName: "Hoạt động",
-          allowedRoles: ["admin"],
         },
         {
           key: "4",
@@ -213,15 +191,6 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <FontAwesomeIcon icon={faTrademark} />,
           labelPageName: "Thương hiệu",
-          allowedRoles: ["admin", "brand"],
-        },
-        {
-          key: "8",
-          linkURL: "/products",
-          pageName: "products",
-          color: color,
-          iconPage: tables,
-          labelPageName: "Sản phẩm",
           allowedRoles: ["admin"],
         },
         {
@@ -233,15 +202,6 @@ function Sidenav({ color }) {
           labelPageName: "Trạm nhận hàng",
           allowedRoles: ["admin", "staff"],
         },
-        {
-          key: "10",
-          linkURL: "/staffs",
-          pageName: "staffs",
-          color: color,
-          iconPage: <FontAwesomeIcon icon={faUserTie} />,
-          labelPageName: "Nhân viên",
-          allowedRoles: ["admin"],
-        },
       ],
     },
     {
@@ -251,15 +211,6 @@ function Sidenav({ color }) {
       type: "group",
       menuSideNav: [
         {
-          key: "11",
-          linkURL: "/categories",
-          pageName: "categories",
-          color: color,
-          iconPage: <FontAwesomeIcon icon={faBars} />,
-          labelPageName: "Thể loại",
-          allowedRoles: ["admin"],
-        },
-        {
           key: "12",
           linkURL: "/universities",
           pageName: "universities",
@@ -267,15 +218,6 @@ function Sidenav({ color }) {
           iconPage: <FontAwesomeIcon icon={faBuildingColumns} />,
           labelPageName: "Đại học",
           allowedRoles: ["admin", "campus"],
-        },
-        {
-          key: "13",
-          linkURL: "/majors",
-          pageName: "majors",
-          color: color,
-          iconPage: <FontAwesomeIcon icon={faGraduationCap} />,
-          labelPageName: "Chuyên ngành",
-          allowedRoles: ["admin"],
         },
         {
           key: "14",
@@ -302,11 +244,11 @@ function Sidenav({ color }) {
         },
         {
           key: "16",
-          linkURL: "/voucher-items",
-          pageName: "voucher-items",
+          linkURL: "/voucher-type",
+          pageName: "voucher-type",
           color: color,
           iconPage: <FontAwesomeIcon icon={faTicket} />,
-          labelPageName: "Phiếu mẫu",
+          labelPageName: "Thể loại",
           allowedRoles: ["brand"],
         },
         {
@@ -315,7 +257,7 @@ function Sidenav({ color }) {
           pageName: "vouchers",
           color: color,
           iconPage: <HiMiniTicket />,
-          labelPageName: "Phiếu ưu đãi",
+          labelPageName: "Phiếu mẫu",
           allowedRoles: ["brand"],
         },
         {
@@ -374,7 +316,7 @@ function Sidenav({ color }) {
         items={menuItems.flatMap((item, index) => {
           if (item.type === "group") {
             return item.menuSideNav
-              .filter((menuItem) => menuItem.allowedRoles.includes(englishRole))
+              .filter((menuItem) => menuItem.allowedRoles.includes(roleLogin))
               .map((menuItem) => ({
                 key: menuItem.key,
                 label: (
@@ -396,7 +338,7 @@ function Sidenav({ color }) {
             return {
               key: "screen-logout",
               label: (
-                <NavLink to="/sign-in" onClick={() => storageService.removeAccessToken()}>
+                <NavLink to="/sign-in" onClick={() => storageService.clearAll()}>
                   <span className="icon">{signin}</span>
                   <span className="label">Đăng xuất</span>
                 </NavLink>

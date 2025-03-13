@@ -10,7 +10,6 @@ const StorageService = {
   },
   setUser(user) {
     if (!user) {
-      console.warn("Attempted to store invalid user data:", user);
       return;
     }
     localStorage.setItem("user", JSON.stringify(user));
@@ -21,7 +20,6 @@ const StorageService = {
     try {
       return JSON.parse(userStr);
     } catch (error) {
-      console.error("Error parsing user:", error);
       return null;
     }
   },
@@ -31,18 +29,15 @@ const StorageService = {
   },
   getBrandId() {
     const brandId = localStorage.getItem("brandId");
-    console.log("Getting brandId from storage:", brandId);
     if (!brandId) {
-      console.warn("No brandId found in storage");
+      return null;
     }
     return brandId;
   },
   setBrandId(brandId) {
     if (!brandId) {
-      console.warn("Attempting to set empty brandId");
       return;
     }
-    console.log("Setting brandId in storage:", brandId);
     localStorage.setItem("brandId", brandId);
   },
   getUserRole() {
@@ -58,6 +53,33 @@ const StorageService = {
   removeRoleLogin() {
     localStorage.removeItem("roleLogin");
   },
+  setNameLogin(name) {
+    localStorage.setItem("nameLogin", name);
+  },
+  getNameLogin() {
+    return localStorage.getItem("nameLogin") || "";
+  },
+  removeNameLogin() {
+    localStorage.removeItem("nameLogin");
+  },
+  setLoginId(id) {
+    localStorage.setItem("loginId", id);
+  },
+  getLoginId() {
+    return localStorage.getItem("loginId") || "";
+  },
+  removeLoginId() {
+    localStorage.removeItem("loginId");
+  },
+  setAvatarLogin(avatar) {
+    localStorage.setItem("avatarLogin", avatar);
+  },
+  getAvatarLogin() {
+    return localStorage.getItem("avatarLogin") || "";
+  },
+  removeAvatarLogin() {
+    localStorage.removeItem("avatarLogin");
+  },
   isAuthenticated() {
     return !!this.getAccessToken();
   },
@@ -68,6 +90,9 @@ const StorageService = {
     this.removeAccessToken();
     this.removeUser();
     this.removeRoleLogin();
+    this.removeNameLogin();
+    this.removeLoginId();
+    this.removeAvatarLogin();
     localStorage.removeItem("brandId");
   },
 };

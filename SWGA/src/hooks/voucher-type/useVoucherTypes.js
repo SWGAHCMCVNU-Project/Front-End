@@ -1,23 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { getVoucherTypesAPI } from "../../store/api/voucherTypeApi";
+import { getVoucherTypesAPI } from "../../store/api/voucherTypeApi"; // Sửa thành named import
 
-export function useVoucherTypes() {
-  const { isLoading, data, error } = useQuery({
-    queryKey: ["voucherTypes"],
-    queryFn: getVoucherTypesAPI,
-    select: (response) => {
-      console.log('Response in useVoucherTypes:', response);
-      if (response?.status === 200 && Array.isArray(response.data)) {
-        console.log('Returning data:', response.data);
-        return response.data;
-      }
-      console.log('No valid data found, returning empty array');
-      return [];
-    },
+export function useVoucherTypes({ page = 1, size = 100, search = "", state = true, isAsc = true } = {}) {
+  const { isLoading, data: response, error } = useQuery({
+    queryKey: ["voucherTypes", page, size, search, state, isAsc],
+    queryFn: () => getVoucherTypesAPI({ page, size, search, state, isAsc }), // Sửa cú pháp gọi hàm
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
     refetchOnWindowFocus: true, // Refetch when window gains focus
   });
 
-  console.log('Hook return value:', { isLoading, error, data });
-  return { isLoading, error, voucherTypes: data };
+  return { isLoading, error, voucherTypes: response };
 }

@@ -15,7 +15,7 @@ import CreateBrandForm from "./CreateBrandForm";
 import HistoriesByBrandId from "./HistoriesByBrandId";
 import StoresByBrandId from "./StoresByBrandId";
 import VouchersBrand from "./VouchersBrand";
-import { useBrand } from "./useBrand";
+// import { useBrand } from "./useBrand";
 
 const HeadingGroup = styled.div`
   display: flex;
