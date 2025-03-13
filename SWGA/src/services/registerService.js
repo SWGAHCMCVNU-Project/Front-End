@@ -1,25 +1,33 @@
-import { registerBrandAPI } from '../store/api/registerAPI';
 import toast from 'react-hot-toast';
 
 class RegisterService {
-  async registerBrand(brandData, navigate) {
+  // Xử lý phản hồi từ API
+  async RegisterBrand(apiData, navigate) {
     try {
-      const result = await registerBrandAPI(brandData);
-
-      if (result.status === 200) {
+      if (apiData) { // Giả sử server trả về dữ liệu thành công
         toast.success('Đăng ký thành công!');
         navigate('/sign-in', { replace: true });
-        return result.data;
+        return {
+          success: true,
+          data: apiData,
+        };
       } else {
-        toast.error(result.data?.message || 'Đăng ký thất bại!');
-        return null;
+        toast.error('Đăng ký thất bại!');
+        return {
+          success: false,
+          message: 'Không nhận được dữ liệu từ server!',
+        };
       }
     } catch (error) {
-      toast.error('Đã có lỗi xảy ra khi đăng ký!');
-      return null;
+      toast.error('Đã có lỗi xảy ra khi xử lý đăng ký!');
+      return {
+        success: false,
+        message: 'Lỗi xử lý dữ liệu đăng ký!',
+      };
     }
   }
 
+  // Định dạng dữ liệu từ UI trước khi gửi lên server
   formatBrandData(formData, coverPhoto) {
     const [openingHours, openingMinutes] = formData.openingHours.split(':');
     const [closingHours, closingMinutes] = formData.closingHours.split(':');
@@ -48,4 +56,4 @@ class RegisterService {
   }
 }
 
-export default new RegisterService();
+export default RegisterService;

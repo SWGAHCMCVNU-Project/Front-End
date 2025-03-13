@@ -7,12 +7,12 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import signinbg from '../assets/images/ảnh ví.png';
 import { HSeparator } from '../components/layout/separator/Separator';
 import { CustomFormItemLogin } from '../ui/custom/Form/InputItem/CustomFormItem';
-import authService from '../services/authService';
+import { loginAPI } from '../store/api/authApi';
 import storageService from '../services/storageService';
 
 const { Footer, Content } = Layout;
 
-function SignIn({ onLogin }) { // Nhận prop onLogin từ App
+function SignIn({ onLogin }) {
   const [data, setData] = useState({
     userName: '',
     password: '',
@@ -20,7 +20,9 @@ function SignIn({ onLogin }) { // Nhận prop onLogin từ App
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    // e.preventDefault(); // Ngăn reload trang khi submit
+
     if (!data.userName.trim() || !data.password) {
       toast.error('Vui lòng nhập tài khoản và mật khẩu!');
       return;
@@ -29,27 +31,27 @@ function SignIn({ onLogin }) { // Nhận prop onLogin từ App
     setIsLoading(true);
 
     try {
-      const response = await authService.login({
+      const response = await loginAPI({
         userName: data.userName.trim(),
         password: data.password,
       });
+      console.log('Response từ loginAPI:', response); // Log để kiểm tra
 
       if (response.success) {
         const { role } = response.data;
 
-        // Gọi onLogin để cập nhật role trong App
         if (onLogin) {
           onLogin(role);
         }
 
-        // toast.success('Đăng nhập thành công!');
+        toast.success('Đăng nhập thành công và chào mừng bạn đã quay trở lại!');
         navigate('/dashboard');
       } else {
-        toast.error(response.message);
+        toast.error(response.message || 'Tài khoản hoặc mật khẩu không đúng, xin vui lòng nhập lại!');
       }
     } catch (error) {
       console.error('Lỗi đăng nhập:', error);
-      toast.error('Lỗi đăng nhập! Vui lòng thử lại.');
+      toast.error('Tài khoản hoặc mật khẩu không đúng, xin vui lòng nhập lại!');
     } finally {
       setIsLoading(false);
     }
@@ -79,6 +81,7 @@ function SignIn({ onLogin }) { // Nhận prop onLogin từ App
                   label="Tài khoản"
                   type="text"
                   placeholder="Hãy điền tên tài khoản..."
+                  value={data.userName}
                   onChange={(e) =>
                     setData({
                       ...data,
@@ -92,6 +95,7 @@ function SignIn({ onLogin }) { // Nhận prop onLogin từ App
                   label="Mật khẩu"
                   type="password"
                   placeholder="Hãy điền mật khẩu..."
+                  value={data.password}
                   onChange={(e) =>
                     setData({ ...data, password: e.target.value })
                   }
@@ -120,20 +124,22 @@ function SignIn({ onLogin }) { // Nhận prop onLogin từ App
                   </Text>
                 </Flex>
 
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={isLoading}
-                  disabled={isLoading}
-                  block
-                  style={{
-                    backgroundColor: '#1890ff',
-                    height: '40px',
-                    marginTop: '10px',
-                  }}
-                >
-                  Đăng nhập
-                </Button>
+                <Form.Item>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={isLoading}
+                    disabled={isLoading}
+                    block
+                    style={{
+                      backgroundColor: '#21b658',
+                      height: '40px',
+                      marginTop: '10px',
+                    }}
+                  >
+                    Đăng nhập
+                  </Button>
+                </Form.Item>
               </Form>
             </Col>
           </Row>
