@@ -1,0 +1,48 @@
+$font-primary-profile-color: #6b7280;
+
+@mixin font-color-profile($size, $color) {
+    font-size: $size;
+    color: $color;
+}
+
+.description-profile {
+    font-size: 16px;
+    font-weight: 500;
+    text-align: justify;
+}
+
+.layout-description-admin .ant-descriptions-title {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.layout-description-admin .ant-descriptions-item-label {
+    @include font-color-profile(15px, $font-primary-profile-color);
+}
+
+.layout-description-admin .ant-descriptions-item-content {
+    @include font-color-profile(15px, #141414);
+}
+
+.list-meta-admin .ant-list-item-meta-title {
+    @include font-color-profile(17px, #141414);
+}
+
+.list-meta-admin .ant-list-item-meta-description {
+    @include font-color-profile(16px, $font-primary-profile-color);
+}
+
+.p-admin-title {
+    color: $font-primary-profile-color !important;
+}
+
+.tag-station-profile {
+    line-height: 1.5rem;
+}
+
+.shape-avatar-profile {
+    margin-right: 20px;
+    width: 80px;
+    height: fit-content;
+    max-height: 80px;
+  }

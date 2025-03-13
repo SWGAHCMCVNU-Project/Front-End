@@ -187,7 +187,6 @@ function VoucherCreateBox({ onCloseModal }) {
       state: true,
     };
 
-    console.log("Voucher data to send:", voucherData);
 
     createVoucher(voucherData, {
       onSuccess: () => {

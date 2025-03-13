@@ -10,10 +10,10 @@ import storageService from '../services/storageService';
 
 const DashBoard = () => {
   const navigate = useNavigate();
-  const roleLogin = storageService.getUserRole();
+  const roleLogin = storageService.getRoleLogin(); // Sử dụng getRoleLogin thay vì getUserRole
 
   useEffect(() => {
-    if (!roleLogin) {
+    if (!storageService.getAccessToken() || !roleLogin) {
       navigate('/sign-in', { replace: true });
     }
   }, [roleLogin, navigate]);

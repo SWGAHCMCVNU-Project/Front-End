@@ -1,12 +1,12 @@
-import { addHours, format } from "date-fns";
+import { addHours, format, isValid } from "date-fns";
 import { vi } from "date-fns/locale";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import coverPhotoBrandDefault from "../../assets/images/coupon.png";
 import greenBean from "../../assets/images/dauxanh.png";
 import DataItem from "../../ui/DataItem";
 import Heading from "../../ui/Heading";
-import { formatCurrency } from "../../utils/helpers";
-import { useEffect, useState } from "react";
+import { formatCurrency, handleValidImageURL } from "../../utils/helpers";
 import DataItemDes from "../brands/DataItemDes";
 
 const StyledStationDataBox = styled.section`
@@ -40,30 +40,11 @@ const Infor = styled.div`
   gap: 1.2rem;
   margin-bottom: 1.6rem;
   color: var(--color-grey-500);
-  /* margin-left: 10%; */
 
   & p:first-of-type {
     font-weight: 500;
     color: var(--color-grey-700);
   }
-`;
-
-const HeadingGroup = styled.div`
-  display: flex;
-  gap: 2.4rem;
-  align-items: center;
-`;
-
-const StyledImageBean = styled.img`
-  width: 25px;
-  height: 25px;
-`;
-
-const StyleGreenWallet = styled.div`
-  color: var(--color-green-400);
-  display: inline-block;
-  font-weight: bold;
-  font-size: 16px;
 `;
 
 const Footer = styled.footer`
@@ -73,12 +54,17 @@ const Footer = styled.footer`
   text-align: right;
 `;
 
+const HeadingGroup = styled.div`
+  display: flex;
+  gap: 2.4rem;
+  align-items: center;
+`;
+
 const Flag = styled.img`
-  width: ${(props) => (props.src ? "40rem" : "40rem")};
+  width: 40rem;
   border-radius: 8px;
   display: block;
   border: ${(props) => (props.src ? "1px solid var(--color-grey-100)" : null)};
-
   content: url(${(props) => (props.src ? props.src : coverPhotoBrandDefault)});
 `;
 
@@ -86,6 +72,18 @@ const StyledTotalBean = styled.div`
   display: flex;
   gap: 2rem;
   align-items: center;
+`;
+
+const StyleGreenWallet = styled.div`
+  color: var(--color-green-400);
+  display: inline-block;
+  font-weight: bold;
+  font-size: 16px;
+`;
+
+const StyledImageBean = styled.img`
+  width: 25px;
+  height: 25px;
 `;
 
 const TagState = styled.span`
@@ -107,11 +105,15 @@ const TagState = styled.span`
 `;
 
 function VoucherDataBox({ voucher }) {
+  // Log dữ liệu để kiểm tra
+
+  // Destructuring các trường từ voucher
   const {
-    voucherName,
+    id: voucherId,
     typeName,
     image,
     dateCreated,
+    voucherName,
     state,
     description,
     condition,
@@ -124,30 +126,32 @@ function VoucherDataBox({ voucher }) {
     false: "error",
   };
 
-  const [isValidCoverPhoto, setIsValidCoverPhoto] = useState(true);
+  const [isValidImage, setIsValidImage] = useState(true);
 
   useEffect(() => {
-    const checkImage = async () => {
-      try {
-        const response = await fetch(image);
-        setIsValidCoverPhoto(response.ok);
-      } catch {
-        setIsValidCoverPhoto(false);
-      }
-    };
-    if (image) checkImage();
+    handleValidImageURL(image)
+      .then((isValid) => setIsValidImage(isValid))
+      .catch(() => setIsValidImage(false));
   }, [image]);
 
-  const convertHTMLToJSX = (htmlContent) => (
-    <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
-  );
+  // Hàm chuyển đổi HTML thành JSX
+  const convertHTMLToJSX = (htmlContent) => {
+    return <div dangerouslySetInnerHTML={{ __html: htmlContent }} />;
+  };
+
+  // Xử lý dateCreated an toàn
+  const formattedDate = dateCreated
+    ? isValid(new Date(dateCreated))
+      ? format(addHours(new Date(dateCreated), 7), "dd MMM yyyy, p", { locale: vi })
+      : "Ngày không hợp lệ"
+    : "Chưa cập nhật";
 
   return (
     <StyledStationDataBox>
       <Section>
         <Guest>
           <Flag
-            src={isValidCoverPhoto ? image : coverPhotoBrandDefault}
+            src={isValidImage ? image || "" : ""}
             alt={`Image of ${voucherName}`}
           />
           <Infor>
@@ -157,10 +161,12 @@ function VoucherDataBox({ voucher }) {
                 {state ? "Hoạt động" : "Không hoạt động"}
               </TagState>
             </HeadingGroup>
+
             <StyledTotalBean>
               <DataItem label="Giá voucher:">
                 <StyleGreenWallet>
-                  {formatCurrency(price)} <StyledImageBean src={greenBean} alt="dau xanh" />
+                  {formatCurrency(price)}{" "}
+                  <StyledImageBean src={greenBean} alt="dau xanh" />
                 </StyleGreenWallet>
               </DataItem>
               |
@@ -168,27 +174,32 @@ function VoucherDataBox({ voucher }) {
                 <StyleGreenWallet>x{rate}</StyleGreenWallet>
               </DataItem>
             </StyledTotalBean>
+
             <DataItem label="Thể loại:">
               <StyleGreenWallet>{typeName}</StyleGreenWallet>
             </DataItem>
+
             {description ? (
-              <DataItemDes label="Mô tả voucher:">{convertHTMLToJSX(description)}</DataItemDes>
+              <DataItemDes label="Mô tả voucher:">
+                {convertHTMLToJSX(description)}
+              </DataItemDes>
             ) : (
               <DataItem label="Mô tả:">Chưa cập nhật</DataItem>
             )}
+
             {condition ? (
-              <DataItemDes label="Điều kiện:">{convertHTMLToJSX(condition)}</DataItemDes>
+              <DataItemDes label="Điều kiện:">
+                {convertHTMLToJSX(condition)}
+              </DataItemDes>
             ) : (
               <DataItem label="Điều kiện:">Chưa cập nhật</DataItem>
             )}
           </Infor>
         </Guest>
       </Section>
+
       <Footer>
-        <p>
-          Ngày tạo:{" "}
-          {format(addHours(new Date(dateCreated), 7), "dd MMM yyyy, p", { locale: vi })}
-        </p>
+        <p>Ngày tạo: {formattedDate}</p>
       </Footer>
     </StyledStationDataBox>
   );

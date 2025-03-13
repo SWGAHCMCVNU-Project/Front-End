@@ -5,13 +5,11 @@ import ButtonGroup from "../../ui/ButtonGroup";
 import ButtonText from "../../ui/ButtonText";
 import Heading from "../../ui/Heading";
 import Row from "../../ui/Row";
-import { HiPencil, HiTrash } from "react-icons/hi2";
-import ConfirmDelete from "../../ui/ConfirmDelete";
-import Modal from "../../ui/Modal";
+import { HiPencil } from "react-icons/hi2";
 import Spinner from "../../ui/Spinner";
 import VoucherDataBox from "./VoucherDataBox";
-
 import { useVoucher } from "../../hooks/voucher/useVoucher";
+
 const HeadingGroup = styled.div`
   display: flex;
   gap: 2.4rem;
@@ -51,10 +49,11 @@ function VoucherDetail() {
   const navigate = useNavigate();
   const { voucherId } = useParams();
   const { voucher, isLoading } = useVoucher();
-  const { isDeleting, deleteVoucher } = useDeleteVoucher();
+
+  // Log voucher trong VoucherDetail
 
   if (isLoading) return <Spinner />;
-  if (!voucher) return null;
+  if (!voucher) return <div>Không có dữ liệu ưu đãi. Vui lòng kiểm tra voucher ID hoặc API.</div>;
 
   const handleEditClick = () => {
     navigate(`/vouchers/edit/${voucher.id}`, { state: { voucherToEdit: voucher } });
@@ -78,25 +77,6 @@ function VoucherDetail() {
               Chỉnh sửa
             </StyledContainerButton>
           </Button>
-          <Modal>
-            <Modal.Open opens="delete">
-              <Button $variations="danger">
-                <StyledContainerButton>
-                  <StyledButton>
-                    <HiTrash />
-                  </StyledButton>
-                  Xóa ưu đãi
-                </StyledContainerButton>
-              </Button>
-            </Modal.Open>
-            <Modal.Window name="delete">
-              <ConfirmDelete
-                resourceName="ưu đãi"
-                disabled={isDeleting}
-                onConfirm={() => deleteVoucher(voucherId, { onSuccess: () => navigate("/vouchers") })}
-              />
-            </Modal.Window>
-          </Modal>
         </ButtonGroup>
       </ButtonGroup>
       <VoucherDataBox voucher={voucher} />

@@ -21,16 +21,35 @@ class AuthService {
           return { success: false, message: 'Không nhận được token từ server!' };
         }
 
+        // Lưu token
         storageService.setAccessToken(token);
 
+        // Ánh xạ role và lưu thông tin user
         const mappedRole = ROLE_MAPPING[role] || role;
-        const userData = { role: mappedRole, accountId };
+        const userData = { 
+          role: mappedRole, 
+          accountId,
+          userName: credentials.userName // Lưu userName từ credentials
+        };
         if (brandId) userData.brandId = brandId;
 
         storageService.setUser(userData);
+        storageService.setRoleLogin(mappedRole); // Lưu role vào roleLogin
+        storageService.setNameLogin(credentials.userName); // Lưu userName vào nameLogin
+        storageService.setLoginId(accountId || ''); // Lưu accountId làm loginId
         if (brandId) storageService.setBrandId(brandId);
 
-        return { success: true };
+        // Trả về thông tin đầy đủ để SignIn sử dụng nếu cần
+        return { 
+          success: true, 
+          data: { 
+            token, 
+            userName: credentials.userName, 
+            loginId: accountId, 
+            role: mappedRole,
+            brandId
+          }
+        };
       } 
 
       return { success: false, message: result?.data?.message || 'Sai tài khoản hoặc mật khẩu!' };
@@ -42,9 +61,7 @@ class AuthService {
   }
 
   logout() {
-    storageService.removeAccessToken();
-    storageService.removeUser();
-    storageService.removeBrandId();
+    storageService.clearAll(); // Sử dụng clearAll để xóa toàn bộ dữ liệu
     toast.success('Đã đăng xuất thành công!');
   }
 }

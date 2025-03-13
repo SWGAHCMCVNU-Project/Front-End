@@ -7,11 +7,12 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import signinbg from '../assets/images/ảnh ví.png';
 import { HSeparator } from '../components/layout/separator/Separator';
 import { CustomFormItemLogin } from '../ui/custom/Form/InputItem/CustomFormItem';
-import authService from '../services/authService'; // Import service
+import authService from '../services/authService';
+import storageService from '../services/storageService';
 
 const { Footer, Content } = Layout;
 
-function SignIn() {
+function SignIn({ onLogin }) { // Nhận prop onLogin từ App
   const [data, setData] = useState({
     userName: '',
     password: '',
@@ -24,19 +25,27 @@ function SignIn() {
       toast.error('Vui lòng nhập tài khoản và mật khẩu!');
       return;
     }
-  
+
     setIsLoading(true);
-  
+
     try {
       const response = await authService.login({
         userName: data.userName.trim(),
         password: data.password,
       });
-  
+
       if (response.success) {
-        navigate('/dashboard'); // Chỉ điều hướng khi login thành công
+        const { role } = response.data;
+
+        // Gọi onLogin để cập nhật role trong App
+        if (onLogin) {
+          onLogin(role);
+        }
+
+        // toast.success('Đăng nhập thành công!');
+        navigate('/dashboard');
       } else {
-        toast.error(response.message); // Chỉ hiển thị lỗi một lần
+        toast.error(response.message);
       }
     } catch (error) {
       console.error('Lỗi đăng nhập:', error);
@@ -45,8 +54,6 @@ function SignIn() {
       setIsLoading(false);
     }
   };
-  
-  
 
   return (
     <Layout className="layout-default layout-signin">
@@ -63,7 +70,7 @@ function SignIn() {
                 </Heading>
               </div>
               <Form
-                onFinish={handleLogin} // Gọi handleLogin trực tiếp
+                onFinish={handleLogin}
                 layout="vertical"
                 className="row-col"
               >

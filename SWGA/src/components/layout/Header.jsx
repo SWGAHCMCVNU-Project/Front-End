@@ -17,7 +17,7 @@ const settingIcon = (
   </svg>
 );
 
-function Header() {
+function Header({ onPress, name, subName, handleSidenavColor, handleSidenavType, handleFixedNavbar }) {
   const { Title } = Typography;
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
@@ -29,7 +29,7 @@ function Header() {
       setUserData(user);
       if (!hasNotified.current) {
         notification.success({
-          message: "Chào mừng!",
+          // message: "Chào mừng!",
           description: `Chào mừng ${user.userName || "bạn"} đã quay trở lại!`,
           placement: "topRight",
           duration: 3,
@@ -41,8 +41,7 @@ function Header() {
 
   const handleLogOut = () => {
     try {
-      storageService.removeAccessToken();
-      storageService.removeUser();
+      storageService.clearAll(); // Sử dụng clearAll để xóa toàn bộ dữ liệu
       navigate("/sign-in");
       notification.success({
         message: "Đăng xuất thành công",
@@ -80,17 +79,14 @@ function Header() {
   );
 
   return (
-    <Row gutter={[24, 0]}>
-      <Col span={24} md={24} className="header-control">
-        <Badge size="small" count={1}>
-          <Popover content={menu} trigger="click" placement="bottom">
-            {settingIcon}
-          </Popover>
-        </Badge>
+    <Row gutter={[24, 0]} align="middle">
+      <Col span={24} md={24} className="header-control" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
         {userData ? (
-          <div className="welcome-text">
-            {profileIcon}
-            <span className="ant-page-header-heading-title"></span>
+          <div className="welcome-text" style={{ display: 'flex', alignItems: 'center', marginRight: '16px' }}>
+            <Avatar src={avatarProfile} size="small" style={{ marginRight: '8px' }} />
+            <span style={{ fontSize: '16px', color: '#111827' }}>
+              Chào mừng, {userData.userName || "bạn"}!
+            </span>
           </div>
         ) : (
           <Link to="/sign-in" className="btn-sign-in">
@@ -98,6 +94,11 @@ function Header() {
             <span>Đăng nhập</span>
           </Link>
         )}
+        <Badge size="small" count={1}>
+          <Popover content={menu} trigger="click" placement="bottom">
+            {settingIcon}
+          </Popover>
+        </Badge>
       </Col>
     </Row>
   );

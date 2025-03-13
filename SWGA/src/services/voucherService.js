@@ -1,13 +1,11 @@
 import apiClient from '../store/api/apiClient';
 import { VOUCHER_ENDPOINTS } from '../store/api/endpoints';
 import toast from 'react-hot-toast';
-import StorageService from './storageService'; // Import StorageService
+import StorageService from './storageService';
 
 class VoucherService {
   async createVoucher(data) {
     try {
-      console.log("Creating voucher with data:", data);
-
       // Lấy brandId từ StorageService
       const brandId = StorageService.getBrandId();
       if (!brandId) {
@@ -15,7 +13,7 @@ class VoucherService {
       }
 
       const formData = new FormData();
-      formData.append("brandId", brandId); // Thêm brandId vào FormData
+      formData.append("brandId", brandId);
       formData.append("typeId", data.typeId);
       formData.append("voucherName", data.voucherName);
       formData.append("price", Math.floor(Number(data.price)));
@@ -27,18 +25,12 @@ class VoucherService {
         formData.append("image", data.image);
       }
 
-      // Log FormData entries for debugging
-      for (let pair of formData.entries()) {
-        console.log(`${pair[0]}: ${pair[1]}`);
-      }
-
       const response = await apiClient.post(VOUCHER_ENDPOINTS.CREATE, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }
       });
 
-      console.log("API Response:", response);
       toast.success("Tạo phiếu ưu đãi thành công!");
 
       return {
@@ -46,19 +38,10 @@ class VoucherService {
         data: response.data
       };
     } catch (error) {
-      console.error("Create voucher error details:", {
-        error: error,
-        response: error.response,
-        data: error.response?.data,
-        message: error.message,
-        stack: error.stack
-      });
-
       if (error.response?.data) {
-        console.error("Server error response:", error.response.data);
+        toast.error(error.message || "Tạo phiếu ưu đãi thất bại");
       }
 
-      toast.error(error.message || "Tạo phiếu ưu đãi thất bại");
       throw {
         status: error.response?.status || 500,
         message: error.message || error.response?.data?.message || "Tạo phiếu ưu đãi thất bại",
@@ -76,9 +59,8 @@ class VoucherService {
     brandId = ""
   }) {
     try {
-      const validPage = Math.max(1, page); // Đảm bảo page >= 1
+      const validPage = Math.max(1, page);
       if (!brandId) {
-        console.warn("No brandId provided for fetching vouchers");
         return {
           status: 200,
           data: {
@@ -91,35 +73,23 @@ class VoucherService {
         };
       }
       
-      console.log("Fetching vouchers with params:", {
-        page,
-        size,
-        search,
-        state,
-        isAsc,
-        brandId
-      });
-      
       const params = new URLSearchParams();
       params.append("page", validPage);
       params.append("size", size);
       params.append("brandId", brandId);
-  
+
       if (search && search.trim() !== "") {
         params.append("search", search.trim());
       }
-  
+
       params.append("state", state.toString());
       params.append("isAsc", isAsc.toString());
-  
+
       const url = `${VOUCHER_ENDPOINTS.GET_ALL}?${params}`;
-      console.log(`Making request to: ${url}`);
-      
+
       const response = await apiClient.get(url);
-      console.log("Vouchers API raw response:", response.data);
-  
+
       if (!response.data) {
-        console.warn("No data received from API");
         return {
           status: response.status,
           data: {
@@ -131,7 +101,7 @@ class VoucherService {
           }
         };
       }
-  
+
       const responseData = {
         status: response.status,
         data: {
@@ -142,14 +112,10 @@ class VoucherService {
           items: Array.isArray(response.data.items) ? response.data.items.filter(item => item.brandId === brandId) : []
         }
       };
-  
-      console.log("Processed response data:", responseData);
+
       return responseData;
-  
+
     } catch (error) {
-      console.error("Error fetching vouchers:", error);
-      console.error("Error response:", error.response?.data);
-      
       return {
         status: error.response?.status || 500,
         data: {

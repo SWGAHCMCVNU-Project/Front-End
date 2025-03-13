@@ -18,7 +18,6 @@ import UniversityPage from './pages/UniversityManagement/UniversityPage.jsx';
 import MajorPage from './pages/MajorManagement/MajorPage.jsx';
 import StorePage from './pages/StoreManagement/StorePage.jsx';
 import VoucherType from './pages/VoucherType/VoucherType.jsx';
-// import VoucherDetail from './pages/VoucherManagement/VoucherDetail.jsx';
 import Vouchers from './pages/VoucherManagement/Vouchers.jsx';
 import Voucher from './pages/VoucherManagement/Voucher.jsx';
 import CustomerPage from './pages/CustomerManagement/CustomerPage.jsx';
@@ -30,31 +29,21 @@ import PackagePoint from './pages/PackagePointManagement/PackagePoint.jsx';
 import Main from './components/layout/Main.jsx';
 import storageService from './services/storageService';
 import VoucherCreatePage from './pages/VoucherManagement/VoucherCreatePage.jsx';
-// import AccessDenied from './pages/AccessDenied/AccessDenied.jsx';
+import Areas from './pages/AreaManagement/Areas.jsx';
+import Area from './pages/AreaManagement/Area.jsx';
+import Profile from './pages/Profile.jsx';
+
 
 function PrivateRoute({ children, allowedRoles = [] }) {
   const location = useLocation();
   const isAuthenticated = !!storageService.getAccessToken();
-  const vietnameseRole = storageService.getUserRole();
+  const roleLogin = storageService.getRoleLogin(); // Lấy role từ storageService
 
-  // Ánh xạ role từ tiếng Việt sang tiếng Anh
-  const mapRoleToEnglish = (vietnameseRole) => {
-    const roleMapping = {
-      'Thương hiệu': 'brand',
-      'Quản trị viên': 'admin',
-      'Nhân viên': 'staff',
-      'Cơ sở': 'campus'
-    };
-    return roleMapping[vietnameseRole] || vietnameseRole;
-  };
-
-  const englishRole = mapRoleToEnglish(vietnameseRole);
-
-  if (!isAuthenticated || !vietnameseRole) {
+  if (!isAuthenticated || !roleLogin) {
     return <Navigate to="/sign-in" state={{ from: location }} replace />;
   }
 
-  if (allowedRoles.length > 0 && !allowedRoles.includes(englishRole)) {
+  if (allowedRoles.length > 0 && !allowedRoles.includes(roleLogin)) {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -62,11 +51,10 @@ function PrivateRoute({ children, allowedRoles = [] }) {
 }
 
 function App() {
-  const [roleLogin, setRoleLogin] = useState(storageService.getUserRole());
+  const [roleLogin, setRoleLogin] = useState(storageService.getRoleLogin());
 
-  const handleLogin = async(newRoleLogin) => {
-    // Lưu trực tiếp role tiếng Việt từ API
-    storageService.setUserRole(newRoleLogin);
+  const handleLogin = (newRoleLogin) => {
+    storageService.setRoleLogin(newRoleLogin);
     setRoleLogin(newRoleLogin);
   };
 
@@ -78,6 +66,8 @@ function App() {
           <Route path="/sign-up" exact element={<SignUp />} />
           <Route path="/" element={<Main />}>
             <Route path="/dashboard" exact element={<DashBoard />} />
+            <Route path="profile" element={<Profile />} />
+
             <Route path="/brands" exact element={
               <PrivateRoute allowedRoles={['admin', 'brand']}>
                 <Brands />
@@ -113,6 +103,16 @@ function App() {
                 <MajorPage />
               </PrivateRoute>
             } />
+            <Route path="/areas" exact element={
+              <PrivateRoute allowedRoles={['admin']}>
+                <Areas />
+              </PrivateRoute>
+            } />
+            <Route path="/areas/:areaId" exact element={
+              <PrivateRoute allowedRoles={['admin']}>
+                <Area />
+              </PrivateRoute>
+            } />
             <Route path="/stores" exact element={
               <PrivateRoute allowedRoles={['brand']}>
                 <StorePage />
@@ -123,13 +123,12 @@ function App() {
                 <Vouchers />
               </PrivateRoute>
             } />
-              <Route path="/vouchers/create" exact element={
+            <Route path="/vouchers/create" exact element={
               <PrivateRoute allowedRoles={['brand']}>
                 <VoucherCreatePage />
               </PrivateRoute>
             } />
-            {/* <Route path="/vouchers/:voucherId" element={checkAccess(['brand'], <VoucherDetail />)} /> */}
-            <Route path="/voucher/voucherId:" exact element={
+            <Route path="/vouchers/:voucherId" exact element={
               <PrivateRoute allowedRoles={['brand']}>
                 <Voucher />
               </PrivateRoute>
@@ -178,4 +177,4 @@ function App() {
   );
 }
 
-export default App; 
+export default App;

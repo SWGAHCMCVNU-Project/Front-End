@@ -16,7 +16,7 @@ apiClient.interceptors.request.use(
     }
     
     // Log the full URL for debugging
-    console.log(`API Request: ${config.method.toUpperCase()} ${config.baseURL}${config.url}`);
+    // console.log(`API Request: ${config.method.toUpperCase()} ${config.baseURL}${config.url}`);
     
     return config;
   },

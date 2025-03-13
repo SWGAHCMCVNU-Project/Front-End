@@ -27,25 +27,12 @@ import storageService from "../../services/storageService";
 import { MenuItem } from "./MenuItem";
 
 function Sidenav({ color }) {
-  const roleLogin = storageService.getUserRole();
+  const roleLogin = storageService.getRoleLogin(); // Sử dụng getRoleLogin thay vì getUserRole
   const navigate = useNavigate();
 
-  // Ánh xạ role từ tiếng Việt sang tiếng Anh
-  const mapRoleToEnglish = (vietnameseRole) => {
-    const roleMapping = {
-      'Thương hiệu': 'brand',
-      'Quản trị viên': 'admin',
-      'Nhân viên': 'staff',
-      'Cơ sở': 'campus'
-    };
-    return roleMapping[vietnameseRole] || vietnameseRole;
-  };
-
-  const englishRole = mapRoleToEnglish(roleLogin);
-
-  // Nếu không có role, redirect về trang login
+  // Nếu không có role hoặc token, redirect về trang login
   useEffect(() => {
-    if (!roleLogin) {
+    if (!storageService.getAccessToken() || !roleLogin) {
       navigate("/sign-in");
     }
   }, [roleLogin, navigate]);
@@ -151,7 +138,7 @@ function Sidenav({ color }) {
           color: color,
           iconPage: dashboard,
           labelPageName: "Thống kê",
-          allowedRoles: ["admin", "brand", "staff", "campus"], // Ánh xạ từ roleLogin
+          allowedRoles: ["admin", "brand", "staff", "campus"],
         },
         {
           key: "2",
@@ -162,7 +149,6 @@ function Sidenav({ color }) {
           labelPageName: "Chiến dịch",
           allowedRoles: ["admin", "brand"],
         },
-        
         {
           key: "4",
           linkURL: "/orders",
@@ -207,7 +193,6 @@ function Sidenav({ color }) {
           labelPageName: "Thương hiệu",
           allowedRoles: ["admin"],
         },
-        
         {
           key: "9",
           linkURL: "/stations",
@@ -217,7 +202,6 @@ function Sidenav({ color }) {
           labelPageName: "Trạm nhận hàng",
           allowedRoles: ["admin", "staff"],
         },
-       
       ],
     },
     {
@@ -226,7 +210,6 @@ function Sidenav({ color }) {
     {
       type: "group",
       menuSideNav: [
-        
         {
           key: "12",
           linkURL: "/universities",
@@ -236,7 +219,6 @@ function Sidenav({ color }) {
           labelPageName: "Đại học",
           allowedRoles: ["admin", "campus"],
         },
-        
         {
           key: "14",
           linkURL: "/areas",
@@ -334,7 +316,7 @@ function Sidenav({ color }) {
         items={menuItems.flatMap((item, index) => {
           if (item.type === "group") {
             return item.menuSideNav
-              .filter((menuItem) => menuItem.allowedRoles.includes(englishRole))
+              .filter((menuItem) => menuItem.allowedRoles.includes(roleLogin))
               .map((menuItem) => ({
                 key: menuItem.key,
                 label: (
@@ -356,7 +338,7 @@ function Sidenav({ color }) {
             return {
               key: "screen-logout",
               label: (
-                <NavLink to="/sign-in" onClick={() => storageService.removeAccessToken()}>
+                <NavLink to="/sign-in" onClick={() => storageService.clearAll()}>
                   <span className="icon">{signin}</span>
                   <span className="label">Đăng xuất</span>
                 </NavLink>

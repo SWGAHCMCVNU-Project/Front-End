@@ -25,7 +25,7 @@ export function useBrands({ page = 1, size = 10, search = "", state = true, isAs
   const updateBrandMutation = useMutation({
     mutationFn: ({ brandId, brandData }) => updateBrandAPI(brandId, brandData),
     onSuccess: () => {
-      toast.success("Cập nhật thương hiệu thành công!");
+      // toast.success("Cập nhật thương hiệu thành công!");
       queryClient.invalidateQueries(["brands"]); // Làm mới danh sách thương hiệu
     },
     onError: () => {
