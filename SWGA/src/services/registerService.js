@@ -1,4 +1,4 @@
-import { registerBrandAPI } from '../store/api/registerApi';
+import { registerBrandAPI } from '../store/api/registerAPI';
 import toast from 'react-hot-toast';
 
 class RegisterService {
