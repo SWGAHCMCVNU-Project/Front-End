@@ -9,8 +9,8 @@ function SetRowsPerPage({ pageSize, onLimitChange }) {
     if (Number(newLimit) !== pageSize) {
       onLimitChange(Number(newLimit));
       searchParams.set("size", newLimit);
-      searchParams.set("page", 1);
-      setSearchParams(searchParams);
+      searchParams.set("page", "1"); // Reset về trang 1
+      setSearchParams(searchParams, { replace: true });
     }
   };
 

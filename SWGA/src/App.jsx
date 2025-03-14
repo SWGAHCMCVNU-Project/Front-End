@@ -133,6 +133,11 @@ function App() {
                 <Voucher />
               </PrivateRoute>
             } />
+             <Route path="/vouchers/edit/:voucherId" exact element={
+              <PrivateRoute allowedRoles={['brand']}>
+                <VoucherCreatePage />
+              </PrivateRoute>
+            } />
             <Route path="/voucher-type" element={
               <PrivateRoute allowedRoles={['brand']}>
                 <VoucherType />

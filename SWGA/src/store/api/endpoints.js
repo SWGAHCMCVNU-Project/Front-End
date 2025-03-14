@@ -9,7 +9,8 @@ export const AUTH_ENDPOINTS = {
   export const VOUCHER_ENDPOINTS = {
     CREATE: '/Voucher',
     GET_ALL: '/Voucher',
-    GET_BY_ID: '/Voucher/{id}'
+    GET_BY_ID: '/Voucher/{id}',
+    UPDATE: "/Voucher/{id}",
   };
 
   export const VOUCHER_TYPE_ENDPOINTS = {

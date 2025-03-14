@@ -13,17 +13,14 @@ import Tag from "../../../ui/Tag";
 import {
   formatCurrency,
   formatPhoneNumber,
-  formattedHours,
   handleValidImageURL,
 } from "../../../utils/helpers";
 import DataItemDes from "./DataItemDes";
 
 const StyledStationDataBox = styled.section`
-  /* Box */
   background-color: var(--color-grey-0);
   border: 1px solid var(--color-grey-100);
   border-radius: var(--border-radius-md);
-
   overflow: hidden;
 `;
 
@@ -58,6 +55,7 @@ const Infor = styled.div`
     color: var(--color-grey-700);
   }
 `;
+
 const Price = styled.div`
   display: flex;
   align-items: center;
@@ -115,8 +113,6 @@ const Flag = styled.img`
   border-radius: var(--border-radius-tiny);
   display: block;
   border: ${(props) => (props.src ? "1px solid var(--color-grey-100)" : null)};
-
-  // If image is empty or null, use logoDefault
   content: url(${(props) => (props.src ? props.src : coverPhotoBrandDefault)});
 `;
 
@@ -131,13 +127,12 @@ const LogoBrand = styled.img`
   border-radius: var(--border-radius-tiny);
   display: block;
   border: ${(props) => (props.src ? "1px solid var(--color-grey-100)" : null)};
-
   content: url(${(props) => (props.src ? props.src : logoDefault)});
 `;
 
 function BrandDataBox({ brand }) {
   const {
-    id: stationId,
+    id,
     logo,
     coverPhoto,
     dateCreated,
@@ -155,6 +150,11 @@ function BrandDataBox({ brand }) {
     greenWalletBalance,
     totalIncome,
     totalSpending,
+    accountId,
+    acronym,
+    coverFileName,
+    link,
+    dateUpdated,
   } = brand;
 
   const statusToTagName = {
@@ -164,6 +164,14 @@ function BrandDataBox({ brand }) {
 
   const [isValidCoverPhoto, setIsValidCoverPhoto] = useState(true);
   const [isValidLogo, setIsValidLogo] = useState(true);
+
+  // Hàm định dạng giờ từ chuỗi "HH:mm:ss" thành "HH:mm"
+  const formatTime = (timeStr) => {
+    if (!timeStr || typeof timeStr !== "string" || !timeStr.includes(":")) {
+      return "Chưa cập nhật";
+    }
+    return timeStr.slice(0, 5); // Lấy "HH:mm" từ "HH:mm:ss"
+  };
 
   useEffect(() => {
     handleValidImageURL(coverPhoto)
@@ -176,6 +184,62 @@ function BrandDataBox({ brand }) {
       .then((isValid) => setIsValidLogo(isValid))
       .catch(() => setIsValidLogo(false));
   }, [logo]);
+
+  // Log đầy đủ dữ liệu của brand, đặc biệt chi tiết về coverPhoto
+  useEffect(() => {
+    console.log("Full Brand Data:", {
+      id,
+      accountId,
+      brandName,
+      acronym,
+      address,
+      coverPhoto: {
+        url: coverPhoto ?? "Chưa có ảnh bìa",
+        fileName: coverFileName ?? "N/A",
+        isValid: isValidCoverPhoto,
+      },
+      link,
+      openingHours,
+      closingHours,
+      totalIncome: totalIncome ?? "N/A",
+      totalSpending: totalSpending ?? "N/A",
+      dateCreated,
+      dateUpdated: dateUpdated ?? "Chưa cập nhật",
+      description,
+      state,
+      status,
+      phone: phone ?? "Chưa cập nhật",
+      email: email ?? "Chưa cập nhật",
+      numberOfFollowers: numberOfFollowers ?? "Chưa cập nhật",
+      greenWalletName: greenWalletName ?? "Chưa cập nhật",
+      greenWalletBalance: greenWalletBalance ?? "Chưa cập nhật",
+    });
+  }, [
+    brand,
+    id,
+    accountId,
+    brandName,
+    acronym,
+    address,
+    coverPhoto,
+    coverFileName,
+    link,
+    openingHours,
+    closingHours,
+    totalIncome,
+    totalSpending,
+    dateCreated,
+    dateUpdated,
+    description,
+    state,
+    status,
+    phone,
+    email,
+    numberOfFollowers,
+    greenWalletName,
+    greenWalletBalance,
+    isValidCoverPhoto,
+  ]);
 
   return (
     <StyledStationDataBox>
@@ -203,24 +267,21 @@ function BrandDataBox({ brand }) {
               <DataItem label="Địa chỉ:">Chưa cập nhật</DataItem>
             )}
 
-            {openingHours ? (
-              <DataItem label=" Giờ mở cửa:">
-                <div>
-                  {formattedHours(openingHours)} &mdash;{" "}
-                  {formattedHours(closingHours)}
-                </div>
+            {openingHours && closingHours ? (
+              <DataItem label="Giờ mở cửa:">
+                {formatTime(openingHours)} — {formatTime(closingHours)}
               </DataItem>
             ) : (
-              <DataItem label=" Giờ mở cửa:">
-                <div>Chưa cập nhật</div>
-              </DataItem>
+              <DataItem label="Giờ mở cửa:">Chưa cập nhật</DataItem>
             )}
 
-            <DataItem label="Số người theo dõi:">{numberOfFollowers}</DataItem>
+            <DataItem label="Số người theo dõi:">
+              {numberOfFollowers ?? "Chưa cập nhật"}
+            </DataItem>
 
-            <DataItem label={greenWalletName + ":"}>
+            <DataItem label={`${greenWalletName || "Ví xanh"}:`}>
               <StyleGreenWallet>
-                {formatCurrency(greenWalletBalance)}{" "}
+                {formatCurrency(greenWalletBalance ?? 0)}{" "}
                 <StyledImageBean src={greenBean} alt="dau xanh" />
               </StyleGreenWallet>
             </DataItem>
@@ -228,35 +289,52 @@ function BrandDataBox({ brand }) {
             <StyledTotalBean>
               <DataItem label="Tổng nhận:">
                 <StyleGreenWallet>
-                  {formatCurrency(totalIncome)}{" "}
+                  {formatCurrency(totalIncome ?? 0)}{" "}
                   <StyledImageBean src={greenBean} alt="dau xanh" />
                 </StyleGreenWallet>
               </DataItem>
               |
               <DataItem label="Tổng chi:">
                 <StyleGreenWallet>
-                  {formatCurrency(totalSpending)}{" "}
+                  {formatCurrency(totalSpending ?? 0)}{" "}
                   <StyledImageBean src={greenBean} alt="dau xanh" />
                 </StyleGreenWallet>
               </DataItem>
             </StyledTotalBean>
+
             {description ? (
-              <DataItemDes label="Mô tả thương hiệu:">
-                {description}
-              </DataItemDes>
+              <DataItemDes label="Mô tả thương hiệu:">{description}</DataItemDes>
             ) : (
               <DataItem label="Mô tả:">Chưa cập nhật</DataItem>
             )}
+
+            <DataItem label="Liên kết:">
+              {link ? (
+                <a href={link} target="_blank" rel="noopener noreferrer">
+                  {link}
+                </a>
+              ) : (
+                "Chưa cập nhật"
+              )}
+            </DataItem>
+
           </Infor>
         </Guest>
 
         <Price>
-          <DataItem icon={<HiOutlineEnvelope />} label={`Gmail`}>
+          <DataItem
+            icon={<HiOutlineEnvelope />}
+            label="Gmail"
+            value={email ?? "Chưa cập nhật"}
+          >
             {email}
           </DataItem>
-          <DataItem icon={<HiOutlinePhone />} label={`Số điện thoại`}>
-            {/* {phone} */}
-            {formatPhoneNumber(phone)}
+          <DataItem
+            icon={<HiOutlinePhone />}
+            label="Số điện thoại"
+            value={phone ? formatPhoneNumber(phone) : "Chưa cập nhật"}
+          >
+            {phone ? formatPhoneNumber(phone) : "Chưa cập nhật"}
           </DataItem>
         </Price>
       </Section>
@@ -267,6 +345,14 @@ function BrandDataBox({ brand }) {
           {format(addHours(new Date(dateCreated), 7), "dd MMM yyyy, p", {
             locale: vi,
           })}
+        </p>
+        <p>
+          Ngày cập nhật:{" "}
+          {dateUpdated
+            ? format(addHours(new Date(dateUpdated), 7), "dd MMM yyyy, p", {
+                locale: vi,
+              })
+            : "Chưa cập nhật"}
         </p>
       </Footer>
     </StyledStationDataBox>

@@ -1,57 +1,36 @@
 /* eslint-disable no-unused-vars */
-import { Flex, Heading, Text } from '@chakra-ui/react';
-import { Button, Card, Col, Form, Layout, Row } from 'antd';
-import React, { useState } from 'react';
-import toast from 'react-hot-toast';
-import { NavLink, useNavigate } from 'react-router-dom';
-import signinbg from '../assets/images/ảnh ví.png';
-import { HSeparator } from '../components/layout/separator/Separator';
-import { CustomFormItemLogin } from '../ui/custom/Form/InputItem/CustomFormItem';
-import { loginAPI } from '../store/api/authApi';
-import storageService from '../services/storageService';
+import { Flex, Heading, Text } from "@chakra-ui/react";
+import { Button, Card, Col, Form, Input, Layout, Row } from "antd";
+import React, { useState } from "react";
+import toast from "react-hot-toast";
+import { NavLink, useNavigate } from "react-router-dom";
+import signinbg from "../assets/images/ảnh ví.png";
+import { login } from "../store/api/authApi";
 
 const { Footer, Content } = Layout;
 
-function SignIn({ onLogin }) {
-  const [data, setData] = useState({
-    userName: '',
-    password: '',
-  });
+function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const [form] = Form.useForm();
 
-  const handleLogin = async (e) => {
-    // e.preventDefault(); // Ngăn reload trang khi submit
-
-    if (!data.userName.trim() || !data.password) {
-      toast.error('Vui lòng nhập tài khoản và mật khẩu!');
-      return;
-    }
-
-    setIsLoading(true);
-
+  const handleLogin = async (values) => {
     try {
-      const response = await loginAPI({
-        userName: data.userName.trim(),
-        password: data.password,
-      });
-      console.log('Response từ loginAPI:', response); // Log để kiểm tra
+      setIsLoading(true);
+      const response = await login(values.username.trim(), values.password);
 
-      if (response.success) {
-        const { role } = response.data;
+      console.log("responsefe", response);
 
-        if (onLogin) {
-          onLogin(role);
-        }
-
-        toast.success('Đăng nhập thành công và chào mừng bạn đã quay trở lại!');
-        navigate('/dashboard');
+      if (response.success) { // Kiểm tra success thay vì status
+        localStorage.setItem('roleLogin', response.data.role);
+        // toast.success("Đăng nhập thành công!");
+        navigate("/dashboard", { replace: true });
       } else {
-        toast.error(response.message || 'Tài khoản hoặc mật khẩu không đúng, xin vui lòng nhập lại!');
+        toast.error(response.message || "Tài khoản hoặc mật khẩu không đúng!");
       }
     } catch (error) {
-      console.error('Lỗi đăng nhập:', error);
-      toast.error('Tài khoản hoặc mật khẩu không đúng, xin vui lòng nhập lại!');
+      console.error("Lỗi đăng nhập:", error);
+      toast.error("Lỗi hệ thống, vui lòng thử lại!");
     } finally {
       setIsLoading(false);
     }
@@ -67,41 +46,42 @@ function SignIn({ onLogin }) {
                 <img src={signinbg} alt="Sign In Background" />
               </div>
               <div>
-                <Heading className="header-login" fontSize="36px">
+                <Heading
+                  className="header-login"
+                  fontSize="36px"
+                  marginTop="20px"
+                >
                   Đăng nhập
                 </Heading>
               </div>
               <Form
+                form={form}
                 onFinish={handleLogin}
+                onFinishFailed={(errorInfo) =>
+                  console.log("Đăng nhập thất bại:", errorInfo)
+                }
                 layout="vertical"
                 className="row-col"
               >
-                <CustomFormItemLogin
-                  name="userName"
+                <Form.Item
+                  name="username"
                   label="Tài khoản"
-                  type="text"
-                  placeholder="Hãy điền tên tài khoản..."
-                  value={data.userName}
-                  onChange={(e) =>
-                    setData({
-                      ...data,
-                      userName: e.target.value.replace(/\s/g, ''),
-                    })
-                  }
-                  disabled={isLoading}
-                />
-                <CustomFormItemLogin
+                  rules={[
+                    { required: true, message: "Vui lòng nhập tài khoản!" },
+                  ]}
+                >
+                  <Input placeholder="Hãy điền tên tài khoản..." />
+                </Form.Item>
+
+                <Form.Item
                   name="password"
                   label="Mật khẩu"
-                  type="password"
-                  placeholder="Hãy điền mật khẩu..."
-                  value={data.password}
-                  onChange={(e) =>
-                    setData({ ...data, password: e.target.value })
-                  }
-                  disabled={isLoading}
-                  pass={true}
-                />
+                  rules={[
+                    { required: true, message: "Vui lòng nhập mật khẩu!" },
+                  ]}
+                >
+                  <Input.Password placeholder="Hãy điền mật khẩu..." />
+                </Form.Item>
 
                 <Flex
                   flexDirection="column"
@@ -112,12 +92,7 @@ function SignIn({ onLogin }) {
                   <Text style={{ fontWeight: 600 }} fontSize="13px">
                     Bạn chưa có tài khoản?
                     <NavLink to="/sign-up">
-                      <Text
-                        color="#506690"
-                        as="span"
-                        ms="5px"
-                        fontWeight="600"
-                      >
+                      <Text color="#506690" as="span" ms="5px" fontWeight="600">
                         Tạo tài khoản mới
                       </Text>
                     </NavLink>
@@ -132,9 +107,9 @@ function SignIn({ onLogin }) {
                     disabled={isLoading}
                     block
                     style={{
-                      backgroundColor: '#21b658',
-                      height: '40px',
-                      marginTop: '10px',
+                      backgroundColor: "#21b658",
+                      height: "40px",
+                      marginTop: "10px",
                     }}
                   >
                     Đăng nhập

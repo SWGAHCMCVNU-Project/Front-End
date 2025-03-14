@@ -5,7 +5,7 @@ const StyledFormRow = styled.div`
   display: grid;
   align-items: center;
   gap: 1rem;
-
+ 
   padding: 1.2rem 0;
 
   &:first-child {
@@ -38,6 +38,7 @@ const Error = styled.div`
   background: none;
   border: none;
   gap: 0.5rem;
+  
 `;
 
 const StyledIcon = styled.div`
@@ -50,6 +51,7 @@ const StyledIcon = styled.div`
     height: 2rem;
     transition: all 0.3s;
   }
+    
 `;
 
 export default function FormRow({ label, error, children }) {

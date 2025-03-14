@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Avatar, Badge, Col, Popover, Row, Typography, notification } from "antd";
+import { Avatar, Badge, Col, Divider, Popover, Row, Typography, notification } from "antd";
+import { UserOutlined, HomeOutlined } from "@ant-design/icons";
 import avatarProfile from "../../assets/images/avatar-profile.png";
 import storageService from "../../services/storageService";
 import ButtonCustom from "../../ui/custom/Button/ButtonCustom";
@@ -21,7 +22,7 @@ function Header({ onPress, name, subName, handleSidenavColor, handleSidenavType,
   const { Title } = Typography;
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
-  const hasNotified = useRef(false); // Kiểm soát trạng thái thông báo
+  const hasNotified = useRef(false);
 
   useEffect(() => {
     const user = storageService.getUser();
@@ -29,7 +30,6 @@ function Header({ onPress, name, subName, handleSidenavColor, handleSidenavType,
       setUserData(user);
       if (!hasNotified.current) {
         notification.success({
-          // message: "Chào mừng!",
           description: `Chào mừng ${user.userName || "bạn"} đã quay trở lại!`,
           placement: "topRight",
           duration: 3,
@@ -41,7 +41,7 @@ function Header({ onPress, name, subName, handleSidenavColor, handleSidenavType,
 
   const handleLogOut = () => {
     try {
-      storageService.clearAll(); // Sử dụng clearAll để xóa toàn bộ dữ liệu
+      storageService.clearAll();
       navigate("/sign-in");
       notification.success({
         message: "Đăng xuất thành công",
@@ -57,12 +57,13 @@ function Header({ onPress, name, subName, handleSidenavColor, handleSidenavType,
   };
 
   const menu = (
-    <div className="setting-item-information">
-      <Avatar.Group>
-        <Avatar className="avatar-setting-profile" shape="square" src={avatarProfile} />
+    <div style={{ padding: '10px', width: '250px' }}>
+      <Avatar.Group style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
         <div>
-          <Title className="title-setting-name" level={5}>{userData?.userName || "Guest User"}</Title>
-          <div className="font-color-setting-description">
+          <Title level={5} style={{ marginLeft: "30px", fontSize: '16px', fontWeight: 'bold' }}>
+            {userData?.userName || "Guest User"}
+          </Title>
+          <div style={{ color: '#666', fontSize: '14px', marginLeft: "30px" }}>
             {userData?.role === "admin" && "Quản trị viên"}
             {userData?.role === "brand" && "Quản lí thương hiệu"}
             {userData?.role === "staff" && "Nhân viên"}
@@ -70,8 +71,25 @@ function Header({ onPress, name, subName, handleSidenavColor, handleSidenavType,
           </div>
         </div>
       </Avatar.Group>
-      <div className="btn-logout-setting">
-        <ButtonCustom type="primary" className="btn-logout" onClick={handleLogOut}>
+      <Divider style={{ margin: '10px 0' }} />
+      <div style={{ marginBottom: '10px', marginLeft: "30px" }}>
+        <Link to="/profile" style={{ display: 'flex', alignItems: 'center', color: '#111827', fontSize: '14px' }}>
+          <UserOutlined style={{ marginRight: '8px', fontSize: '16px' }} />
+         Thông tin chi tiết
+        </Link>
+      </div>
+      <div style={{ marginBottom: '15px', marginLeft: "30px" }}>
+        <Link to="/dashboard" style={{ display: 'flex', alignItems: 'center', color: '#111827', fontSize: '14px' }}>
+          <HomeOutlined style={{ marginRight: '8px', fontSize: '16px' }} />
+          Trang chủ
+        </Link>
+      </div>
+      <div style={{ textAlign: 'center' }}>
+        <ButtonCustom
+          type="primary"
+          onClick={handleLogOut}
+          style={{ width: '100%', backgroundColor: '#1890ff', borderColor: '#1890ff', fontSize: '14px' }}
+        >
           Đăng Xuất
         </ButtonCustom>
       </div>
@@ -79,28 +97,54 @@ function Header({ onPress, name, subName, handleSidenavColor, handleSidenavType,
   );
 
   return (
-    <Row gutter={[24, 0]} align="middle">
-      <Col span={24} md={24} className="header-control" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-        {userData ? (
-          <div className="welcome-text" style={{ display: 'flex', alignItems: 'center', marginRight: '16px' }}>
-            <Avatar src={avatarProfile} size="small" style={{ marginRight: '8px' }} />
-            <span style={{ fontSize: '16px', color: '#111827' }}>
-              Chào mừng, {userData.userName || "bạn"}!
-            </span>
-          </div>
-        ) : (
-          <Link to="/sign-in" className="btn-sign-in">
-            {profileIcon}
-            <span>Đăng nhập</span>
-          </Link>
-        )}
-        <Badge size="small" count={1}>
-          <Popover content={menu} trigger="click" placement="bottom">
-            {settingIcon}
-          </Popover>
-        </Badge>
-      </Col>
-    </Row>
+    <div 
+      style={{ 
+        position: 'fixed', 
+        top: 0, 
+        
+        left: 290, 
+        right: 0, 
+        zIndex: 1000, 
+        backgroundColor: '#fff', 
+        boxShadow: '0 2px 8px rgba(255, 255, 255, 0.15)',
+        padding: '30 px 0',
+        height: '70px',
+             // Đặt chiều cao cố định (tùy chỉnh theo ý bạn)
+  
+      }}
+    >
+      <Row gutter={[24, 0]} align="middle">
+        <Col span={24} md={24} className="header-control" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end',marginTop: "30px" }}>
+          {userData ? (
+            <>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={{ fontSize: '16px', color: '#111827', marginLeft: "15px" }}>
+                  Chào mừng, {userData.userName || "bạn"}!
+                </span>
+                <Avatar src={avatarProfile} size="small" style={{ marginLeft: '15px'}} />
+              </div>
+              <Badge size="small" count={1} style={{ marginLeft: '30px' }}>
+                <Popover content={menu} trigger="click" placement="bottom" >
+                  {settingIcon}
+                </Popover>
+              </Badge>
+            </>
+          ) : (
+            <>
+              <Link to="/sign-in" className="btn-sign-in" style={{ marginRight: '25px' }}>
+                {profileIcon}
+                <span style={{ marginLeft: '8px' }}>Đăng nhập</span>
+              </Link>
+              <Badge size="small" count={1} style={{ marginRight: '30px' }}>
+                <Popover content={menu} trigger="click" placement="bottom">
+                  {settingIcon}
+                </Popover>
+              </Badge>
+            </>
+          )}
+        </Col>
+      </Row>
+    </div>
   );
 }
 

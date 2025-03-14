@@ -40,8 +40,8 @@ const StyledModal = styled.div`
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-lg);
   padding: 3.2rem 4rem;
-  max-width: 500px; /* Giới hạn chiều rộng tối đa */
-  width: 90%; /* Đảm bảo responsive trên màn hình nhỏ */
+  max-width: 1100px; /* Giới hạn chiều rộng tối đa */
+  // width: 90%; /* Đảm bảo responsive trên màn hình nhỏ */
   position: relative; /* Đảm bảo nội dung không bị ảnh hưởng bởi overlay */
   animation: slideIn 0.3s ease-in-out;
 

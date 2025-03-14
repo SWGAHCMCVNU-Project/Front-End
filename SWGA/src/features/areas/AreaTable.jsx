@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import styled from "styled-components";
-import Spinner from "../../ui/Spinner";
 import Table from "../../ui/Table";
 import Empty from "../../ui/Empty";
 import Pagination from "../../ui/Pagination";
@@ -52,7 +51,7 @@ export default function AreaTable() {
     setSortOrder((prevSortOrder) => (prevSortOrder === "asc" ? "desc" : "asc"));
   };
 
-  if (isLoading) return <Spinner />;
+  // if (isLoading) return <Spinner />;
   if (!areas?.result?.length) return <Empty resourceName="khu vực" />;
 
   const filteredCategories = filterCategoriesByState(

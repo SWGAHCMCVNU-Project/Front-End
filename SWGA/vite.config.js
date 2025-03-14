@@ -8,4 +8,7 @@ export default defineConfig({
   define: {
     global: "window", // Định nghĩa global là window trong trình duyệt
   },
+  build: {
+    outDir: 'dist', // Đảm bảo thư mục đầu ra là 'dist'
+  },
 })

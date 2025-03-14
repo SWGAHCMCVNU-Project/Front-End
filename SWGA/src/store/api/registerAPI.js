@@ -1,13 +1,34 @@
+// store/api/registerApi.js
 import apiClient from "./apiClient";
 import { REGISTER_ENDPOINTS } from "./endpoints";
-import RegisterService from "../../services/registerService"; // Import RegisterService
-
-const registerService = new RegisterService(); // Tạo instance của RegisterService
+import toast from 'react-hot-toast';
 
 export const registerBrandAPI = async (formData, coverPhoto, navigate) => {
   try {
-    // Format dữ liệu từ UI bằng RegisterService trước khi gửi lên server
-    const brandData = registerService.formatBrandData(formData, coverPhoto);
+    // Định dạng dữ liệu từ UI trước khi gửi lên server
+    const formatBrandData = (formData, coverPhoto) => {
+      const [openingHours, openingMinutes] = formData.openingHours.split(':');
+      const [closingHours, closingMinutes] = formData.closingHours.split(':');
+
+      return {
+        userName: formData.userName,
+        password: formData.password,
+        phone: formData.phone,
+        email: formData.email,
+        brandName: formData.brandName,
+        acronym: formData.acronym || "",
+        address: formData.address,
+        coverPhoto: coverPhoto,
+        link: formData.link || "",
+        openingHours: `${openingHours.padStart(2, '0')}:${openingMinutes.padStart(2, '0')}:00`, // Định dạng "HH:mm:ss"
+        closingHours: `${closingHours.padStart(2, '0')}:${closingMinutes.padStart(2, '0')}:00`, // Định dạng "HH:mm:ss"
+        description: formData.description || "",
+        state: true
+      };
+    };
+
+    // Format dữ liệu từ UI
+    const brandData = formatBrandData(formData, coverPhoto);
 
     // Tạo FormData object
     const apiFormData = new FormData();
@@ -27,10 +48,8 @@ export const registerBrandAPI = async (formData, coverPhoto, navigate) => {
     }
 
     apiFormData.append('link', brandData.link || '');
-    apiFormData.append('openingHours.hours', brandData.openingHours.hours);
-    apiFormData.append('openingHours.minutes', brandData.openingHours.minutes);
-    apiFormData.append('closingHours.hours', brandData.closingHours.hours);
-    apiFormData.append('closingHours.minutes', brandData.closingHours.minutes);
+    apiFormData.append('openingHours', brandData.openingHours); // Gửi trực tiếp chuỗi HH:mm:ss
+    apiFormData.append('closingHours', brandData.closingHours); // Gửi trực tiếp chuỗi HH:mm:ss
     apiFormData.append('description', brandData.description || '');
     apiFormData.append('state', brandData.state);
 
@@ -45,18 +64,27 @@ export const registerBrandAPI = async (formData, coverPhoto, navigate) => {
       }
     );
 
-    // Gọi Service để xử lý phản hồi từ server
-    const result = await registerService.processRegisterResponse(response.data, navigate);
-
-    return {
-      status: response.status,
-      success: result.success,
-      data: result.data,
-      message: result.message,
-    };
+    // Xử lý phản hồi từ API
+    if (response.data) { // Giả sử server trả về dữ liệu thành công
+      toast.success('Đăng ký thành công!');
+      navigate('/sign-in', { replace: true });
+      return {
+        status: response.status,
+        success: true,
+        data: response.data,
+      };
+    } else {
+      toast.error('Đăng ký thất bại!');
+      return {
+        status: response.status,
+        success: false,
+        message: 'Không nhận được dữ liệu từ server!',
+      };
+    }
   } catch (error) {
     console.error('Register API Error:', error);
     const errorMessage = error.response?.data?.message || "Đăng ký thất bại";
+    toast.error(errorMessage);
     return {
       status: error.response?.status || 500,
       success: false,
