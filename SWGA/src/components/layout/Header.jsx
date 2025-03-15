@@ -73,9 +73,9 @@ function Header({ onPress, name, subName, handleSidenavColor, handleSidenavType,
       </Avatar.Group>
       <Divider style={{ margin: '10px 0' }} />
       <div style={{ marginBottom: '10px', marginLeft: "30px" }}>
-        <Link to="/profile" style={{ display: 'flex', alignItems: 'center', color: '#111827', fontSize: '14px' }}>
+        <Link to="/account" style={{ display: 'flex', alignItems: 'center', color: '#111827', fontSize: '14px' }}>
           <UserOutlined style={{ marginRight: '8px', fontSize: '16px' }} />
-         Thông tin chi tiết
+         Hồ sơ
         </Link>
       </div>
       <div style={{ marginBottom: '15px', marginLeft: "30px" }}>

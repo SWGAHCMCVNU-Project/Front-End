@@ -46,7 +46,13 @@ export const updateVoucherTypeAPI = async (id, data) => {
     formData.append("state", data.state);
 
     if (data.image) {
-      formData.append("image", data.image, data.image.name);
+      if (data.image instanceof File) {
+        // Nếu là file (từ input type="file")
+        formData.append("image", data.image, data.image.name);
+      } else {
+        // Nếu là chuỗi (URL)
+        formData.append("image", data.image);
+      }
     }
 
     const response = await apiClient.put(
@@ -64,7 +70,7 @@ export const updateVoucherTypeAPI = async (id, data) => {
       throw new Error("Invalid server response");
     }
 
-    toast.success("Cập nhật loại ưu đãi thành công!");
+    // toast.success("Cập nhật loại ưu đãi thành công!");
     return { status: response.status, data: response.data };
   } catch (error) {
     console.error("Update voucher type API error:", error);
@@ -76,7 +82,6 @@ export const updateVoucherTypeAPI = async (id, data) => {
     };
   }
 };
-
 export const getVoucherTypesAPI = async ({
   page = 1,
   size = 10,

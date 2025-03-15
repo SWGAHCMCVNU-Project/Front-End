@@ -5,11 +5,11 @@ import Menus from "../../ui/Menus";
 import Pagination from "../../ui/Pagination";
 import Spinner from "../../ui/Spinner";
 import Table from "../../ui/Table";
-import VoucherTypeRow from "./VoucherTypeRow";
+import CampaignTypeRow from "./CampaignTypeRow";
 import SetRowsPerPage from "./SetRowsPerPage";
 import { useSearchParams } from "react-router-dom";
 import { useDebounced } from "../../hooks/useDebounced";
-import { useVoucherTypes } from "../../hooks/voucher-type/useVoucherTypes";
+import { useCampaignTypes } from "../../hooks/campaign-type/useCampaignTypes";
 import { toast } from "react-hot-toast";
 
 const TableContainer = styled.div`
@@ -18,37 +18,15 @@ const TableContainer = styled.div`
   gap: 2rem;
 `;
 
-function VoucherTypeTable() {
+function CampaignTypeTable() {
   const [searchParams, setSearchParams] = useSearchParams();
+  
   const currentPage = Number(searchParams.get("page")) || 1;
   const pageSize = Number(searchParams.get("size")) || 10;
   const [sortOrder] = useState(true);
-  const searchTerm = searchParams.get("search") || "";
+
+  const searchTerm = searchParams.get("searchName") || ""; // Changed to searchName
   const debouncedSearch = useDebounced(searchTerm, 500);
-
-  const { voucherTypes, error, isLoading } = useVoucherTypes({
-    page: currentPage,
-    size: pageSize,
-    search: debouncedSearch,
-    isAsc: sortOrder,
-    state: true,
-  });
-
-  const [voucherTypeData, setVoucherTypeData] = useState(
-    voucherTypes?.data || {
-      items: [],
-      total: 0,
-      page: currentPage,
-      size: pageSize,
-      totalPages: 0,
-    }
-  );
-
-  useEffect(() => {
-    if (voucherTypes?.data) {
-      setVoucherTypeData(voucherTypes.data);
-    }
-  }, [voucherTypes]);
 
   useEffect(() => {
     if (searchTerm !== debouncedSearch) {
@@ -56,34 +34,50 @@ function VoucherTypeTable() {
         new URLSearchParams({
           page: "1",
           size: pageSize.toString(),
-          ...(debouncedSearch && { search: debouncedSearch }),
+          ...(debouncedSearch && { searchName: debouncedSearch }), // Changed to searchName
         }),
         { replace: true }
       );
     }
   }, [debouncedSearch, searchTerm, pageSize, setSearchParams]);
 
+  const { campaignTypes, error, isLoading } = useCampaignTypes({
+    page: currentPage,
+    size: pageSize,
+    searchName: debouncedSearch, // Changed search to searchName
+    isAsc: sortOrder,
+    state: true,
+  });
+
+  const campaignTypeData = campaignTypes?.data || {
+    items: [],
+    total: 0,
+    page: currentPage,
+    size: pageSize,
+    totalPages: 0,
+  };
+
   useEffect(() => {
-    if (voucherTypeData.items.length === 0 && currentPage > 1) {
+    if (campaignTypeData.items.length === 0 && currentPage > 1) {
       setSearchParams(
         new URLSearchParams({
           page: (currentPage - 1).toString(),
           size: pageSize.toString(),
-          ...(debouncedSearch && { search: debouncedSearch }),
+          ...(debouncedSearch && { searchName: debouncedSearch }), // Changed to searchName
         }),
         { replace: true }
       );
     }
-  }, [voucherTypeData.items, currentPage, pageSize, debouncedSearch, setSearchParams]);
+  }, [campaignTypeData.items, currentPage, pageSize, debouncedSearch, setSearchParams]);
 
   const handlePageChange = (newPage) => {
-    const maxPage = Math.max(1, voucherTypeData.totalPages || 1);
+    const maxPage = Math.max(1, campaignTypeData.totalPages || 1);
     if (newPage > maxPage) return;
     setSearchParams(
       new URLSearchParams({
         page: newPage.toString(),
         size: pageSize.toString(),
-        ...(debouncedSearch && { search: debouncedSearch }),
+        ...(debouncedSearch && { searchName: debouncedSearch }), // Changed to searchName
       }),
       { replace: true }
     );
@@ -94,57 +88,47 @@ function VoucherTypeTable() {
       new URLSearchParams({
         size: newSize.toString(),
         page: "1",
-        ...(debouncedSearch && { search: debouncedSearch }),
+        ...(debouncedSearch && { searchName: debouncedSearch }), // Changed to searchName
       }),
       { replace: true }
     );
   };
 
-  const handleVoucherTypeUpdate = (updatedVoucherType) => {
-    setVoucherTypeData((prev) => ({
-      ...prev,
-      items: prev.items.map((item) =>
-        item.id === updatedVoucherType.id ? { ...item, ...updatedVoucherType } : item
-      ),
-    }));
-  };
-
   if (isLoading) return <Spinner />;
   if (error) {
-    toast.error("Có lỗi khi tải danh sách loại ưu đãi");
+    toast.error("Có lỗi khi tải danh sách loại chiến dịch");
     return null;
   }
 
   return (
     <TableContainer>
-      {!voucherTypeData.items.length ? (
-        <Empty resource="loại ưu đãi" />
+      {!campaignTypeData.items.length ? (
+        <Empty resource="loại chiến dịch" />
       ) : (
         <Menus>
           <Table columns="0.5fr 3.2fr 2.5fr 1.6fr 1.2fr">
             <Table.Header>
               <div>STT</div>
-              <div>Tên loại ưu đãi</div>
+              <div>Tên loại chiến dịch</div>
               <div>Mô tả</div>
               <div>Trạng thái</div>
               <div>Hành động</div>
             </Table.Header>
 
             <Table.Body
-              data={voucherTypeData.items}
-              render={(voucherType, index) => (
-                <VoucherTypeRow
-                  key={voucherType.id}
-                  {...voucherType}
+              data={campaignTypeData.items}
+              render={(campaignType, index) => (
+                <CampaignTypeRow
+                  key={campaignType.id}
+                  {...campaignType}
                   displayedIndex={(currentPage - 1) * pageSize + index + 1}
-                  onUpdate={handleVoucherTypeUpdate} // Truyền callback để cập nhật
                 />
               )}
             />
 
             <Table.Footer>
               <Pagination
-                count={voucherTypeData.total}
+                count={campaignTypeData.total}
                 pageSize={pageSize}
                 currentPage={currentPage}
                 onPageChange={handlePageChange}
@@ -161,4 +145,4 @@ function VoucherTypeTable() {
   );
 }
 
-export default VoucherTypeTable;
+export default CampaignTypeTable;

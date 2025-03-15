@@ -14,25 +14,29 @@ function Main() {
   useEffect(() => {
     const token = storageService.getAccessToken();
     const nameLogin = storageService.getNameLogin();
-
+  
     if (token) {
       try {
         const tokenDecode = jwtDecode(token);
         const currentTime = Math.floor(Date.now() / 1000);
-
+  
         if (currentTime > tokenDecode.exp) {
-          storageService.clearAll(); // Sử dụng clearAll thay vì xóa từng cái
+          storageService.removeAccessToken(); // Chỉ xóa token
+          storageService.removeNameLogin();   // Chỉ xóa nameLogin
           navigate('/sign-in');
         } else if (nameLogin === "" || nameLogin === null) {
-          storageService.clearAll();
+          storageService.removeAccessToken();
+          storageService.removeNameLogin();
           navigate('/sign-in');
         }
       } catch (error) {
-        storageService.clearAll();
+        storageService.removeAccessToken();
+        storageService.removeNameLogin();
         navigate('/sign-in');
       }
     } else {
-      storageService.clearAll();
+      storageService.removeAccessToken();
+      storageService.removeNameLogin();
       navigate('/sign-in');
     }
   }, [navigate]);

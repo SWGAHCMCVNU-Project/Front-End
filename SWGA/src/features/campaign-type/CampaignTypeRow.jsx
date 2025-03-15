@@ -1,4 +1,5 @@
-import { HiEye, HiPencil, HiTrash } from "react-icons/hi2";
+import { HiPencil, HiTrash } from "react-icons/hi2";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Table from "../../ui/Table";
 import Tag from "../../ui/Tag";
@@ -7,8 +8,8 @@ import logoDefault from "../../assets/images/brand.png";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import Modal from "../../ui/Modal";
 import { handleValidImageURL } from "../../utils/helpers";
-import { useUpdateVoucherType } from "../../hooks/voucher-type/useUpdateVoucherType";
-import EditVoucherTypeForm from "./EditVoucherTypeForm";
+import UpdateCampaignTypeForm from "./UpdateCampaignTypeForm";
+import { useCampaignTypeById } from "../../hooks/campaign-type/useCampaignTypeById"; // Import hook
 
 const Station = styled.div`
   display: flex;
@@ -77,9 +78,9 @@ const StyledAction = styled.div`
   justify-content: center;
 `;
 
-function VoucherTypeRow({ id, typeName, image, description, state, displayedIndex }) {
+function CampaignTypeRow({ id, typeName, image, description, state, displayedIndex }) {
   const [isValidImage, setIsValidImage] = useState(true);
-  const { updateVoucherType, isLoading } = useUpdateVoucherType();
+  const { campaignType, isLoading } = useCampaignTypeById(id); // Sử dụng hook để lấy dữ liệu chi tiết
 
   useEffect(() => {
     handleValidImageURL(image)
@@ -87,18 +88,19 @@ function VoucherTypeRow({ id, typeName, image, description, state, displayedInde
       .catch(() => setIsValidImage(false));
   }, [image]);
 
+  // Nếu đang tải dữ liệu, có thể hiển thị trạng thái loading (tùy chọn)
+  if (isLoading) {
+    return <Table.Row><td colSpan="5">Đang tải...</td></Table.Row>;
+  }
+
   return (
     <Table.Row>
-      <StyledButton>
-        <StationIndex>{displayedIndex}</StationIndex>
-      </StyledButton>
+      <StationIndex>{displayedIndex}</StationIndex>
 
-      <StyledButton>
-        <Station>
-          <Img src={isValidImage ? image || logoDefault : logoDefault} />
-          <StationName>{typeName}</StationName>
-        </Station>
-      </StyledButton>
+      <Station>
+        <Img src={isValidImage ? image || logoDefault : logoDefault} />
+        <StationName>{typeName}</StationName>
+      </Station>
 
       <Description>{description}</Description>
 
@@ -114,11 +116,9 @@ function VoucherTypeRow({ id, typeName, image, description, state, displayedInde
             </StyledButton>
           </Modal.Open>
           <Modal.Window name={`edit-${id}`}>
-            <EditVoucherTypeForm
-              voucherTypeToEdit={{ id, typeName, image, description, state }}
-              onSubmit={updateVoucherType}
-              isLoading={isLoading}
-              onClose={() => document.querySelector(`[data-modal-window="edit-${id}"]`)?.close()} // Đóng modal thủ công
+            <UpdateCampaignTypeForm
+              campaignTypeToEdit={campaignType?.data || { id, typeName, image, description, state }} // Sử dụng dữ liệu từ API hoặc fallback
+              onCloseModal={() => Modal.Close(`edit-${id}`)}
             />
           </Modal.Window>
         </Modal>
@@ -130,7 +130,7 @@ function VoucherTypeRow({ id, typeName, image, description, state, displayedInde
             </StyledButton>
           </Modal.Open>
           <Modal.Window name={`delete-${id}`}>
-            <ConfirmDelete resourceName="loại ưu đãi" />
+            <ConfirmDelete resourceName="loại chiến dịch" />
           </Modal.Window>
         </Modal>
       </StyledAction>
@@ -138,4 +138,4 @@ function VoucherTypeRow({ id, typeName, image, description, state, displayedInde
   );
 }
 
-export default VoucherTypeRow;
+export default CampaignTypeRow;

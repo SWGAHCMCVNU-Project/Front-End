@@ -2,8 +2,11 @@ export const AUTH_ENDPOINTS = {
     LOGIN: '/Auth/login',
     LOGOUT: '/logout',
   };
-  export const REGISTER_ENDPOINTS = {
+  export const ACCOUNT_ENDPOINTS = {
     RegisterBrand: '/Account/brandRegister',
+    RegisterStore: '/Account/storeRegister',
+    AccountDetail: '/Account/{id}',
+    UPDATEACCOUNT: '/Account/{id}',
     LOGOUT: '/logout',
   };
   export const VOUCHER_ENDPOINTS = {
@@ -17,6 +20,7 @@ export const AUTH_ENDPOINTS = {
     GET_ALL: "/VoucherType",
     GET_BY_ID: "/VoucherType/{id}",
     CREATE: "/VoucherType",
+    UPDATE: "/VoucherType/{id}",
   };
   export const BRAND_ENDPOINTS = {
     GET_ALL: "/Brand",
@@ -31,5 +35,15 @@ export const AUTH_ENDPOINTS = {
     GET_BY_ID: '/Area/areas/{id}',
     UPDATE: "/Area/areas/{id}"
   };
-  
+  export const CAMPAIGN_TYPE_ENDPOINTS = {
+    GET_ALL: "/CampaignType",
+    GET_BY_ID: "/CampaignType/{id}",
+    CREATE: "/CampaignType",
+    UPDATE: "/CampaignType/{id}",
+  };
+  export const STORE_ENDPOINTS = {
+    GET_ALL: "/Store",
+    GET_BY_ID: "/Store/{id}",
+    UPDATE: "/Store/{id}",
+  };
 

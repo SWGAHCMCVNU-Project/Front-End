@@ -6,7 +6,8 @@ import toast from "react-hot-toast";
 import { NavLink, useNavigate } from "react-router-dom";
 import signinbg from "../assets/images/ảnh ví.png";
 import { login } from "../store/api/authApi";
-
+import storageService from "../services/storageService"; // Import StorageService
+import { notification } from "antd"; // Import notification từ antd
 const { Footer, Content } = Layout;
 
 function SignIn() {
@@ -23,6 +24,8 @@ function SignIn() {
 
       if (response.success) { // Kiểm tra success thay vì status
         localStorage.setItem('roleLogin', response.data.role);
+        storageService.setAccessToken(response.data.token);
+    storageService.setBrandId(response.data.brandId); // Lưu brandId
         // toast.success("Đăng nhập thành công!");
         navigate("/dashboard", { replace: true });
       } else {

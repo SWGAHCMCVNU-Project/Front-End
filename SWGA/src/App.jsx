@@ -32,12 +32,16 @@ import VoucherCreatePage from './pages/VoucherManagement/VoucherCreatePage.jsx';
 import Areas from './pages/AreaManagement/Areas.jsx';
 import Area from './pages/AreaManagement/Area.jsx';
 import Profile from './pages/Profile.jsx';
-
+import CampaignType from './pages/CampaignType/CampaignType.jsx';
+import StoreCreatePage from './pages/StoreManagement/StoreCreatePage.jsx';
+import StoreDetailsPage from './pages/StoreManagement/StoreDetailsPage.jsx';
+import StoreUpdatePage from './pages/StoreManagement/StoreUpdatePage.jsx';
+import Account from './pages/Account.jsx'; // Import the Account component
 
 function PrivateRoute({ children, allowedRoles = [] }) {
   const location = useLocation();
   const isAuthenticated = !!storageService.getAccessToken();
-  const roleLogin = storageService.getRoleLogin(); // Lấy role từ storageService
+  const roleLogin = storageService.getRoleLogin();
 
   if (!isAuthenticated || !roleLogin) {
     return <Navigate to="/sign-in" state={{ from: location }} replace />;
@@ -66,7 +70,8 @@ function App() {
           <Route path="/sign-up" exact element={<SignUp />} />
           <Route path="/" element={<Main />}>
             <Route path="/dashboard" exact element={<DashBoard />} />
-            <Route path="profile" element={<Profile />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/account" element={<Account />} /> {/* New route for "Hồ sơ" */}
 
             <Route path="/brands" exact element={
               <PrivateRoute allowedRoles={['admin', 'brand']}>
@@ -118,6 +123,21 @@ function App() {
                 <StorePage />
               </PrivateRoute>
             } />
+            <Route path="/stores/create" exact element={
+              <PrivateRoute allowedRoles={['brand']}>
+                <StoreCreatePage />
+              </PrivateRoute>
+            } />
+            <Route path="/stores/:storeId" exact element={
+              <PrivateRoute allowedRoles={['brand']}>
+                <StoreDetailsPage />
+              </PrivateRoute>
+            } />
+            <Route path="/stores/edit/:storeId" exact element={
+              <PrivateRoute allowedRoles={['brand']}>
+                <StoreUpdatePage />
+              </PrivateRoute>
+            } />
             <Route path="/vouchers" exact element={
               <PrivateRoute allowedRoles={['brand']}>
                 <Vouchers />
@@ -133,7 +153,7 @@ function App() {
                 <Voucher />
               </PrivateRoute>
             } />
-             <Route path="/vouchers/edit/:voucherId" exact element={
+            <Route path="/vouchers/edit/:voucherId" exact element={
               <PrivateRoute allowedRoles={['brand']}>
                 <VoucherCreatePage />
               </PrivateRoute>
@@ -141,6 +161,11 @@ function App() {
             <Route path="/voucher-type" element={
               <PrivateRoute allowedRoles={['brand']}>
                 <VoucherType />
+              </PrivateRoute>
+            } />
+            <Route path="/campaign-type" element={
+              <PrivateRoute allowedRoles={['brand']}>
+                <CampaignType />
               </PrivateRoute>
             } />
             <Route path="/customers" exact element={

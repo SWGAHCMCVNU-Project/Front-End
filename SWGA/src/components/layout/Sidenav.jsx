@@ -239,6 +239,15 @@ function Sidenav({ color }) {
         },
         {
           key: "18",
+          linkURL: "/campaign-type",
+          pageName: "campaign-type",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faCalendarDays} />,
+          labelPageName: "Loại chiến dịch",
+          allowedRoles: ["brand"],
+        },
+        {
+          key: "19",
           linkURL: "/transactions",
           pageName: "transactions",
           color: color,
@@ -255,13 +264,22 @@ function Sidenav({ color }) {
       type: "group",
       menuSideNav: [
         {
-          key: "19",
+          key: "20",
           linkURL: "/profile",
           pageName: "profile",
           color: color,
           iconPage: <ProfileOutlined />,
           labelPageName: "Thông tin chi tiết",
           allowedRoles: ["admin", "brand", "staff", "campus"],
+        },
+        {
+          key: "21", // New menu item for "Hồ sơ"
+          linkURL: "/account",
+          pageName: "account",
+          color: color,
+          iconPage: <ProfileOutlined />, // Reusing the ProfileOutlined icon; you can change it if needed
+          labelPageName: "Hồ sơ",
+          allowedRoles: ["admin", "brand"], // Accessible to both admin and brand roles
         },
       ],
     },
