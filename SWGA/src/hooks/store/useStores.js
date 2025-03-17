@@ -2,7 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAllStoresAPI } from "../../store/api/storeApi";
 
-export const useStores = ({ searchName = "", page = 1, size = 10, state, areaId, sort } = {}) => {
+export const useStores = ({ searchName = "", page = 1, size = 100, state, areaId, sort } = {}) => {
   const { data, error, isLoading } = useQuery({
     queryKey: ["stores", searchName, page, size, state, areaId, sort],
     queryFn: () =>

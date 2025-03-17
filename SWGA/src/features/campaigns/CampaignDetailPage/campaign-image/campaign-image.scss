@@ -1,0 +1,10 @@
+@mixin image-size($width, $height) {
+    width: $width;
+    height: $height;
+}
+
+.campaign-details-avatar-img {
+    @include image-size(auto, auto);
+    max-height: 45rem;
+    max-width: 60rem;
+}

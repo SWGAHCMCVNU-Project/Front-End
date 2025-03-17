@@ -17,7 +17,7 @@ function CampaignType() {
   return (
     <>
       <Container>
-        <Heading as="h1">Danh sách các thể loại của phiếu</Heading>
+        <Heading as="h1">Danh sách các thể loại của chiến dịch</Heading>
         <Row type="horizontal">
           <FilterOperations />
           <CampaignTypeTableOperations />

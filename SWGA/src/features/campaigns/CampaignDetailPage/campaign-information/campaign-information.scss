@@ -1,0 +1,126 @@
+@mixin font-size-information($prop, $marginValue) {
+    font: {
+        size: 17px;
+        weight: bold;
+    }
+
+    margin-#{$prop}: $marginValue;
+}
+
+@mixin font-size-brand-logo($color) {
+    font-size: 17px;
+    font-weight: bold;
+    color: $color
+}
+
+@mixin campaign-details-brand-display {
+    display: flex;
+    flex-direction: row;
+}
+
+@mixin campaign-details-brand-label {
+    @include font-size-brand-logo(black);
+    margin-bottom: 3px;
+    width: fit-content;
+}
+
+@mixin brand-information {
+    @include font-size-brand-logo(#2ecc71);
+    margin-left: 3px;
+    text-transform: uppercase;
+}
+
+@mixin participant-information {
+    @include font-size-brand-logo(#2ecc71);
+    margin-left: 3px;
+}
+
+.campaign-details-condition {
+    display: flex;
+    flex-direction: column;
+
+    label {
+        @include font-size-information(bottom, 3px);
+    }
+
+    span {
+        font-size: 17px;
+        margin-top: 5px;
+    }
+}
+
+.campaign-details-information {
+    @include campaign-details-brand-display();
+    margin-top: 10px;
+    margin-bottom: 10px;
+    justify-content: space-between;
+    width: fit-content;
+
+    //Lấy thẻ div thứ nhất của class cha
+    div:nth-child(1) {
+        margin-right: 10px;
+
+        //CSS của thẻ label ở trong thẻ div thứ nhất
+        label {
+            @include campaign-details-brand-label();
+        }
+
+        span {
+            @include brand-information();
+        }
+    }
+
+    //Lấy thẻ div thứ hai của class cha
+    div:nth-of-type(2) {
+        margin-left: 10px;
+
+        //CSS của thẻ label ở trong thẻ div thứ hai
+        label {
+            @include campaign-details-brand-label();
+        }
+
+        span {
+            @include brand-information();
+        }
+    }
+}
+
+.campaign-details-participant-information {
+    @include campaign-details-brand-display();
+    margin-top: 10px;
+    margin-bottom: 10px;
+    justify-content: space-between;
+    width: fit-content;
+
+    label {
+        @include campaign-details-brand-label();
+    }
+
+    span {
+        @include participant-information();
+    }
+}
+
+.link-web {
+    margin-top: 10px;
+
+    label {
+        font: {
+            size: 17px;
+            weight: bold;
+        }
+        color: black;
+    }
+
+    span {
+        font: {
+            size: 17px;
+        }
+        color: #374151;
+        text-decoration: underline;
+    }
+}
+
+.website-span:hover {
+    color: #2ecc71;
+}

@@ -1,133 +1,82 @@
-// import { useQuery, useQueryClient } from "@tanstack/react-query";
-// import { useContext, useState } from "react";
-// import { useSearchParams } from "react-router-dom";
-// import PaginationContext from "../../../context/PaginationContext";
-// import { useTablePagination } from "../../../hooks/useTablePagination";
-// import { getCampaigns } from "../../../store/api/apiCampaigns";
-
-// export function useCampaign() {
-//     return useContext(PaginationContext);
-// }
-
-// export function CampaignProvider({ children }) {
-//     const queryClient = useQueryClient();
-//     const [searchParams] = useSearchParams();
-//     const { page, limit, handlePageChange, handleLimitChange } = useTablePagination(1, 10);
-//     const [sort, setSort] = useState("Id,desc");
-//     const [statesFilter, setStatesFilter] = useState([]);
-//     const [statesFilterValue, setStatesFilterValue] = useState(undefined);
-
-//     //SEARCH
-//     const search =
-//         searchParams.get("search") !== "" ? searchParams.get("search") : null;
-
-//     //Filter by brandIds
-//     const brandIds =
-//         searchParams.get("brandIds") !== ""
-//             ? searchParams.get("brandIds")?.split(",")
-//             : null;
-
-//     //Filter by campaignTypeIds
-//     const campaignTypeIds =
-//         searchParams.get("campaignTypeIds") !== ""
-//             ? searchParams.get("campaignTypeIds")?.split(",")
-//             : null;
-
-//     const queryKey = ["campaigns", {
-//         sort, search, page, limit,
-//         brandIds, campaignTypeIds, statesFilterValue
-//     }];
-
-//     const {
-//         isLoading,
-//         data: campaigns,
-//         error
-//     } = useQuery({
-//         queryKey: queryKey,
-//         queryFn: () => getCampaigns({
-//             sort, search, page, limit,
-//             brandIds, campaignTypeIds, statesFilterValue
-//         }),
-//         onSuccess: (data) => {
-//             queryClient.setQueryData(['campaigns', {
-//                 sort, search, page, limit,
-//                 brandIds, campaignTypeIds, statesFilterValue
-//             }], data);
-//         }
-//     });
-
-
-//     const value = {
-//         isLoading,
-//         campaigns,
-//         page,
-//         limit,
-//         handlePageChange,
-//         handleLimitChange,
-//         sort,
-//         setSort,
-//         statesFilter,
-//         statesFilterValue,
-//         setStatesFilter,
-//         setStatesFilterValue
-//     };
-
-//     return <PaginationContext.Provider value={value}>{children}</PaginationContext.Provider>;
-// }
-import { useState, useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { mockCampaigns } from "./mockData";
 import PaginationContext from "../../../context/PaginationContext";
+import useGetAllCampaigns from "../../../hooks/campaign/useGetAllCampaigns";
+import { useTablePagination } from "../../../hooks/useTablePagination";
 
 export function useCampaign() {
-    return useContext(PaginationContext);
+  return useContext(PaginationContext);
 }
 
 export function CampaignProvider({ children }) {
-    const [searchParams] = useSearchParams();
-    const [page, setPage] = useState(1);
-    const [limit, setLimit] = useState(10);
-    const [sort, setSort] = useState("Id,desc");
-    const [statesFilter, setStatesFilter] = useState([]);
-    const [statesFilterValue, setStatesFilterValue] = useState(undefined);
-    const [isLoading, setIsLoading] = useState(false);
+  const [searchParams] = useSearchParams();
+  const { page: initialPage, limit: initialSize, handlePageChange: setInitialPage, handleLimitChange: handleSizeChange } = useTablePagination(1, 10);
+  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [sort, setSort] = useState("Id,desc");
+  const [statesFilterValue, setStatesFilterValue] = useState(undefined);
+  const [errorMessage, setErrorMessage] = useState(null);
 
-    const handlePageChange = (newPage) => setPage(newPage);
-    const handleLimitChange = (newLimit) => setLimit(newLimit);
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    setInitialPage(newPage);
+  };
 
-    //SEARCH
-    const search =
-        searchParams.get("search") !== "" ? searchParams.get("search") : null;
+  const handleSizeChangeWithReset = (newSize) => {
+    handleSizeChange(newSize);
+    setCurrentPage(1);
+  };
 
-    //Filter by brandIds
-    const brandIds =
-        searchParams.get("brandIds") !== ""
-            ? searchParams.get("brandIds")?.split(",")
-            : null;
+  useEffect(() => {
+    setCurrentPage(initialPage);
+  }, [initialPage]);
 
-    //Filter by campaignTypeIds
-    const campaignTypeIds =
-        searchParams.get("campaignTypeIds") !== ""
-            ? searchParams.get("campaignTypeIds")?.split(",")
-            : null;
+  const search = searchParams.get("search") || null;
+  const brandIds = searchParams.get("brandIds") ? searchParams.get("brandIds").split(",") : null;
+  const campaignTypeIds = searchParams.get("campaignTypeIds") ? searchParams.get("campaignTypeIds").split(",") : null;
 
-    // Giả lập data từ mockData
-    const campaigns = mockCampaigns;
+  console.log('Params in CampaignProvider:', { search, brandIds, campaignTypeIds, statesFilterValue });
 
-    const value = {
-        isLoading,
-        campaigns,
-        page,
-        limit,
-        handlePageChange,
-        handleLimitChange,
-        sort,
-        setSort,
-        statesFilter,
-        statesFilterValue,
-        setStatesFilter,
-        setStatesFilterValue
-    };
+  const {
+    isLoading,
+    data: campaigns,
+    error
+  } = useGetAllCampaigns({
+    sort,
+    search,
+    page: currentPage,
+    size: initialSize,
+    brandIds,
+    campaignTypeIds,
+    statesFilterValue
+  });
 
-    return <PaginationContext.Provider value={value}>{children}</PaginationContext.Provider>;
+  useEffect(() => {
+    if (error) {
+      setErrorMessage("Không thể tải danh sách chiến dịch. Vui lòng thử lại sau.");
+      console.error("API error:", error);
+    } else {
+      setErrorMessage(null);
+    }
+  }, [error]);
+
+  const mappedCampaigns = campaigns
+    ? { result: campaigns.items || [], totalCount: campaigns.total || 0 }
+    : { result: [], totalCount: 0 };
+
+  const value = {
+    isLoading,
+    campaigns: mappedCampaigns,
+    error,
+    errorMessage,
+    page: currentPage,
+    size: initialSize,
+    handlePageChange,
+    handleLimitChange: handleSizeChangeWithReset,
+    sort,
+    setSort,
+    statesFilterValue,
+    setStatesFilterValue
+  };
+
+  return <PaginationContext.Provider value={value}>{children}</PaginationContext.Provider>;
 }
