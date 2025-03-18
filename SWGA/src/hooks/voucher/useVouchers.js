@@ -6,7 +6,7 @@ import { toast } from "react-hot-toast";
 export function useVouchers({ page = 1, size = 100, search = "", state = true, isAsc = true } = {}) {
     const { brand } = useBrand();
     const brandId = brand?.id || "";
-    console.log("Brand:", brand, "BrandId:", brandId); // Debug brand và brandId
+    // console.log("Brand:", brand, "BrandId:", brandId); // Debug brand và brandId
 
 
     const { isLoading, data: vouchers, error } = useQuery({
@@ -17,6 +17,6 @@ export function useVouchers({ page = 1, size = 100, search = "", state = true, i
         onError: () => toast.error("Không thể tải danh sách phiếu ưu đãi"),
     });
 
-    console.log("Vouchers from useVouchers:", vouchers); // Debug dữ liệu vouchers
+    // console.log("Vouchers from useVouchers:", vouchers); // Debug dữ liệu vouchers
     return { isLoading, vouchers, error };
 }

@@ -20,9 +20,9 @@ function CampaignLogoBrand() {
         : data;
 
     // Debug: Log dữ liệu để kiểm tra
-    console.log("API response:", data);
-    console.log("Campaign ID from URL:", campaignId);
-    console.log("Found campaign:", campaign);
+    // console.log("API response:", data);
+    // console.log("Campaign ID from URL:", campaignId);
+    // console.log("Found campaign:", campaign);
 
     if (!campaign) return <div>Không tìm thấy campaign</div>; // Xử lý khi không có dữ liệu
 

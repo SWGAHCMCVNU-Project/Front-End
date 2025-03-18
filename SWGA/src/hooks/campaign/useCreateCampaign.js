@@ -4,7 +4,7 @@ import { createCampaignAPI } from '../../store/api/campaignApi';
 const useCreateCampaign = () => {
   const queryClient = useQueryClient();
 
-  const { mutate, isPending } = useMutation({
+  const mutation = useMutation({
     mutationFn: createCampaignAPI,
     onSuccess: () => {
       // Invalidate query để làm mới danh sách campaigns sau khi tạo
@@ -15,7 +15,13 @@ const useCreateCampaign = () => {
     },
   });
 
-  return { mutate, isCreating: isPending }; // Trả về mutate và isCreating
+  return {
+    mutate: mutation.mutate,
+    isCreating: mutation.isPending,
+    isSuccess: mutation.isSuccess,
+    isError: mutation.isError,
+    error: mutation.error,
+  };
 };
 
 export default useCreateCampaign;

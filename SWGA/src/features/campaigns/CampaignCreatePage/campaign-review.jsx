@@ -1,4 +1,4 @@
-import { Avatar, Card, DatePicker, Spin, message } from "antd"; // Thêm message từ antd
+import { Avatar, Card, DatePicker, Spin, message } from "antd";
 import moment from "moment-timezone";
 import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -84,7 +84,7 @@ const formatDateToObject = (date) => {
 
 function CampaignReview() {
   const { current, setCurrent, newCampaign } = useContext(NextPrevContext);
-  const { mutate: createNewCampaign, isCreating, isSuccess } = useCreateCampaign(); // Giả định isSuccess từ hook
+  const { mutate: createNewCampaign, isCreating, isSuccess, isError, error } = useCreateCampaign();
   const { campaignTypes } = useCampaignTypes();
   const [campaignTypesOptions, setCampaignTypesOptions] = useState([]);
   const navigate = useNavigate();
@@ -122,12 +122,15 @@ function CampaignReview() {
   // Hiển thị thông báo và điều hướng khi tạo thành công
   useEffect(() => {
     if (isSuccess) {
-      message.success("Tạo thành công chiến dịch!"); // Thêm thông báo
+      message.success("Tạo thành công chiến dịch!");
       setTimeout(() => {
-        navigate("/campaigns"); // Điều hướng sau 1 giây để người dùng thấy thông báo
-      }, 1000);
+        navigate("/campaigns");
+      }, 2000); // Chờ 2 giây để hiển thị thông báo trước khi điều hướng
     }
-  }, [isSuccess, navigate]);
+    if (isError) {
+      message.error(`Tạo chiến dịch thất bại: ${error?.message || "Lỗi không xác định"}`);
+    }
+  }, [isSuccess, isError, error, navigate]);
 
   function onSubmit(data) {
     const startOn = newCampaign?.startOn
@@ -150,6 +153,7 @@ function CampaignReview() {
       storeIds: newCampaign?.storeIds || ["default-store-id"],
       link: newCampaign?.link || "",
       image: newCampaign?.image || null,
+      campaignDetails: newCampaign?.campaignDetails || [], // Thêm campaignDetails nếu có
     };
 
     console.log("newCampaign:", newCampaign);
@@ -159,6 +163,7 @@ function CampaignReview() {
 
   function onError(errors) {
     console.log("Form errors:", errors);
+    message.error("Vui lòng kiểm tra lại thông tin biểu mẫu!");
   }
 
   const prev = () => {
@@ -242,7 +247,7 @@ function CampaignReview() {
                     />
                   </CustomFormRow>
 
-                  <CustomFormRow label="Brand ID">
+                  {/* <CustomFormRow label="Brand ID">
                     <Input
                       type="text"
                       id="brandId"
@@ -250,9 +255,9 @@ function CampaignReview() {
                       value={StorageService.getBrandId() || "N/A"}
                       readOnly
                     />
-                  </CustomFormRow>
+                  </CustomFormRow> */}
 
-                  <CustomFormRow label="Total Income">
+                  {/* <CustomFormRow label="Total Income">
                     <Input
                       type="number"
                       id="totalIncome"
@@ -260,7 +265,7 @@ function CampaignReview() {
                       value={newCampaign?.totalIncome ?? 0}
                       readOnly
                     />
-                  </CustomFormRow>
+                  </CustomFormRow> */}
 
                   <CustomFormEditorRow label="Mô tả">
                     <MyEditor

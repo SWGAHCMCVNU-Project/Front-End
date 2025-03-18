@@ -29,7 +29,7 @@ export const login = async (userName, password) => {
       password
     });
 
-    console.log('📥 Phản hồi từ server:', response);
+    // console.log('📥 Phản hồi từ server:', response);
 
     if (response.status !== 200 || !response.data) {
       console.warn('⚠️ API trả về lỗi:', response);

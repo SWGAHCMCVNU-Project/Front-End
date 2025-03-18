@@ -55,7 +55,7 @@ function CampaignList() {
   const campaignImages = campaigns?.result?.map(campaign => campaign.image);
   const isValidImages = useImageValidity(campaigns?.result, campaignImages);
 
-  console.log('Page and Size in CampaignList:', { page, size }); // Log để kiểm tra
+  // console.log('Page and Size in CampaignList:', { page, size }); // Log để kiểm tra
 
   const currentDate = new Date();
   const year = currentDate.getFullYear();
@@ -159,7 +159,7 @@ function CampaignList() {
   ];
 
   if (isLoading) {
-    console.log("Loading campaigns...");
+    // console.log("Loading campaigns...");
     return (
       <Spin>
         <TableItem
@@ -175,7 +175,7 @@ function CampaignList() {
     return <Alert message={errorMessage} type="error" showIcon />;
   }
 
-  console.log("Campaigns data:", campaigns);
+  // console.log("Campaigns data:", campaigns);
   if (!campaigns?.result?.length) return <Empty resourceName="chiến dịch" />;
 
   const data = campaigns?.result?.map((campaign, index) => {

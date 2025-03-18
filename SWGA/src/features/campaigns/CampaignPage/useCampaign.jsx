@@ -30,16 +30,22 @@ export function CampaignProvider({ children }) {
     setCurrentPage(initialPage);
   }, [initialPage]);
 
+  useEffect(() => {
+    // Re-fetch khi initialSize thay đổi
+    setCurrentPage(1); // Reset về trang 1 khi thay đổi size
+  }, [initialSize]);
+
   const search = searchParams.get("search") || null;
   const brandIds = searchParams.get("brandIds") ? searchParams.get("brandIds").split(",") : null;
   const campaignTypeIds = searchParams.get("campaignTypeIds") ? searchParams.get("campaignTypeIds").split(",") : null;
 
-  console.log('Params in CampaignProvider:', { search, brandIds, campaignTypeIds, statesFilterValue });
+  console.log('Params in CampaignProvider:', { search, brandIds, campaignTypeIds, statesFilterValue, initialSize });
 
   const {
     isLoading,
     data: campaigns,
-    error
+    error,
+    refetch, // Thêm refetch để gọi lại thủ công
   } = useGetAllCampaigns({
     sort,
     search,
@@ -58,6 +64,11 @@ export function CampaignProvider({ children }) {
       setErrorMessage(null);
     }
   }, [error]);
+
+  useEffect(() => {
+    // Gọi refetch khi initialSize thay đổi
+    refetch();
+  }, [initialSize, refetch]);
 
   const mappedCampaigns = campaigns
     ? { result: campaigns.items || [], totalCount: campaigns.total || 0 }

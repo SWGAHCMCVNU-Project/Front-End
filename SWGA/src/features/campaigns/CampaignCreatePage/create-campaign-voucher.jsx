@@ -63,8 +63,8 @@ function CreateCampaignVoucher({ selectVoucher, cost, disabled }) {
 
     useEffect(() => {
         if (!hasInitialized && !isLoading && vouchers && vouchers.data && Array.isArray(vouchers.data.items)) {
-            console.log("Vouchers from useVouchers:", vouchers.data.items);
-            console.log("Error from useVouchers:", error);
+            // console.log("Vouchers from useVouchers:", vouchers.data.items);
+            // console.log("Error from useVouchers:", error);
             getVoucherSelectBox();
             setHasInitialized(true);
         }
@@ -97,7 +97,7 @@ function CreateCampaignVoucher({ selectVoucher, cost, disabled }) {
             })));
         } else {
             setCampaignVoucherOptions([]);
-            console.log("No vouchers found with state=true or vouchers is empty");
+            // console.log("No vouchers found with state=true or vouchers is empty");
         }
     };
 
@@ -132,7 +132,7 @@ function CreateCampaignVoucher({ selectVoucher, cost, disabled }) {
     };
 
     useEffect(() => {
-        console.log("Selected Vouchers in CreateCampaignVoucher:", selectedVouchers);
+        // console.log("Selected Vouchers in CreateCampaignVoucher:", selectedVouchers);
         if (selectedVouchers.length > 0) {
             total = calculateTotal();
             selectVoucher(selectedVouchers);

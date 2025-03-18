@@ -1,16 +1,14 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import PaginationContext from "../../../context/PaginationContext";
 import { useTablePagination } from "../../../hooks/useTablePagination";
-// import { useQuery, useQueryClient } from "@tanstack/react-query";
-// import { getCampaignStoreById } from "../../../store/api/apiCampaigns";
+import useGetCampaignById from "../../../hooks/campaign/useGetCampaignById"; // Import custom hook
 
 export function useCampaignStore() {
     return useContext(PaginationContext);
 }
 
 export function CampaignStoreProvider({ children }) {
-    // const queryClient = useQueryClient();
     const { campaignId } = useParams();
     const [searchParams] = useSearchParams();
     const { page, limit, handlePageChange, handleLimitChange } = useTablePagination(1, 5);
@@ -21,25 +19,41 @@ export function CampaignStoreProvider({ children }) {
     const [areasFilter, setAreasFilter] = useState([]);
     const [areasFilterValue, setAreasFilterValue] = useState(null);
 
-    // const search = searchParams.get("search") !== "" ? searchParams.get("search") : null;
+    // Lấy giá trị tìm kiếm từ searchParams (hiện tại không được sử dụng vì API không hỗ trợ)
+    const search = searchParams.get("search") !== "" ? searchParams.get("search") : null;
 
-    // const queryKey = ["campaignStores", { campaignId, state, sort, search, page, limit, brandsFilterValue, areasFilterValue }];
+    // Sử dụng custom hook useGetCampaignById
+    const {
+        isLoading,
+        data: campaignData,
+        error,
+    } = useGetCampaignById(campaignId);
 
-    // const {
-    //     isLoading,
-    //     data: campaignStores,
-    //     error
-    // } = useQuery({
-    //     queryKey: queryKey,
-    //     queryFn: () => getCampaignStoreById(campaignId, { state, sort, search, page, limit, brandsFilterValue, areasFilterValue }),
-    //     onSuccess: (data) => {
-    //         queryClient.setQueryData(['campaignStores', { campaignId, state, sort, search, page, limit, brandsFilterValue, areasFilterValue }], data);
-    //     }
-    // });
+    // Giả định campaignData chứa danh sách stores trong campaign (ví dụ: campaignData.stores)
+    // Vì không có phân trang từ API, ta tự phân trang trên frontend
+    const allStores = campaignData?.stores || [];
+    const totalStores = allStores.length;
+    
+    // Tính toán phân trang trên frontend
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedStores = allStores.slice(startIndex, endIndex);
+
+    // Định dạng campaignStores theo cấu trúc { result: [], total: number }
+    const campaignStores = {
+        result: paginatedStores,
+        total: totalStores,
+    };
+
+    useEffect(() => {
+        if (error) {
+            console.error("API error in CampaignStoreProvider:", error);
+        }
+    }, [error]);
 
     const value = {
-        isLoading: false,
-        campaignStores: null,
+        isLoading,
+        campaignStores, // Truyền danh sách stores đã phân trang
         state,
         setState,
         page,

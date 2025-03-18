@@ -2,11 +2,11 @@ import apiClient from "./apiClient";
 import { CAMPAIGN_ENDPOINTS } from "./endpoints";
 
 // Hàm lấy danh sách tất cả các chiến dịch (giữ nguyên)
-export const getAllCampaignsAPI = async ({ sort, search, page, limit, brandIds, campaignTypeIds, statesFilterValue }) => {
+export const getAllCampaignsAPI = async ({ sort, searchName, page, limit, brandIds, campaignTypeIds, statesFilterValue }) => {
   try {
     const params = new URLSearchParams();
     if (sort) params.append('sort', sort);
-    if (search) params.append('search', search);
+    if (searchName) params.append('searchName', searchName); // Thay search thành searchName
     if (page) params.append('page', page);
     if (limit) params.append('size', limit);
     if (brandIds && Array.isArray(brandIds)) params.append('brandIds', brandIds.join(','));
@@ -98,11 +98,14 @@ export const createCampaignAPI = async (params) => {
     });
 
     const formData = new FormData();
-    if (image) formData.append("image", image);
-    if (campaignDetails) formData.append("campaignDetails", JSON.stringify(campaignDetails));
+    if (image) formData.append("image", image); // Thêm file ảnh nếu có
+    if (campaignDetails) formData.append("campaignDetails", JSON.stringify(campaignDetails)); // Thêm campaignDetails nếu có
+    // Debug formData
+    for (let pair of formData.entries()) {
+      console.log("FormData entry:", pair[0], pair[1]);
+    }
 
     console.log("Query params:", queryParams.toString());
-    console.log("Form data:", formData);
 
     const response = await apiClient.post(
       `${CAMPAIGN_ENDPOINTS.CREATE}?${queryParams.toString()}`,
@@ -114,6 +117,9 @@ export const createCampaignAPI = async (params) => {
       }
     );
 
+    // Log response để kiểm tra campaign vừa tạo
+    console.log("Create Campaign Response:", response.data);
+
     return response.data;
   } catch (error) {
     console.error("Error creating campaign:", error);
@@ -121,7 +127,6 @@ export const createCampaignAPI = async (params) => {
     throw error;
   }
 };
-
 // Hàm cập nhật chiến dịch theo ID (sửa đổi)
 export const updateCampaignAPI = async (id, params) => {
   try {

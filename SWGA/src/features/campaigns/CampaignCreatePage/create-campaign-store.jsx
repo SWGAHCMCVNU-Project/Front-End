@@ -36,8 +36,8 @@ function CreateCampaignStore({ selectStore, disabled }) {
 
     useEffect(() => {
         if (!hasInitialized && !isLoading && stores && Array.isArray(stores.result)) {
-            console.log("stores from useStores:", stores);
-            console.log("error from useStores:", error);
+            // console.log("stores from useStores:", stores);
+            // console.log("error from useStores:", error);
             getStoreSelectBox();
             setHasInitialized(true);
         }
@@ -63,7 +63,7 @@ function CreateCampaignStore({ selectStore, disabled }) {
             })));
         } else {
             setCampaignStoreOptions([]);
-            console.log("No stores found with state=true or stores.result is empty");
+            // console.log("No stores found with state=true or stores.result is empty");
         }
     };
 
@@ -84,7 +84,7 @@ function CreateCampaignStore({ selectStore, disabled }) {
     }, [campaignStoreOptions, newCampaign]);
 
     useEffect(() => {
-        console.log("Selected Stores in CreateCampaignStore:", selectedStores); // Debug log
+        // console.log("Selected Stores in CreateCampaignStore:", selectedStores); // Debug log
         if (selectedStores.length > 0) {
             selectStore(selectedStores);
         } else {

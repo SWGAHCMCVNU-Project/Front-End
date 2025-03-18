@@ -132,10 +132,10 @@ function CampaignBasicInformation() {
     const endOn = watch('endOn');
 
     useEffect(() => {
-        console.log("currentDate:", currentDate.format('YYYY-MM-DD'));
-        console.log("startOn:", startOn ? startOn.format('YYYY-MM-DD') : null);
-        console.log("endOn:", endOn ? endOn.format('YYYY-MM-DD') : null);
-        console.log("typesLoading:", typesLoading);
+        // console.log("currentDate:", currentDate.format('YYYY-MM-DD'));
+        // console.log("startOn:", startOn ? startOn.format('YYYY-MM-DD') : null);
+        // console.log("endOn:", endOn ? endOn.format('YYYY-MM-DD') : null);
+        // console.log("typesLoading:", typesLoading);
     }, [startOn, endOn, typesLoading]);
 
     useEffect(() => {
@@ -223,7 +223,7 @@ function CampaignBasicInformation() {
         const formattedEndOn = data.endOn ? data.endOn.format("YYYY-MM-DD") : null;
 
         if (!formattedStartOn || !formattedEndOn) {
-            console.log("Invalid date values:", { startOn: formattedStartOn, endOn: formattedEndOn });
+            // console.log("Invalid date values:", { startOn: formattedStartOn, endOn: formattedEndOn });
             return;
         }
 
@@ -235,7 +235,7 @@ function CampaignBasicInformation() {
 
         const validationErrors = validateCampaign(brandId, checkCampaignType, timeRange);
         if (validationErrors) {
-            console.log("Validation errors:", validationErrors);
+            // console.log("Validation errors:", validationErrors);
             return;
         }
 
@@ -249,13 +249,13 @@ function CampaignBasicInformation() {
             });
             // Tăng current để chuyển sang bước tiếp theo
             setCurrent(current + 1);
-            console.log("Updated current:", current + 1);
+            // console.log("Updated current:", current + 1);
         }
-        console.log("Campaign created:", { ...data, brandId, image, startOn: formattedStartOn, endOn: formattedEndOn });
+        // console.log("Campaign created:", { ...data, brandId, image, startOn: formattedStartOn, endOn: formattedEndOn });
     }
 
     function onError(errors) {
-        console.log("Form errors:", errors);
+        // console.log("Form errors:", errors);
     }
 
     return (
@@ -460,7 +460,7 @@ function CampaignBasicInformation() {
                                                 if (isMounted.current && date) {
                                                     field.onChange(date);
                                                     setValue('startOn', date, { shouldValidate: true });
-                                                    console.log("Updated startOn:", date.format('YYYY-MM-DD'));
+                                                    // console.log("Updated startOn:", date.format('YYYY-MM-DD'));
                                                 }
                                             }}
                                             disabled={typesLoading}
@@ -483,7 +483,7 @@ function CampaignBasicInformation() {
                                                 if (isMounted.current && date) {
                                                     field.onChange(date);
                                                     setValue('endOn', date, { shouldValidate: true });
-                                                    console.log("Updated endOn:", date.format('YYYY-MM-DD'));
+                                                    // console.log("Updated endOn:", date.format('YYYY-MM-DD'));
                                                 }
                                             }}
                                             disabled={typesLoading}
