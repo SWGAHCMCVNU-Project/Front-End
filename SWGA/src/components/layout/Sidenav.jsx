@@ -27,17 +27,15 @@ import storageService from "../../services/storageService";
 import { MenuItem } from "./MenuItem";
 
 function Sidenav({ color }) {
-  const roleLogin = storageService.getRoleLogin(); // Sử dụng getRoleLogin thay vì getUserRole
+  const roleLogin = storageService.getRoleLogin();
   const navigate = useNavigate();
 
-  // Nếu không có role hoặc token, redirect về trang login
   useEffect(() => {
     if (!storageService.getAccessToken() || !roleLogin) {
       navigate("/sign-in");
     }
   }, [roleLogin, navigate]);
 
-  // Dashboard icon
   const dashboard = [
     <svg
       width="20"
@@ -62,7 +60,6 @@ function Sidenav({ color }) {
     </svg>,
   ];
 
-  // Tables icon
   const tables = [
     <svg
       width="20"
@@ -85,7 +82,6 @@ function Sidenav({ color }) {
     </svg>,
   ];
 
-  // Billing icon
   const billing = [
     <svg
       width="20"
@@ -103,25 +99,6 @@ function Sidenav({ color }) {
         fillRule="evenodd"
         clipRule="evenodd"
         d="M18 9H2V14C2 15.1046 2.89543 16 4 16H16C17.1046 16 18 15.1046 18 14V9ZM4 13C4 12.4477 4.44772 12 5 12H6C6.55228 12 7 12.4477 7 13C7 13.5523 6.55228 14 6 14H5C4.44772 14 4 13.5523 4 13ZM9 12C8.44772 12 8 12.4477 8 13C8 13.5523 8.44772 14 9 14H10C10.5523 14 11 13.5523 11 13C11 12.4477 10.5523 12 10 12H9Z"
-        fill={color}
-      ></path>
-    </svg>,
-  ];
-
-  // Sign in icon
-  const signin = [
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      key="signin-logo"
-    >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M6 2C5.44772 2 5 2.44772 5 3V4H4C2.89543 4 2 4.89543 2 6V16C2 17.1046 2.89543 18 4 18H16C17.1046 18 18 17.1046 18 16V6C18 4.89543 17.1046 4 16 4H15V3C15 2.44772 14.5523 2 14 2C13.4477 2 13 2.44772 13 3V4H7V3C7 2.44772 6.55228 2 6 2ZM6 7C5.44772 7 5 7.44772 5 8C5 8.55228 5.44772 9 6 9H14C14.5523 9 15 8.55228 15 8C15 7.44772 14.5523 7 14 7H6Z"
         fill={color}
       ></path>
     </svg>,
@@ -262,6 +239,15 @@ function Sidenav({ color }) {
         },
         {
           key: "18",
+          linkURL: "/campaign-type",
+          pageName: "campaign-type",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faCalendarDays} />,
+          labelPageName: "Loại chiến dịch",
+          allowedRoles: ["brand"],
+        },
+        {
+          key: "19",
           linkURL: "/transactions",
           pageName: "transactions",
           color: color,
@@ -278,18 +264,24 @@ function Sidenav({ color }) {
       type: "group",
       menuSideNav: [
         {
-          key: "19",
+          key: "20",
           linkURL: "/profile",
           pageName: "profile",
           color: color,
           iconPage: <ProfileOutlined />,
-          labelPageName: "Hồ Sơ",
+          labelPageName: "Thông tin chi tiết",
           allowedRoles: ["admin", "brand", "staff", "campus"],
         },
+        {
+          key: "21", // New menu item for "Hồ sơ"
+          linkURL: "/account",
+          pageName: "account",
+          color: color,
+          iconPage: <ProfileOutlined />, // Reusing the ProfileOutlined icon; you can change it if needed
+          labelPageName: "Hồ sơ",
+          allowedRoles: ["admin", "brand"], // Accessible to both admin and brand roles
+        },
       ],
-    },
-    {
-      type: "screen-logout",
     },
   ];
 
@@ -301,12 +293,13 @@ function Sidenav({ color }) {
             width: "35%",
             height: "40%",
             borderRadius: 10,
-            marginRight: 10,
+            marginRight: 20,
+            marginLeft: "47px",
           }}
           src={logo}
           alt=""
         />
-        <span style={{ fontSize: "20px" }}>S_WALLET</span>
+        <span style={{ fontSize: "20px", marginLeft: "40px" }}>S_WALLET</span>
       </div>
       <Divider />
       <Menu
@@ -333,16 +326,6 @@ function Sidenav({ color }) {
             return {
               key: `divider-${index}`,
               label: <Divider />,
-            };
-          } else if (item.type === "screen-logout") {
-            return {
-              key: "screen-logout",
-              label: (
-                <NavLink to="/sign-in" onClick={() => storageService.clearAll()}>
-                  <span className="icon">{signin}</span>
-                  <span className="label">Đăng xuất</span>
-                </NavLink>
-              ),
             };
           }
           return null;

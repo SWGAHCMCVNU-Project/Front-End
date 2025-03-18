@@ -12,7 +12,7 @@ import Textarea from "../../ui/Textarea";
 import { RegisterButton } from "../../ui/custom/Button/Button";
 import { CustomFormRow } from "../../ui/custom/Form/InputItem/CustomFormItem";
 import { toast } from "react-hot-toast";
-import registerService from "../../services/registerService";
+import {registerBrandAPI} from "../../store/api/registerAPI";
 
 // Styled components (giữ nguyên)
 const StyledDataBox = styled.section`
@@ -145,8 +145,8 @@ function RegisterBrand() {
 
     setIsLoading(true);
     try {
-      const brandData = registerService.formatBrandData(data, coverPhotoStorage);
-      await registerService.registerBrand(brandData, navigate);
+      const brandData = registerBrandAPI.formatBrandData(data, coverPhotoStorage);
+      await registerBrandAPI.registerBrand(brandData, navigate);
     } catch (error) {
       console.error("Register error:", error);
     } finally {

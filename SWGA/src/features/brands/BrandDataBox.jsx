@@ -1,28 +1,19 @@
 import { addHours, format } from "date-fns";
 import { vi } from "date-fns/locale";
-import { HiOutlineEnvelope, HiOutlinePhone } from "react-icons/hi2";
 import styled from "styled-components";
 import { useEffect, useState } from "react";
 import logoDefault from "../../assets/images/brand.png";
-import greenBean from "../../assets/images/dauxanh.png";
 import coverPhotoBrandDefault from "../../assets/images/gallery.png";
 import DataItem from "../../ui/DataItem";
 import Heading from "../../ui/Heading";
 import Tag from "../../ui/Tag";
-import {
-  formatCurrency,
-  formatPhoneNumber,
-  formattedHours,
-  handleValidImageURL,
-} from "../../utils/helpers";
+import { formatCurrency, formattedHours, handleValidImageURL } from "../../utils/helpers";
 import DataItemDes from "./DataItemDes";
 
 const StyledStationDataBox = styled.section`
-  /* Box */
   background-color: var(--color-grey-0);
   border: 1px solid var(--color-grey-100);
   border-radius: var(--border-radius-md);
-
   overflow: hidden;
 `;
 
@@ -57,54 +48,11 @@ const Infor = styled.div`
     color: var(--color-grey-700);
   }
 `;
-const Price = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.6rem 3.2rem;
-  border-radius: var(--border-radius-sm);
-  margin-top: 2.4rem;
-  gap: 5rem;
-
-  background-color: ${(props) =>
-    props.isPaid ? "var(--color-green-100)" : "var(--color-yellow-100)"};
-  color: ${(props) =>
-    props.isPaid ? "var(--color-green-700)" : "var(--color-yellow-700)"};
-
-  & p:last-child {
-    text-transform: uppercase;
-    font-size: 1.4rem;
-    font-weight: 600;
-  }
-
-  svg {
-    height: 2.4rem;
-    width: 2.4rem;
-    color: currentColor !important;
-  }
-`;
 
 const HeadingGroup = styled.div`
   display: flex;
   gap: 2.4rem;
   align-items: center;
-`;
-
-const StyledImageBean = styled.img`
-  width: 25px;
-  height: 25px;
-  display: inline-block;
-  vertical-align: middle;
-  margin-left: 5px;
-`;
-
-const StyleGreenWallet = styled.div`
-  color: var(--color-green-400);
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-weight: bold;
-  font-size: 16px;
 `;
 
 const Footer = styled.footer`
@@ -119,7 +67,6 @@ const Flag = styled.img`
   border-radius: var(--border-radius-tiny);
   display: block;
   border: ${(props) => (props.src ? "1px solid var(--color-grey-100)" : null)};
-
   content: url(${(props) => (props.src ? props.src : coverPhotoBrandDefault)});
 `;
 
@@ -134,29 +81,40 @@ const LogoBrand = styled.img`
   border-radius: var(--border-radius-tiny);
   display: block;
   border: ${(props) => (props.src ? "1px solid var(--color-grey-100)" : null)};
-
   content: url(${(props) => (props.src ? props.src : logoDefault)});
 `;
 
 function BrandDataBox({ brand }) {
+  // Nếu brand là null hoặc undefined, hiển thị fallback UI
+  if (!brand) {
+    return (
+      <StyledStationDataBox>
+        <Section>
+          <Heading as="h1">Không tìm thấy thương hiệu</Heading>
+        </Section>
+      </StyledStationDataBox>
+    );
+  }
+
+  // Destructure các thuộc tính từ Swagger
   const {
-    id: stationId,
-    logo,
+    id,
+    accountId,
+    brandName,
+    acronym,
+    address,
     coverPhoto,
-    dateCreated,
+    coverFileName,
+    link,
     openingHours,
     closingHours,
-    phone,
-    brandName,
-    email,
-    state,
-    description,
-    address,
-    numberOfFollowers,
-    greenWalletName,
-    greenWalletBalance,
     totalIncome,
     totalSpending,
+    dateCreated,
+    dateUpdated,
+    description,
+    state,
+    status,
   } = brand;
 
   const statusToTagName = {
@@ -165,19 +123,12 @@ function BrandDataBox({ brand }) {
   };
 
   const [isValidCoverPhoto, setIsValidCoverPhoto] = useState(true);
-  const [isValidLogo, setIsValidLogo] = useState(true);
 
   useEffect(() => {
     handleValidImageURL(coverPhoto)
       .then((isValid) => setIsValidCoverPhoto(isValid))
       .catch(() => setIsValidCoverPhoto(false));
   }, [coverPhoto]);
-
-  useEffect(() => {
-    handleValidImageURL(logo)
-      .then((isValid) => setIsValidLogo(isValid))
-      .catch(() => setIsValidLogo(false));
-  }, [logo]);
 
   return (
     <StyledStationDataBox>
@@ -190,8 +141,9 @@ function BrandDataBox({ brand }) {
 
           <Infor>
             <HeadingGroup>
+              {/* Không có logo trong Swagger, dùng coverPhoto làm logo tạm thời */}
               <LogoBrand
-                src={isValidLogo ? logo || "" : ""}
+                src={isValidCoverPhoto ? coverPhoto || "" : ""}
                 alt={`Logo of ${brandName}`}
               />
               <Heading as="h1">{brandName}</Heading>
@@ -199,67 +151,55 @@ function BrandDataBox({ brand }) {
                 {state ? "Hoạt động" : "Không hoạt động"}
               </Tag>
             </HeadingGroup>
+
+            <DataItem label="Tên viết tắt:">{acronym}</DataItem>
+
             {address ? (
               <DataItem label="Địa chỉ:">{address}</DataItem>
             ) : (
               <DataItem label="Địa chỉ:">Chưa cập nhật</DataItem>
             )}
 
+            {link ? (
+              <DataItem label="Liên kết:">
+                <a href={link} target="_blank" rel="noopener noreferrer">
+                  {link}
+                </a>
+              </DataItem>
+            ) : (
+              <DataItem label="Liên kết:">Chưa cập nhật</DataItem>
+            )}
+
             {openingHours ? (
-              <DataItem label=" Giờ mở cửa:">
+              <DataItem label="Giờ mở cửa:">
                 <div>
-                  {formattedHours(openingHours)} &mdash;{" "}
+                  {formattedHours(openingHours)} —{" "}
                   {formattedHours(closingHours)}
                 </div>
               </DataItem>
             ) : (
-              <DataItem label=" Giờ mở cửa:">
+              <DataItem label="Giờ mở cửa:">
                 <div>Chưa cập nhật</div>
               </DataItem>
             )}
 
-            <DataItem label="Số người theo dõi:">{numberOfFollowers}</DataItem>
-
-            <DataItem label={greenWalletName + ":"}>
-              <StyleGreenWallet>
-                {formatCurrency(greenWalletBalance)}
-                <StyledImageBean src={greenBean} alt="dau xanh" />
-              </StyleGreenWallet>
-            </DataItem>
-
             <StyledTotalBean>
               <DataItem label="Tổng nhận:">
-                <StyleGreenWallet>
-                  {formatCurrency(totalIncome)}
-                  <StyledImageBean src={greenBean} alt="dau xanh" />
-                </StyleGreenWallet>
+                {totalIncome !== null ? formatCurrency(totalIncome) : "Chưa cập nhật"}
               </DataItem>
               |
               <DataItem label="Tổng chi:">
-                <StyleGreenWallet>
-                  {formatCurrency(totalSpending)}
-                  <StyledImageBean src={greenBean} alt="dau xanh" />
-                </StyleGreenWallet>
+                {totalSpending !== null ? formatCurrency(totalSpending) : "Chưa cập nhật"}
               </DataItem>
             </StyledTotalBean>
+
             {description ? (
-              <DataItemDes label="Mô tả thương hiệu:">
-                {description}
-              </DataItemDes>
+              <DataItemDes label="Mô tả thương hiệu:">{description}</DataItemDes>
             ) : (
               <DataItem label="Mô tả:">Chưa cập nhật</DataItem>
             )}
           </Infor>
         </Guest>
-
-        <Price>
-          <DataItem icon={<HiOutlineEnvelope />} label={`Gmail`}>
-            {email}
-          </DataItem>
-          <DataItem icon={<HiOutlinePhone />} label={`Số điện thoại`}>
-            {formatPhoneNumber(phone)}
-          </DataItem>
-        </Price>
       </Section>
 
       <Footer>
@@ -268,6 +208,9 @@ function BrandDataBox({ brand }) {
           {format(addHours(new Date(dateCreated), 7), "dd MMM yyyy, p", {
             locale: vi,
           })}
+          {dateUpdated && (
+            <> | Ngày cập nhật: {format(addHours(new Date(dateUpdated), 7), "dd MMM yyyy, p", { locale: vi })}</>
+          )}
         </p>
       </Footer>
     </StyledStationDataBox>

@@ -1,5 +1,4 @@
 import { HiEye, HiPencil, HiTrash } from "react-icons/hi2";
-import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Table from "../../ui/Table";
 import Tag from "../../ui/Tag";
@@ -8,6 +7,8 @@ import logoDefault from "../../assets/images/brand.png";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import Modal from "../../ui/Modal";
 import { handleValidImageURL } from "../../utils/helpers";
+import { useUpdateVoucherType } from "../../hooks/voucher-type/useUpdateVoucherType";
+import EditVoucherTypeForm from "./EditVoucherTypeForm";
 
 const Station = styled.div`
   display: flex;
@@ -77,8 +78,8 @@ const StyledAction = styled.div`
 `;
 
 function VoucherTypeRow({ id, typeName, image, description, state, displayedIndex }) {
-  const navigate = useNavigate();
   const [isValidImage, setIsValidImage] = useState(true);
+  const { updateVoucherType, isLoading } = useUpdateVoucherType();
 
   useEffect(() => {
     handleValidImageURL(image)
@@ -86,19 +87,13 @@ function VoucherTypeRow({ id, typeName, image, description, state, displayedInde
       .catch(() => setIsValidImage(false));
   }, [image]);
 
-  const handleEditClick = () => {
-    navigate(`/voucher-types/edit/${id}`, {
-      state: { voucherTypeToEdit: { id, typeName, image, description, state } },
-    });
-  };
-
   return (
     <Table.Row>
-      <StyledButton onClick={() => navigate(`/voucher-types/${id}`)}>
+      <StyledButton>
         <StationIndex>{displayedIndex}</StationIndex>
       </StyledButton>
 
-      <StyledButton onClick={() => navigate(`/voucher-types/${id}`)}>
+      <StyledButton>
         <Station>
           <Img src={isValidImage ? image || logoDefault : logoDefault} />
           <StationName>{typeName}</StationName>
@@ -112,21 +107,29 @@ function VoucherTypeRow({ id, typeName, image, description, state, displayedInde
       </StyledButton>
 
       <StyledAction>
-        {/* <StyledButton onClick={() => navigate(`/voucher-types/${id}`)}>
-          <HiEye />
-        </StyledButton> */}
-
-        <StyledButton onClick={handleEditClick}>
-          <HiPencil />
-        </StyledButton>
+        <Modal>
+          <Modal.Open opens={`edit-${id}`}>
+            <StyledButton>
+              <HiPencil />
+            </StyledButton>
+          </Modal.Open>
+          <Modal.Window name={`edit-${id}`}>
+            <EditVoucherTypeForm
+              voucherTypeToEdit={{ id, typeName, image, description, state }}
+              onSubmit={updateVoucherType}
+              isLoading={isLoading}
+              onClose={() => document.querySelector(`[data-modal-window="edit-${id}"]`)?.close()} // Đóng modal thủ công
+            />
+          </Modal.Window>
+        </Modal>
 
         <Modal>
-          <Modal.Open opens="delete">
+          <Modal.Open opens={`delete-${id}`}>
             <StyledButton>
               <HiTrash />
             </StyledButton>
           </Modal.Open>
-          <Modal.Window name="delete">
+          <Modal.Window name={`delete-${id}`}>
             <ConfirmDelete resourceName="loại ưu đãi" />
           </Modal.Window>
         </Modal>

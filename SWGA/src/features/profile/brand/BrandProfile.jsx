@@ -9,7 +9,7 @@ import { HiPencil } from "react-icons/hi2";
 import { useMoveBack } from "../../../hooks/useMoveBack";
 import Modal from "../../../ui/Modal";
 import Spinner from "../../../ui/Spinner";
-import CreateBrandForm from "./CreateBrandForm";
+import EditBrandForm from "./EditBrandForm";
 import { useBrand } from "../../../hooks/brand/useBrand";
 
 const HeadingGroup = styled.div`
@@ -74,7 +74,7 @@ function BrandProfile() {
             </Button>
           </Modal.Open>
           <Modal.Window name="edit">
-            <CreateBrandForm brandToEdit={brand} />
+            <EditBrandForm brandToEdit={brand} />
           </Modal.Window>
         </Modal>
       </ButtonGroup>

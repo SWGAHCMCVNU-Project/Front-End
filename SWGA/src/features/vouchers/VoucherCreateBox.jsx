@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import styled, { css } from "styled-components";
 import greenBean from "../../assets/images/dauxanh.png";
 import Button from "../../ui/Button";
@@ -13,8 +13,10 @@ import FormRowUnit from "./FormRowUnit";
 import ImageCard from "./ImageCard";
 import TextEditor from "./components/TextEditor";
 import { useCreateVoucher } from "../../hooks/voucher/useCreateVoucher";
+import { useUpdateVoucher } from "../../hooks/voucher/useUpdateVoucher";
 import { useVoucherTypes } from "../../hooks/voucher-type/useVoucherTypes";
 import { Select } from "antd";
+import toast from "react-hot-toast";
 
 const { Option } = Select;
 
@@ -40,7 +42,6 @@ const Form = styled.form`
     css`
       width: 80rem;
     `}
-    
   overflow: hidden;
   font-size: 1.4rem;
 `;
@@ -132,23 +133,41 @@ const CustomSelect = styled(Select)`
 
 function VoucherCreateBox({ onCloseModal }) {
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const voucherToEdit = state?.voucherToEdit || {};
+  const { id: editId, ...editValues } = voucherToEdit;
+  const isEditSession = Boolean(editId);
+
   const { isCreating, createVoucher } = useCreateVoucher();
+  const { isLoading: isEditing, updateVoucher } = useUpdateVoucher();
   const { voucherTypes, isLoading: isLoadingTypes } = useVoucherTypes();
 
-  const { register, handleSubmit, reset, getValues, setValue, formState } = useForm();
+  const isWorking = isCreating || isEditing;
+
+  // Chuẩn hóa state trong defaultValues
+  const defaultValues = isEditSession
+    ? {
+        ...editValues,
+        state: editValues.state === true || editValues.state === "true" // Chuẩn hóa state thành boolean
+          ? true
+          : false,
+      }
+    : {};
+
+  const { register, handleSubmit, reset, getValues, setValue, formState } = useForm({
+    defaultValues,
+  });
   const { errors } = formState;
 
   const [fileImageVoucherType, setFileImageVoucherType] = useState(null);
   const [voucherTypeError, setVoucherTypeError] = useState("");
 
-  // Hàm validate giá
   const validatePrice = (value) => {
     if (!value) return "Hãy nhập giá ưu đãi";
     if (isNaN(value) || parseInt(value) <= 0) return "Giá ưu đãi phải là số nguyên dương";
     return true;
   };
 
-  // Hàm validate tỉ lệ chuyển đổi
   const validateRate = (value) => {
     if (!value) return "Hãy nhập tỉ lệ chuyển đổi";
     if (isNaN(value) || parseFloat(value) < 1) return "Số lớn hơn hoặc bằng 1";
@@ -183,27 +202,50 @@ function VoucherCreateBox({ onCloseModal }) {
 
     const voucherData = {
       ...data,
-      image: fileImageVoucherType,
-      state: true,
+      image: fileImageVoucherType || (isEditSession ? editValues.image : null),
+      state: isEditSession ? data.state : true, // Đảm bảo state là boolean
     };
 
-
-    createVoucher(voucherData, {
-      onSuccess: () => {
-        reset();
-        setFileImageVoucherType(null);
-        onCloseModal?.();
-        navigate(`/vouchers`);
-      },
-    });
+    if (isEditSession) {
+      updateVoucher(editId, voucherData, {
+        onSuccess: () => {
+          toast.success("Cập nhật voucher thành công!");
+          reset();
+          setFileImageVoucherType(null);
+          onCloseModal?.();
+          navigate(`/vouchers/${editId}`);
+        },
+        onError: (err) => {
+          toast.error("Cập nhật voucher thất bại: " + err.message);
+        },
+      });
+    } else {
+      createVoucher(voucherData, {
+        onSuccess: (response) => {
+          toast.success("Tạo voucher thành công!");
+          reset();
+          setFileImageVoucherType(null);
+          onCloseModal?.();
+          const newVoucherId = response?.data?.id;
+          navigate(newVoucherId ? `/vouchers/${newVoucherId}` : "/vouchers");
+        },
+        onError: (err) => {
+          toast.error("Tạo voucher thất bại: " + err.message);
+        },
+      });
+    }
   }
 
   return (
     <div>
       <Form onSubmit={handleSubmit(onSubmit)} type={onCloseModal ? "modal" : "regular"}>
         <ButtonGroup>
-          <ButtonText onClick={() => navigate(`/vouchers`)}>← Quay lại</ButtonText>
-          <Button disabled={isCreating}>Tạo ưu đãi mới</Button>
+          <ButtonText onClick={() => navigate(isEditSession ? `/vouchers/${editId}` : `/vouchers`)}>
+            ← Quay lại
+          </ButtonText>
+          <Button disabled={isWorking}>
+            {isEditSession ? "Cập nhật ưu đãi" : "Tạo ưu đãi mới"}
+          </Button>
         </ButtonGroup>
         <BrandFormContainer>
           <LeftFormHalf>
@@ -215,7 +257,7 @@ function VoucherCreateBox({ onCloseModal }) {
                 <Input
                   type="text"
                   id="voucherName"
-                  disabled={isCreating}
+                  disabled={isWorking}
                   {...register("voucherName", {
                     required: "Hãy nhập tên ưu đãi",
                     maxLength: { value: 100, message: "Tên ưu đãi tối đa 100 kí tự" },
@@ -229,6 +271,7 @@ function VoucherCreateBox({ onCloseModal }) {
                 <TextEditor
                   id="description"
                   onContentChange={handleEditorDescriptionChange}
+                  initialValue={isEditSession ? editValues.description : ""}
                   {...register("description", {
                     required: "Hãy nhập mô tả",
                     maxLength: { value: 1000, message: "Mô tả tối đa 1000 kí tự" },
@@ -240,6 +283,7 @@ function VoucherCreateBox({ onCloseModal }) {
                 <TextEditor
                   id="condition"
                   onContentChange={handleEditorConditionChange}
+                  initialValue={isEditSession ? editValues.condition : ""}
                   {...register("condition", {
                     required: "Hãy nhập điều kiện",
                     maxLength: { value: 1000, message: "Điều kiện tối đa 1000 kí tự" },
@@ -259,7 +303,7 @@ function VoucherCreateBox({ onCloseModal }) {
                 ) : (
                   <Select
                     id="typeId"
-                    disabled={isCreating}
+                    disabled={isWorking}
                     value={getValues("typeId")}
                     onChange={(value) => setValue("typeId", value, { shouldValidate: true })}
                     placeholder="Chọn thể loại"
@@ -281,7 +325,7 @@ function VoucherCreateBox({ onCloseModal }) {
                 <InputPriceUnit
                   type="number"
                   id="price"
-                  disabled={isCreating}
+                  disabled={isWorking}
                   {...register("price", { validate: validatePrice })}
                 />
               </FormRowUnit>
@@ -294,7 +338,7 @@ function VoucherCreateBox({ onCloseModal }) {
                 <Input
                   type="text"
                   id="rate"
-                  disabled={isCreating}
+                  disabled={isWorking}
                   {...register("rate", { validate: validateRate })}
                 />
               </FormRow>
@@ -307,23 +351,37 @@ function VoucherCreateBox({ onCloseModal }) {
                 file={fileImageVoucherType}
                 fileRemove={handleFileImageRemove}
                 error={errors?.image?.message}
+                avatar={isEditSession ? editValues.image : null}
               >
                 <FileInput
                   id="image"
                   accept="image/*"
-                  {...register("image", { required: "Thêm ảnh ưu đãi" })}
+                  {...register("image", { required: isEditSession ? false : "Thêm ảnh ưu đãi" })}
                   onChange={handleImageChange}
                 />
               </ImageCard>
             </StyledImageBox>
+            {isEditSession && (
+              <StyledStationDataBox>
+                <Header>
+                  <div>Trạng thái</div>
+                </Header>
+                <FormRow error={errors?.state?.message}>
+                  <Select
+                    id="state"
+                    disabled={isWorking}
+                    value={getValues("state")?.toString()} // Chuẩn hóa giá trị hiển thị
+                    onChange={(value) => setValue("state", value === "true", { shouldValidate: true })}
+                    placeholder="Chọn trạng thái"
+                  >
+                    <Option value="true">Hoạt động</Option>
+                    <Option value="false">Không hoạt động</Option>
+                  </Select>
+                </FormRow>
+              </StyledStationDataBox>
+            )}
           </RightFormHalf>
         </BrandFormContainer>
-        <FormRow>
-          <Button $variations="secondary" type="reset" onClick={() => onCloseModal?.()}>
-            Hủy bỏ
-          </Button>
-          <Button disabled={isCreating}>Tạo ưu đãi mới</Button>
-        </FormRow>
       </Form>
     </div>
   );

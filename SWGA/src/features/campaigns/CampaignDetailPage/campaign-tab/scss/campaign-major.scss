@@ -1,0 +1,16 @@
+.campaign-description-major {
+    width: auto;
+    max-width: 100rem;
+    white-space: break-spaces;
+    text-align: justify;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.description-major {
+    @extend .campaign-description-major;
+    color: black !important;
+}

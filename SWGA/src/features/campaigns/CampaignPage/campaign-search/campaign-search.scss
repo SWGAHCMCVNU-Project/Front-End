@@ -1,3 +1,19 @@
-.nav-create {
-    margin-left: 30px;
-}
+.order-filter-header {
+    display: flex;
+    justify-content: space-between; // Đặt SearchBar bên trái và NavigateCreateButton bên phải
+    align-items: center; // Đảm bảo các phần tử thẳng hàng theo chiều dọc
+    width: 100%;
+    margin-bottom: 10px; // Thêm khoảng cách dưới nếu cần
+  
+    .nav-create {
+      // Loại bỏ margin-left: 30px vì không cần thiết nữa
+      margin-top: -55px;
+    }
+  
+    .search-bar-container {
+        margin-left: auto; // Đẩy SearchBar sang bên phải
+        min-width: 200px; // Đảm bảo SearchBar không bị co lại quá mức
+        margin-right: 10px; // Khoảng cách giữa SearchBar và NavigateCreateButton
+        margin-top: -50px;
+    }
+  }

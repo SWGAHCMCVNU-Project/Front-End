@@ -77,13 +77,11 @@ function CreateAreaForm({ areaToEdit = {}, onCloseModal }) {
       onSubmit={handleSubmit(onSubmit, onError)}
       type={onCloseModal ? "modal" : "regular"}
       style={{
-        background: "#fff",
-        padding: "20px",
-        borderRadius: "10px",
-        boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+       
+     
         width: "600px",
         margin: "20px auto",
-        maxWidth: "90%",
+        
       }}
     >
       <CustomFormRow label="Tên khu vực" error={errors?.areaName?.message}>

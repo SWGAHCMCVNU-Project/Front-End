@@ -105,9 +105,6 @@ const TagState = styled.span`
 `;
 
 function VoucherDataBox({ voucher }) {
-  // Log dữ liệu để kiểm tra
-
-  // Destructuring các trường từ voucher
   const {
     id: voucherId,
     typeName,
@@ -134,17 +131,18 @@ function VoucherDataBox({ voucher }) {
       .catch(() => setIsValidImage(false));
   }, [image]);
 
-  // Hàm chuyển đổi HTML thành JSX
   const convertHTMLToJSX = (htmlContent) => {
     return <div dangerouslySetInnerHTML={{ __html: htmlContent }} />;
   };
 
-  // Xử lý dateCreated an toàn
   const formattedDate = dateCreated
     ? isValid(new Date(dateCreated))
       ? format(addHours(new Date(dateCreated), 7), "dd MMM yyyy, p", { locale: vi })
       : "Ngày không hợp lệ"
     : "Chưa cập nhật";
+
+  // Chuẩn hóa state trước khi hiển thị
+  const normalizedState = state === "true" || state === true ? "true" : "false";
 
   return (
     <StyledStationDataBox>
@@ -157,8 +155,8 @@ function VoucherDataBox({ voucher }) {
           <Infor>
             <HeadingGroup>
               <Heading as="h1">{voucherName}</Heading>
-              <TagState type={statusToTagName[state]}>
-                {state ? "Hoạt động" : "Không hoạt động"}
+              <TagState type={statusToTagName[normalizedState]}>
+                {normalizedState === "true" ? "Hoạt động" : "Không hoạt động"}
               </TagState>
             </HeadingGroup>
 

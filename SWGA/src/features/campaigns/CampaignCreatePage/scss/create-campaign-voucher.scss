@@ -1,0 +1,49 @@
+@mixin price-font-color($color) {
+    color: $color;
+
+    font: {
+        size: 16px;
+        weight: bold;
+    }
+}
+
+.title-campaign-voucher {
+    width: 200px;
+    white-space: break-spaces;
+    line-height: 1.5;
+    margin-top: 10px;
+}
+
+.bottom-voucher-container {
+    margin-bottom: 100px;
+}
+
+.cost-container {  
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-right: 2%;
+    gap: 4rem;
+    margin-top: 1rem;
+
+    .cost-label {
+        @include price-font-color(#4b5563);
+    }
+}
+
+.cost-not-enough {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-right: 2%;
+    margin-top: 1rem;
+}
+
+.title-add-voucher-campaign {
+    max-width: 250px;
+    white-space: break-spaces;
+}
+
+.btn-action-layout {
+    margin-right: 1rem;
+}
