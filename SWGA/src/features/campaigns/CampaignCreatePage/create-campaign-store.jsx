@@ -21,7 +21,7 @@ const Header = styled.header`
     gap: 1.6rem;
     font-weight: 600;
     font-size: 1.7rem;
-    margin-bottom: 10px;
+    margin-bottom: 3px;
   }
 `;
 
@@ -36,8 +36,6 @@ function CreateCampaignStore({ selectStore, disabled }) {
 
     useEffect(() => {
         if (!hasInitialized && !isLoading && stores && Array.isArray(stores.result)) {
-            // console.log("stores from useStores:", stores);
-            // console.log("error from useStores:", error);
             getStoreSelectBox();
             setHasInitialized(true);
         }
@@ -63,7 +61,6 @@ function CreateCampaignStore({ selectStore, disabled }) {
             })));
         } else {
             setCampaignStoreOptions([]);
-            // console.log("No stores found with state=true or stores.result is empty");
         }
     };
 
@@ -84,7 +81,6 @@ function CreateCampaignStore({ selectStore, disabled }) {
     }, [campaignStoreOptions, newCampaign]);
 
     useEffect(() => {
-        // console.log("Selected Stores in CreateCampaignStore:", selectedStores); // Debug log
         if (selectedStores.length > 0) {
             selectStore(selectedStores);
         } else {
@@ -134,8 +130,8 @@ function CreateCampaignStore({ selectStore, disabled }) {
             key: value,
             number: <div className="number-header"><span>{dataIndex}</span></div>,
             StoreName: (
-                <Avatar.Group>
-                    <Avatar className="shape-avatar-product" shape="square" src={avatarSrc} />
+                <Avatar.Group >
+                    <Avatar style={{marginBottom: "10px"}} className="shape-avatar-product" shape="square" src={avatarSrc} />
                     <div className="avatar-info">
                         <Title className="title-product-name" level={5}>{option?.label}</Title>
                         <p className="p-column-table">Thương hiệu {option?.brand} tại {option?.area}</p>
@@ -184,16 +180,29 @@ function CreateCampaignStore({ selectStore, disabled }) {
                     placeholder="Chọn cửa hàng..."
                     onChange={handleSelectStore}
                     className="select-campaign-major"
-                    style={{ width: '100%' }}
+                    style={{ width: '100%', marginBottom: "8px" }}
                     showSearch={false}
                     value={selectedItems}
                     tagRender={(props) => {
                         const option = campaignStoreOptions.find((option) => option.value === props.value);
                         if (!option) return null;
                         return (
-                            <Tag className="tag-select-items">
+                            <Tag
+                                className="tag-select-items"
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    marginTop: '3px', // Apply margin-top to the entire tag
+                                }}
+                            >
                                 <div className="div-option-major">
-                                    <img src={option.image !== null ? option.image : imgDefaultStore} alt="store" width={40} height={40} />
+                                    <img
+                                        src={option.image !== null ? option.image : imgDefaultStore}
+                                        alt="store"
+                                        width={40}
+                                        height={40}
+                                        style={{ marginTop: "10px" }} // Keep the image margin for consistency
+                                    />
                                     <label className="label-option-update">{option.label}</label>
                                 </div>
                             </Tag>

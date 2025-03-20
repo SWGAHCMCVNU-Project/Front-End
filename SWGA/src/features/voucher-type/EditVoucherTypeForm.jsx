@@ -3,6 +3,7 @@ import styled from "styled-components";
 import Button from "../../ui/Button";
 import SpinnerMini from "../../ui/SpinnerMini";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const Form = styled.form`
   display: flex;
@@ -50,7 +51,16 @@ const Checkbox = styled.input`
   height: 1.6rem;
 `;
 
+const ImagePreview = styled.img`
+  max-width: 200px;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-top: 0.8rem;
+`;
+
 function EditVoucherTypeForm({ voucherTypeToEdit, onSubmit, isLoading, onClose, onSuccess }) {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     typeName: voucherTypeToEdit.typeName || "",
     image: voucherTypeToEdit.image || "",
@@ -83,17 +93,25 @@ function EditVoucherTypeForm({ voucherTypeToEdit, onSubmit, isLoading, onClose, 
       };
       const response = await onSubmit(voucherTypeToEdit.id, submitData);
       toast.success("Cập nhật loại ưu đãi thành công!");
-      
+
       // Gọi onSuccess để thông báo dữ liệu mới lên component cha
       if (onSuccess) {
         onSuccess({
+          id: voucherTypeToEdit.id,
           typeName: submitData.typeName,
-          image: newImageFile ? URL.createObjectURL(newImageFile) : submitData.image, // Tạm dùng URL.createObjectURL cho file mới
+          image: newImageFile ? URL.createObjectURL(newImageFile) : submitData.image,
           description: submitData.description,
           state: submitData.state,
         });
       }
+
+      // Đóng modal trước khi navigate
       onClose();
+      // Navigate sau khi modal đóng
+      setTimeout(() => {
+        console.log("Navigating to /voucher-type");
+        navigate("/voucher-type");
+      }, 100);
     } catch (err) {
       toast.error("Có lỗi khi cập nhật loại ưu đãi!");
       console.error("Error updating voucher type:", err);
@@ -115,12 +133,13 @@ function EditVoucherTypeForm({ voucherTypeToEdit, onSubmit, isLoading, onClose, 
 
       <FormRow>
         <Label>Ảnh hiện tại</Label>
-        <Input
-          name="image"
-          value={formData.image}
-          onChange={handleChange}
-          disabled={isLoading || newImageFile}
-        />
+        {newImageFile ? (
+          <ImagePreview src={URL.createObjectURL(newImageFile)} alt="New Voucher Type Image" />
+        ) : formData.image ? (
+          <ImagePreview src={formData.image} alt="Current Voucher Type Image" />
+        ) : (
+          <p>Chưa có ảnh được chọn</p>
+        )}
       </FormRow>
 
       <FormRow>

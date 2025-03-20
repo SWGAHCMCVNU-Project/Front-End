@@ -79,7 +79,15 @@ const { RangePicker } = DatePicker;
 // Hàm chuyển đổi ngày thành định dạng YYYY/MM/DD
 const formatDateToObject = (date) => {
   const momentDate = moment(date);
-  return momentDate.format("YYYY/MM/DD"); // Định dạng thành "2025/03/20"
+  return momentDate.format("YYYY/MM/DD");
+};
+
+// Hàm chuyển array campaignDetails thành string theo định dạng backend mong muốn
+const convertCampaignDetailsToString = (details) => {
+  if (!Array.isArray(details) || details.length === 0) return "";
+
+  // Chuyển array thành JSON string
+  return JSON.stringify(details);
 };
 
 function CampaignReview() {
@@ -119,13 +127,12 @@ function CampaignReview() {
     }
   }, [campaignTypesOptions, setValue, newCampaign]);
 
-  // Hiển thị thông báo và điều hướng khi tạo thành công
   useEffect(() => {
     if (isSuccess) {
       message.success("Tạo thành công chiến dịch!");
       setTimeout(() => {
         navigate("/campaigns");
-      }, 2000); // Chờ 2 giây để hiển thị thông báo trước khi điều hướng
+      }, 2000);
     }
     if (isError) {
       message.error(`Tạo chiến dịch thất bại: ${error?.message || "Lỗi không xác định"}`);
@@ -140,6 +147,9 @@ function CampaignReview() {
       ? formatDateToObject(newCampaign.endOn)
       : formatDateToObject(new Date());
 
+    // Chuyển campaignDetails từ array thành string
+    const campaignDetailsString = convertCampaignDetailsToString(newCampaign?.campaignDetails);
+
     const completeCampaignData = {
       ...newCampaign,
       brandId: StorageService.getBrandId() || "default-brand-id",
@@ -153,11 +163,13 @@ function CampaignReview() {
       storeIds: newCampaign?.storeIds || ["default-store-id"],
       link: newCampaign?.link || "",
       image: newCampaign?.image || null,
-      campaignDetails: newCampaign?.campaignDetails || [], // Thêm campaignDetails nếu có
+      campaignDetails: campaignDetailsString, // Gửi dưới dạng string
     };
 
     console.log("newCampaign:", newCampaign);
     console.log("completeCampaignData:", completeCampaignData);
+    console.log("campaignDetailsString:", campaignDetailsString);
+
     createNewCampaign(completeCampaignData);
   }
 
@@ -246,26 +258,6 @@ function CampaignReview() {
                       readOnly
                     />
                   </CustomFormRow>
-
-                  {/* <CustomFormRow label="Brand ID">
-                    <Input
-                      type="text"
-                      id="brandId"
-                      disabled={isCreating}
-                      value={StorageService.getBrandId() || "N/A"}
-                      readOnly
-                    />
-                  </CustomFormRow> */}
-
-                  {/* <CustomFormRow label="Total Income">
-                    <Input
-                      type="number"
-                      id="totalIncome"
-                      disabled={isCreating}
-                      value={newCampaign?.totalIncome ?? 0}
-                      readOnly
-                    />
-                  </CustomFormRow> */}
 
                   <CustomFormEditorRow label="Mô tả">
                     <MyEditor

@@ -1,3 +1,4 @@
+// useCreateCampaign.js
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createCampaignAPI } from '../../store/api/campaignApi';
 
@@ -11,7 +12,11 @@ const useCreateCampaign = () => {
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
     },
     onError: (error) => {
-      console.error('Error creating campaign:', error);
+      console.error('Error creating campaign:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
     },
   });
 

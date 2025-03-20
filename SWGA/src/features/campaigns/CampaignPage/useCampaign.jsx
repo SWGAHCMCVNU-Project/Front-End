@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import PaginationContext from "../../../context/PaginationContext";
 import useGetAllCampaigns from "../../../hooks/campaign/useGetAllCampaigns";
 import { useTablePagination } from "../../../hooks/useTablePagination";
+import StorageService from '../../../services/storageService';
 
 export function useCampaign() {
   return useContext(PaginationContext);
@@ -31,27 +32,22 @@ export function CampaignProvider({ children }) {
   }, [initialPage]);
 
   useEffect(() => {
-    // Re-fetch khi initialSize thay đổi
-    setCurrentPage(1); // Reset về trang 1 khi thay đổi size
+    setCurrentPage(1);
   }, [initialSize]);
 
   const search = searchParams.get("search") || null;
-  const brandIds = searchParams.get("brandIds") ? searchParams.get("brandIds").split(",") : null;
   const campaignTypeIds = searchParams.get("campaignTypeIds") ? searchParams.get("campaignTypeIds").split(",") : null;
-
-  console.log('Params in CampaignProvider:', { search, brandIds, campaignTypeIds, statesFilterValue, initialSize });
 
   const {
     isLoading,
     data: campaigns,
     error,
-    refetch, // Thêm refetch để gọi lại thủ công
+    refetch,
   } = useGetAllCampaigns({
     sort,
     search,
     page: currentPage,
     size: initialSize,
-    brandIds,
     campaignTypeIds,
     statesFilterValue
   });
@@ -65,14 +61,21 @@ export function CampaignProvider({ children }) {
     }
   }, [error]);
 
-  useEffect(() => {
-    // Gọi refetch khi initialSize thay đổi
-    refetch();
-  }, [initialSize, refetch]);
+  // Bỏ useEffect gọi refetch không cần thiết
+  // useEffect(() => {
+  //   if (refetch) {
+  //     refetch();
+  //   }
+  // }, [initialSize, refetch]);
+
+  const brandId = StorageService.getBrandId();
+  console.log('🔍 brandId trong CampaignProvider:', brandId);
+  console.log('🔍 Raw campaigns từ API:', campaigns);
 
   const mappedCampaigns = campaigns
     ? { result: campaigns.items || [], totalCount: campaigns.total || 0 }
     : { result: [], totalCount: 0 };
+  console.log('🔍 Mapped campaigns:', mappedCampaigns);
 
   const value = {
     isLoading,
@@ -86,7 +89,8 @@ export function CampaignProvider({ children }) {
     sort,
     setSort,
     statesFilterValue,
-    setStatesFilterValue
+    setStatesFilterValue,
+    refetch,
   };
 
   return <PaginationContext.Provider value={value}>{children}</PaginationContext.Provider>;

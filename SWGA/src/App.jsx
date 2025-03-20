@@ -134,7 +134,7 @@ function App() {
               path="/campaigns/edit/:campaignId"
               exact
               element={
-                <PrivateRoute allowedRoles={[ "brand"]}>
+                <PrivateRoute allowedRoles={["brand"]}>
                   <CampaignUpdatePage />
                 </PrivateRoute>
               }
@@ -267,7 +267,7 @@ function App() {
             <Route
               path="/voucher-type"
               element={
-                <PrivateRoute allowedRoles={["brand"]}>
+                <PrivateRoute allowedRoles={["admin"]}>
                   <VoucherType />
                 </PrivateRoute>
               }
@@ -275,7 +275,7 @@ function App() {
             <Route
               path="/campaign-type"
               element={
-                <PrivateRoute allowedRoles={["brand"]}>
+                <PrivateRoute allowedRoles={["admin"]}>
                   <CampaignType />
                 </PrivateRoute>
               }

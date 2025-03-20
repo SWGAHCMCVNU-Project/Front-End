@@ -10,6 +10,7 @@ import { ButtonAction } from "../../../../ui/custom/Button/Button";
 import { TableItem } from "../../../../ui/custom/Table/TableItem";
 import { formatDate, useImageValidity } from "../../../../utils/helpers";
 import { useCampaign } from "../useCampaign";
+import StorageService from "../../../../services/storageService";
 import "./campaign-list.scss";
 
 const StackedTime = styled.span`
@@ -45,17 +46,23 @@ function CampaignList() {
     campaigns,
     errorMessage,
     page,
-    size, // Đổi từ limit thành size
+    size,
     handlePageChange,
-    handleLimitChange: handleSizeChange, // Đổi tên để đồng bộ
+    handleLimitChange: handleSizeChange,
     setSort
   } = useCampaign();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const campaignImages = campaigns?.result?.map(campaign => campaign.image);
-  const isValidImages = useImageValidity(campaigns?.result, campaignImages);
 
-  // console.log('Page and Size in CampaignList:', { page, size }); // Log để kiểm tra
+  const brandId = StorageService.getBrandId();
+  console.log('🔍 brandId trong CampaignList:', brandId);
+
+  if (!brandId) {
+    return <Alert message="Không tìm thấy brandId. Vui lòng đăng nhập lại." type="error" showIcon />;
+  }
+
+  const campaignImages = campaigns?.result?.map(campaign => campaign.image) || [];
+  const isValidImages = useImageValidity(campaigns?.result || [], campaignImages);
 
   const currentDate = new Date();
   const year = currentDate.getFullYear();
@@ -65,7 +72,6 @@ function CampaignList() {
 
   const handleSort = (pagination, filters, sorter) => {
     const sortOrder = sorter.order === "ascend" ? "asc" : "desc";
-
     switch (sorter.field) {
       case "CampaignName":
         setSort(`${sorter.field},${sortOrder}`);
@@ -85,7 +91,6 @@ function CampaignList() {
     const startDate = new Date(startOn);
     const endDate = new Date(endOn);
     const today = new Date(formattedDate);
-
     if (today < startDate) return "Chờ duyệt";
     if (today >= startDate && today <= endDate) return "Hoạt động";
     if (today > endDate) return "Kết thúc";
@@ -94,79 +99,31 @@ function CampaignList() {
 
   const getStatusTagColor = (stateCurrent) => {
     switch (stateCurrent) {
-      case "Chờ duyệt":
-        return 'orange';
-      case "Từ chối":
-        return 'purple';
-      case "Hoạt động":
-        return 'cyan';
-      case "Không hoạt động":
-        return 'default';
-      case "Kết thúc":
-        return 'volcano';
-      case "Đóng":
-        return 'red';
-      case "Hủy":
-        return 'error';
-      default:
-        return 'default-color';
+      case "Chờ duyệt": return 'orange';
+      case "Từ chối": return 'purple';
+      case "Hoạt động": return 'cyan';
+      case "Không hoạt động": return 'default';
+      case "Kết thúc": return 'volcano';
+      case "Đóng": return 'red';
+      case "Hủy": return 'error';
+      default: return 'default-color';
     }
   };
 
   const columns = [
-    {
-      title: "STT",
-      dataIndex: "number",
-      key: "number",
-      align: "center"
-    },
-    {
-      title: "Chiến dịch",
-      dataIndex: "CampaignName",
-      key: "CampaignName",
-      sorter: true
-    },
-    {
-      title: "Thương hiệu",
-      dataIndex: "BrandName",
-      key: "BrandName",
-      align: "center"
-    },
-    {
-      title: "Thời gian diễn ra",
-      dataIndex: "StartOn",
-      key: "StartOn",
-      sorter: true
-    },
-    {
-      title: "Chi phí",
-      key: "TotalIncome",
-      dataIndex: "TotalIncome",
-      sorter: true
-    },
-    {
-      title: "Trạng thái",
-      key: "State",
-      dataIndex: "State",
-      align: "center"
-    },
-    {
-      title: "Hành động",
-      key: "action",
-      dataIndex: "action",
-      align: "center"
-    }
+    { title: "STT", dataIndex: "number", key: "number", align: "center" },
+    { title: "Chiến dịch", dataIndex: "CampaignName", key: "CampaignName", sorter: true },
+    { title: "Thương hiệu", dataIndex: "BrandName", key: "BrandName", align: "center" },
+    { title: "Thời gian diễn ra", dataIndex: "StartOn", key: "StartOn", sorter: true },
+    { title: "Chi phí", key: "TotalIncome", dataIndex: "TotalIncome", sorter: true },
+    { title: "Trạng thái", key: "State", dataIndex: "State", align: "center" },
+    { title: "Hành động", key: "action", dataIndex: "action", align: "center" }
   ];
 
   if (isLoading) {
-    // console.log("Loading campaigns...");
     return (
       <Spin>
-        <TableItem
-          columns={columns}
-          dataSource={[]}
-          pagination={false}
-        />
+        <TableItem columns={columns} dataSource={[]} pagination={false} />
       </Spin>
     );
   }
@@ -175,31 +132,22 @@ function CampaignList() {
     return <Alert message={errorMessage} type="error" showIcon />;
   }
 
-  // console.log("Campaigns data:", campaigns);
   if (!campaigns?.result?.length) return <Empty resourceName="chiến dịch" />;
 
-  const data = campaigns?.result?.map((campaign, index) => {
-    const dataIndex = !isNaN((page - 1) * size + index + 1) ? (page - 1) * size + index + 1 : index + 1; // Đảm bảo dataIndex là số
+  console.log('🔍 Campaigns result trong CampaignList:', campaigns?.result);
 
+  const data = campaigns?.result?.map((campaign, index) => {
+    const dataIndex = !isNaN((page - 1) * size + index + 1) ? (page - 1) * size + index + 1 : index + 1;
     const isValid = isValidImages[index];
     const avatarSrc = isValid ? campaign.image : imgDefaultCampaign;
-
     const campaignStatus = determineCampaignStatus(campaign.startOn, campaign.endOn);
 
     return {
       key: campaign.id,
-      number: (
-        <div className="number-header">
-          <span>{dataIndex}</span>
-        </div>
-      ),
+      number: <div className="number-header"><span>{dataIndex}</span></div>,
       CampaignName: (
         <Avatar.Group>
-          <Avatar
-            className="shape-avatar-product"
-            shape="square"
-            src={avatarSrc}
-          />
+          <Avatar className="shape-avatar-product" shape="square" src={avatarSrc} />
           <div className="avatar-info">
             <Title className="title-product-name" level={5}>{campaign.campaignName}</Title>
             <p className="p-column-table">Thể loại {campaign.typeName}</p>
@@ -209,41 +157,25 @@ function CampaignList() {
       BrandName: <div className="campaign-brand-row">{campaign.brandName}</div>,
       StartOn: (
         <StackedTime>
-          <span>
-            Bắt đầu: <StackedTimeFrameAbove>{formatDate(campaign.startOn)}</StackedTimeFrameAbove>
-          </span>
-          <span>
-            Kết thúc: <StackedTimeFrameBelow>{formatDate(campaign.endOn)}</StackedTimeFrameBelow>
-          </span>
+          <span>Bắt đầu: <StackedTimeFrameAbove>{formatDate(campaign.startOn)}</StackedTimeFrameAbove></span>
+          <span>Kết thúc: <StackedTimeFrameBelow>{formatDate(campaign.endOn)}</StackedTimeFrameBelow></span>
         </StackedTime>
       ),
       TotalIncome: (
         <StackedTime>
-          <span>
-            Hạn mức: <TotalIncome>{campaign.totalIncome.toLocaleString("vi-VN")}<img className="shape-avatar-campaign-bean" src={greenBean} /></TotalIncome>
-          </span>
-          <span>
-            Đã chi: <TotalSpending>{campaign.totalSpending.toLocaleString("vi-VN")}<img className="shape-avatar-campaign-bean" src={greenBean} /></TotalSpending>
-          </span>
+          <span>Hạn mức: <TotalIncome>{campaign.totalIncome.toLocaleString("vi-VN")}<img className="shape-avatar-campaign-bean" src={greenBean} /></TotalIncome></span>
+          <span>Đã chi: <TotalSpending>{campaign.totalSpending.toLocaleString("vi-VN")}<img className="shape-avatar-campaign-bean" src={greenBean} /></TotalSpending></span>
         </StackedTime>
       ),
-      State: (
-        <Tag className="campaign-status-tag" color={getStatusTagColor(campaignStatus)}>
-          {campaignStatus}
-        </Tag>
-      ),
+      State: <Tag className="campaign-status-tag" color={getStatusTagColor(campaignStatus)}>{campaignStatus}</Tag>,
       action: (
         <div className="ant-employed-actions">
           <Link className="link-details" to={`/campaigns/${campaign.id}`}>
-            <ButtonAction>
-              <HiEye />
-            </ButtonAction>
+            <ButtonAction><HiEye /></ButtonAction>
           </Link>
           {(new Date(campaign.startOn) > new Date(formattedDate)) && (
             <Link to={`/campaigns/edit/${campaign.id}`} state={{ campaign }}>
-              <ButtonAction>
-                <HiPencil />
-              </ButtonAction>
+              <ButtonAction><HiPencil /></ButtonAction>
             </Link>
           )}
         </div>
@@ -264,12 +196,12 @@ function CampaignList() {
         columns={columns}
         dataSource={data}
         handleSort={handleSort}
-        limit={size} // Đổi từ limit thành size
+        limit={size}
         label="Chiến dịch / Trang"
         page={page}
         elements={campaigns?.totalCount}
         setPage={handlePageChange}
-        setLimit={handleSizeChange} // Đổi từ handleLimitChange thành handleSizeChange
+        setLimit={handleSizeChange}
         handleRowClick={handleRowClick}
       />
     </Spin>

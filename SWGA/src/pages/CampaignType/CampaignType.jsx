@@ -4,7 +4,6 @@ import CampaignTypeTable from "../../features/campaign-type/CampaignTypeTable";
 import CampaignTypeTableOperations from "../../features/campaign-type/CampaignTypeTableOperations";
 import Heading from "../../ui/Heading";
 import Row from "../../ui/Row";
-import VoucherTypeList from "../../features/voucher-type/VoucherTypeList";
 
 const Container = styled.div`
   margin: 0 auto 3rem;

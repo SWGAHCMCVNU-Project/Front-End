@@ -12,7 +12,7 @@ import Textarea from "../../ui/Textarea";
 import { RegisterButton } from "../../ui/custom/Button/Button";
 import { CustomFormRow } from "../../ui/custom/Form/InputItem/CustomFormItem";
 import { toast } from "react-hot-toast";
-import {registerBrandAPI} from "../../store/api/registerAPI";
+import { registerBrandAPI } from "../../store/api/registerAPI";
 
 // Styled components (giữ nguyên)
 const StyledDataBox = styled.section`
@@ -145,10 +145,22 @@ function RegisterBrand() {
 
     setIsLoading(true);
     try {
-      const brandData = registerBrandAPI.formatBrandData(data, coverPhotoStorage);
-      await registerBrandAPI.registerBrand(brandData, navigate);
+      // Gọi registerBrandAPI và nhận phản hồi
+      const result = await registerBrandAPI(data, coverPhotoStorage, navigate);
+
+      // Kiểm tra nếu đăng ký không thành công
+      if (!result.success) {
+        // Chỉ kiểm tra lỗi liên quan đến userName
+        if (result.message.includes("userName")) {
+          toast.error("Tên tài khoản này đã được sử dụng!");
+        } else {
+          toast.error(result.message || "Đăng ký thất bại!");
+        }
+      }
+      // Nếu thành công, registerBrandAPI đã xử lý toast và navigate, nên không cần làm gì thêm
     } catch (error) {
       console.error("Register error:", error);
+      toast.error("Có lỗi xảy ra khi đăng ký. Vui lòng thử lại!");
     } finally {
       setIsLoading(false);
     }
@@ -160,12 +172,11 @@ function RegisterBrand() {
 
   return (
     <>
-     
       <div className="header-login">
-            <Title style={{ color: "#15803d" }}>
-              Đăng Kí Tài Khoản Thương Hiệu
-            </Title>
-          </div>
+        <Title style={{ color: "#15803d" }}>
+          Đăng Kí Tài Khoản Thương Hiệu
+        </Title>
+      </div>
       <div className="btn-header-signup">
         <ButtonText onClick={moveBack}>← Quay lại đăng nhập</ButtonText>
       </div>

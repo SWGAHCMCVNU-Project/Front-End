@@ -1,5 +1,5 @@
 import { Tabs } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom"; // Add useParams
 import styled from "styled-components";
 import Button from "../../ui/Button";
 import ButtonGroup from "../../ui/ButtonGroup";
@@ -10,12 +10,11 @@ import BrandDataBox from "./BrandDataBox";
 import { HiPencil } from "react-icons/hi2";
 import Modal from "../../ui/Modal";
 import Spinner from "../../ui/Spinner";
-// import CampaignsByBrandId from "./CampaignsByBrandId";
 import CreateBrandForm from "./CreateBrandForm";
 import HistoriesByBrandId from "./HistoriesByBrandId";
 import StoresByBrandId from "./StoresByBrandId";
 import VouchersBrand from "./VouchersBrand";
-// import { useBrand } from "./useBrand";
+import useBrand from "../../hooks/brand/useBrandId.js";
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -53,17 +52,43 @@ const StyledButton = styled.div`
 `;
 
 function BrandDetail() {
-  const { brand, isLoading } = useBrand();
+  const { brandId } = useParams(); // Extract brandId from the URL
+  const { brand, isLoading, error, refetch } = useBrand(brandId); // Pass brandId to useBrand
   const navigate = useNavigate();
 
+  // Handle loading state
   if (isLoading) return <Spinner />;
 
+  // Handle error state
+  if (error) {
+    return (
+      <Container>
+        <Row type="horizontal">
+          <HeadingGroup>
+            <Heading as="h1">Thông tin thương hiệu</Heading>
+          </HeadingGroup>
+        </Row>
+        <p>{error}</p>
+        <Button onClick={refetch}>Thử lại</Button>
+      </Container>
+    );
+  }
+
+  // Handle case where brand is not found
+  if (!brand) {
+    return (
+      <Container>
+        <Row type="horizontal">
+          <HeadingGroup>
+            <Heading as="h1">Thông tin thương hiệu</Heading>
+          </HeadingGroup>
+        </Row>
+        <p>Không tìm thấy thương hiệu.</p>
+      </Container>
+    );
+  }
+
   const items = [
-    // {
-    //   key: "campaigns",
-    //   label: "Chiến dịch",
-    //   children: <CampaignsByBrandId />,
-    // },
     {
       key: "histories",
       label: "Lịch sử",
@@ -85,19 +110,18 @@ function BrandDetail() {
     <Container>
       <Row type="horizontal">
         <HeadingGroup>
-          <Heading as="h1">Thông tin thương hiệu </Heading>
+          <Heading as="h1">Thông tin thương hiệu</Heading>
         </HeadingGroup>
       </Row>
 
       <ButtonGroup>
         <ButtonText onClick={() => navigate(`/brands`)}>
-          &larr; Quay lại
+          ← Quay lại
         </ButtonText>
 
         <Modal>
           <Modal.Open opens="edit">
             <Button $variations="primary">
-              {" "}
               <StyledContainerButton>
                 <StyledButton>
                   <HiPencil />
@@ -114,7 +138,7 @@ function BrandDetail() {
 
       <BrandDataBox brand={brand} />
 
-      <Tabs defaultActiveKey="campaigns" items={items} />
+      <Tabs defaultActiveKey="histories" items={items} />
     </Container>
   );
 }

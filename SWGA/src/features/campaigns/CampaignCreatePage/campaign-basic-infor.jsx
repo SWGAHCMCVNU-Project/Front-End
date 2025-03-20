@@ -82,7 +82,7 @@ function CampaignBasicInformation() {
     const [campaignTypesOptions, setCampaignTypesOptions] = useState([]);
     const [typeError, setTypeError] = useState("");
     const [fileCard, setFileCard] = useState(null);
-    const { newCampaign, setNewCampaign, current, setCurrent } = useContext(NextPrevContext); // Thêm current và setCurrent
+    const { newCampaign, setNewCampaign, current, setCurrent } = useContext(NextPrevContext);
     const brandId = storageService.getLoginId();
     const isMounted = useRef(false);
 
@@ -132,10 +132,7 @@ function CampaignBasicInformation() {
     const endOn = watch('endOn');
 
     useEffect(() => {
-        // console.log("currentDate:", currentDate.format('YYYY-MM-DD'));
-        // console.log("startOn:", startOn ? startOn.format('YYYY-MM-DD') : null);
-        // console.log("endOn:", endOn ? endOn.format('YYYY-MM-DD') : null);
-        // console.log("typesLoading:", typesLoading);
+      
     }, [startOn, endOn, typesLoading]);
 
     useEffect(() => {
@@ -235,7 +232,7 @@ function CampaignBasicInformation() {
 
         const validationErrors = validateCampaign(brandId, checkCampaignType, timeRange);
         if (validationErrors) {
-            // console.log("Validation errors:", validationErrors);
+         
             return;
         }
 
@@ -247,11 +244,11 @@ function CampaignBasicInformation() {
                 startOn: formattedStartOn,
                 endOn: formattedEndOn
             });
-            // Tăng current để chuyển sang bước tiếp theo
+            
             setCurrent(current + 1);
-            // console.log("Updated current:", current + 1);
+           
         }
-        // console.log("Campaign created:", { ...data, brandId, image, startOn: formattedStartOn, endOn: formattedEndOn });
+      
     }
 
     function onError(errors) {

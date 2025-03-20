@@ -25,6 +25,7 @@
     margin-right: 2%;
     gap: 4rem;
     margin-top: 1rem;
+    padding-bottom: 20px; /* Add padding to ensure space for the buttons */
 
     .cost-label {
         @include price-font-color(#4b5563);

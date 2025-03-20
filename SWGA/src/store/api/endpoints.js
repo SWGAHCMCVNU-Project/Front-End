@@ -1,6 +1,8 @@
 export const AUTH_ENDPOINTS = {
     LOGIN: '/Auth/login',
     LOGOUT: '/logout',
+    VERIFY_ACCOUNT: '/Auth/verify-account'
+    
   };
   export const ACCOUNT_ENDPOINTS = {
     RegisterBrand: '/Account/brandRegister',

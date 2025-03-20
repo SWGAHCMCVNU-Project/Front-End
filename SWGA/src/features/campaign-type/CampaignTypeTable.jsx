@@ -25,7 +25,7 @@ function CampaignTypeTable() {
   const pageSize = Number(searchParams.get("size")) || 10;
   const [sortOrder] = useState(true);
 
-  const searchTerm = searchParams.get("searchName") || ""; // Changed to searchName
+  const searchTerm = searchParams.get("searchName") || "";
   const debouncedSearch = useDebounced(searchTerm, 500);
 
   useEffect(() => {
@@ -34,7 +34,7 @@ function CampaignTypeTable() {
         new URLSearchParams({
           page: "1",
           size: pageSize.toString(),
-          ...(debouncedSearch && { searchName: debouncedSearch }), // Changed to searchName
+          ...(debouncedSearch && { searchName: debouncedSearch }),
         }),
         { replace: true }
       );
@@ -44,31 +44,32 @@ function CampaignTypeTable() {
   const { campaignTypes, error, isLoading } = useCampaignTypes({
     page: currentPage,
     size: pageSize,
-    searchName: debouncedSearch, // Changed search to searchName
+    searchName: debouncedSearch,
     isAsc: sortOrder,
     state: true,
   });
 
-  const campaignTypeData = campaignTypes?.data || {
-    items: [],
-    total: 0,
+  // Sử dụng trực tiếp campaignTypes (là mảng) và tạo campaignTypeData
+  const campaignTypeData = {
+    items: Array.isArray(campaignTypes) ? campaignTypes : [],
+    total: campaignTypes?.length || 0, // Tạm thời dùng length của mảng
     page: currentPage,
     size: pageSize,
-    totalPages: 0,
+    totalPages: Math.ceil((campaignTypes?.length || 0) / pageSize) || 1, // Tạm thời tính totalPages
   };
 
   useEffect(() => {
-    if (campaignTypeData.items.length === 0 && currentPage > 1) {
+    if (campaignTypeData?.items?.length === 0 && currentPage > 1) {
       setSearchParams(
         new URLSearchParams({
           page: (currentPage - 1).toString(),
           size: pageSize.toString(),
-          ...(debouncedSearch && { searchName: debouncedSearch }), // Changed to searchName
+          ...(debouncedSearch && { searchName: debouncedSearch }),
         }),
         { replace: true }
       );
     }
-  }, [campaignTypeData.items, currentPage, pageSize, debouncedSearch, setSearchParams]);
+  }, [campaignTypeData, currentPage, pageSize, debouncedSearch, setSearchParams]);
 
   const handlePageChange = (newPage) => {
     const maxPage = Math.max(1, campaignTypeData.totalPages || 1);
@@ -77,7 +78,7 @@ function CampaignTypeTable() {
       new URLSearchParams({
         page: newPage.toString(),
         size: pageSize.toString(),
-        ...(debouncedSearch && { searchName: debouncedSearch }), // Changed to searchName
+        ...(debouncedSearch && { searchName: debouncedSearch }),
       }),
       { replace: true }
     );
@@ -88,7 +89,7 @@ function CampaignTypeTable() {
       new URLSearchParams({
         size: newSize.toString(),
         page: "1",
-        ...(debouncedSearch && { searchName: debouncedSearch }), // Changed to searchName
+        ...(debouncedSearch && { searchName: debouncedSearch }),
       }),
       { replace: true }
     );
@@ -98,6 +99,9 @@ function CampaignTypeTable() {
   if (error) {
     toast.error("Có lỗi khi tải danh sách loại chiến dịch");
     return null;
+  }
+  if (!campaignTypeData || !campaignTypeData.items) {
+    return <Empty resource="loại chiến dịch" />;
   }
 
   return (
