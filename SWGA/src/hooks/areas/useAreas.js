@@ -2,15 +2,15 @@ import { useQuery } from "@tanstack/react-query";
 import { getAreasAPI } from "../../store/api/areasApi";
 import { toast } from "react-hot-toast";
 
-export function useAreas({ page = 1, size = 10, search = "", state = true, isAsc = true } = {}) {
+export function useAreas({ page = 1, size = 10, search = "", isAsc = true } = {}) {
   const { isLoading, data, error } = useQuery({
-    queryKey: ["areas", page, size, search, state, isAsc],
-    queryFn: () => getAreasAPI({ page, size, search, state, isAsc }),
+    queryKey: ["areas", page, size, search, isAsc],
+    queryFn: () => getAreasAPI({ page, size, search, isAsc }), // Remove state filter
     staleTime: 1000 * 60,
+    keepPreviousData: true,
     onError: () => toast.error("Không thể tải danh sách khu vực"),
   });
 
-  // Ánh xạ dữ liệu từ API thành cấu trúc mong muốn
   const areas = data?.data
     ? {
         result: data.data.items || [],

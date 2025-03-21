@@ -10,7 +10,6 @@ import { ButtonAction } from "../../../../ui/custom/Button/Button";
 import { TableItem } from "../../../../ui/custom/Table/TableItem";
 import { formatDate, useImageValidity } from "../../../../utils/helpers";
 import { useCampaign } from "../useCampaign";
-import StorageService from "../../../../services/storageService";
 import "./campaign-list.scss";
 
 const StackedTime = styled.span`
@@ -54,13 +53,8 @@ function CampaignList() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  const brandId = StorageService.getBrandId();
-  console.log('🔍 brandId trong CampaignList:', brandId);
-
-  if (!brandId) {
-    return <Alert message="Không tìm thấy brandId. Vui lòng đăng nhập lại." type="error" showIcon />;
-  }
-
+  
+  
   const campaignImages = campaigns?.result?.map(campaign => campaign.image) || [];
   const isValidImages = useImageValidity(campaigns?.result || [], campaignImages);
 

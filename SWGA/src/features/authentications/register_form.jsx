@@ -84,7 +84,6 @@ function RegisterBrand() {
       event.preventDefault();
       event.returnValue = "";
     };
-
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, []);
@@ -98,6 +97,10 @@ function RegisterBrand() {
 
   const convertFileToBase64 = (file) => {
     return new Promise((resolve, reject) => {
+      if (!(file instanceof Blob)) {
+        reject(new Error("Invalid file type"));
+        return;
+      }
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result);
       reader.onerror = reject;
@@ -105,22 +108,28 @@ function RegisterBrand() {
     });
   };
 
-  const handleChangeLogo = async ({ file }) => {
-    if (file) {
-      const base64 = await convertFileToBase64(file);
-      setLogo(file);
-      setLogoStorage(base64);
+  const handleChangeLogo = async ({ fileList }) => {
+    if (fileList.length > 0) {
+      const file = fileList[fileList.length - 1].originFileObj; // Lấy file mới nhất
+      if (file) {
+        const base64 = await convertFileToBase64(file);
+        setLogo(file);
+        setLogoStorage(base64);
+      }
     } else {
       setLogo(null);
       setLogoStorage(null);
     }
   };
 
-  const handleChangeCoverPhoto = async ({ file }) => {
-    if (file) {
-      const base64 = await convertFileToBase64(file);
-      setCoverPhoto(file);
-      setCoverPhotoStorage(base64);
+  const handleChangeCoverPhoto = async ({ fileList }) => {
+    if (fileList.length > 0) {
+      const file = fileList[fileList.length - 1].originFileObj;
+      if (file) {
+        const base64 = await convertFileToBase64(file);
+        setCoverPhoto(file);
+        setCoverPhotoStorage(base64);
+      }
     } else {
       setCoverPhoto(null);
       setCoverPhotoStorage(null);
@@ -129,7 +138,9 @@ function RegisterBrand() {
 
   const validateClosingTime = (value) => {
     const openingTime = getValues("openingHours");
-    return value > openingTime || "Thời gian đóng cửa phải sau thời gian mở cửa";
+    return (
+      value > openingTime || "Thời gian đóng cửa phải sau thời gian mở cửa"
+    );
   };
 
   const validatePasswordConfirmation = (value) => {
@@ -145,19 +156,20 @@ function RegisterBrand() {
 
     setIsLoading(true);
     try {
-      // Gọi registerBrandAPI và nhận phản hồi
-      const result = await registerBrandAPI(data, coverPhotoStorage, navigate);
+      const result = await registerBrandAPI(data, coverPhotoStorage);
 
-      // Kiểm tra nếu đăng ký không thành công
-      if (!result.success) {
-        // Chỉ kiểm tra lỗi liên quan đến userName
-        if (result.message.includes("userName")) {
+      if (result.success) {
+        toast.success(
+          "Đăng ký thành công! Vui lòng kiểm tra email để lấy mã xác minh."
+        );
+        navigate("/sign-in"); // Chuyển thẳng về đăng nhập
+      } else {
+        if (result.message?.includes("userName")) {
           toast.error("Tên tài khoản này đã được sử dụng!");
         } else {
           toast.error(result.message || "Đăng ký thất bại!");
         }
       }
-      // Nếu thành công, registerBrandAPI đã xử lý toast và navigate, nên không cần làm gì thêm
     } catch (error) {
       console.error("Register error:", error);
       toast.error("Có lỗi xảy ra khi đăng ký. Vui lòng thử lại!");
@@ -186,7 +198,10 @@ function RegisterBrand() {
           <LeftFormHalf>
             <StyledDataBox>
               <Header>Thông tin đăng nhập</Header>
-              <CustomFormRow label="Tên tài khoản" error={errors?.userName?.message}>
+              <CustomFormRow
+                label="Tên tài khoản"
+                error={errors?.userName?.message}
+              >
                 <Input
                   type="text"
                   id="userName"
@@ -244,7 +259,10 @@ function RegisterBrand() {
               </CustomFormRow>
 
               <Header>Thông tin cơ bản</Header>
-              <CustomFormRow label="Tên thương hiệu" error={errors?.brandName?.message}>
+              <CustomFormRow
+                label="Tên thương hiệu"
+                error={errors?.brandName?.message}
+              >
                 <Input
                   type="text"
                   id="brandName"
@@ -256,7 +274,10 @@ function RegisterBrand() {
                 />
               </CustomFormRow>
 
-              <CustomFormRow label="Tên viết tắt" error={errors?.acronym?.message}>
+              <CustomFormRow
+                label="Tên viết tắt"
+                error={errors?.acronym?.message}
+              >
                 <Input
                   type="text"
                   id="acronym"
@@ -268,7 +289,10 @@ function RegisterBrand() {
                 />
               </CustomFormRow>
 
-              <CustomFormRow label="Số điện thoại" error={errors?.phone?.message}>
+              <CustomFormRow
+                label="Số điện thoại"
+                error={errors?.phone?.message}
+              >
                 <Input
                   type="tel"
                   id="phone"
@@ -360,11 +384,25 @@ function RegisterBrand() {
               <Card className="card-product-media">
                 <Upload
                   accept="image/*"
-                  id="logo"
                   listType="picture-card"
                   beforeUpload={() => false}
                   onChange={handleChangeLogo}
-                  fileList={logo ? [logo] : []}
+                  fileList={
+                    logo
+                      ? [
+                          {
+                            uid: "-1",
+                            name: "logo.png",
+                            status: "done",
+                            url: logoStorage,
+                          },
+                        ]
+                      : []
+                  }
+                  onRemove={() => {
+                    setLogo(null);
+                    setLogoStorage(null);
+                  }}
                   disabled={isLoading}
                 >
                   {!logo && (
@@ -386,6 +424,10 @@ function RegisterBrand() {
                   onChange={handleChangeCoverPhoto}
                   fileList={coverPhoto ? [coverPhoto] : []}
                   disabled={isLoading}
+                  showUploadList={{
+                    showPreviewIcon: false,
+                    showRemoveIcon: true,
+                  }}
                 >
                   {!coverPhoto && (
                     <div>

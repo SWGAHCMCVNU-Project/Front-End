@@ -7,7 +7,7 @@ export const getAllCampaignsAPI = async ({
   searchName,
   page,
   limit,
-  brandId,
+  
   campaignTypeIds,
   statesFilterValue,
 }) => {
@@ -20,12 +20,11 @@ export const getAllCampaignsAPI = async ({
         searchName,
         page,
         size: limit,
-        brandId,
+       
         campaignTypeIds: campaignTypeIds?.join(","),
         statesFilterValue,
       },
     });
-    console.log("brandId",brandId);
     
     return response.data;
   } catch (error) {

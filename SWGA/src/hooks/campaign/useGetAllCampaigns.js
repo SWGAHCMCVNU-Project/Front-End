@@ -1,61 +1,35 @@
-import { useQuery } from '@tanstack/react-query';
-import { getAllCampaignsAPI } from '../../store/api/campaignApi';
-import StorageService from '../../services/storageService';
+import { useQuery } from "@tanstack/react-query";
+import { getAllCampaignsAPI } from "../../store/api/campaignApi";
+// import { useBrand } from "../brand/useBrand";
+import { toast } from "react-hot-toast";
 
 const useGetAllCampaigns = ({ 
   sort, 
   search, 
   page, 
   size, 
-  brandId: providedBrandId, // Đổi tên để tránh xung đột
   campaignTypeIds, 
   statesFilterValue 
 } = {}) => {
-  // Nếu brandId không được truyền qua tham số, lấy từ StorageService
-  const brandId = providedBrandId || StorageService.getBrandId();
-  console.log('🔍 brandId (sau khi lấy từ tham số hoặc StorageService):', brandId);
+  // const { brand } = useBrand();
+  // const brandId = brand?.id; // Lấy brandId từ useBrand
 
-  if (!brandId) {
-    console.error('brandId is null or undefined, cannot fetch campaigns');
-    return { 
-      data: null, 
-      isLoading: false, 
-      error: new Error('brandId is missing. Please ensure you are logged in and brandId is set in storage.') 
-    };
-  }
-
-  let formattedStates = statesFilterValue;
-  if (statesFilterValue === "3,4") {
-    formattedStates = "3,4";
-  } else if (statesFilterValue === undefined) {
-    formattedStates = null;
-  }
-
-  console.log('🔍 Params in useGetAllCampaigns:', { 
-    sort, 
-    searchName: search, 
-    page, 
-    size, 
-    brandId, 
-    campaignTypeIds, 
-    statesFilterValue: formattedStates 
-  });
+  const params = {
+    sort,
+    searchName: search,
+    page,
+    limit: size,
+    campaignTypeIds,
+    statesFilterValue: statesFilterValue === "3,4" ? "3,4" : statesFilterValue || null,
+    // ...(brandId && { brandId }), // Chỉ thêm brandId nếu có
+  };
 
   const queryResult = useQuery({
-    queryKey: ['campaigns', sort, search, page, size, brandId, campaignTypeIds?.join(','), formattedStates],
-    queryFn: () => getAllCampaignsAPI({
-      sort,
-      searchName: search,
-      page,
-      limit: size,
-      brandId,
-      campaignTypeIds,
-      statesFilterValue: formattedStates
-    }),
-    enabled: !!brandId, // Chỉ fetch khi brandId có giá trị
-    onError: (error) => {
-      console.error('Error fetching all campaigns:', error);
-    },
+    queryKey: ["campaigns", sort, search, page, size,  campaignTypeIds?.join(","), params.statesFilterValue],
+    queryFn: () => getAllCampaignsAPI(params),
+    // enabled: !!brandId, // Chỉ gọi API nếu có brandId
+    staleTime: 1000 * 60,
+    onError: () => toast.error("Không thể tải danh sách chiến dịch"),
     keepPreviousData: true,
   });
 

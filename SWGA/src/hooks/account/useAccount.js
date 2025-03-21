@@ -4,42 +4,41 @@ import toast from "react-hot-toast";
 
 const useAccount = (id) => {
   const [account, setAccount] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const fetchAccount = useCallback(async () => {
+    if (!id) return;
     setLoading(true);
     setError(null);
 
     try {
-      const response = await getAccountByIdAPI(id);
+      console.log("Fetching account ID:", id);
+      const response = await getAccountByIdAPI(id, { noCache: true });
+
       if (response.success) {
         setAccount(response.data);
       } else {
-        setError(response.message);
-        toast.error(response.message);
+        throw new Error(response.message || "Lỗi khi lấy dữ liệu");
       }
     } catch (err) {
-      const errorMessage = err.message || "Failed to fetch account details";
-      setError(errorMessage);
-      toast.error(errorMessage);
+      setError(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
   }, [id]);
 
-  useEffect(() => {
-    if (id !== undefined) {
-      fetchAccount();
-    }
-  }, [id, fetchAccount]);
-
-  return {
-    account,
-    loading,
-    error,
-    refetch: fetchAccount,
+  // 🔥 Hàm cập nhật ngay dữ liệu khi chỉnh sửa
+  const updateLocalAccount = (updatedData) => {
+    setAccount((prev) => ({ ...prev, ...updatedData }));
   };
+
+  useEffect(() => {
+    fetchAccount();
+  }, [fetchAccount]);
+
+  return { account, loading, error, refetch: fetchAccount, updateLocalAccount };
 };
 
 export default useAccount;

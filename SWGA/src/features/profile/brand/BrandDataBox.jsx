@@ -16,6 +16,7 @@ import {
   handleValidImageURL,
 } from "../../../utils/helpers";
 import DataItemDes from "./DataItemDes";
+import useAccount from "../../../hooks/account/useAccount"; // Import the useAccount hook
 
 const StyledStationDataBox = styled.section`
   background-color: var(--color-grey-0);
@@ -131,31 +132,41 @@ const LogoBrand = styled.img`
 `;
 
 function BrandDataBox({ brand }) {
+  // Add a safeguard in case brand is null or undefined
+  if (!brand) {
+    return <div>No brand data available.</div>;
+  }
+
   const {
-    id,
-    logo,
-    coverPhoto,
-    dateCreated,
-    openingHours,
-    closingHours,
-    phone,
-    status,
-    brandName,
-    email,
-    state,
-    description,
-    address,
-    numberOfFollowers,
-    greenWalletName,
-    greenWalletBalance,
-    totalIncome,
-    totalSpending,
-    accountId,
-    acronym,
-    coverFileName,
-    link,
-    dateUpdated,
+    id = "",
+    logo = "",
+    coverPhoto = "",
+    dateCreated = "",
+    openingHours = "",
+    closingHours = "",
+    status = "",
+    brandName = "Chưa cập nhật",
+    state = false,
+    description = "",
+    address = "",
+    numberOfFollowers = 0,
+    greenWalletName = "",
+    greenWalletBalance = 0,
+    totalIncome = 0,
+    totalSpending = 0,
+    accountId = "",
+    acronym = "",
+    coverFileName = "",
+    link = "",
+    dateUpdated = "",
   } = brand;
+
+  // Fetch account details using the accountId from the brand
+  const { account, loading: accountLoading, error: accountError } = useAccount(accountId);
+
+  // Use email and phone from the account data if available, otherwise fall back to defaults
+  const email = account?.email ?? "Chưa cập nhật";
+  const phone = account?.phone ?? "Chưa cập nhật";
 
   const statusToTagName = {
     true: "cyan",
@@ -185,7 +196,7 @@ function BrandDataBox({ brand }) {
       .catch(() => setIsValidLogo(false));
   }, [logo]);
 
-  // Log đầy đủ dữ liệu của brand, đặc biệt chi tiết về coverPhoto
+  // Log đầy đủ dữ liệu của brand, bao gồm cả email và phone từ account
   useEffect(() => {
     console.log("Full Brand Data:", {
       id,
@@ -208,14 +219,16 @@ function BrandDataBox({ brand }) {
       description,
       state,
       status,
-      phone: phone ?? "Chưa cập nhật",
-      email: email ?? "Chưa cập nhật",
+      phone, // Use the phone from account
+      email, // Use the email from account
       numberOfFollowers: numberOfFollowers ?? "Chưa cập nhật",
       greenWalletName: greenWalletName ?? "Chưa cập nhật",
       greenWalletBalance: greenWalletBalance ?? "Chưa cập nhật",
+      accountData: account, // Log the full account data for debugging
+      accountLoading,
+      accountError,
     });
   }, [
-    brand,
     id,
     accountId,
     brandName,
@@ -239,7 +252,21 @@ function BrandDataBox({ brand }) {
     greenWalletName,
     greenWalletBalance,
     isValidCoverPhoto,
+    account, // Add account as a dependency to re-log when account data changes
+    accountLoading,
+    accountError,
   ]);
+
+  // Show a loading state while fetching account data
+  if (accountLoading) {
+    return <div>Loading account details...</div>;
+  }
+
+  // Show an error if fetching account data fails
+  if (accountError) {
+    console.error("Error fetching account details:", accountError);
+    // You can choose to render the component with default values or show an error
+  }
 
   return (
     <StyledStationDataBox>
@@ -317,7 +344,6 @@ function BrandDataBox({ brand }) {
                 "Chưa cập nhật"
               )}
             </DataItem>
-
           </Infor>
         </Guest>
 
@@ -325,7 +351,7 @@ function BrandDataBox({ brand }) {
           <DataItem
             icon={<HiOutlineEnvelope />}
             label="Gmail"
-            value={email ?? "Chưa cập nhật"}
+            value={email}
           >
             {email}
           </DataItem>

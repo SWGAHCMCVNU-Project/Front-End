@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
-import styled from "styled-components";
-import Empty from "../../ui/Empty";
-import Menus from "../../ui/Menus";
-import Pagination from "../../ui/Pagination";
-import Spinner from "../../ui/Spinner";
-import Table from "../../ui/Table";
-import CampaignTypeRow from "./CampaignTypeRow";
-import SetRowsPerPage from "./SetRowsPerPage";
-import { useSearchParams } from "react-router-dom";
-import { useDebounced } from "../../hooks/useDebounced";
-import { useCampaignTypes } from "../../hooks/campaign-type/useCampaignTypes";
-import { toast } from "react-hot-toast";
+import { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import Empty from '../../ui/Empty';
+import Menus from '../../ui/Menus';
+import Pagination from '../../ui/Pagination';
+import Spinner from '../../ui/Spinner';
+import Table from '../../ui/Table';
+import CampaignTypeRow from './CampaignTypeRow';
+import SetRowsPerPage from './SetRowsPerPage';
+import { useSearchParams } from 'react-router-dom';
+import { useDebounced } from '../../hooks/useDebounced';
+import { useCampaignTypes } from '../../hooks/campaign-type/useCampaignTypes';
+import { toast } from 'react-hot-toast';
 
 const TableContainer = styled.div`
   display: flex;
@@ -20,19 +20,18 @@ const TableContainer = styled.div`
 
 function CampaignTypeTable() {
   const [searchParams, setSearchParams] = useSearchParams();
-  
-  const currentPage = Number(searchParams.get("page")) || 1;
-  const pageSize = Number(searchParams.get("size")) || 10;
+  const currentPage = Number(searchParams.get('page')) || 1;
+  const pageSize = Number(searchParams.get('size')) || 10;
   const [sortOrder] = useState(true);
 
-  const searchTerm = searchParams.get("searchName") || "";
+  const searchTerm = searchParams.get('searchName') || '';
   const debouncedSearch = useDebounced(searchTerm, 500);
 
   useEffect(() => {
     if (searchTerm !== debouncedSearch) {
       setSearchParams(
         new URLSearchParams({
-          page: "1",
+          page: '1',
           size: pageSize.toString(),
           ...(debouncedSearch && { searchName: debouncedSearch }),
         }),
@@ -49,13 +48,12 @@ function CampaignTypeTable() {
     state: true,
   });
 
-  // Sử dụng trực tiếp campaignTypes (là mảng) và tạo campaignTypeData
   const campaignTypeData = {
     items: Array.isArray(campaignTypes) ? campaignTypes : [],
-    total: campaignTypes?.length || 0, // Tạm thời dùng length của mảng
+    total: campaignTypes?.length || 0,
     page: currentPage,
     size: pageSize,
-    totalPages: Math.ceil((campaignTypes?.length || 0) / pageSize) || 1, // Tạm thời tính totalPages
+    totalPages: Math.ceil((campaignTypes?.length || 0) / pageSize) || 1,
   };
 
   useEffect(() => {
@@ -88,7 +86,7 @@ function CampaignTypeTable() {
     setSearchParams(
       new URLSearchParams({
         size: newSize.toString(),
-        page: "1",
+        page: '1',
         ...(debouncedSearch && { searchName: debouncedSearch }),
       }),
       { replace: true }
@@ -97,20 +95,20 @@ function CampaignTypeTable() {
 
   if (isLoading) return <Spinner />;
   if (error) {
-    toast.error("Có lỗi khi tải danh sách loại chiến dịch");
+    toast.error('Có lỗi khi tải danh sách loại chiến dịch');
     return null;
   }
   if (!campaignTypeData || !campaignTypeData.items) {
-    return <Empty resource="loại chiến dịch" />;
+    return <Empty resource='loại chiến dịch' />;
   }
 
   return (
     <TableContainer>
       {!campaignTypeData.items.length ? (
-        <Empty resource="loại chiến dịch" />
+        <Empty resource='loại chiến dịch' />
       ) : (
         <Menus>
-          <Table columns="0.5fr 3.2fr 2.5fr 1.6fr 1.2fr">
+          <Table columns='0.5fr 2fr 2fr 1fr 1fr'>
             <Table.Header>
               <div>STT</div>
               <div>Tên loại chiến dịch</div>

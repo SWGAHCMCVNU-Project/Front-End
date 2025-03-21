@@ -6,11 +6,11 @@ import Row from "../../../ui/Row";
 import BrandDataBox from "./BrandDataBox";
 
 import { HiPencil } from "react-icons/hi2";
-import { useMoveBack } from "../../../hooks/useMoveBack";
 import Modal from "../../../ui/Modal";
 import Spinner from "../../../ui/Spinner";
 import EditBrandForm from "./EditBrandForm";
 import { useBrand } from "../../../hooks/brand/useBrand";
+import { useParams } from "react-router-dom";
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -48,23 +48,34 @@ const StyledButton = styled.div`
 `;
 
 function BrandProfile() {
-  const { brand, isLoading } = useBrand();
+  const { brandId } = useParams();
+  const { brand, loading: isLoading, error } = useBrand(brandId);
+
+  // Debug: Log the state
+  console.log("BrandProfile - brandId:", brandId);
+  console.log("BrandProfile - isLoading:", isLoading);
+  console.log("BrandProfile - error:", error);
+  console.log("BrandProfile - brand:", brand);
 
   if (isLoading) return <Spinner />;
+
+  if (error) return <div>Error: {error}</div>;
+
+  if (!brand) return <div>Brand with ID {brandId} not found.</div>;
 
   return (
     <Container>
       <ButtonGroup>
         <Row type="horizontal">
+          "BrandProfile - brand:", brand
           <HeadingGroup>
-            <Heading as="h1">Thông tin thương hiệu </Heading>
+            <Heading as="h1">Thông tin thương hiệu</Heading>
           </HeadingGroup>
         </Row>
 
         <Modal>
           <Modal.Open opens="edit">
             <Button $variations="primary">
-              {" "}
               <StyledContainerButton>
                 <StyledButton>
                   <HiPencil />

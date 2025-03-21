@@ -1,19 +1,24 @@
-/* eslint-disable no-unused-vars */
 import { Flex, Heading, Text } from "@chakra-ui/react";
-import { Button, Card, Col, Form, Input, Layout, Row } from "antd";
+import { Button, Card, Col, Form, Input, Layout, Modal } from "antd";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { NavLink, useNavigate } from "react-router-dom";
 import signinbg from "../assets/images/ảnh ví.png";
 import { login } from "../store/api/authApi";
-import storageService from "../services/storageService"; // Import StorageService
-import { notification } from "antd"; // Import notification từ antd
+import { useVerifyAccount } from "../hooks/account/useVerifyAccount";
+import storageService from "../services/storageService";
+import VerificationCode from "../features/authentications/verification-code"; // Điều chỉnh path theo thư mục của bạn
+import Row from "../ui/Row";
+
 const { Footer, Content } = Layout;
 
 function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const [loginData, setLoginData] = useState(null);
   const navigate = useNavigate();
   const [form] = Form.useForm();
+  const { verifyUserAccount, isLoading: isVerifying, error: verifyError } = useVerifyAccount();
 
   const handleLogin = async (values) => {
     try {
@@ -22,12 +27,20 @@ function SignIn() {
 
       console.log("responsefe", response);
 
-      if (response.success) { // Kiểm tra success thay vì status
-        localStorage.setItem('roleLogin', response.data.role);
-        storageService.setAccessToken(response.data.token);
-    storageService.setBrandId(response.data.brandId); // Lưu brandId
-        // toast.success("Đăng nhập thành công!");
-        navigate("/dashboard", { replace: true });
+      if (response.success) {
+        const { role, token, brandId, isVerify, loginId } = response.data;
+        
+        localStorage.setItem('roleLogin', role);
+        storageService.setAccessToken(token);
+        if (brandId) storageService.setBrandId(brandId);
+
+        if (!isVerify) {
+          setLoginData({ userName: values.username, accountId: loginId });
+          setShowVerifyModal(true);
+        } else {
+          toast.success("Đăng nhập thành công!");
+          navigate("/dashboard", { replace: true });
+        }
       } else {
         toast.error(response.message || "Tài khoản hoặc mật khẩu không đúng!");
       }
@@ -37,6 +50,47 @@ function SignIn() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleVerify = async (verificationCode) => {
+    if (!verificationCode || verificationCode.length < 6) {
+      toast.error("Vui lòng nhập mã xác minh đầy đủ!");
+      return;
+    }
+
+    const result = await verifyUserAccount(
+      loginData.accountId,
+      loginData.userName, // Giả sử username = email
+      verificationCode
+    );
+
+    if (result.success) {
+      storageService.setItem('isVerify', true);
+      toast.success("Xác minh thành công!");
+      setShowVerifyModal(false);
+      navigate("/dashboard", { replace: true });
+    } else {
+      toast.error(result.message || "Mã xác minh không đúng!");
+    }
+  };
+
+  const handleSendAgain = async () => {
+    // Gọi verifyUserAccount với code = null để gửi lại mã
+    const result = await verifyUserAccount(
+      loginData.accountId,
+      loginData.userName,
+      null // Backend xử lý gửi lại mã
+    );
+
+    if (result.success) {
+      toast.success("Đã gửi lại mã xác minh!");
+    } else {
+      toast.error(result.message || "Không thể gửi lại mã!");
+    }
+  };
+
+  const handleCancel = () => {
+    setShowVerifyModal(false);
   };
 
   return (
@@ -49,29 +103,21 @@ function SignIn() {
                 <img src={signinbg} alt="Sign In Background" />
               </div>
               <div>
-                <Heading
-                  className="header-login"
-                  fontSize="36px"
-                  marginTop="20px"
-                >
+                <Heading className="header-login" fontSize="36px" marginTop="20px">
                   Đăng nhập
                 </Heading>
               </div>
               <Form
                 form={form}
                 onFinish={handleLogin}
-                onFinishFailed={(errorInfo) =>
-                  console.log("Đăng nhập thất bại:", errorInfo)
-                }
+                onFinishFailed={(errorInfo) => console.log("Đăng nhập thất bại:", errorInfo)}
                 layout="vertical"
                 className="row-col"
               >
                 <Form.Item
                   name="username"
                   label="Tài khoản"
-                  rules={[
-                    { required: true, message: "Vui lòng nhập tài khoản!" },
-                  ]}
+                  rules={[{ required: true, message: "Vui lòng nhập tài khoản!" }]}
                 >
                   <Input placeholder="Hãy điền tên tài khoản..." />
                 </Form.Item>
@@ -79,9 +125,7 @@ function SignIn() {
                 <Form.Item
                   name="password"
                   label="Mật khẩu"
-                  rules={[
-                    { required: true, message: "Vui lòng nhập mật khẩu!" },
-                  ]}
+                  rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
                 >
                   <Input.Password placeholder="Hãy điền mật khẩu..." />
                 </Form.Item>
@@ -123,6 +167,23 @@ function SignIn() {
           </Row>
         </Content>
       </Card>
+
+      <Modal
+        open={showVerifyModal}
+        footer={null}
+        onCancel={handleCancel}
+        centered
+      >
+        <VerificationCode
+          email={loginData?.userName}
+          isLoading={isVerifying}
+          error={verifyError}
+          onVerify={handleVerify}
+          onSendAgain={handleSendAgain}
+          onCancel={handleCancel}
+        />
+      </Modal>
+
       <Footer>
         <Text className="copyright">S_WALLET</Text>
       </Footer>

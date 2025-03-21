@@ -26,6 +26,18 @@ const StyledHeader = styled(CommonRow)`
   letter-spacing: 0.4px;
   font-weight: 600;
   color: var(--color-grey-600);
+
+  & > div {
+    display: flex;
+    justify-content: center; /* Center-align header text */
+    align-items: center;
+  }
+
+  /* Left-align specific columns */
+  & > div:nth-child(2),
+  & > div:nth-child(3) {
+    justify-content: flex-start;
+  }
 `;
 
 const StyledRow = styled(CommonRow)`
@@ -35,10 +47,21 @@ const StyledRow = styled(CommonRow)`
   &:not(:last-child) {
     border-bottom: 1px solid var(--color-grey-100);
   }
+
+  & > div {
+    display: flex;
+    justify-content: center; /* Center-align all cells by default */
+    align-items: center;
+  }
+
+  /* Left-align specific columns */
+  & > div:nth-child(2),
+  & > div:nth-child(3) {
+    justify-content: flex-start;
+  }
 `;
 
 const StyledBody = styled.section`
-  /* margin: 0.4rem 0; */
   margin: 0rem 0;
 `;
 
@@ -48,7 +71,6 @@ const Footer = styled.footer`
   justify-content: center;
   padding: 1.2rem;
 
-  /* This will hide the footer when it contains no child elements. Possible thanks to the parent selector :has 🎉 */
   &:not(:has(*)) {
     display: none;
   }

@@ -35,7 +35,7 @@ export default function AddCampaignType() {
               <StyledButton>
                 <HiMiniPlus />
               </StyledButton>
-              Thêm loại ưu đãi
+              Thêm loại chiến dịch mới
             </StyledContainerButton>
           </Button>
         </MyModal.Open>
