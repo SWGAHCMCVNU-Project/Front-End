@@ -63,7 +63,7 @@ function BrandTable() {
         <Empty resourceName="thương hiệu" />
       ) : (
         <Menus>
-          <Table columns="0.5fr 3.2fr 1.6fr 1.2fr 1.1fr 1.2fr">
+          <Table columns="0.6fr 2fr 1.5fr 0.5fr 1.4fr 1fr">
             <Table.Header>
               <div>STT</div>
               <StackedHeader label="Tên thương hiệu" />

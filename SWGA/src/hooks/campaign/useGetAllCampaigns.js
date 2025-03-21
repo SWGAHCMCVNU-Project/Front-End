@@ -1,32 +1,39 @@
-import { useQuery } from '@tanstack/react-query';
-import { getAllCampaignsAPI } from '../../store/api/campaignApi';
+import { useQuery } from "@tanstack/react-query";
+import { getAllCampaignsAPI } from "../../store/api/campaignApi";
+// import { useBrand } from "../brand/useBrand";
+import { toast } from "react-hot-toast";
 
-const useGetAllCampaigns = ({ sort, search, page, size, brandIds, campaignTypeIds, statesFilterValue }) => {
-  let formattedStates = statesFilterValue;
-  if (statesFilterValue === "3,4") {
-    formattedStates = "3,4";
-  } else if (statesFilterValue === undefined) {
-    formattedStates = null;
-  }
+const useGetAllCampaigns = ({ 
+  sort, 
+  search, 
+  page, 
+  size, 
+  campaignTypeIds, 
+  statesFilterValue 
+} = {}) => {
+  // const { brand } = useBrand();
+  // const brandId = brand?.id; // Lấy brandId từ useBrand
 
-  console.log('Params in useGetAllCampaigns:', { sort, searchName: search, page, size, brandIds, campaignTypeIds, statesFilterValue: formattedStates });
+  const params = {
+    sort,
+    searchName: search,
+    page,
+    limit: size,
+    campaignTypeIds,
+    statesFilterValue: statesFilterValue === "3,4" ? "3,4" : statesFilterValue || null,
+    // ...(brandId && { brandId }), // Chỉ thêm brandId nếu có
+  };
 
-  return useQuery({
-    queryKey: ['campaigns', { sort, search, page, size, brandIds, campaignTypeIds, statesFilterValue }],
-    queryFn: () => getAllCampaignsAPI({
-      sort,
-      searchName: search,
-      page,
-      size,
-      brandIds,
-      campaignTypeIds,
-      statesFilterValue: formattedStates
-    }),
-    onError: (error) => {
-      console.error('Error fetching all campaigns:', error);
-    },
-    keepPreviousData: false, // Tắt cache để debug
+  const queryResult = useQuery({
+    queryKey: ["campaigns", sort, search, page, size,  campaignTypeIds?.join(","), params.statesFilterValue],
+    queryFn: () => getAllCampaignsAPI(params),
+    // enabled: !!brandId, // Chỉ gọi API nếu có brandId
+    staleTime: 1000 * 60,
+    onError: () => toast.error("Không thể tải danh sách chiến dịch"),
+    keepPreviousData: true,
   });
+
+  return queryResult;
 };
 
 export default useGetAllCampaigns;

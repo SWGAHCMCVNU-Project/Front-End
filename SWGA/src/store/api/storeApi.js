@@ -4,40 +4,47 @@ import { STORE_ENDPOINTS } from "./endpoints";
 import toast from "react-hot-toast";
 
 // 1. Lấy danh sách tất cả cửa hàng
-export const getAllStoresAPI = async ({ searchName = "", page = 1, size = 10 } = {}) => {
-    try {
-      const response = await apiClient.get(STORE_ENDPOINTS.GET_ALL, {
-        params: {
-          searchName,
-          page,
-          size,
-        },
-      });
-  
-      if (response.data) {
-        return {
-          status: response.status,
-          success: true,
-          data: response.data,
-        };
-      } else {
-        return {
-          status: response.status,
-          success: false,
-          message: "Không nhận được dữ liệu từ server!",
-        };
-      }
-    } catch (error) {
-      console.error("Get All Stores API Error:", error);
-      const errorMessage = error.response?.data?.message || "Lấy danh sách cửa hàng thất bại";
+
+export const getAllStoresAPI = async ({
+  searchName = "",
+  page = 1,
+  size = 10,
+  // brandID // Thêm brandID vào tham số
+} = {}) => {
+  try {
+    const response = await apiClient.get(STORE_ENDPOINTS.GET_ALL, {
+      params: {
+        searchName,
+        page,
+        size,
+        // ...(brandID && { brandID }) // Thêm brandID vào params nếu có
+      },
+    });
+
+    if (response.data) {
       return {
-        status: error.response?.status || 500,
+        status: response.status,
+        success: true,
+        data: response.data,
+      };
+    } else {
+      return {
+        status: response.status,
         success: false,
-        message: errorMessage,
+        message: "Không nhận được dữ liệu từ server!",
       };
     }
-  };
-
+  } catch (error) {
+    console.error("Get All Stores API Error:", error);
+    const errorMessage =
+      error.response?.data?.message || "Lấy danh sách cửa hàng thất bại";
+    return {
+      status: error.response?.status || 500,
+      success: false,
+      message: errorMessage,
+    };
+  }
+};
 // 2. Lấy thông tin cửa hàng theo ID
 export const getStoreByIdAPI = async (id) => {
   try {
@@ -60,7 +67,8 @@ export const getStoreByIdAPI = async (id) => {
     }
   } catch (error) {
     console.error("Get Store By ID API Error:", error);
-    const errorMessage = error.response?.data?.message || "Lấy thông tin cửa hàng thất bại";
+    const errorMessage =
+      error.response?.data?.message || "Lấy thông tin cửa hàng thất bại";
     return {
       status: error.response?.status || 500,
       success: false,
@@ -76,10 +84,18 @@ export const updateStoreAPI = async (id, formData) => {
     const formatStoreData = (formData) => {
       // Convert openingHours and closingHours to "HH:MM" format or split into hour/minute
       const openingHoursStr = formData.openingHours
-        ? `${String(formData.openingHours.hour || formData.openingHours.split(":")[0]).padStart(2, "0")}:${String(formData.openingHours.minute || formData.openingHours.split(":")[1]).padStart(2, "0")}`
+        ? `${String(
+            formData.openingHours.hour || formData.openingHours.split(":")[0]
+          ).padStart(2, "0")}:${String(
+            formData.openingHours.minute || formData.openingHours.split(":")[1]
+          ).padStart(2, "0")}`
         : "";
       const closingHoursStr = formData.closingHours
-        ? `${String(formData.closingHours.hour || formData.closingHours.split(":")[0]).padStart(2, "0")}:${String(formData.closingHours.minute || formData.closingHours.split(":")[1]).padStart(2, "0")}`
+        ? `${String(
+            formData.closingHours.hour || formData.closingHours.split(":")[0]
+          ).padStart(2, "0")}:${String(
+            formData.closingHours.minute || formData.closingHours.split(":")[1]
+          ).padStart(2, "0")}`
         : "";
 
       return {
@@ -119,7 +135,10 @@ export const updateStoreAPI = async (id, formData) => {
       apiFormData.append("avatar", formData.avatar);
     } else if (formData.avatar && typeof formData.avatar === "string") {
       // If avatar is a URL or base64, you might need to handle it differently
-      console.warn("Avatar is a string, skipping file upload:", formData.avatar);
+      console.warn(
+        "Avatar is a string, skipping file upload:",
+        formData.avatar
+      );
     }
 
     // Log the query parameters and FormData for debugging
@@ -130,11 +149,14 @@ export const updateStoreAPI = async (id, formData) => {
     }
 
     // Send the PUT request with query parameters and FormData body
-    const url = `${STORE_ENDPOINTS.UPDATE.replace("{id}", id)}?${queryParams.toString()}`;
+    const url = `${STORE_ENDPOINTS.UPDATE.replace(
+      "{id}",
+      id
+    )}?${queryParams.toString()}`;
     const response = await apiClient.put(url, apiFormData, {
       headers: {
         "Content-Type": "multipart/form-data",
-        "Accept": "text/plain", // Match the Accept header from registerStore
+        Accept: "text/plain", // Match the Accept header from registerStore
       },
     });
 

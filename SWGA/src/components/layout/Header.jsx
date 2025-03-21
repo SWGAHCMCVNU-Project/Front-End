@@ -22,20 +22,20 @@ function Header({ onPress, name, subName, handleSidenavColor, handleSidenavType,
   const { Title } = Typography;
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
-  const hasNotified = useRef(false);
+  // const hasNotified = useRef(false);
 
   useEffect(() => {
     const user = storageService.getUser();
     if (user) {
       setUserData(user);
-      if (!hasNotified.current) {
-        notification.success({
-          description: `Chào mừng ${user.userName || "bạn"} đã quay trở lại!`,
-          placement: "topRight",
-          duration: 3,
-        });
-        hasNotified.current = true;
-      }
+      // if (!hasNotified.current) {
+      //   notification.success({
+      //     // description: `Chào mừng ${user.userName || "bạn"} đã quay trở lại!`,
+      //     placement: "topRight",
+      //     duration: 3,
+      //   });
+      //   hasNotified.current = true;
+      // }
     }
   }, []);
 

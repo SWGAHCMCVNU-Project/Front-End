@@ -1,20 +1,21 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import Spinner from "../ui/Spinner";
-import BrandAccount from "../features/account/brand/BrandAccount";
+import AccountPage from "../features/account/brand/AccountPage";
 import storageService from "../services/storageService";
 
 const Account = () => {
   const navigate = useNavigate();
   const roleLogin = storageService.getRoleLogin();
+  const accountId = storageService.getAccountId();
 
   useEffect(() => {
-    if (!storageService.getAccessToken() || !roleLogin) {
+    if (!storageService.getAccessToken() || !roleLogin || !accountId) {
       navigate("/sign-in", { replace: true });
     }
-  }, [roleLogin, navigate]);
+  }, [roleLogin, navigate, accountId]);
 
-  if (!roleLogin) {
+  if (!roleLogin || !accountId) {
     return <Spinner />;
   }
 
@@ -22,7 +23,7 @@ const Account = () => {
     case "admin":
       return <div>Admin Profile (To be implemented)</div>;
     case "brand":
-      return <BrandAccount accountId={storageService.getAccountId()} />;
+      return <AccountPage accountId={accountId} />;
     default:
       return <Navigate to="/sign-in" replace />;
   }

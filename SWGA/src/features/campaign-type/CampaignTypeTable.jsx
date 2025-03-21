@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
-import styled from "styled-components";
-import Empty from "../../ui/Empty";
-import Menus from "../../ui/Menus";
-import Pagination from "../../ui/Pagination";
-import Spinner from "../../ui/Spinner";
-import Table from "../../ui/Table";
-import CampaignTypeRow from "./CampaignTypeRow";
-import SetRowsPerPage from "./SetRowsPerPage";
-import { useSearchParams } from "react-router-dom";
-import { useDebounced } from "../../hooks/useDebounced";
-import { useCampaignTypes } from "../../hooks/campaign-type/useCampaignTypes";
-import { toast } from "react-hot-toast";
+import { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import Empty from '../../ui/Empty';
+import Menus from '../../ui/Menus';
+import Pagination from '../../ui/Pagination';
+import Spinner from '../../ui/Spinner';
+import Table from '../../ui/Table';
+import CampaignTypeRow from './CampaignTypeRow';
+import SetRowsPerPage from './SetRowsPerPage';
+import { useSearchParams } from 'react-router-dom';
+import { useDebounced } from '../../hooks/useDebounced';
+import { useCampaignTypes } from '../../hooks/campaign-type/useCampaignTypes';
+import { toast } from 'react-hot-toast';
 
 const TableContainer = styled.div`
   display: flex;
@@ -20,21 +20,20 @@ const TableContainer = styled.div`
 
 function CampaignTypeTable() {
   const [searchParams, setSearchParams] = useSearchParams();
-  
-  const currentPage = Number(searchParams.get("page")) || 1;
-  const pageSize = Number(searchParams.get("size")) || 10;
+  const currentPage = Number(searchParams.get('page')) || 1;
+  const pageSize = Number(searchParams.get('size')) || 10;
   const [sortOrder] = useState(true);
 
-  const searchTerm = searchParams.get("searchName") || ""; // Changed to searchName
+  const searchTerm = searchParams.get('searchName') || '';
   const debouncedSearch = useDebounced(searchTerm, 500);
 
   useEffect(() => {
     if (searchTerm !== debouncedSearch) {
       setSearchParams(
         new URLSearchParams({
-          page: "1",
+          page: '1',
           size: pageSize.toString(),
-          ...(debouncedSearch && { searchName: debouncedSearch }), // Changed to searchName
+          ...(debouncedSearch && { searchName: debouncedSearch }),
         }),
         { replace: true }
       );
@@ -44,31 +43,31 @@ function CampaignTypeTable() {
   const { campaignTypes, error, isLoading } = useCampaignTypes({
     page: currentPage,
     size: pageSize,
-    searchName: debouncedSearch, // Changed search to searchName
+    searchName: debouncedSearch,
     isAsc: sortOrder,
     state: true,
   });
 
-  const campaignTypeData = campaignTypes?.data || {
-    items: [],
-    total: 0,
+  const campaignTypeData = {
+    items: Array.isArray(campaignTypes) ? campaignTypes : [],
+    total: campaignTypes?.length || 0,
     page: currentPage,
     size: pageSize,
-    totalPages: 0,
+    totalPages: Math.ceil((campaignTypes?.length || 0) / pageSize) || 1,
   };
 
   useEffect(() => {
-    if (campaignTypeData.items.length === 0 && currentPage > 1) {
+    if (campaignTypeData?.items?.length === 0 && currentPage > 1) {
       setSearchParams(
         new URLSearchParams({
           page: (currentPage - 1).toString(),
           size: pageSize.toString(),
-          ...(debouncedSearch && { searchName: debouncedSearch }), // Changed to searchName
+          ...(debouncedSearch && { searchName: debouncedSearch }),
         }),
         { replace: true }
       );
     }
-  }, [campaignTypeData.items, currentPage, pageSize, debouncedSearch, setSearchParams]);
+  }, [campaignTypeData, currentPage, pageSize, debouncedSearch, setSearchParams]);
 
   const handlePageChange = (newPage) => {
     const maxPage = Math.max(1, campaignTypeData.totalPages || 1);
@@ -77,7 +76,7 @@ function CampaignTypeTable() {
       new URLSearchParams({
         page: newPage.toString(),
         size: pageSize.toString(),
-        ...(debouncedSearch && { searchName: debouncedSearch }), // Changed to searchName
+        ...(debouncedSearch && { searchName: debouncedSearch }),
       }),
       { replace: true }
     );
@@ -87,8 +86,8 @@ function CampaignTypeTable() {
     setSearchParams(
       new URLSearchParams({
         size: newSize.toString(),
-        page: "1",
-        ...(debouncedSearch && { searchName: debouncedSearch }), // Changed to searchName
+        page: '1',
+        ...(debouncedSearch && { searchName: debouncedSearch }),
       }),
       { replace: true }
     );
@@ -96,17 +95,20 @@ function CampaignTypeTable() {
 
   if (isLoading) return <Spinner />;
   if (error) {
-    toast.error("Có lỗi khi tải danh sách loại chiến dịch");
+    toast.error('Có lỗi khi tải danh sách loại chiến dịch');
     return null;
+  }
+  if (!campaignTypeData || !campaignTypeData.items) {
+    return <Empty resource='loại chiến dịch' />;
   }
 
   return (
     <TableContainer>
       {!campaignTypeData.items.length ? (
-        <Empty resource="loại chiến dịch" />
+        <Empty resource='loại chiến dịch' />
       ) : (
         <Menus>
-          <Table columns="0.5fr 3.2fr 2.5fr 1.6fr 1.2fr">
+          <Table columns='0.5fr 2fr 2fr 1fr 1fr'>
             <Table.Header>
               <div>STT</div>
               <div>Tên loại chiến dịch</div>

@@ -42,6 +42,7 @@ const StackedTime = styled.span`
 
 const StackedTimeFrameAbove = styled.span`
   color: #2ecc71;
+  marginRight: -10px;
 `;
 
 const StackedTimeFrameBelow = styled.span`
@@ -111,8 +112,8 @@ function BrandRow({ brand, displayedIndex }) {
         </span>
       </StackedTime>
 
-      <StackedTime>
-        <span>
+      <StackedTime >
+        <span >
           Tổng nhận: <StackedTimeFrameAbove>{formatCurrency(totalIncome)}</StackedTimeFrameAbove>
         </span>
         <span>

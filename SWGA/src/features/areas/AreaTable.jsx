@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import Table from "../../ui/Table";
@@ -6,7 +6,7 @@ import Empty from "../../ui/Empty";
 import Pagination from "../../ui/Pagination";
 import SetRowsPerPage from "./SetRowsPerPage";
 import StackedHeader from "../../ui/StackedHeader";
-import { useAreas } from "../../hooks/areas/useAreas"; // Thay đổi đường dẫn import
+import { useAreas } from "../../hooks/areas/useAreas";
 import AreaRow from "./AreaRow";
 
 const StyledHeader = styled.div`
@@ -26,24 +26,35 @@ const StyledButton = styled.div`
 `;
 
 export default function AreaTable() {
-  const [limit, setLimit] = useState(10); // Mặc định size là 10
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Lấy limit và page từ URL, nếu không có thì mặc định
+  const limit = Number(searchParams.get("limit")) || 10;
+  const currentPage = Number(searchParams.get("page")) || 1;
+
   const [sortField, setSortField] = useState("Id");
   const [sortOrder, setSortOrder] = useState("desc");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchParams, setSearchParams] = useSearchParams();
 
-  // Gọi useAreas với các tham số
+  // Gọi API với các tham số từ URL
   const { isLoading, areas, error } = useAreas({
     page: currentPage,
     size: limit,
     search: searchParams.get("search") || "",
-    state: searchParams.get("state") === "true" ? true : false,
+    state: searchParams.get("state") === "true",
     isAsc: sortOrder === "asc",
   });
 
+  // Cập nhật URL khi limit thay đổi
   const onLimitChange = (newLimit) => {
-    setLimit(newLimit);
-    setCurrentPage(1); // Reset về trang 1 khi thay đổi limit
+    searchParams.set("limit", newLimit);
+    searchParams.set("page", 1);  // Reset về trang 1 khi đổi limit
+    setSearchParams(searchParams);
+  };
+
+  // Cập nhật URL khi đổi trang
+  const onPageChange = (page) => {
+    searchParams.set("page", page);
+    setSearchParams(searchParams);
   };
 
   const handleStackedClick = (clickedColumn) => {
@@ -51,13 +62,7 @@ export default function AreaTable() {
     setSortOrder((prevSortOrder) => (prevSortOrder === "asc" ? "desc" : "asc"));
   };
 
-  // if (isLoading) return <Spinner />;
   if (!areas?.result?.length) return <Empty resourceName="khu vực" />;
-
-  const filteredCategories = filterCategoriesByState(
-    areas.result,
-    searchParams.get("state")
-  );
 
   return (
     <Table columns="0.4fr 2.1fr 1.9fr 1fr 1.3fr 1fr">
@@ -81,46 +86,28 @@ export default function AreaTable() {
       </Table.Header>
 
       <Table.Body
-        data={filteredCategories}
+        data={areas.result}
         render={(area, index) => (
-          <StyledButton>
+          <StyledButton key={area.id}>
             <AreaRow
               area={area}
-              key={area.id}
               index={index + 1}
-              displayedIndex={
-                (areas.currentPage - 1) * areas.pageSize + index + 1
-              }
+              displayedIndex={(currentPage - 1) * limit + index + 1}
             />
           </StyledButton>
         )}
       />
       <Table.Footer>
         <Pagination
-          count={areas?.totalCount} // Sử dụng totalCount
+          count={areas.totalCount}
           currentPage={currentPage}
-          pageSize={areas?.pageSize}
-          pageCount={areas?.pageCount}
-          totalCount={areas?.totalCount}
-          onPageChange={(page) => setCurrentPage(page)} // Thêm sự kiện thay đổi trang
+          pageSize={limit}
+          pageCount={areas.pageCount}
+          totalCount={areas.totalCount}
+          onPageChange={onPageChange}
         />
-        <SetRowsPerPage
-          pageSize={areas?.pageSize}
-          onLimitChange={onLimitChange}
-        />
+        <SetRowsPerPage pageSize={limit} onLimitChange={onLimitChange} />
       </Table.Footer>
     </Table>
   );
-}
-
-function filterCategoriesByState(categories, filterValue) {
-  if (!filterValue || filterValue === "all") {
-    return categories;
-  }
-
-  const filteredStations = categories.filter((category) => {
-    return category.state === (filterValue === "true");
-  });
-
-  return filteredStations;
 }

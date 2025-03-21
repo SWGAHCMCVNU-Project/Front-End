@@ -3,6 +3,8 @@ import apiClient from "./apiClient";
 import { ACCOUNT_ENDPOINTS } from "./endpoints";
 import toast from 'react-hot-toast';
 import StorageService from "../../services/storageService"
+
+
 export const registerBrandAPI = async (formData, coverPhoto, navigate) => {
   try {
     // Định dạng dữ liệu từ UI trước khi gửi lên server
@@ -218,35 +220,24 @@ export const getAccountByIdAPI = async (id) => {
   }
 };
 
-export const updateAccountIdAPI = async (id, oldPassword, updatedData, navigate) => {
+export const updateAccountIdAPI = async (id, oldPassword, updatedData) => {
   try {
     const accountId = id || StorageService.getAccountId();
-    if (!accountId) {
-      toast.error("Account ID is required!");
-      return {
-        status: 400,
-        success: false,
-        message: "Account ID is required!",
-      };
-    }
+    if (!accountId) throw new Error("Account ID is required!");
 
-    const queryParams = new URLSearchParams({
-      oldPassword: oldPassword || "",
-    }).toString();
-
-    const requestBody = {
-      userName: updatedData.userName || "",
-      password: updatedData.password || "",
-      phone: updatedData.phone || "",
-      email: updatedData.email || "",
-    };
+    // Xây dựng query params (chỉ thêm nếu có giá trị)
+    const queryParams = new URLSearchParams();
+    if (oldPassword) queryParams.append("oldPassword", oldPassword);
+    if (updatedData.phone) queryParams.append("phone", updatedData.phone);
+    if (updatedData.email) queryParams.append("email", updatedData.email);
+    if (updatedData.password) queryParams.append("newPassword", updatedData.password);
 
     console.log("Updating account with ID:", accountId);
-    console.log("Request Body:", requestBody);
+    console.log("Query Params:", queryParams.toString());
 
     const response = await apiClient.put(
-      `${ACCOUNT_ENDPOINTS.UPDATEACCOUNT.replace("{id}", accountId)}?${queryParams}`,
-      requestBody,
+      `${ACCOUNT_ENDPOINTS.UPDATEACCOUNT.replace("{id}", accountId)}?${queryParams.toString()}`,
+      {}, // Không cần body vì tất cả dữ liệu đã nằm trong query params
       {
         headers: {
           "Content-Type": "application/json",
@@ -254,30 +245,15 @@ export const updateAccountIdAPI = async (id, oldPassword, updatedData, navigate)
       }
     );
 
-    if (response.data) {
-      // toast.success("Account updated successfully!");
-      navigate && navigate(); // `navigate` is `onCloseModal` (refetch function)
-      return {
-        status: response.status,
-        success: true,
-        data: response.data,
-      };
+    // Check if the response indicates success
+    if (response.status >= 200 && response.status < 300) {
+      return { success: true, data: response.data || {} };
     } else {
-      toast.error("Account update failed!");
-      return {
-        status: response.status,
-        success: false,
-        message: "No data received from server!",
-      };
+      throw new Error("Failed to update account");
     }
   } catch (error) {
-    console.error("Update Account API Error:", error.response?.data || error);
-    const errorMessage = error.response?.data?.message || "Failed to update account";
-    toast.error(errorMessage);
-    return {
-      status: error.response?.status || 500,
-      success: false,
-      message: errorMessage,
-    };
+    console.error("❌ Update Account API Error:", error.response?.data || error.message);
+    toast.error(error.response?.data?.message || "Cập nhật tài khoản thất bại!");
+    return { success: false, message: error.response?.data?.message || error.message };
   }
 };

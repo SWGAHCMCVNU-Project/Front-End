@@ -2,18 +2,30 @@ import apiClient from "./apiClient";
 import { CAMPAIGN_ENDPOINTS } from "./endpoints";
 
 // Hàm lấy danh sách tất cả các chiến dịch (giữ nguyên)
-export const getAllCampaignsAPI = async ({ sort, searchName, page, limit, brandIds, campaignTypeIds, statesFilterValue }) => {
+export const getAllCampaignsAPI = async ({
+  sort,
+  searchName,
+  page,
+  limit,
+  
+  campaignTypeIds,
+  statesFilterValue,
+}) => {
   try {
-    const params = new URLSearchParams();
-    if (sort) params.append('sort', sort);
-    if (searchName) params.append('searchName', searchName); // Thay search thành searchName
-    if (page) params.append('page', page);
-    if (limit) params.append('size', limit);
-    if (brandIds && Array.isArray(brandIds)) params.append('brandIds', brandIds.join(','));
-    if (campaignTypeIds && Array.isArray(campaignTypeIds)) params.append('campaignTypeIds', campaignTypeIds.join(','));
-    if (statesFilterValue) params.append('statesFilterValue', statesFilterValue);
-
-    const response = await apiClient.get(`${CAMPAIGN_ENDPOINTS.GET_ALL}?${params.toString()}`);
+    
+    
+    const response = await apiClient.get(CAMPAIGN_ENDPOINTS.GET_ALL, {
+      params: {
+        sort,
+        searchName,
+        page,
+        size: limit,
+       
+        campaignTypeIds: campaignTypeIds?.join(","),
+        statesFilterValue,
+      },
+    });
+    
     return response.data;
   } catch (error) {
     console.error("Error fetching all campaigns:", error);
@@ -54,34 +66,7 @@ export const createCampaignAPI = async (params) => {
       campaignDetails,
     } = params;
 
-    console.log("Params received in createCampaignAPI:", params);
-
-    if (
-      !brandId ||
-      !typeId ||
-      !campaignName ||
-      !condition ||
-      !startOn ||
-      !endOn ||
-      totalIncome === undefined ||
-      !description ||
-      !Array.isArray(storeIds) ||
-      storeIds.length === 0
-    ) {
-      console.log("Missing fields:", {
-        brandId,
-        typeId,
-        campaignName,
-        condition,
-        startOn,
-        endOn,
-        totalIncome,
-        description,
-        storeIds,
-      });
-      throw new Error("Missing required parameters");
-    }
-
+    // Tạo query string cho các trường không phải file
     const queryParams = new URLSearchParams();
     queryParams.append("brandId", brandId);
     queryParams.append("typeId", typeId);
@@ -92,20 +77,13 @@ export const createCampaignAPI = async (params) => {
     queryParams.append("endOn", endOn);
     queryParams.append("totalIncome", totalIncome);
     queryParams.append("description", description);
-
     storeIds.forEach((storeId) => {
       queryParams.append("storeIds", storeId);
     });
 
     const formData = new FormData();
-    if (image) formData.append("image", image); // Thêm file ảnh nếu có
-    if (campaignDetails) formData.append("campaignDetails", JSON.stringify(campaignDetails)); // Thêm campaignDetails nếu có
-    // Debug formData
-    for (let pair of formData.entries()) {
-      console.log("FormData entry:", pair[0], pair[1]);
-    }
-
-    console.log("Query params:", queryParams.toString());
+    if (image) formData.append("image", image);
+    if (campaignDetails) formData.append("campaignDetails", campaignDetails);
 
     const response = await apiClient.post(
       `${CAMPAIGN_ENDPOINTS.CREATE}?${queryParams.toString()}`,
@@ -116,11 +94,7 @@ export const createCampaignAPI = async (params) => {
         },
       }
     );
-
-    // Log response để kiểm tra campaign vừa tạo
-    console.log("Create Campaign Response:", response.data);
-
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error creating campaign:", error);
     console.error("Error response:", error.response?.data);
@@ -149,16 +123,16 @@ export const updateCampaignAPI = async (id, params) => {
       campaignDetails,
     } = params;
 
-    console.log("Params received in updateCampaignAPI:", params);
+    // console.log("Params received in updateCampaignAPI:", params);
 
     // Chỉ yêu cầu các trường chắc chắn có từ form
     if (!typeId || !campaignName || !condition || !description) {
-      console.log("Missing required fields:", {
-        typeId,
-        campaignName,
-        condition,
-        description,
-      });
+      // console.log("Missing required fields:", {
+      //   typeId,
+      //   campaignName,
+      //   condition,
+      //   description,
+      // });
       throw new Error("Missing required parameters");
     }
 
@@ -170,7 +144,8 @@ export const updateCampaignAPI = async (id, params) => {
     if (link) queryParams.append("link", link);
     if (startOn) queryParams.append("startOn", startOn);
     if (endOn) queryParams.append("endOn", endOn);
-    if (totalIncome !== undefined) queryParams.append("totalIncome", totalIncome);
+    if (totalIncome !== undefined)
+      queryParams.append("totalIncome", totalIncome);
     if (description) queryParams.append("description", description);
 
     // Gửi storeIds nếu có, không bắt buộc
@@ -182,10 +157,11 @@ export const updateCampaignAPI = async (id, params) => {
 
     const formData = new FormData();
     if (image) formData.append("image", image);
-    if (campaignDetails) formData.append("campaignDetails", JSON.stringify(campaignDetails));
+    if (campaignDetails)
+      formData.append("campaignDetails", JSON.stringify(campaignDetails));
 
-    console.log("Query params:", queryParams.toString());
-    console.log("Form data:", formData);
+    // console.log("Query params:", queryParams.toString());
+    // console.log("Form data:", formData);
 
     const url = CAMPAIGN_ENDPOINTS.UPDATE.replace("{id}", id);
     const response = await apiClient.put(

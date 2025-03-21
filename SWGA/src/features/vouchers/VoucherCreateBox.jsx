@@ -194,6 +194,35 @@ function VoucherCreateBox({ onCloseModal }) {
     setValue("description", htmlContent);
   };
 
+  // Helper function to compare two objects for changes
+  const hasChanges = (newData, originalData) => {
+    const fieldsToCompare = [
+      "voucherName",
+      "description",
+      "condition",
+      "typeId",
+      "price",
+      "rate",
+      "state",
+    ];
+
+    // Compare fields that exist in both objects
+    for (const field of fieldsToCompare) {
+      if (field in newData && field in originalData) {
+        if (newData[field] !== originalData[field]) {
+          return true; // Found a change
+        }
+      }
+    }
+
+    // Check if the image has changed
+    if (fileImageVoucherType !== null && fileImageVoucherType !== originalData.image) {
+      return true; // Image has changed
+    }
+
+    return false; // No changes detected
+  };
+
   function onSubmit(data) {
     if (!data.typeId) {
       setVoucherTypeError("Vui lòng chọn thể loại");
@@ -207,6 +236,14 @@ function VoucherCreateBox({ onCloseModal }) {
     };
 
     if (isEditSession) {
+      // Compare the new data with the original data
+      if (!hasChanges(voucherData, editValues)) {
+        toast.info("Không có thay đổi để cập nhật.");
+        onCloseModal?.();
+        navigate(`/vouchers/${editId}`);
+        return;
+      }
+
       updateVoucher(editId, voucherData, {
         onSuccess: () => {
           toast.success("Cập nhật voucher thành công!");
@@ -222,7 +259,7 @@ function VoucherCreateBox({ onCloseModal }) {
     } else {
       createVoucher(voucherData, {
         onSuccess: (response) => {
-          toast.success("Tạo voucher thành công!");
+          // toast.success("Tạo voucher thành công!");
           reset();
           setFileImageVoucherType(null);
           onCloseModal?.();

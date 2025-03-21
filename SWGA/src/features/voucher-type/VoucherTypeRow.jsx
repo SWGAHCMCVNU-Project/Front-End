@@ -2,7 +2,7 @@ import { HiEye, HiPencil, HiTrash } from "react-icons/hi2";
 import styled from "styled-components";
 import Table from "../../ui/Table";
 import Tag from "../../ui/Tag";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import logoDefault from "../../assets/images/brand.png";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import Modal from "../../ui/Modal";
@@ -77,15 +77,46 @@ const StyledAction = styled.div`
   justify-content: center;
 `;
 
-function VoucherTypeRow({ id, typeName, image, description, state, displayedIndex }) {
+function VoucherTypeRow({ id, typeName, image, description, state, displayedIndex, onUpdate }) {
   const [isValidImage, setIsValidImage] = useState(true);
   const { updateVoucherType, isLoading } = useUpdateVoucherType();
+  const modalRef = useRef(null);
 
   useEffect(() => {
     handleValidImageURL(image)
       .then((isValid) => setIsValidImage(isValid))
       .catch(() => setIsValidImage(false));
   }, [image]);
+
+  const handleCloseModal = () => {
+    // Thử nhiều selector khác nhau để tìm modal element
+    let modalElement = document.querySelector(`[data-modal-window="edit-${id}"]`);
+    if (!modalElement) {
+      modalElement = document.querySelector(`#edit-${id}`);
+    }
+    if (!modalElement) {
+      modalElement = document.querySelector(`[data-modal="edit-${id}"]`);
+    }
+    if (!modalElement) {
+      modalElement = document.querySelector(`dialog[data-modal-window="edit-${id}"]`);
+    }
+
+    if (modalElement) {
+      console.log("Found modal element:", modalElement);
+      modalElement.close();
+    } else {
+      console.warn("Modal element not found for edit-", id);
+      // Log tất cả dialog elements để debug
+      const allDialogs = document.querySelectorAll("dialog");
+      console.log("All dialog elements in DOM:", allDialogs);
+    }
+
+    // Fallback: Sử dụng ref nếu selector không tìm thấy
+    if (modalRef.current) {
+      console.log("Closing modal via ref for edit-", id);
+      modalRef.current.close();
+    }
+  };
 
   return (
     <Table.Row>
@@ -113,18 +144,22 @@ function VoucherTypeRow({ id, typeName, image, description, state, displayedInde
               <HiPencil />
             </StyledButton>
           </Modal.Open>
-          <Modal.Window name={`edit-${id}`}>
+          <Modal.Window name={`edit-${id}`} ref={modalRef}>
             <EditVoucherTypeForm
               voucherTypeToEdit={{ id, typeName, image, description, state }}
               onSubmit={updateVoucherType}
               isLoading={isLoading}
-              onClose={() => document.querySelector(`[data-modal-window="edit-${id}"]`)?.close()} // Đóng modal thủ công
+              onClose={handleCloseModal}
+              onSuccess={(updatedData) => {
+                console.log("onSuccess called with:", updatedData);
+                onUpdate(updatedData);
+              }}
             />
           </Modal.Window>
         </Modal>
 
         <Modal>
-          <Modal.Open opens={`delete-${id}`}>
+          <Modal.Open opens={`edit-${id}`}>
             <StyledButton>
               <HiTrash />
             </StyledButton>

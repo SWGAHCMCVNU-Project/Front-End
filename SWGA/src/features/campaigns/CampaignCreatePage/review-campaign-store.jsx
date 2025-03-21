@@ -33,7 +33,7 @@ function ReviewCampaignStore() {
   // Memoize filtered stores để tránh lặp không cần thiết
   const filteredCampaignStores = useMemo(() => {
     const filtered = stores?.result?.filter((c) => c.state) || [];
-    console.log("Filtered stores:", filtered); // Chỉ log một lần khi filtered thay đổi
+    // console.log("Filtered stores:", filtered); // Chỉ log một lần khi filtered thay đổi
     return filtered;
   }, [stores?.result]);
 
@@ -53,7 +53,7 @@ function ReviewCampaignStore() {
       );
     } else {
       setCampaignStoreOptions([]);
-      console.log("No stores found with state=true or stores is empty");
+      // console.log("No stores found with state=true or stores is empty");
     }
   }, [filteredCampaignStores]);
 
@@ -61,11 +61,11 @@ function ReviewCampaignStore() {
   useEffect(() => {
     if (newCampaign?.campaignStores !== undefined) {
       const selectedStoreIds = newCampaign?.campaignStores?.map((option) => option.storeId) || [];
-      console.log("Selected store IDs from newCampaign:", selectedStoreIds);
+      // console.log("Selected store IDs from newCampaign:", selectedStoreIds);
       setSelectedItems(selectedStoreIds);
     } else if (campaignStoreOptions.length > 0) {
       const initialSelectedIds = campaignStoreOptions.map((option) => option.value);
-      console.log("Initial selected IDs from campaignStoreOptions:", initialSelectedIds);
+      // console.log("Initial selected IDs from campaignStoreOptions:", initialSelectedIds);
       setSelectedItems(initialSelectedIds);
     }
   }, [newCampaign?.campaignStores, campaignStoreOptions]);
@@ -76,13 +76,13 @@ function ReviewCampaignStore() {
       ...prev,
       storeIds: selectedItems, // Cập nhật storeIds vào newCampaign
     }));
-    console.log("Updated newCampaign.storeIds:", selectedItems);
+    // console.log("Updated newCampaign.storeIds:", selectedItems);
   }, [selectedItems, setNewCampaign]);
 
   // Log dữ liệu từ useStores để debug
   useEffect(() => {
-    console.log("Stores data from useStores:", stores);
-    console.log("Error from useStores:", error);
+    // console.log("Stores data from useStores:", stores);
+    // console.log("Error from useStores:", error);
   }, [stores, error]);
 
   const columns = [

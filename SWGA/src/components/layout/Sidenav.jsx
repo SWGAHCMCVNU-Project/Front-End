@@ -127,6 +127,24 @@ function Sidenav({ color }) {
           allowedRoles: ["admin", "brand"],
         },
         {
+          key: "16", // Moved from brand section
+          linkURL: "/voucher-type",
+          pageName: "voucher-type",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faTicket} />,
+          labelPageName: "Thể loại",
+          allowedRoles: ["admin"], // Changed to admin only
+        },
+        {
+          key: "18", // Moved from brand section
+          linkURL: "/campaign-type",
+          pageName: "campaign-type",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faCalendarDays} />,
+          labelPageName: "Loại chiến dịch",
+          allowedRoles: ["admin"], // Changed to admin only
+        },
+        {
           key: "4",
           linkURL: "/orders",
           pageName: "orders",
@@ -220,30 +238,12 @@ function Sidenav({ color }) {
           allowedRoles: ["brand"],
         },
         {
-          key: "16",
-          linkURL: "/voucher-type",
-          pageName: "voucher-type",
-          color: color,
-          iconPage: <FontAwesomeIcon icon={faTicket} />,
-          labelPageName: "Thể loại",
-          allowedRoles: ["brand"],
-        },
-        {
           key: "17",
           linkURL: "/vouchers",
           pageName: "vouchers",
           color: color,
           iconPage: <HiMiniTicket />,
           labelPageName: "Phiếu mẫu",
-          allowedRoles: ["brand"],
-        },
-        {
-          key: "18",
-          linkURL: "/campaign-type",
-          pageName: "campaign-type",
-          color: color,
-          iconPage: <FontAwesomeIcon icon={faCalendarDays} />,
-          labelPageName: "Loại chiến dịch",
           allowedRoles: ["brand"],
         },
         {
@@ -271,15 +271,6 @@ function Sidenav({ color }) {
           iconPage: <ProfileOutlined />,
           labelPageName: "Thông tin chi tiết",
           allowedRoles: ["admin", "brand", "staff", "campus"],
-        },
-        {
-          key: "21", // New menu item for "Hồ sơ"
-          linkURL: "/account",
-          pageName: "account",
-          color: color,
-          iconPage: <ProfileOutlined />, // Reusing the ProfileOutlined icon; you can change it if needed
-          labelPageName: "Hồ sơ",
-          allowedRoles: ["admin", "brand"], // Accessible to both admin and brand roles
         },
       ],
     },

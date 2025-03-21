@@ -13,6 +13,7 @@ export const createCampaignType = async ({ typeName, description, image, state =
     if (image) {
       formData.append("image", image, image.name);
     }
+console.log("image", image, image.name);
 
     const response = await apiClient.post(CAMPAIGN_TYPE_ENDPOINTS.CREATE, formData, {
       headers: {

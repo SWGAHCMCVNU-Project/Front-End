@@ -1,8 +1,9 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import PaginationContext from "../../../context/PaginationContext";
 import useGetAllCampaigns from "../../../hooks/campaign/useGetAllCampaigns";
 import { useTablePagination } from "../../../hooks/useTablePagination";
+// import StorageService from "../../../services/storageService";
 
 export function useCampaign() {
   return useContext(PaginationContext);
@@ -10,11 +11,19 @@ export function useCampaign() {
 
 export function CampaignProvider({ children }) {
   const [searchParams] = useSearchParams();
-  const { page: initialPage, limit: initialSize, handlePageChange: setInitialPage, handleLimitChange: handleSizeChange } = useTablePagination(1, 10);
+  const { page: initialPage, limit: initialSize, handlePageChange: setInitialPage, handleLimitChange: setInitialSize } = useTablePagination(1, 10);
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [sort, setSort] = useState("Id,desc");
   const [statesFilterValue, setStatesFilterValue] = useState(undefined);
   const [errorMessage, setErrorMessage] = useState(null);
+
+  useEffect(() => {
+    setCurrentPage(initialPage);
+  }, [initialPage]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [initialSize]);
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
@@ -22,72 +31,74 @@ export function CampaignProvider({ children }) {
   };
 
   const handleSizeChangeWithReset = (newSize) => {
-    handleSizeChange(newSize);
+    setInitialSize(newSize);
     setCurrentPage(1);
   };
 
-  useEffect(() => {
-    setCurrentPage(initialPage);
-  }, [initialPage]);
-
-  useEffect(() => {
-    // Re-fetch khi initialSize thay đổi
-    setCurrentPage(1); // Reset về trang 1 khi thay đổi size
-  }, [initialSize]);
-
   const search = searchParams.get("search") || null;
-  const brandIds = searchParams.get("brandIds") ? searchParams.get("brandIds").split(",") : null;
-  const campaignTypeIds = searchParams.get("campaignTypeIds") ? searchParams.get("campaignTypeIds").split(",") : null;
-
-  console.log('Params in CampaignProvider:', { search, brandIds, campaignTypeIds, statesFilterValue, initialSize });
+  const campaignTypeIds = searchParams.get("campaignTypeIds")?.split(",") || null;
 
   const {
     isLoading,
     data: campaigns,
     error,
-    refetch, // Thêm refetch để gọi lại thủ công
+    refetch,
   } = useGetAllCampaigns({
     sort,
     search,
     page: currentPage,
     size: initialSize,
-    brandIds,
     campaignTypeIds,
-    statesFilterValue
+    statesFilterValue,
   });
 
   useEffect(() => {
-    if (error) {
-      setErrorMessage("Không thể tải danh sách chiến dịch. Vui lòng thử lại sau.");
-      console.error("API error:", error);
-    } else {
-      setErrorMessage(null);
-    }
+    setErrorMessage(error ? "Không thể tải danh sách chiến dịch. Vui lòng thử lại sau." : null);
+    if (error) console.error("API error:", error);
   }, [error]);
 
-  useEffect(() => {
-    // Gọi refetch khi initialSize thay đổi
-    refetch();
-  }, [initialSize, refetch]);
+  // const brandId = useMemo(() => StorageService.getBrandId(), []);
+  // const roleLogin = useMemo(() => StorageService.getRoleLogin(), []);
 
-  const mappedCampaigns = campaigns
-    ? { result: campaigns.items || [], totalCount: campaigns.total || 0 }
-    : { result: [], totalCount: 0 };
+  const mappedCampaigns = useMemo(
+    () => ({
+      result: campaigns?.items || [],
+      totalCount: campaigns?.total || 0,
+    }),
+    [campaigns]
+  );
 
-  const value = {
-    isLoading,
-    campaigns: mappedCampaigns,
-    error,
-    errorMessage,
-    page: currentPage,
-    size: initialSize,
-    handlePageChange,
-    handleLimitChange: handleSizeChangeWithReset,
-    sort,
-    setSort,
-    statesFilterValue,
-    setStatesFilterValue
-  };
+  const value = useMemo(
+    () => ({
+      isLoading,
+      campaigns: mappedCampaigns,
+      error,
+      errorMessage,
+      page: currentPage,
+      size: initialSize,
+      handlePageChange,
+      handleLimitChange: handleSizeChangeWithReset,
+      sort,
+      setSort,
+      statesFilterValue,
+      setStatesFilterValue,
+      refetch,
+      // brandId: brandId ?? (roleLogin === "admin" ? null : undefined),
+    }),
+    [
+      isLoading,
+      mappedCampaigns,
+      error,
+      errorMessage,
+      currentPage,
+      initialSize,
+      sort,
+      statesFilterValue,
+      refetch,
+      // brandId,
+      // roleLogin,
+    ]
+  );
 
   return <PaginationContext.Provider value={value}>{children}</PaginationContext.Provider>;
 }

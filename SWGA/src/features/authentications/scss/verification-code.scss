@@ -1,0 +1,43 @@
+.custom-styles-verification {
+    height: 25vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.header-description-verification {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+        "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+        sans-serif;
+    text-align: center;
+    font-size: 1.7rem;
+}
+
+.header-login-verification {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.card-verification-code {
+    width: 40%;
+    margin: auto;
+}
+
+.btn-verification-code {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.btn-send-verification {
+    border: none;
+    box-shadow: none;
+    font-size: 16px;
+    color: var(--color-green-600);    
+    font-weight: 600;
+    
+    &:hover {
+        color: var(--color-green-700);
+    }
+}
