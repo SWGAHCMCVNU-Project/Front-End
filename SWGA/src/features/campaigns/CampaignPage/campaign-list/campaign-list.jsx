@@ -128,7 +128,7 @@ function CampaignList() {
 
   if (!campaigns?.result?.length) return <Empty resourceName="chiến dịch" />;
 
-  console.log('🔍 Campaigns result trong CampaignList:', campaigns?.result);
+  // console.log('🔍 Campaigns result trong CampaignList:', campaigns?.result);
 
   const data = campaigns?.result?.map((campaign, index) => {
     const dataIndex = !isNaN((page - 1) * size + index + 1) ? (page - 1) * size + index + 1 : index + 1;

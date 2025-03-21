@@ -52,10 +52,10 @@ function BrandProfile() {
   const { brand, loading: isLoading, error } = useBrand(brandId);
 
   // Debug: Log the state
-  console.log("BrandProfile - brandId:", brandId);
-  console.log("BrandProfile - isLoading:", isLoading);
-  console.log("BrandProfile - error:", error);
-  console.log("BrandProfile - brand:", brand);
+  // console.log("BrandProfile - brandId:", brandId);
+  // console.log("BrandProfile - isLoading:", isLoading);
+  // console.log("BrandProfile - error:", error);
+  // console.log("BrandProfile - brand:", brand);
 
   if (isLoading) return <Spinner />;
 

@@ -1,118 +1,79 @@
-import { Card, Spin } from "antd";
-import { useContext, useEffect, useState } from "react";
+import { Spin } from "antd";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { NextPrevContext } from "../../../context/NextPrevContext";
-import storageService from "../../../services/storageService";
 import { ButtonNextPrev } from "../../../ui/custom/Button/Button";
-import CreateCampaignVoucher from "./create-campaign-voucher";
+import ButtonCustom from "../../../ui/custom/Button/ButtonCustom";
+import CampaignVoucher from "./CampaignVoucher";
+import "./scss/campaign.scss";
 import toast from "react-hot-toast";
 
 function CampaignVoucherCost() {
   const { current, setCurrent, newCampaign, setNewCampaign } = useContext(NextPrevContext);
-  const [selectedItemVouchers, setSelectedItemVouchers] = useState([]);
-  const [costCampaign, setCostCampaign] = useState(0);
-  const brandId = storageService.getBrandId();
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  const { register, handleSubmit, reset, getValues, setValue, formState } = useForm({
-    defaultValues: newCampaign ? newCampaign : {}
+  const { handleSubmit } = useForm({
+    defaultValues: newCampaign || {}
   });
-  const { errors } = formState;
 
-  // Logic validate
-  const validateCampaignVoucherCost = (checkVoucherCost) => {
-    const errors = [];
-
-    if (!checkVoucherCost.brandId) {
-      errors.push("Brand ID is required");
-    }
-
-    if (!checkVoucherCost.campaignDetails || checkVoucherCost.campaignDetails.length === 0) {
-      errors.push("Please select at least one voucher");
-    }
-
-    if (checkVoucherCost.totalIncome <= 0) {
-      errors.push("Campaign cost must be greater than 0");
-    }
-
-    return errors.length === 0 ? null : errors;
+  const handleVoucherSelect = (vouchers) => {
+    setNewCampaign(prev => ({
+      ...prev,
+      campaignDetails: vouchers
+    }));
   };
 
-  function onSubmit(data) {
-    const checkVoucherCost = {
-      brandId: brandId,
-      totalIncome: costCampaign,
-      campaignDetails: selectedItemVouchers
-    };
+  const handleCostUpdate = (cost) => {
+    setNewCampaign(prev => ({
+      ...prev,
+      cost: cost
+    }));
+  };
 
-    const validationErrors = validateCampaignVoucherCost(checkVoucherCost);
-    if (validationErrors) {
-      validationErrors.forEach(error => toast.error(error));
-      return;
-    }
-
-    setNewCampaign({
-      ...newCampaign,
-      campaignDetails: selectedItemVouchers, // Lưu dưới dạng array
-      cost: costCampaign
-    });
-
-    if (current < 3) {
+  const onSubmit = () => {
+    setIsLoading(true);
+    try {
+      if (!newCampaign?.campaignDetails?.length) {
+        toast.error("Vui lòng chọn ít nhất một ưu đãi");
+        return;
+      }
       setCurrent(current + 1);
+    } catch {
+      toast.error("Có lỗi xảy ra, vui lòng thử lại");
+    } finally {
+      setIsLoading(false);
     }
-  }
+  };
 
-  function onSubmitPrev(data) {
-    setNewCampaign({
-      ...newCampaign,
-      campaignDetails: selectedItemVouchers, // Lưu dưới dạng array
-      cost: costCampaign
-    });
-    if (current > 0) {
-      setCurrent(current - 1);
-    }
-  }
+  const onError = () => {
+    toast.error("Vui lòng kiểm tra lại thông tin biểu mẫu!");
+  };
 
-  function onError(errors) {
-    console.log(errors);
-  }
+  const onSubmitPrev = () => {
+    setCurrent(current - 1);
+  };
 
   return (
     <>
       <div>
-        <Card className="card-noti">
-          <label>⚠️ Lưu ý: </label>
-          <span>
-            Những nội dung dưới đây sau khi tạo chiến dịch sẽ
-            <strong className="note-strong"> không thể chỉnh sửa</strong>, vui lòng kiểm tra trước khi
-            <strong className="note-strong"> xác nhận thông tin</strong>.
-          </span>
-        </Card>
-      </div>
-      <div>
-        <CreateCampaignVoucher
-          selectVoucher={setSelectedItemVouchers}
-          cost={setCostCampaign}
-          disabled={false}
+        <CampaignVoucher 
+          selectVoucher={handleVoucherSelect} 
+          cost={handleCostUpdate} 
+          disabled={isLoading} 
+          mode="create" 
         />
       </div>
       <div className="btn-next-prev">
-        <ButtonNextPrev
-          onClick={handleSubmit(onSubmitPrev, onError)}
-          disabled={false}
-        >
+        <ButtonNextPrev onClick={() => onSubmitPrev()} disabled={isLoading}>
           Quay lại
         </ButtonNextPrev>
-        <ButtonNextPrev
+        <ButtonCustom
           className="btn-next-form"
           onClick={handleSubmit(onSubmit, onError)}
-          disabled={false}
+          disabled={isLoading}
         >
-          Tiếp theo
-        </ButtonNextPrev>
+          {isLoading ? <Spin /> : "Tiếp theo"}
+        </ButtonCustom>
       </div>
     </>
   );

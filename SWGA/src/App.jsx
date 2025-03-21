@@ -36,7 +36,7 @@ import Main from "./components/layout/Main.jsx";
 import storageService from "./services/storageService";
 import VoucherCreatePage from "./pages/VoucherManagement/VoucherCreatePage.jsx";
 import Areas from "./pages/AreaManagement/Areas.jsx";
-import Area from "./pages/AreaManagement/Area.jsx";
+// import Area from "./pages/AreaManagement/Area.jsx";
 import Profile from "./pages/Profile.jsx";
 import CampaignType from "./pages/CampaignType/CampaignType.jsx";
 import StoreCreatePage from "./pages/StoreManagement/StoreCreatePage.jsx";
@@ -183,7 +183,7 @@ function App() {
                 </PrivateRoute>
               }
             />
-            <Route
+            {/* <Route
               path="/areas/:areaId"
               exact
               element={
@@ -191,7 +191,7 @@ function App() {
                   <Area />
                 </PrivateRoute>
               }
-            />
+            /> */}
             <Route
               path="/stores"
               exact

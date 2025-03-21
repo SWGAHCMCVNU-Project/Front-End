@@ -245,7 +245,7 @@ function StoreList() {
 
   return (
     <>
-      <Spin spinning={isLoading}>
+      {/* <Spin spinning={isLoading}> */}
         <TableItem
           columns={columns}
           dataSource={data}
@@ -258,7 +258,7 @@ function StoreList() {
           setLimit={handleLimitChange}
           handleRowClick={handleRowClick}
         />
-      </Spin>
+      {/* </Spin> */}
     </>
   );
 }

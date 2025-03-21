@@ -100,7 +100,7 @@ const TimeFrameHalf = styled.div`
 function StoreFormCreate() {
   const { isCreating, createStore, error } = useCreateStore();
   const brandId = storageService.getBrandId(); // Sử dụng getBrandId thay vì getLoginId
-  console.log("brandId from StorageService:", brandId);
+  // console.log("brandId from StorageService:", brandId);
 
 
   const { areas, isLoading: isLoadingAreas } = useAreas({ state: true });
@@ -171,7 +171,7 @@ function StoreFormCreate() {
     }
 
     // Log dữ liệu trước khi gửi để debug
-    console.log("Form Data before submission:", { ...data, brandId, avatar });
+    // console.log("Form Data before submission:", { ...data, brandId, avatar });
 
     createStore({ ...data, brandId, avatar });
   }

@@ -53,6 +53,7 @@ export const AUTH_ENDPOINTS = {
     GET_BY_ID: "/Campaign/{id}",
     CREATE: "/Campaign",
     UPDATE: "/Campaign/{id}",
+    GET_ALL_CAMPAIGN: "Campaign/getAll"
   };
   export const CAMPAIGN_DETAIL_ENDPOINTS = {
     GET_VOUCHER: "/CampaignDetail",

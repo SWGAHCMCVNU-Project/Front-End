@@ -1,33 +1,42 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAllCampaignsAPI } from "../../store/api/campaignApi";
-// import { useBrand } from "../brand/useBrand";
+
 import { toast } from "react-hot-toast";
 
-const useGetAllCampaigns = ({ 
-  sort, 
-  search, 
-  page, 
-  size, 
-  campaignTypeIds, 
-  statesFilterValue 
+const useGetAllCampaigns = ({
+  sort,
+  search,
+  page,
+  size,
+  campaignTypeIds,
+  statesFilterValue,
+  brandId,
+  enabled = true,
 } = {}) => {
-  // const { brand } = useBrand();
-  // const brandId = brand?.id; // Lấy brandId từ useBrand
-
   const params = {
     sort,
     searchName: search,
     page,
     limit: size,
     campaignTypeIds,
-    statesFilterValue: statesFilterValue === "3,4" ? "3,4" : statesFilterValue || null,
-    // ...(brandId && { brandId }), // Chỉ thêm brandId nếu có
+    brandId,
+    statesFilterValue:
+      statesFilterValue === "3,4" ? "3,4" : statesFilterValue || null,
   };
 
   const queryResult = useQuery({
-    queryKey: ["campaigns", sort, search, page, size,  campaignTypeIds?.join(","), params.statesFilterValue],
+    queryKey: [
+      "campaigns",
+      sort,
+      search,
+      page,
+      size,
+      campaignTypeIds?.join(","),
+      params.statesFilterValue,
+      brandId,
+    ],
     queryFn: () => getAllCampaignsAPI(params),
-    // enabled: !!brandId, // Chỉ gọi API nếu có brandId
+    enabled,
     staleTime: 1000 * 60,
     onError: () => toast.error("Không thể tải danh sách chiến dịch"),
     keepPreviousData: true,

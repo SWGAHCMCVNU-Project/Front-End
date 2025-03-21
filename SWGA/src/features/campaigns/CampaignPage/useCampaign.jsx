@@ -57,8 +57,7 @@ export function CampaignProvider({ children }) {
     if (error) console.error("API error:", error);
   }, [error]);
 
-  // const brandId = useMemo(() => StorageService.getBrandId(), []);
-  // const roleLogin = useMemo(() => StorageService.getRoleLogin(), []);
+  
 
   const mappedCampaigns = useMemo(
     () => ({
@@ -83,7 +82,7 @@ export function CampaignProvider({ children }) {
       statesFilterValue,
       setStatesFilterValue,
       refetch,
-      // brandId: brandId ?? (roleLogin === "admin" ? null : undefined),
+      
     }),
     [
       isLoading,
@@ -95,8 +94,7 @@ export function CampaignProvider({ children }) {
       sort,
       statesFilterValue,
       refetch,
-      // brandId,
-      // roleLogin,
+      
     ]
   );
 

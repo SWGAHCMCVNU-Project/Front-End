@@ -110,12 +110,12 @@ function StoreFormUpdate() {
   const [storeToEdit, setStoreToEdit] = useState(location.state?.store);
 
   if (!storeToEdit) {
-    console.log("No store data found in location.state");
+    // console.log("No store data found in location.state");
     return <div>Không tìm thấy dữ liệu cửa hàng để chỉnh sửa. Vui lòng quay lại trang chi tiết cửa hàng.</div>;
   }
 
   // Debug the storeToEdit data
-  console.log("storeToEdit:", storeToEdit);
+  // console.log("storeToEdit:", storeToEdit);
 
   const { areas, isLoading: isLoadingAreas } = useAreas();
   const [areaOptions, setAreaOptions] = useState([]);

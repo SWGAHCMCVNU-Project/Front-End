@@ -170,7 +170,7 @@ function CampaignFormUpdate() {
   }
 
   function onError(errors) {
-    console.log("Validation errors:", errors);
+    // console.log("Validation errors:", errors);
   }
 
   return (

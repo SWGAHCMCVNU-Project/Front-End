@@ -1,8 +1,8 @@
 import { Avatar, Card, DatePicker, Spin, message } from "antd";
 import moment from "moment-timezone";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { NextPrevContext } from "../../../context/NextPrevContext";
 import Input from "../../../ui/Input";
 import { ButtonNextPrev } from "../../../ui/custom/Button/Button";
@@ -11,12 +11,11 @@ import { CustomFormEditorRow, CustomFormRow } from "../../../ui/custom/Form/Inpu
 import MyEditor from "../../../ui/custom/Form/TextEditor/MyEditor";
 import { FormSelect } from "../../../ui/custom/Select/SelectBox/SelectForm";
 import { useCampaignTypes } from "../../../hooks/campaign-type/useCampaignTypes";
-import ReviewCampaignStore from "./review-campaign-store";
-import ReviewCampaignVoucher from "./review-campaign-voucher";
-import "./scss/campaign-review.scss";
+import CampaignStore from "./CampaignStore";
+import CampaignVoucher from "./CampaignVoucher";
+import "./scss/campaign.scss";
 import useCreateCampaign from "../../../hooks/campaign/useCreateCampaign";
 import StorageService from "../../../services/storageService";
-import { useNavigate } from "react-router-dom";
 
 const StyledDataBox = styled.section`
   background-color: var(--color-grey-0);
@@ -85,61 +84,28 @@ const formatDateToObject = (date) => {
 // Hàm chuyển array campaignDetails thành string theo định dạng backend mong muốn
 const convertCampaignDetailsToString = (details) => {
   if (!Array.isArray(details) || details.length === 0) return "";
-
-  // Chuyển array thành JSON string
   return JSON.stringify(details);
 };
 
 function CampaignReview() {
   const { current, setCurrent, newCampaign } = useContext(NextPrevContext);
-  const { mutate: createNewCampaign, isCreating, isSuccess, isError, error } = useCreateCampaign();
+  const { mutate: createNewCampaign, isCreating } = useCreateCampaign();
   const { campaignTypes } = useCampaignTypes();
-  const [campaignTypesOptions, setCampaignTypesOptions] = useState([]);
-  const navigate = useNavigate();
-
-  const getDataSelectBox = () => {
-    if (campaignTypes && Array.isArray(campaignTypes)) {
-      const filteredCampaignTypes = campaignTypes.filter((c) => c.state);
-      if (filteredCampaignTypes.length > 0) {
-        setCampaignTypesOptions(
-          filteredCampaignTypes.map((c) => ({ value: c.id, label: c.typeName }))
-        );
-      }
-    }
-  };
-
-  useEffect(() => {
-    getDataSelectBox();
-  }, [campaignTypes]);
-
-  const { register, handleSubmit, reset, getValues, setValue, formState } = useForm({
+  const { handleSubmit, setValue } = useForm({
     defaultValues: newCampaign ? newCampaign : {},
   });
-  const { errors } = formState;
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   useEffect(() => {
     if (newCampaign?.typeId !== undefined) {
       setValue("typeId", newCampaign?.typeId);
     }
-  }, [campaignTypesOptions, setValue, newCampaign]);
+  }, [setValue, newCampaign]);
 
   useEffect(() => {
-    if (isSuccess) {
-      message.success("Tạo thành công chiến dịch!");
-      setTimeout(() => {
-        navigate("/campaigns");
-      }, 2000);
-    }
-    if (isError) {
-      message.error(`Tạo chiến dịch thất bại: ${error?.message || "Lỗi không xác định"}`);
-    }
-  }, [isSuccess, isError, error, navigate]);
+    window.scrollTo(0, 0);
+  }, []);
 
-  function onSubmit(data) {
+  function onSubmit() {
     const startOn = newCampaign?.startOn
       ? formatDateToObject(newCampaign.startOn)
       : formatDateToObject(new Date());
@@ -147,34 +113,28 @@ function CampaignReview() {
       ? formatDateToObject(newCampaign.endOn)
       : formatDateToObject(new Date());
 
-    // Chuyển campaignDetails từ array thành string
     const campaignDetailsString = convertCampaignDetailsToString(newCampaign?.campaignDetails);
 
     const completeCampaignData = {
       ...newCampaign,
-      brandId: StorageService.getBrandId() || "default-brand-id",
-      typeId: newCampaign?.typeId || "default-type-id",
-      campaignName: newCampaign?.campaignName || "Default Campaign",
-      condition: newCampaign?.condition || "Default condition",
-      description: newCampaign?.description || "Default description",
+      brandId: StorageService.getBrandId(),
+      typeId: newCampaign?.typeId,
+      campaignName: newCampaign?.campaignName,
+      condition: newCampaign?.condition,
+      description: newCampaign?.description,
       startOn: startOn,
       endOn: endOn,
-      totalIncome: newCampaign?.totalIncome ?? 0,
-      storeIds: newCampaign?.storeIds || ["default-store-id"],
+      totalIncome: newCampaign?.cost ?? 0,
+      storeIds: newCampaign?.storeIds || [],
       link: newCampaign?.link || "",
       image: newCampaign?.image || null,
-      campaignDetails: campaignDetailsString, // Gửi dưới dạng string
+      campaignDetails: campaignDetailsString,
     };
-
-    console.log("newCampaign:", newCampaign);
-    console.log("completeCampaignData:", completeCampaignData);
-    console.log("campaignDetailsString:", campaignDetailsString);
 
     createNewCampaign(completeCampaignData);
   }
 
-  function onError(errors) {
-    console.log("Form errors:", errors);
+  function onError() {
     message.error("Vui lòng kiểm tra lại thông tin biểu mẫu!");
   }
 
@@ -243,7 +203,10 @@ function CampaignReview() {
                       <FormSelect
                         id="typeId"
                         value={newCampaign?.typeId ? newCampaign.typeId : null}
-                        options={campaignTypesOptions}
+                        options={campaignTypes?.filter(c => c.state).map(c => ({
+                          value: c.id,
+                          label: c.typeName
+                        }))}
                         disabled={true}
                       />
                     </div>
@@ -276,8 +239,16 @@ function CampaignReview() {
                   </CustomFormEditorRow>
                 </StyledDataBox>
                 <div className="review-select-table">
-                  <ReviewCampaignStore />
-                  <ReviewCampaignVoucher />
+                  <StyledDataBox>
+                    <div className="review-section store-section">
+                      <CampaignStore mode="review" />
+                    </div>
+                  </StyledDataBox>
+                  <StyledDataBox>
+                    <div className="review-section voucher-section">
+                      <CampaignVoucher mode="review" />
+                    </div>
+                  </StyledDataBox>
                 </div>
               </LeftFormHalf>
             </CampaignFormContainer>

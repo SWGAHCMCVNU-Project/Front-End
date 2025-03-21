@@ -3,8 +3,8 @@ import React, { useEffect, useState,useContext } from "react";
 import { useForm } from "react-hook-form";
 import { NextPrevContext } from "../../../context/NextPrevContext";
 import { ButtonNextPrev } from "../../../ui/custom/Button/Button";
-import CreateCampaignStore from "./create-campaign-store";
-import "./scss/campaign-msc.scss";
+import CampaignStore from "./CampaignStore";
+import "./scss/campaign.scss";
 
 function CampaignMSC() {
     const { current, setCurrent, newCampaign, setNewCampaign } = useContext(NextPrevContext);
@@ -22,7 +22,7 @@ function CampaignMSC() {
     const validateCampaignMSC = (options) => {
         const errors = [];
 
-        console.log("Validating with campaignStores:", options.campaignStores); // Debug log
+        // console.log("Validating with campaignStores:", options.campaignStores); // Debug log
         if (!options.campaignStores || !Array.isArray(options.campaignStores) || options.campaignStores.length === 0) {
             errors.push("Please select at least one store");
         }
@@ -31,14 +31,14 @@ function CampaignMSC() {
     };
 
     function onSubmit(data) {
-        console.log("Selected Item Stores in CampaignMSC:", selectedItemStores); // Debug log
+        // console.log("Selected Item Stores in CampaignMSC:", selectedItemStores); // Debug log
         const checkOptionValid = {
             campaignStores: selectedItemStores
         };
 
         const validationErrors = validateCampaignMSC(checkOptionValid);
         if (validationErrors) {
-            console.log("Validation errors:", validationErrors);
+            // console.log("Validation errors:", validationErrors);
             return;
         }
 
@@ -78,7 +78,7 @@ function CampaignMSC() {
                 </Card>
             </div>
             <div className="msc-container">
-                <CreateCampaignStore
+                <CampaignStore
                     selectStore={setSelectedItemStores}
                     disabled={false}
                 />

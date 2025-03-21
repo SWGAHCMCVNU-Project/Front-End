@@ -8,7 +8,7 @@ import CampaignBasicInformation from "./campaign-basic-infor";
 import CampaignMSC from "./campaign-msc";
 import CampaignReview from "./campaign-review";
 import CampaignVoucherCost from "./campaign-voucher-cost";
-import "./scss/campaign-step.scss";
+import "./scss/campaign.scss";
 
 function CampaignStep() {
     const moveBack = useMoveBack();
