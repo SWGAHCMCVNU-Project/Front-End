@@ -451,7 +451,7 @@ function CampaignVoucher({ selectVoucher, cost, disabled = false, mode = "create
           const option = campaignVoucherOptions.find(o => o.value === props.value);
           if (!option) return null;
           return (
-            <Tag className="tag-select-items">
+            <Tag className="tag-select-items" style={{marginTop: "5px"}}>
               <div className="div-option-major">
                 <img
                   src={option.image || imgDefaultVoucher}

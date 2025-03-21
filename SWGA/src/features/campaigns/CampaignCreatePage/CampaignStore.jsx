@@ -177,8 +177,8 @@ function CampaignStore({ selectStore, disabled = false, mode = "create" }) {
         tagRender={({ value }) => {
           const option = campaignStoreOptions.find(o => o.value === value);
           if (!option) return null;
-          return (
-            <Tag className="tag-select-items">
+          return ( 
+            <Tag className="tag-select-items" style={{marginTop: "5px"}}>
               <div className="div-option-major">
                 <img
                   src={option.image || imgDefaultStore}
