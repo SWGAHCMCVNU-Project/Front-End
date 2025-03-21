@@ -10,8 +10,6 @@ const useGetAllCampaigns = ({
   size,
   campaignTypeIds,
   statesFilterValue,
-  brandId,
-  enabled = true,
 } = {}) => {
   const params = {
     sort,
@@ -19,7 +17,6 @@ const useGetAllCampaigns = ({
     page,
     limit: size,
     campaignTypeIds,
-    brandId,
     statesFilterValue:
       statesFilterValue === "3,4" ? "3,4" : statesFilterValue || null,
   };
@@ -33,10 +30,9 @@ const useGetAllCampaigns = ({
       size,
       campaignTypeIds?.join(","),
       params.statesFilterValue,
-      brandId,
     ],
     queryFn: () => getAllCampaignsAPI(params),
-    enabled,
+
     staleTime: 1000 * 60,
     onError: () => toast.error("Không thể tải danh sách chiến dịch"),
     keepPreviousData: true,

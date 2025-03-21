@@ -60,3 +60,7 @@ export const AUTH_ENDPOINTS = {
     GET_VOUCHER_BY_ID: "/CampaignDetail/{id}",
 
   };
+  export const EMAIL_ENDPOINTS = {
+  SEND_CODE_EMAIL_AGAIN: "/Email",
+
+  };

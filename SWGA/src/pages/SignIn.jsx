@@ -7,8 +7,9 @@ import signinbg from "../assets/images/ảnh ví.png";
 import { login } from "../store/api/authApi";
 import { useVerifyAccount } from "../hooks/account/useVerifyAccount";
 import storageService from "../services/storageService";
-import VerificationCode from "../features/authentications/verification-code"; // Điều chỉnh path theo thư mục của bạn
+import VerificationCode from "../features/authentications/verification-code";
 import Row from "../ui/Row";
+import { getAccountByIdAPI } from "../store/api/registerAPI";
 
 const { Footer, Content } = Layout;
 
@@ -18,14 +19,12 @@ function SignIn() {
   const [loginData, setLoginData] = useState(null);
   const navigate = useNavigate();
   const [form] = Form.useForm();
-  const { verifyUserAccount, isLoading: isVerifying, error: verifyError } = useVerifyAccount();
+  const { verifyUserAccount, resendVerificationCode, isLoading: isVerifying, error: verifyError } = useVerifyAccount();
 
   const handleLogin = async (values) => {
     try {
       setIsLoading(true);
       const response = await login(values.username.trim(), values.password);
-
-      // console.log("responsefe", response);
 
       if (response.success) {
         const { role, token, brandId, isVerify, loginId } = response.data;
@@ -35,7 +34,18 @@ function SignIn() {
         if (brandId) storageService.setBrandId(brandId);
 
         if (!isVerify) {
-          setLoginData({ userName: values.username, accountId: loginId });
+          // Lấy thông tin email từ account detail
+          const accountResponse = await getAccountByIdAPI(loginId);
+          if (!accountResponse.success) {
+            toast.error("Không thể lấy thông tin tài khoản!");
+            return;
+          }
+
+          setLoginData({ 
+            userName: values.username, 
+            accountId: loginId,
+            email: accountResponse.data.email // Lấy email từ account detail
+          });
           setShowVerifyModal(true);
         } else {
           toast.success("Đăng nhập thành công!");
@@ -53,44 +63,54 @@ function SignIn() {
   };
 
   const handleVerify = async (verificationCode) => {
-    if (!verificationCode || verificationCode.length < 6) {
+    const code = verificationCode?.trim();
+    console.log('Verification code:', code, 'Length:', code?.length);
+
+    if (!code || code.length < 6) {
       toast.error("Vui lòng nhập mã xác minh đầy đủ!");
       return;
     }
 
-    const result = await verifyUserAccount(
-      loginData.accountId,
-      loginData.userName, // Giả sử username = email
-      verificationCode
-    );
+    try {
+      const result = await verifyUserAccount(
+        loginData.accountId,
+        loginData.email, // Sử dụng email từ account detail
+        code
+      );
 
-    if (result.success) {
-      storageService.setItem('isVerify', true);
-      toast.success("Xác minh thành công!");
-      setShowVerifyModal(false);
-      navigate("/dashboard", { replace: true });
-    } else {
-      toast.error(result.message || "Mã xác minh không đúng!");
+      if (result.success) {
+        // toast.success("Xác minh thành công!");
+        setShowVerifyModal(false);
+        navigate("/dashboard", { replace: true });
+      } else {
+        toast.error(result.message || "Xác minh thất bại!");
+      }
+    } catch (error) {
+      console.error("Lỗi xác minh:", error);
+      toast.error("Có lỗi xảy ra khi xác minh!");
     }
   };
 
   const handleSendAgain = async () => {
-    // Gọi verifyUserAccount với code = null để gửi lại mã
-    const result = await verifyUserAccount(
-      loginData.accountId,
-      loginData.userName,
-      null // Backend xử lý gửi lại mã
-    );
+    if (!loginData?.email) {
+      toast.error("Thiếu thông tin email để gửi lại mã!");
+      return;
+    }
 
-    if (result.success) {
-      toast.success("Đã gửi lại mã xác minh!");
-    } else {
-      toast.error(result.message || "Không thể gửi lại mã!");
+    try {
+      const result = await resendVerificationCode(loginData.email);
+      if (!result.success) {
+        toast.error(result.message || "Không thể gửi lại mã. Vui lòng thử lại!");
+      }
+    } catch (error) {
+      console.error("Lỗi khi gửi lại mã:", error);
+      toast.error("Không thể gửi lại mã. Vui lòng thử lại!");
     }
   };
 
   const handleCancel = () => {
     setShowVerifyModal(false);
+    form.resetFields();
   };
 
   return (
@@ -175,7 +195,7 @@ function SignIn() {
         centered
       >
         <VerificationCode
-          email={loginData?.userName}
+          email={loginData?.email}
           isLoading={isVerifying}
           error={verifyError}
           onVerify={handleVerify}
