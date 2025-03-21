@@ -1,8 +1,9 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
+import PropTypes from 'prop-types';
 import PaginationContext from "../../../context/PaginationContext";
 import { useTablePagination } from "../../../hooks/useTablePagination";
-import useGetCampaignById from "../../../hooks/campaign/useGetCampaignById"; // Import custom hook
+import useGetStoresByCampaignId from "../../../hooks/campaignDetail/useGetStoresByCampaignId";
 
 export function useCampaignStore() {
     return useContext(PaginationContext);
@@ -19,41 +20,43 @@ export function CampaignStoreProvider({ children }) {
     const [areasFilter, setAreasFilter] = useState([]);
     const [areasFilterValue, setAreasFilterValue] = useState(null);
 
-    // Lấy giá trị tìm kiếm từ searchParams (hiện tại không được sử dụng vì API không hỗ trợ)
     const search = searchParams.get("search") !== "" ? searchParams.get("search") : null;
 
-    // Sử dụng custom hook useGetCampaignById
-    const {
-        isLoading,
-        data: campaignData,
-        error,
-    } = useGetCampaignById(campaignId);
+    // Sử dụng hook mới với pagination
+    const { stores, loading: isLoading, error, total, currentPage, totalPages } = useGetStoresByCampaignId(
+        campaignId,
+        search,
+        page,
+        limit
+    );
 
-    // Giả định campaignData chứa danh sách stores trong campaign (ví dụ: campaignData.stores)
-    // Vì không có phân trang từ API, ta tự phân trang trên frontend
-    const allStores = campaignData?.stores || [];
-    const totalStores = allStores.length;
-    
-    // Tính toán phân trang trên frontend
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    const paginatedStores = allStores.slice(startIndex, endIndex);
+    console.log('Stores from hook:', stores);
 
-    // Định dạng campaignStores theo cấu trúc { result: [], total: number }
+    // Format dữ liệu cho component
     const campaignStores = {
-        result: paginatedStores,
-        total: totalStores,
+        result: stores?.map(store => ({
+            id: store.id,
+            name: store.storeName,
+            brand: store.brandName,
+            avatar: store.avatar,
+            email: store.email,
+            phone: store.phone,
+            address: store.address,
+            openTime: store.openingHours,
+            closeTime: store.closingHours,
+            state: store.state ? "active" : "inactive"
+        })) || [],
+        total,
+        page: currentPage,
+        totalPages
     };
 
-    useEffect(() => {
-        if (error) {
-            console.error("API error in CampaignStoreProvider:", error);
-        }
-    }, [error]);
+    console.log('Formatted campaign stores:', campaignStores);
 
     const value = {
         isLoading,
-        campaignStores, // Truyền danh sách stores đã phân trang
+        error,
+        campaignStores,
         state,
         setState,
         page,
@@ -73,4 +76,15 @@ export function CampaignStoreProvider({ children }) {
     };
 
     return <PaginationContext.Provider value={value}>{children}</PaginationContext.Provider>;
+}
+
+// Add PropTypes validation
+CampaignStoreProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+};
+
+// Helper function để format thời gian
+function formatTime(timeObj) {
+    if (!timeObj) return "00:00";
+    return timeObj;
 }
