@@ -71,7 +71,7 @@ export const login = async (userName, password) => {
       ? StorageService.setItem('isVerify', isVerify)
       : localStorage.setItem('isVerify', JSON.stringify(isVerify)); // Fallback
 
-    console.log('✅ Thông tin người dùng đã lưu:', userData);
+    // console.log('✅ Thông tin người dùng đã lưu:', userData);
 
     return {
       success: true,

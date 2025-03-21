@@ -67,7 +67,7 @@ function BrandProfile() {
     <Container>
       <ButtonGroup>
         <Row type="horizontal">
-          "BrandProfile - brand:", brand
+       
           <HeadingGroup>
             <Heading as="h1">Thông tin thương hiệu</Heading>
           </HeadingGroup>
