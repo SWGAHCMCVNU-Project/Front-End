@@ -1,8 +1,28 @@
 .custom-styles-verification {
-    height: 25vh;
+    height: 120px;
     display: flex;
     justify-content: center;
     align-items: center;
+
+    .ReactInputVerificationCode__container {
+        width: 100%;
+        gap: 12px;
+        justify-content: center;
+        
+        .ReactInputVerificationCode__input {
+            width: 85px !important;
+            height: 45px !important;
+            border: 2px solid #ddd !important;
+            border-radius: 8px !important;
+            font-size: 20px !important;
+            font-weight: 600 !important;
+            
+            &:focus {
+                border-color: #21b658 !important;
+                box-shadow: 0 0 0 2px rgba(33, 182, 88, 0.2) !important;
+            }
+        }
+    }
 }
 
 .header-description-verification {
@@ -10,34 +30,61 @@
         "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
         sans-serif;
     text-align: center;
-    font-size: 1.7rem;
+    font-size: 14px;
+    margin: 20px 0;
+    color: #666;
+
+    strong {
+        color: #333;
+        word-break: break-all;
+    }
 }
 
 .header-login-verification {
     text-align: center;
     margin-top: 20px;
+
+    .signup-img {
+        width: 80px;
+        margin: 0 auto 16px;
+        
+        img {
+            width: 100%;
+            height: auto;
+        }
+    }
+
+    h2 {
+        font-size: 22px;
+        margin: 0;
+    }
 }
 
 .card-verification-code {
-    width: 40%;
+    width: 100%;
+    max-width: 490px;
     margin: auto;
+    padding: 30px;
 }
 
 .btn-verification-code {
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: space-between;
     margin-top: 20px;
+    padding: 0 20px;
 }
 
 .btn-send-verification {
     border: none;
     box-shadow: none;
-    font-size: 16px;
+    font-size: 14px;
     color: var(--color-green-600);    
     font-weight: 600;
+    padding: 0 4px;
     
     &:hover {
         color: var(--color-green-700);
+        background: none;
     }
 }

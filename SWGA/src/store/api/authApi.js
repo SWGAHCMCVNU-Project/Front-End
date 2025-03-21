@@ -1,7 +1,7 @@
 import apiClient from './apiClient';
 import toast from 'react-hot-toast';
 import StorageService from '../../services/storageService'; // Ensure this import is correct
-import { AUTH_ENDPOINTS } from './endpoints';
+import { AUTH_ENDPOINTS, EMAIL_ENDPOINTS } from './endpoints';
 
 const ROLE_MAPPING = {
   'Quản trị viên': 'admin',
@@ -66,12 +66,12 @@ export const login = async (userName, password) => {
     StorageService.setLoginId(accountId || '');
     if (brandId) StorageService.setBrandId(brandId);
 
-    // Use a custom method or localStorage directly if setItem isn’t defined
+    // Use a custom method or localStorage directly if setItem isn't defined
     StorageService.setItem
       ? StorageService.setItem('isVerify', isVerify)
       : localStorage.setItem('isVerify', JSON.stringify(isVerify)); // Fallback
 
-    console.log('✅ Thông tin người dùng đã lưu:', userData);
+    // console.log('✅ Thông tin người dùng đã lưu:', userData);
 
     return {
       success: true,
@@ -95,10 +95,18 @@ export const login = async (userName, password) => {
 
 export const verifyAccount = async (id, email, code) => {
   try {
+    // Nếu không có code, không gọi API verify
+    if (!code) {
+      return {
+        success: false,
+        message: "Vui lòng nhập mã xác minh!"
+      };
+    }
+
     const response = await apiClient.post(AUTH_ENDPOINTS.VERIFY_ACCOUNT, {
       id,
       email,
-      code,
+      code: code.toString() // Đảm bảo code là string
     });
 
     if (response.status !== 200 || !response.data) {
@@ -118,14 +126,16 @@ export const verifyAccount = async (id, email, code) => {
       };
     }
 
+    // Xác thực thành công
     toast.success('Xác minh tài khoản thành công!');
+    localStorage.setItem('isVerify', 'true');
+
     return {
       success: true,
       data: apiData,
     };
   } catch (error) {
     console.error('❌ Lỗi khi xác minh tài khoản:', error);
-    toast.error(ERROR_MESSAGES.VERIFY_ACCOUNT_ERROR);
     return {
       success: false,
       message: error.response?.data?.message || ERROR_MESSAGES.VERIFY_ACCOUNT_ERROR,
@@ -140,5 +150,32 @@ export const logout = () => {
   } catch (error) {
     console.error('Lỗi khi đăng xuất:', error);
     toast.error(ERROR_MESSAGES.LOGOUT_ERROR);
+  }
+};
+
+export const resendVerificationCode = async (email) => {
+  try {
+    const response = await apiClient.post(EMAIL_ENDPOINTS.SEND_CODE_EMAIL_AGAIN, {}, {
+      params: { email }  // Gửi email qua query params
+    });
+
+    if (response.status === 200) {
+      toast.success("Đã gửi lại mã xác minh!");
+      return {
+        success: true
+      };
+    }
+
+    return {
+      success: false,
+      message: response.data?.message || "Không thể gửi lại mã xác minh"
+    };
+
+  } catch (error) {
+    console.error('❌ Lỗi khi gửi lại mã:', error);
+    return {
+      success: false,
+      message: error.response?.data?.message || "Lỗi khi gửi lại mã xác minh"
+    };
   }
 };

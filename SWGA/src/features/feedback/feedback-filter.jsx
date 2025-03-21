@@ -46,7 +46,7 @@ function FeedbackFilter() {
   const { categoryFilter, setCategoryFilter, setCategoryFilterValue, status, setStatus } = useFeedback();
 
   useEffect(() => {
-    console.log('Running useEffect in FeedbackFilter, categories:', categories, 'categoryFilter:', categoryFilter);
+    // console.log('Running useEffect in FeedbackFilter, categories:', categories, 'categoryFilter:', categoryFilter);
     if (categories && categories.length > 0 && !categoryFilter.length) { // Chỉ set nếu categoryFilter rỗng và categories có dữ liệu
       setCategoryFilter(categories);
     }

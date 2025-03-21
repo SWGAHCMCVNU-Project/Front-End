@@ -1,9 +1,14 @@
 // api/campaignTypeApi.js
-import apiClient from './apiClient';
+import apiClient from "./apiClient";
 import { CAMPAIGN_TYPE_ENDPOINTS } from "./endpoints"; // Adjust path to endpoints.js
 import toast from "react-hot-toast";
 
-export const createCampaignType = async ({ typeName, description, image, state = true }) => {
+export const createCampaignType = async ({
+  typeName,
+  description,
+  image,
+  state = true,
+}) => {
   try {
     const formData = new FormData();
     formData.append("typeName", typeName || "");
@@ -13,14 +18,18 @@ export const createCampaignType = async ({ typeName, description, image, state =
     if (image) {
       formData.append("image", image, image.name);
     }
-console.log("image", image, image.name);
+    console.log("image", image, image.name);
 
-    const response = await apiClient.post(CAMPAIGN_TYPE_ENDPOINTS.CREATE, formData, {
-      headers: {
-        Accept: "text/plain",
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    const response = await apiClient.post(
+      CAMPAIGN_TYPE_ENDPOINTS.CREATE,
+      formData,
+      {
+        headers: {
+          Accept: "text/plain",
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
 
     if (response.status < 200 || response.status >= 300) {
       toast.error("Tạo loại chiến dịch thất bại!");
@@ -39,7 +48,10 @@ console.log("image", image, image.name);
   }
 };
 
-export const updateCampaignType = async (id, { typeName, description, image, state, status }) => {
+export const updateCampaignType = async (
+  id,
+  { typeName, description, image, state, status }
+) => {
   try {
     const formData = new FormData();
     formData.append("typeName", typeName || "");
@@ -70,10 +82,13 @@ export const updateCampaignType = async (id, { typeName, description, image, sta
     return { status: response.status, data: response.data };
   } catch (error) {
     console.error("Update campaign type API error:", error);
-    toast.error(error.message || "Đã có lỗi xảy ra khi cập nhật loại chiến dịch!");
+    toast.error(
+      error.message || "Đã có lỗi xảy ra khi cập nhật loại chiến dịch!"
+    );
     throw {
       status: error.response?.status || 500,
-      message: error.response?.data?.message || "Cập nhật loại chiến dịch thất bại",
+      message:
+        error.response?.data?.message || "Cập nhật loại chiến dịch thất bại",
       details: error.response?.data || error.message,
     };
   }
@@ -139,10 +154,14 @@ export const getAllCampaignTypes = async ({
     return responseData;
   } catch (error) {
     console.error("Error in getAllCampaignTypes:", error);
-    toast.error(error.message || "Đã có lỗi xảy ra khi lấy danh sách loại chiến dịch!");
+    toast.error(
+      error.message || "Đã có lỗi xảy ra khi lấy danh sách loại chiến dịch!"
+    );
     throw {
       status: error.response?.status || 500,
-      message: error.response?.data?.message || "Lấy danh sách loại chiến dịch thất bại",
+      message:
+        error.response?.data?.message ||
+        "Lấy danh sách loại chiến dịch thất bại",
       details: error.response?.data || error.message,
     };
   }
@@ -178,10 +197,14 @@ export const getCampaignTypeById = async (id) => {
     return responseData;
   } catch (error) {
     console.error("Error in getCampaignTypeById:", error);
-    toast.error(error.message || "Đã có lỗi xảy ra khi lấy thông tin loại chiến dịch!");
+    toast.error(
+      error.message || "Đã có lỗi xảy ra khi lấy thông tin loại chiến dịch!"
+    );
     throw {
       status: error.response?.status || 500,
-      message: error.response?.data?.message || "Lấy thông tin loại chiến dịch thất bại",
+      message:
+        error.response?.data?.message ||
+        "Lấy thông tin loại chiến dịch thất bại",
       details: error.response?.data || error.message,
     };
   }

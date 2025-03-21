@@ -7,7 +7,11 @@ import { toast } from "react-hot-toast";
 export function useArea() {
   const { areaId } = useParams();
 
-  const { isLoading, data: area, error } = useQuery({
+  const { 
+    isLoading, 
+    data, 
+    error 
+  } = useQuery({
     queryKey: ["area", areaId],
     queryFn: () => getAreaByIdAPI(areaId),
     enabled: !!areaId,
@@ -15,5 +19,9 @@ export function useArea() {
     onError: () => toast.error("Không thể tải thông tin khu vực"),
   });
 
-  return { isLoading, area, error };
+  return { 
+    isLoading, 
+    error,
+    area: data?.data 
+  };
 }

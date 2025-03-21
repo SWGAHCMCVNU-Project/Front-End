@@ -1,0 +1,273 @@
+// Combined styles for all campaign components
+@mixin price-font-color($color) {
+    color: $color;
+    font: {
+        size: 16px;
+        weight: bold;
+    }
+}
+
+// Campaign MSC styles
+.container-table {
+    display: block;
+    height: 400px;
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+.tbl-msc tbody {
+    height: 300px;
+}
+
+.btn-next-prev {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 2;
+}
+
+.msc-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5rem;
+    margin-bottom: 100px;
+}
+
+.card-noti {
+    margin-bottom: 20px;
+
+    label {
+        font-size: 16px;
+        font-weight: 600;
+        color: red;
+    }
+
+    span {
+        font-size: 16px;
+    }
+}
+
+.note-strong {
+    color: red;
+}
+
+.notification-create {
+    display: flex;
+    flex-direction: column;
+}
+
+.link-noti {
+    color: var(--color-green-600);
+    font-weight: 600;
+  
+    &:hover {
+        color: var(--color-green-700);
+    }
+}
+
+// Campaign Review styles
+.input-edit-quantity {
+    width: 60px;
+}
+
+.review-form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.review-form {
+    width: 85%;
+}
+
+.review-img-date {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.review-img-date-child {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    label {
+        font-weight: 600;
+    }
+}
+
+.review-img-date-child-2 {
+    @extend .review-img-date-child;
+    width: 40%;
+}
+
+.shape-review-avatar-campaign {
+    margin-top: 20px;
+    width: fit-content;
+    height: 25rem;
+    max-width: 100rem;
+}
+
+.avatar-review-campaign {
+    display: flex;
+    justify-content: center;
+}
+
+.campaign-review-major {
+    width: auto;
+    max-width: 25rem;
+    white-space: break-spaces;
+    text-align: justify;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.review-select-table {
+    margin-top: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+
+    .review-section {
+        width: 100%;
+
+        &.store-section {
+            margin-bottom: 0;
+        }
+
+        &.voucher-section {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.bottom-store-container {
+    margin-bottom: 0;
+}
+
+// Campaign Step styles
+.card-step {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.btn-next-form {
+    margin-left: 1rem;
+}
+
+.ant-steps-item-finish .ant-steps-item-icon {
+    background-color: #2ECC71;
+    border-color: #2ECC71;
+}
+
+.ant-steps-item-finish .ant-steps-item-icon>.ant-steps-icon {
+    color: #fff;
+}
+
+.ant-steps-item-process>.ant-steps-item-container>.ant-steps-item-icon {
+    background: #2ECC71;
+    border-color: #2ECC71;
+}
+
+.ant-steps-item-process > .ant-steps-item-container > .ant-steps-item-content > .ant-steps-item-title {
+    color: #2ECC71;
+}
+
+.ant-steps-item-finish > .ant-steps-item-container > .ant-steps-item-content > .ant-steps-item-title {
+    color: #2ECC71;
+}
+
+.ant-steps-horizontal:not(.ant-steps-label-vertical) .ant-steps-item-tail {
+    display: none;
+}
+
+.ant-steps-item-process>.ant-steps-item-container>.ant-steps-item-content>.ant-steps-item-title::after {
+    background-color: #9ca3af;
+}
+
+.ant-steps-item-wait>.ant-steps-item-container>.ant-steps-item-content>.ant-steps-item-title::after {
+    background-color: #9ca3af;
+}
+
+.ant-steps-item-finish>.ant-steps-item-container>.ant-steps-item-content>.ant-steps-item-title::after {
+    background-color: #2ECC71;
+}
+
+.ant-steps-item-wait>.ant-steps-item-container>.ant-steps-item-content>.ant-steps-item-title {
+    color: #6b7280;
+}
+
+.ant-steps-item-wait .ant-steps-item-icon > .ant-steps-icon {
+    color: #6b7280;
+}
+
+.ant-steps-item-wait .ant-steps-item-icon {
+    background-color: #fff;
+    border-color: #6b7280;
+}
+
+// Campaign Store styles
+.select-campaign-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+}
+
+.ant-select-dropdown {
+    .select-campaign-container {
+        .div-option-major {
+            img {
+                margin-top: 5px !important;
+            }
+        }
+    }
+}
+
+// Campaign Voucher styles
+.title-campaign-voucher {
+    width: 200px;
+    white-space: break-spaces;
+    line-height: 1.5;
+    margin-top: 10px;
+}
+
+.bottom-voucher-container {
+    margin-bottom: 100px;
+}
+
+.cost-container {  
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-right: 2%;
+    gap: 4rem;
+    margin-top: 1rem;
+    padding-bottom: 20px;
+
+    .cost-label {
+        @include price-font-color(#4b5563);
+    }
+}
+
+.cost-not-enough {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-right: 2%;
+    margin-top: 1rem;
+}
+
+.title-add-voucher-campaign {
+    max-width: 250px;
+    white-space: break-spaces;
+}
+
+.btn-action-layout {
+    margin-right: 1rem;
+} 

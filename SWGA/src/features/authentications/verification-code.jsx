@@ -23,6 +23,7 @@ function VerificationCode({
   const [isCodeExpired, setIsCodeExpired] = useState(false);
 
   const handleChangeCode = (value) => {
+    console.log('Code changed:', value, 'Length:', value?.length);
     setVerificationCode(value);
   };
 

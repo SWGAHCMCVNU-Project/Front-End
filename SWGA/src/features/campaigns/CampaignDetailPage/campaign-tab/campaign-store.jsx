@@ -49,31 +49,31 @@ function CampaignStore() {
 
     // Chuyển đổi dữ liệu từ campaignStores thành định dạng phù hợp với Table
     const dataSource = campaignStores?.result?.map((store, index) => ({
-        key: store.id || index + 1, // Giả định mỗi store có id, nếu không dùng index
+        key: store.id || index + 1,
         number: <div className="number-header"><span>{(page - 1) * limit + index + 1}</span></div>,
         StoreName: (
             <Avatar.Group>
                 <Avatar className="shape-avatar-product" shape="square" src={store.avatar || imgDefaultStore} />
                 <div className="avatar-info">
-                    <Title className="title-product-name" level={5}>{store.name || "Cửa hàng không tên"}</Title>
-                    <p className="p-column-table">{store.brand || "Thương hiệu không rõ"}</p>
+                    <Title className="title-product-name" level={5}>{store.name}</Title>
+                    <p className="p-column-table">{store.brand}</p>
                 </div>
             </Avatar.Group>
         ),
         Hours: (
             <StackedTime>
-                <span>Mở cửa: <StackedTimeFrameAbove>{store.openTime || "09:00"}</StackedTimeFrameAbove></span>
-                <span>Đóng cửa: <StackedTimeFrameBelow>{store.closeTime || "18:00"}</StackedTimeFrameBelow></span>
+                <span>Mở cửa: <StackedTimeFrameAbove>{store.openTime}</StackedTimeFrameAbove></span>
+                <span>Đóng cửa: <StackedTimeFrameBelow>{store.closeTime}</StackedTimeFrameBelow></span>
             </StackedTime>
         ),
         Contact: (
             <Stacked>
-                <span>{store.email || "email@example.com"}</span>
-                <span>{store.phone || "0987 654 321"}</span>
+                <span>{store.email}</span>
+                <span>{store.phone}</span>
             </Stacked>
         ),
-        Address: <div className="campaign-item-address">{store.address || "Địa chỉ không rõ"}</div>,
-        State: <Tag className="status-tag" color={store.state === "active" ? "cyan" : "red"}>{store.state || "Không rõ"}</Tag>,
+        Address: <div className="campaign-item-address">{store.address}</div>,
+        State: <Tag className="status-tag" color={store.state === "active" ? "cyan" : "red"}>{store.state}</Tag>,
     })) || [];
 
     const handleSort = (pagination, filters, sorter) => {

@@ -7,25 +7,48 @@ export const getAllCampaignsAPI = async ({
   searchName,
   page,
   limit,
-  
+
   campaignTypeIds,
   statesFilterValue,
 }) => {
   try {
-    
-    
     const response = await apiClient.get(CAMPAIGN_ENDPOINTS.GET_ALL, {
       params: {
         sort,
         searchName,
         page,
         size: limit,
-       
+
         campaignTypeIds: campaignTypeIds?.join(","),
         statesFilterValue,
       },
     });
-    
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all campaigns:", error);
+    throw error;
+  }
+};
+
+
+export const getAllCampaignsAdminAPI = async ({
+  sort,
+  searchName,
+  page,
+  limit,
+
+}) => {
+  try {
+    const response = await apiClient.get(CAMPAIGN_ENDPOINTS.GET_ALL_CAMPAIGN, {
+      params: {
+        sort,
+        searchName,
+        page,
+        size: limit,
+      },
+    });
+
     return response.data;
   } catch (error) {
     console.error("Error fetching all campaigns:", error);

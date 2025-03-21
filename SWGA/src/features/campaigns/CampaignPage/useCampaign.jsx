@@ -2,8 +2,10 @@ import { useContext, useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import PaginationContext from "../../../context/PaginationContext";
 import useGetAllCampaigns from "../../../hooks/campaign/useGetAllCampaigns";
+import useGetAllCampaignsAdmin from "../../../hooks/campaign/useGetAllCampaignsAdmin";
 import { useTablePagination } from "../../../hooks/useTablePagination";
-// import StorageService from "../../../services/storageService";
+import StorageService from "../../../services/storageService";
+import PropTypes from "prop-types";
 
 export function useCampaign() {
   return useContext(PaginationContext);
@@ -16,6 +18,9 @@ export function CampaignProvider({ children }) {
   const [sort, setSort] = useState("Id,desc");
   const [statesFilterValue, setStatesFilterValue] = useState(undefined);
   const [errorMessage, setErrorMessage] = useState(null);
+
+  const roleLogin = StorageService.getRoleLogin().toLowerCase();
+  const isAdmin = roleLogin === "admin";
 
   useEffect(() => {
     setCurrentPage(initialPage);
@@ -38,11 +43,12 @@ export function CampaignProvider({ children }) {
   const search = searchParams.get("search") || null;
   const campaignTypeIds = searchParams.get("campaignTypeIds")?.split(",") || null;
 
+  // Query cho brand (mặc định)
   const {
-    isLoading,
-    data: campaigns,
-    error,
-    refetch,
+    isLoading: isLoadingBrand,
+    data: campaignsBrand,
+    error: errorBrand,
+    refetch: refetchBrand,
   } = useGetAllCampaigns({
     sort,
     search,
@@ -50,15 +56,33 @@ export function CampaignProvider({ children }) {
     size: initialSize,
     campaignTypeIds,
     statesFilterValue,
+    enabled: !isAdmin, // Chỉ enable khi không phải admin
   });
+
+  // Query cho admin
+  const {
+    isLoading: isLoadingAdmin,
+    data: campaignsAdmin,
+    error: errorAdmin,
+    refetch: refetchAdmin,
+  } = useGetAllCampaignsAdmin({
+    sort,
+    search,
+    page: currentPage,
+    size: initialSize,
+    enabled: isAdmin, // Chỉ enable khi là admin
+  });
+
+  // Combine data dựa vào role
+  const isLoading = isAdmin ? isLoadingAdmin : isLoadingBrand;
+  const campaigns = isAdmin ? campaignsAdmin : campaignsBrand;
+  const error = isAdmin ? errorAdmin : errorBrand;
+  const refetch = isAdmin ? refetchAdmin : refetchBrand;
 
   useEffect(() => {
     setErrorMessage(error ? "Không thể tải danh sách chiến dịch. Vui lòng thử lại sau." : null);
     if (error) console.error("API error:", error);
   }, [error]);
-
-  // const brandId = useMemo(() => StorageService.getBrandId(), []);
-  // const roleLogin = useMemo(() => StorageService.getRoleLogin(), []);
 
   const mappedCampaigns = useMemo(
     () => ({
@@ -83,7 +107,7 @@ export function CampaignProvider({ children }) {
       statesFilterValue,
       setStatesFilterValue,
       refetch,
-      // brandId: brandId ?? (roleLogin === "admin" ? null : undefined),
+      isAdmin,
     }),
     [
       isLoading,
@@ -95,10 +119,13 @@ export function CampaignProvider({ children }) {
       sort,
       statesFilterValue,
       refetch,
-      // brandId,
-      // roleLogin,
+      isAdmin,
     ]
   );
 
   return <PaginationContext.Provider value={value}>{children}</PaginationContext.Provider>;
 }
+
+CampaignProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};

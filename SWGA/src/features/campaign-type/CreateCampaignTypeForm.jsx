@@ -46,7 +46,7 @@ const CreateCampaignTypeForm = ({ onCloseModal }) => {
 
     if (typeImage) {
       formData.image = typeImage;
-      console.log("Image to be uploaded:", typeImage);
+      // console.log("Image to be uploaded:", typeImage);
     }
 
     createCampaignType(formData, {

@@ -42,7 +42,7 @@ const StackedTime = styled.span`
 
 const StackedTimeFrameAbove = styled.span`
   color: #2ecc71;
-  marginRight: -10px;
+  
 `;
 
 const StackedTimeFrameBelow = styled.span`

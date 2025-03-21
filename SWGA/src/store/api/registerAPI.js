@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import StorageService from "../../services/storageService"
 
 
-export const registerBrandAPI = async (formData, coverPhoto, navigate) => {
+export const registerBrandAPI = async (formData, coverPhoto) => {
   try {
     // Định dạng dữ liệu từ UI trước khi gửi lên server
     const formatBrandData = (formData, coverPhoto) => {
@@ -67,16 +67,13 @@ export const registerBrandAPI = async (formData, coverPhoto, navigate) => {
     );
 
     // Xử lý phản hồi từ API
-    if (response.data) { // Giả sử server trả về dữ liệu thành công
-      toast.success('Đăng ký thành công!');
-      navigate('/sign-in', { replace: true });
+    if (response.data) {
       return {
         status: response.status,
         success: true,
         data: response.data,
       };
     } else {
-      toast.error('Đăng ký thất bại!');
       return {
         status: response.status,
         success: false,
@@ -86,7 +83,6 @@ export const registerBrandAPI = async (formData, coverPhoto, navigate) => {
   } catch (error) {
     console.error('Register API Error:', error);
     const errorMessage = error.response?.data?.message || "Đăng ký thất bại";
-    toast.error(errorMessage);
     return {
       status: error.response?.status || 500,
       success: false,
