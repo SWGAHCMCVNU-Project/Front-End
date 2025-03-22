@@ -16,6 +16,7 @@ export const AUTH_ENDPOINTS = {
     GET_ALL: '/Voucher',
     GET_BY_ID: '/Voucher/{id}',
     UPDATE: "/Voucher/{id}",
+    GET_VOUCHER_BY_ID: "/Voucher/campaign-detail/{id}"
   };
 
   export const VOUCHER_TYPE_ENDPOINTS = {
@@ -66,3 +67,14 @@ export const AUTH_ENDPOINTS = {
   SEND_CODE_EMAIL_AGAIN: "/Email",
 
   };
+  export const VOUCHER_ITEM_ENDPOINTS = {
+    GET_BY_CAMPAIGN_ID: "/VoucherItem",
+  };
+  export const POINT_PACKAGE = {
+    GET_ALL: "/PointPackage",
+    GET_BY_ID: "/PointPackage/{id}",
+    CREATE: "/PointPackage",
+    UPDATE: "/PointPackage/{id}",
+  }
+
+

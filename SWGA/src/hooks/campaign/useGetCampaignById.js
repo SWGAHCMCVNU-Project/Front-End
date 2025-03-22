@@ -1,13 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
 import { getCampaignByIdAPI } from '../../store/api/campaignApi';
 
-const useGetCampaignById = (id, params = {}) => {
-    const { state, sort, search, page, limit, brandsFilterValue, areasFilterValue } = params;
-
+const useGetCampaignById = (id) => {
     return useQuery({
-        queryKey: ['campaign', id, { state, sort, search, page, limit, brandsFilterValue, areasFilterValue }],
-        queryFn: () => getCampaignByIdAPI(id, params),
+        queryKey: ['campaign', id],
+        queryFn: () => getCampaignByIdAPI(id),
         enabled: !!id,
+        select: (data) => ({
+            ...data,
+            campaignDetailIds: data.campaignDetailId || []
+        }),
         onError: (error) => {
             console.error(`Error fetching campaign with ID ${id}:`, error);
         },

@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { Select } from "antd";
 import { FilterButtonRadio, StyledFilterRadio } from "../../../../ui/custom/Filter/Radio/RadioOptions";
-import { SelectFilter } from "../../../../ui/custom/Select/SelectFilter/SelectFilter";
-// import { useCampaignVoucherItem } from "../useCampaignVoucherItem";
-// import { useFilterCampaignVoucherItem } from "../useFilterItem";
+import { useCampaignVoucherItem } from "../useCampaignVoucherItem";
 import CampaignVoucherItems from "./campaign-voucher-items";
+import "./filter-item.scss";
 
 const filters = [
     <svg
@@ -27,21 +27,14 @@ const filters = [
 ];
 
 function ItemFilter() {
-    // const { vouchers } = useFilterCampaignVoucherItem();
-    // const {
-    //     campaignItemsFilter,
-    //     setCampaignItemsFilter,
-    //     setCampaignItemsFilterValue,
-    //     setIsBought,
-    //     setIsUsed,
-    // } = useCampaignVoucherItem();
+    const {
+        voucherGroups,
+        selectedVoucherId,
+        setSelectedVoucherId,
+        setIsBought,
+        setIsUsed,
+    } = useCampaignVoucherItem();
     const [selectedOption, setSelectedOption] = useState("");
-
-    // useEffect(() => {
-    //     if (vouchers?.result) {
-    //         setCampaignItemsFilter(vouchers?.result);
-    //     }
-    // }, [vouchers]);
 
     const optionStates = [
         { value: "", label: "Chưa mua" },
@@ -51,23 +44,23 @@ function ItemFilter() {
 
     const handleChangeState = (selectedOptionState) => {
         setSelectedOption(selectedOptionState);
-        // if (selectedOptionState === "bought") {
-        //     setIsBought(true);
-        //     setIsUsed(false);
-        // } else if (selectedOptionState === "used") {
-        //     setIsBought(true);
-        //     setIsUsed(true);
-        // } else {
-        //     setIsBought(false);
-        //     setIsUsed(false);
-        // }
+        if (selectedOptionState === "bought") {
+            setIsBought(true);
+            setIsUsed(false);
+        } else if (selectedOptionState === "used") {
+            setIsBought(true);
+            setIsUsed(true);
+        } else {
+            setIsBought(false);
+            setIsUsed(false);
+        }
     };
 
-    // Dữ liệu mẫu cho SelectFilter
-    const mockCampaignItemsFilter = [
-        { voucherName: "Voucher 1" },
-        { voucherName: "Voucher 2" },
-    ];
+    // Chuyển đổi voucherGroups thành format cho Select
+    const voucherOptions = Object.entries(voucherGroups).map(([voucherId, groupData]) => ({
+        value: voucherId,
+        label: `${groupData.voucher?.name || groupData.voucher?.voucherName || 'Chưa có tên voucher'} (${groupData.items.length} items)`
+    }));
 
     return (
         <>
@@ -89,14 +82,16 @@ function ItemFilter() {
                 <div className="custom-select-container-product">
                     {filters}
                     <div>
-                        <SelectFilter
-                            width={550}
-                            label="Phân loại"
-                            placeholder="Ưu đãi..."
-                            optionFilter={mockCampaignItemsFilter}
-                            optionLabelFilter="voucherName"
-                            onChange={() => {}} // Hàm rỗng để tránh lỗi
-                            onClear={() => {}} // Hàm rỗng để tránh lỗi
+                        {/* <div className="filter-label">Chọn Voucher</div> */}
+                        <Select
+                            style={{ width: 550 }}
+                            placeholder="Chọn voucher để xem danh sách..."
+                            options={voucherOptions}
+                            value={selectedVoucherId}
+                            onChange={setSelectedVoucherId}
+                            allowClear
+                            onClear={() => setSelectedVoucherId(null)}
+                            className="voucher-select"
                         />
                     </div>
                 </div>

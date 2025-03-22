@@ -223,6 +223,15 @@ function Sidenav({ color }) {
           labelPageName: "Khu vực",
           allowedRoles: ["admin"],
         },
+        {
+          key: "15",
+          linkURL: "/point-packages",
+          pageName: "point-packages",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faTicket} />,
+          labelPageName: "Gói điểm",
+          allowedRoles: ["admin"],
+        },
       ],
     },
     {

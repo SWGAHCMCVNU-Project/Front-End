@@ -328,7 +328,7 @@ function App() {
               path="/point-packages"
               exact
               element={
-                <PrivateRoute allowedRoles={["campus"]}>
+                <PrivateRoute allowedRoles={["admin"]}>
                   <PackagePoint />
                 </PrivateRoute>
               }

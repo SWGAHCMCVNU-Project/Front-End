@@ -2,19 +2,19 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import SearchBar from "../../ui/SearchBar";
 import TableOperations from "../../ui/TableOperations";
-import AddCampaignType from "./AddCampaignType";
+import AddPackagePoint from "./AddPackagePoint";
 
-function CampaignTypeTableOperations() {
+function PackageTableOperations() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
     if (searchTerm.trim() !== "") {
-      params.set("searchName", searchTerm.trim());
+      params.set("search", searchTerm.trim());
       params.set("page", "1");
     } else {
-      params.delete("searchName");
+      params.delete("search");
       params.set("page", "1");
     }
     setSearchParams(params);
@@ -40,11 +40,11 @@ function CampaignTypeTableOperations() {
         value={searchTerm}
         onChange={handleSearch}
         onKeyDown={handleKeyDown}
-        placeholder="Nhập tên loại chiến dịch"
+        placeholder="Nhập tên gói điểm"
       />
-      <AddCampaignType />
+      <AddPackagePoint />
     </TableOperations>
   );
 }
 
-export default CampaignTypeTableOperations;
+export default PackageTableOperations; 

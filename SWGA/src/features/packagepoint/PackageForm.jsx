@@ -1,83 +1,145 @@
-import { useState, useEffect } from "react"; // Loại bỏ useContext
+import { useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
 import styled from "styled-components";
-import Modal from "../../ui/Modal";
+import Button from "../../ui/Button";
 import Form from "../../ui/Form";
 import FormRow from "../../ui/FormRow";
-import { SelectForm } from "../../ui/custom/Select/SelectBox/SelectForm";
-import Button from "../../ui/Button";
-import usePackages from "./usePackages"; // Sử dụng usePackages thay vì context
+import { toast } from "react-hot-toast";
+import PropTypes from "prop-types";
+import { useCreatePointPackage } from "../../hooks/point-package/useCreatePointPackage";
+import { useUpdatePointPackage } from "../../hooks/point-package/useUpdatePointPackage";
 
-const StyledModal = styled(Modal)`
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  padding: 2rem;
-  max-width: 500px;
-  margin: 0 auto;
-  animation: slideIn 0.3s ease-in-out;
-
-  @keyframes slideIn {
-    from { transform: translateY(-20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
+const StyledInput = styled.input`
+  width: 100%;
+  border: 1px solid var(--color-grey-300);
+  background-color: var(--color-grey-0);
+  padding: 0.8rem 1.2rem;
+  border-radius: 5px;
+  box-shadow: var(--shadow-sm);
 `;
 
-function PackageForm({ isOpen, onClose, initialData }) {
-  const { buyPackage } = usePackages(); // Gọi usePackages để lấy buyPackage
-  const [formData, setFormData] = useState(initialData || {
-    packageId: mockData.mockPackages[0]?.id || 1,
-    campusId: 1, // Giả định campusId = 1
-    pointsPurchased: 0,
-    pricePaid: 0,
+const PackageForm = ({ packageToEdit = {}, onCloseModal }) => {
+  const { id: editId, packageName, point, price, status } = packageToEdit;
+  const isEditSession = Boolean(editId);
+
+  const { create, isLoading: isCreating } = useCreatePointPackage();
+  const { update, isLoading: isUpdating } = useUpdatePointPackage();
+  const queryClient = useQueryClient();
+
+  const { register, handleSubmit, reset, formState } = useForm({
+    defaultValues: isEditSession ? {
+      packageName: packageName || "",
+      point: point || 0,
+      price: price || 0,
+      status: status ?? true,
+    } : {
+      status: true
+    },
   });
+  const { errors } = formState;
 
-  const handleChange = (value) => {
-    const selectedPackage = mockData.mockPackages.find((pkg) => pkg.id === value);
-    setFormData({
-      packageId: selectedPackage.id,
-      campusId: 1,
-      pointsPurchased: selectedPackage.points,
-      pricePaid: selectedPackage.price,
-    });
+  const onSubmit = (data) => {
+    const formData = {
+      packageName: data.packageName?.trim() || "",
+      point: Number(data.point),
+      price: Number(data.price),
+      status: data.status ?? true,
+    };
+
+    if (!formData.packageName) {
+      toast.error("Vui lòng nhập tên gói điểm");
+      return;
+    }
+
+    if (isEditSession) {
+      update({ id: editId, data: formData }, {
+        onSuccess: () => {
+          reset();
+          onCloseModal?.();
+          queryClient.invalidateQueries(["pointPackages"]);
+        },
+      });
+    } else {
+      create(formData, {
+        onSuccess: () => {
+          reset();
+          onCloseModal?.();
+          queryClient.invalidateQueries(["pointPackages"]);
+        },
+      });
+    }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    buyPackage(formData);
-    onClose();
-  };
+  const isWorking = isCreating || isUpdating;
 
   return (
-    <StyledModal isOpen={isOpen} onClose={onClose}>
-      <Form onSubmit={handleSubmit}>
-        <FormRow>
-          <SelectForm
-            options={mockData.mockPackages
-              .filter((pkg) => pkg.state === "active")
-              .map((pkg) => ({ value: pkg.id, label: `${pkg.name} (${pkg.points} điểm, ${pkg.price} VND)` }))}
-            value={formData.packageId}
-            onChange={handleChange}
-            disabled={false}
-            inModal={true}
-            style={{
-              border: '1px solid var(--color-grey-300)',
-              borderRadius: '8px',
-              padding: '0.6rem',
-            }}
+    <Form onSubmit={handleSubmit(onSubmit)} type={onCloseModal ? "modal" : "regular"}>
+      <FormRow label="Tên gói điểm" error={errors?.packageName?.message}>
+        <StyledInput
+          type="text"
+          id="packageName"
+          disabled={isWorking}
+          {...register("packageName", { required: "Hãy nhập tên gói điểm" })}
+        />
+      </FormRow>
+      <FormRow label="Điểm" error={errors?.point?.message}>
+        <StyledInput
+          type="number"
+          id="point"
+          disabled={isWorking}
+          {...register("point", { 
+            required: "Hãy nhập số điểm",
+            min: { value: 0, message: "Điểm phải lớn hơn hoặc bằng 0" }
+          })}
+        />
+      </FormRow>
+      <FormRow label="Giá (VND)" error={errors?.price?.message}>
+        <StyledInput
+          type="number"
+          id="price"
+          disabled={isWorking}
+          {...register("price", { 
+            required: "Hãy nhập giá",
+            min: { value: 0, message: "Giá phải lớn hơn hoặc bằng 0" }
+          })}
+        />
+      </FormRow>
+      {isEditSession && (
+        <FormRow label="Trạng thái">
+          <StyledInput
+            type="checkbox"
+            id="status"
+            disabled={isWorking}
+            {...register("status")}
           />
         </FormRow>
-        <Button 
-          type="submit"
-          style={{ backgroundColor: '#28a745', marginTop: '1rem' }}
+      )}
+      <FormRow>
+        <Button
+          $variations="secondary"
+          type="reset"
+          disabled={isWorking}
+          onClick={() => onCloseModal?.()}
         >
-          Xác nhận
+          Hủy bỏ
         </Button>
-      </Form>
-    </StyledModal>
+        <Button disabled={isWorking}>
+          {isEditSession ? "Cập nhật gói điểm" : "Tạo gói điểm mới"}
+        </Button>
+      </FormRow>
+    </Form>
   );
-}
+};
 
-// Giả định mockData được import từ mockData.js
-import mockData from "./mockData";
+PackageForm.propTypes = {
+  packageToEdit: PropTypes.shape({
+    id: PropTypes.string,
+    packageName: PropTypes.string,
+    point: PropTypes.number,
+    price: PropTypes.number,
+    status: PropTypes.bool,
+  }),
+  onCloseModal: PropTypes.func,
+};
 
-export default PackageForm;
+export default PackageForm; 

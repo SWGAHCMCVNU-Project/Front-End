@@ -8,7 +8,6 @@ import Table from '../../ui/Table';
 import CampaignTypeRow from './CampaignTypeRow';
 import SetRowsPerPage from './SetRowsPerPage';
 import { useSearchParams } from 'react-router-dom';
-import { useDebounced } from '../../hooks/useDebounced';
 import { useCampaignTypes } from '../../hooks/campaign-type/useCampaignTypes';
 import { toast } from 'react-hot-toast';
 
@@ -23,74 +22,40 @@ function CampaignTypeTable() {
   const currentPage = Number(searchParams.get('page')) || 1;
   const pageSize = Number(searchParams.get('size')) || 10;
   const [sortOrder] = useState(true);
-
   const searchTerm = searchParams.get('searchName') || '';
-  const debouncedSearch = useDebounced(searchTerm, 500);
 
-  useEffect(() => {
-    if (searchTerm !== debouncedSearch) {
-      setSearchParams(
-        new URLSearchParams({
-          page: '1',
-          size: pageSize.toString(),
-          ...(debouncedSearch && { searchName: debouncedSearch }),
-        }),
-        { replace: true }
-      );
-    }
-  }, [debouncedSearch, searchTerm, pageSize, setSearchParams]);
-
-  const { campaignTypes, error, isLoading } = useCampaignTypes({
+  const { campaignTypes, error, isLoading, totalCount, totalPages } = useCampaignTypes({
     page: currentPage,
     size: pageSize,
-    searchName: debouncedSearch,
+    searchName: searchTerm,
     isAsc: sortOrder,
     state: true,
   });
 
-  const campaignTypeData = {
-    items: Array.isArray(campaignTypes) ? campaignTypes : [],
-    total: campaignTypes?.length || 0,
-    page: currentPage,
-    size: pageSize,
-    totalPages: Math.ceil((campaignTypes?.length || 0) / pageSize) || 1,
-  };
-
   useEffect(() => {
-    if (campaignTypeData?.items?.length === 0 && currentPage > 1) {
-      setSearchParams(
-        new URLSearchParams({
-          page: (currentPage - 1).toString(),
-          size: pageSize.toString(),
-          ...(debouncedSearch && { searchName: debouncedSearch }),
-        }),
-        { replace: true }
-      );
+    if (campaignTypes?.length === 0 && currentPage > 1 && !isLoading) {
+      setSearchParams({
+        page: (currentPage - 1).toString(),
+        size: pageSize.toString(),
+        ...(searchTerm && { searchName: searchTerm }),
+      });
     }
-  }, [campaignTypeData, currentPage, pageSize, debouncedSearch, setSearchParams]);
+  }, [campaignTypes, currentPage, pageSize, searchTerm, setSearchParams, isLoading]);
 
   const handlePageChange = (newPage) => {
-    const maxPage = Math.max(1, campaignTypeData.totalPages || 1);
-    if (newPage > maxPage) return;
-    setSearchParams(
-      new URLSearchParams({
-        page: newPage.toString(),
-        size: pageSize.toString(),
-        ...(debouncedSearch && { searchName: debouncedSearch }),
-      }),
-      { replace: true }
-    );
+    setSearchParams({
+      page: newPage.toString(),
+      size: pageSize.toString(),
+      ...(searchTerm && { searchName: searchTerm }),
+    });
   };
 
   const handlePageSizeChange = (newSize) => {
-    setSearchParams(
-      new URLSearchParams({
-        size: newSize.toString(),
-        page: '1',
-        ...(debouncedSearch && { searchName: debouncedSearch }),
-      }),
-      { replace: true }
-    );
+    setSearchParams({
+      size: newSize.toString(),
+      page: '1',
+      ...(searchTerm && { searchName: searchTerm }),
+    });
   };
 
   if (isLoading) return <Spinner />;
@@ -98,13 +63,13 @@ function CampaignTypeTable() {
     toast.error('Có lỗi khi tải danh sách loại chiến dịch');
     return null;
   }
-  if (!campaignTypeData || !campaignTypeData.items) {
+  if (!campaignTypes) {
     return <Empty resource='loại chiến dịch' />;
   }
 
   return (
     <TableContainer>
-      {!campaignTypeData.items.length ? (
+      {!campaignTypes.length ? (
         <Empty resource='loại chiến dịch' />
       ) : (
         <Menus>
@@ -118,7 +83,7 @@ function CampaignTypeTable() {
             </Table.Header>
 
             <Table.Body
-              data={campaignTypeData.items}
+              data={campaignTypes}
               render={(campaignType, index) => (
                 <CampaignTypeRow
                   key={campaignType.id}
@@ -129,15 +94,16 @@ function CampaignTypeTable() {
             />
 
             <Table.Footer>
-              <Pagination
-                count={campaignTypeData.total}
-                pageSize={pageSize}
-                currentPage={currentPage}
-                onPageChange={handlePageChange}
-              />
+              
               <SetRowsPerPage
                 pageSize={pageSize}
                 onLimitChange={handlePageSizeChange}
+              />
+              <Pagination
+                count={totalCount}
+                pageSize={pageSize}
+                currentPage={currentPage}
+                onPageChange={handlePageChange}
               />
             </Table.Footer>
           </Table>
