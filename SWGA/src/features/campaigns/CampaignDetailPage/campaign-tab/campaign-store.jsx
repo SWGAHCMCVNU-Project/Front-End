@@ -8,8 +8,9 @@ import { useCampaignStore } from "../useCampaignStore"; // Import useCampaignSto
 const Stacked = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.4rem;
   font-size: 1.4rem;
+  padding-left: 8px;
 
   & span:first-child {
     font-weight: 500;
@@ -23,16 +24,60 @@ const Stacked = styled.div`
 const StackedTime = styled.span`
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.4rem;
   font-weight: 500;
+  padding-left: 8px;
+
+  span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+`;
+
+const TimeLabel = styled.span`
+  min-width: 70px;
+  color: var(--color-grey-600);
 `;
 
 const StackedTimeFrameAbove = styled.span`
   color: #2ecc71;
+  font-size: 1.4rem;
 `;
 
 const StackedTimeFrameBelow = styled.span`
   color: red;
+  font-size: 1.4rem;
+`;
+
+const StoreNameWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding-left: 8px;
+
+  .avatar-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .title-product-name {
+    margin: 0;
+    font-size: 1.4rem;
+  }
+
+  .p-column-table {
+    margin: 0;
+    color: var(--color-grey-500);
+    font-size: 1.3rem;
+  }
+`;
+
+const StyledAddress = styled.div`
+  font-size: 1.4rem;
+  color: var(--color-grey-600);
+  padding-left: 8px;
 `;
 
 function CampaignStore() {
@@ -52,18 +97,29 @@ function CampaignStore() {
         key: store.id || index + 1,
         number: <div className="number-header"><span>{(page - 1) * limit + index + 1}</span></div>,
         StoreName: (
-            <Avatar.Group>
-                <Avatar className="shape-avatar-product" shape="square" src={store.avatar || imgDefaultStore} />
+            <StoreNameWrapper>
+                <Avatar 
+                    className="shape-avatar-product" 
+                    shape="square" 
+                    src={store.avatar || imgDefaultStore} 
+                    size={45}
+                />
                 <div className="avatar-info">
                     <Title className="title-product-name" level={5}>{store.name}</Title>
                     <p className="p-column-table">{store.brand}</p>
                 </div>
-            </Avatar.Group>
+            </StoreNameWrapper>
         ),
         Hours: (
             <StackedTime>
-                <span>Mở cửa: <StackedTimeFrameAbove>{store.openTime}</StackedTimeFrameAbove></span>
-                <span>Đóng cửa: <StackedTimeFrameBelow>{store.closeTime}</StackedTimeFrameBelow></span>
+                <span>
+                    <TimeLabel>Mở cửa:</TimeLabel>
+                    <StackedTimeFrameAbove>{store.openTime}</StackedTimeFrameAbove>
+                </span>
+                <span>
+                    <TimeLabel>Đóng cửa:</TimeLabel>
+                    <StackedTimeFrameBelow>{store.closeTime}</StackedTimeFrameBelow>
+                </span>
             </StackedTime>
         ),
         Contact: (
@@ -72,7 +128,7 @@ function CampaignStore() {
                 <span>{store.phone}</span>
             </Stacked>
         ),
-        Address: <div className="campaign-item-address">{store.address}</div>,
+        Address: <StyledAddress>{store.address}</StyledAddress>,
         State: <Tag className="status-tag" color={store.state === "active" ? "cyan" : "red"}>{store.state}</Tag>,
     })) || [];
 
@@ -87,12 +143,45 @@ function CampaignStore() {
             {campaignStores?.result?.length > 0 ? (
                 <TableItem
                     columns={[
-                        { title: "STT", dataIndex: "number", key: "number", align: "center" },
-                        { title: "Cửa hàng", dataIndex: "StoreName", key: "StoreName", width: "18%", sorter: true },
-                        { title: "Thời gian làm việc", dataIndex: "Hours", key: "Hours" },
-                        { title: "Liên hệ", dataIndex: "Contact", key: "Contact" },
-                        { title: "Địa chỉ", key: "Address", dataIndex: "Address" },
-                        { title: "Trạng thái", key: "State", dataIndex: "State", align: "center" },
+                        { 
+                            title: "STT", 
+                            dataIndex: "number", 
+                            key: "number", 
+                            align: "center",
+                            width: "5%" 
+                        },
+                        { 
+                            title: "Cửa hàng", 
+                            dataIndex: "StoreName", 
+                            key: "StoreName", 
+                            width: "25%", 
+                            sorter: true 
+                        },
+                        { 
+                            title: "Thời gian làm việc", 
+                            dataIndex: "Hours", 
+                            key: "Hours",
+                            width: "20%"
+                        },
+                        { 
+                            title: "Liên hệ", 
+                            dataIndex: "Contact", 
+                            key: "Contact",
+                            width: "20%"
+                        },
+                        { 
+                            title: "Địa chỉ", 
+                            key: "Address", 
+                            dataIndex: "Address",
+                            width: "20%"
+                        },
+                        { 
+                            title: "Trạng thái", 
+                            key: "State", 
+                            dataIndex: "State", 
+                            align: "center",
+                            width: "10%" 
+                        },
                     ]}
                     dataSource={dataSource}
                     handleSort={handleSort}

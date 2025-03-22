@@ -1,27 +1,80 @@
 import apiClient from './apiClient';
-import { CAMPAIGN_DETAIL_ENDPOINTS, CAMPAIGN_ENDPOINTS } from './endpoints';
+import { CAMPAIGN_DETAIL_ENDPOINTS, CAMPAIGN_ENDPOINTS,VOUCHER_ENDPOINTS, VOUCHER_ITEM_ENDPOINTS } from './endpoints';
 
 export const getVouchersByCampaignId = async (campaignId, searchName = "", page = 1, size = 10) => {
     try {
-        const response = await apiClient.get(CAMPAIGN_DETAIL_ENDPOINTS.GET_VOUCHER, {
+        console.log('Calling getVouchersByCampaignId with params:', {
+            campaignId,
+            searchName,
+            page,
+            size
+        });
+
+        const response = await apiClient.get(VOUCHER_ENDPOINTS.GET_VOUCHER_BY_ID.replace("{id}", campaignId), {
             params: {
-                campaignId,
                 searchName,
                 page,
                 size,
             },
         });
 
-        let vouchersData = response.data?.items || response.data?.data || response.data;
-        
-        if (!Array.isArray(vouchersData)) {
-            console.warn('Expected array data, converting:', typeof vouchersData);
-            vouchersData = [vouchersData].filter(Boolean);
+        console.log('Raw Response Data:', response.data);
+
+        // Kiểm tra nếu response.data là null hoặc undefined
+        if (!response.data) {
+            console.warn('API returned null/undefined data for campaignId:', campaignId);
+            return {
+                items: [],
+                total: 0,
+                page: 1,
+                totalPages: 0
+            };
         }
 
-        return vouchersData;
+        // Format lại dữ liệu voucher từ response
+        const items = response.data.items || response.data;
+        const formattedItems = Array.isArray(items) ? items.map(item => ({
+            id: item.id || '',
+            brandId: item.brandId || '',
+            brandName: item.brandName || 'Thương hiệu không rõ',
+            typeId: item.typeId || '',
+            typeName: item.typeName || 'Loại không rõ',
+            voucherName: item.voucherName || 'Voucher không tên',
+            price: item.price || 0,
+            rate: item.rate || 0,
+            condition: item.condition || '',
+            voucherImage: item.image || '',
+            image: item.image || '',
+            imageName: item.imageName || '',
+            file: item.file || '',
+            fileName: item.fileName || '',
+            dateCreated: item.dateCreated || null,
+            dateUpdated: item.dateUpdated || null,
+            description: item.description || '',
+            state: item.state || false,
+            status: item.status || false,
+            quantity: item.numberOfItems || 0,
+            quantityInStock: item.numberOfItemsAvailable || 0
+        })) : [];
+
+        console.log('Formatted Items:', formattedItems);
+
+        const result = {
+            items: formattedItems,
+            total: response.data.total || formattedItems.length,
+            page: response.data.page || page,
+            totalPages: response.data.totalPages || Math.ceil(formattedItems.length / size)
+        };
+
+        console.log('Final Result:', result);
+        return result;
     } catch (error) {
-        console.error("Error fetching vouchers:", error.message);
+        console.error("Error fetching vouchers:", {
+            message: error.message,
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data
+        });
         throw error;
     }
 };
@@ -109,3 +162,125 @@ export const getStoresByCampaignId = async (campaignId, searchName = "", page = 
         throw error;
     }
 };
+
+export const getVoucherItemsByCampaignId = async ({
+    campaignDetailId,
+    state = null,
+    sort = "Id,desc",
+    search = "",
+    page = 1,
+    limit = 10,
+    isLocked = null,
+    isBought = null,
+    isUsed = null
+}) => {
+    try {
+        console.log('Calling getVoucherItemsByCampaignId with params:', {
+            campaignDetailId,
+            state,
+            sort,
+            search,
+            page,
+            limit,
+            isLocked,
+            isBought,
+            isUsed
+        });
+
+        // Đảm bảo campaignDetailId là array
+        const campaignDetailIds = Array.isArray(campaignDetailId) ? campaignDetailId : [campaignDetailId];
+
+        // Tạo object params
+        const params = {};
+        
+        // Thêm các campaignDetailId riêng lẻ
+        campaignDetailIds.forEach(id => {
+            if (!params.campaignDetailId) {
+                params.campaignDetailId = [];
+            }
+            params.campaignDetailId.push(id);
+        });
+
+        // Thêm các params khác
+        if (state !== null) params.state = state;
+        if (sort) params.sort = sort;
+        if (search) params.searchName = search;
+        if (page) params.pageNumber = page;
+        if (limit) params.pageSize = limit;
+        if (isLocked !== null) params.isLocked = isLocked;
+        if (isBought !== null) params.isBought = isBought;
+        if (isUsed !== null) params.isUsed = isUsed;
+
+        const response = await apiClient.get(VOUCHER_ITEM_ENDPOINTS.GET_BY_CAMPAIGN_ID, {
+            params: params,
+            paramsSerializer: {
+                indexes: null // Điều này sẽ giúp axios serialize array params đúng cách
+            }
+        });
+
+        console.log('Raw Response Data:', response.data);
+
+        if (!response.data) {
+            console.warn('API returned null/undefined data for campaignDetailIds:', campaignDetailIds);
+            return {
+                items: [],
+                total: 0,
+                page: 1,
+                totalPages: 0
+            };
+        }
+
+        // Format lại dữ liệu từ response
+        const items = Array.isArray(response.data) ? response.data : (response.data.items || []);
+        const formattedItems = items.map(item => ({
+            id: item.id || '',
+            voucherId: item.voucherId || '',
+            campaignDetailId: item.campaignDetailId || '',
+            code: item.voucherCode || '',
+            name: item.voucher?.voucherName || 'Voucher không tên',
+            image: item.voucher?.image || '',
+            price: item.voucher?.price || 0,
+            rate: item.voucher?.rate || 0,
+            isLocked: item.isLocked || false,
+            isBought: item.isBought || false,
+            isUsed: item.isUsed || false,
+            validOn: item.validOn || null,
+            expireOn: item.expireOn || null,
+            createdAt: item.dateCreated || null,
+            dateIssued: item.dateIssued || null,
+            status: getVoucherItemStatus(item),
+            studentName: item.student?.fullName || '',
+            studentEmail: item.student?.email || ''
+        }));
+
+        console.log('Formatted Items:', formattedItems);
+
+        const result = {
+            items: formattedItems,
+            total: Array.isArray(response.data) ? formattedItems.length : (response.data.total || formattedItems.length),
+            page: Array.isArray(response.data) ? page : (response.data.page || page),
+            totalPages: Array.isArray(response.data) ? Math.ceil(formattedItems.length / limit) : (response.data.totalPages || Math.ceil(formattedItems.length / limit))
+        };
+
+        console.log('Final Result:', result);
+        return result;
+    } catch (error) {
+        console.error("Error fetching voucher items:", {
+            message: error.message,
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data
+        });
+        throw error;
+    }
+};
+
+// Helper function to get voucher item status
+function getVoucherItemStatus(item) {
+    if (item.isUsed) return 'Đã sử dụng';
+    if (item.isBought) return 'Đã mua';
+    if (item.isLocked) return 'Đã khóa';
+    return 'Khả dụng';
+}
+
+

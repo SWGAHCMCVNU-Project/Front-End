@@ -1,0 +1,40 @@
+.filter-tab {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+
+    .custom-select-container-product {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+}
+
+.filter-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.voucher-select {
+    .ant-select-selector {
+        border-radius: 8px !important;
+        &:hover {
+            border-color: #40a9ff !important;
+        }
+    }
+
+    &.ant-select-focused .ant-select-selector {
+        border-color: #40a9ff !important;
+        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+    }
+
+    .ant-select-selection-placeholder {
+        color: #bfbfbf;
+    }
+
+    .ant-select-selection-item {
+        font-weight: 500;
+    }
+} 
