@@ -4,7 +4,6 @@ import styled from "styled-components";
 import Table from "../../ui/Table";
 import Tag from "../../ui/Tag";
 import logoDefault from "../../assets/images/brand.png";
-import ConfirmDelete from "../../ui/ConfirmDelete";
 import Modal from "../../ui/Modal";
 import { handleValidImageURL } from "../../utils/helpers";
 import UpdateCampaignTypeForm from "./UpdateCampaignTypeForm";
@@ -150,16 +149,7 @@ function CampaignTypeRow({ id, typeName, image, description, state, displayedInd
           </Modal.Window>
         </Modal>
 
-        <Modal>
-          <Modal.Open opens={`delete-${id}`}>
-            <StyledButton>
-              <HiTrash />
-            </StyledButton>
-          </Modal.Open>
-          <Modal.Window name={`delete-${id}`}>
-            <ConfirmDelete resourceName="loại chiến dịch" />
-          </Modal.Window>
-        </Modal>
+       
       </StyledAction>
     </StyledTableRow>
   );

@@ -70,3 +70,11 @@ export const AUTH_ENDPOINTS = {
   export const VOUCHER_ITEM_ENDPOINTS = {
     GET_BY_CAMPAIGN_ID: "/VoucherItem",
   };
+  export const POINT_PACKAGE = {
+    GET_ALL: "/PointPackage",
+    GET_BY_ID: "/PointPackage/{id}",
+    CREATE: "/PointPackage",
+    UPDATE: "/PointPackage/{id}",
+  }
+
+

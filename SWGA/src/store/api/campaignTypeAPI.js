@@ -97,7 +97,7 @@ export const updateCampaignType = async (
 export const getAllCampaignTypes = async ({
   page = 1,
   size = 10,
-  searchName = "", // Changed from search to searchName
+  searchName = "",
   state = true,
   isAsc = true,
 } = {}) => {
@@ -106,9 +106,11 @@ export const getAllCampaignTypes = async ({
     params.append("page", page);
     params.append("size", size);
     if (searchName && searchName.trim() !== "") {
-      params.append("searchName", searchName.trim()); // Changed to searchName
+      params.append("searchName", searchName.trim());
     }
-    params.append("state", state.toString());
+    if (state !== null) {
+      params.append("state", state.toString());
+    }
     params.append("isAsc", isAsc.toString());
 
     const url = `${CAMPAIGN_TYPE_ENDPOINTS.GET_ALL}?${params}`;
