@@ -7,14 +7,24 @@ export function useBrands({ page = 1, size = 10, search = "", state = true, isAs
   const { brand, isLoading: isLoadingBrand } = useBrand();
   const brandId = brand?.id || "";
 
-  const { 
-    isLoading: isLoadingBrands, 
+  console.log("useBrands called with page:", page); // Debug giá trị page nhận được
+
+  const {
+    isLoading: isLoadingBrands,
     data: response,
-    error 
+    error,
+    refetch, // Thêm refetch
   } = useQuery({
     queryKey: ["brands", page, size, search, state, isAsc],
-    queryFn: () => getAllBrandsAPI({ page, size, search, state, isAsc }),
-    staleTime: 1000 * 60,
+    queryFn: () => {
+      console.log("Fetching data for page:", page);
+      return getAllBrandsAPI({ page, size, search, state, isAsc });
+    },
+    staleTime: 0, // Tạm thời vô hiệu hóa cache
+    cacheTime: 0, // Tạm thời vô hiệu hóa cache
+    onSuccess: (data) => {
+      console.log("Data fetched:", data);
+    },
     onError: () => {
       toast.error("Không thể tải danh sách thương hiệu");
     },
@@ -22,5 +32,5 @@ export function useBrands({ page = 1, size = 10, search = "", state = true, isAs
 
   const isLoading = isLoadingBrand || isLoadingBrands;
 
-  return { isLoading, error, brands: response }; 
+  return { isLoading, error, brands: response, refetch };
 }

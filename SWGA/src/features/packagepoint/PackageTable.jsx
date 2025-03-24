@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import styled from 'styled-components';
 import Empty from '../../ui/Empty';
 import Menus from '../../ui/Menus';
-import Pagination from '../../ui/Pagination';
 import Spinner from '../../ui/Spinner';
 import Table from '../../ui/Table';
 import PackageRow from './PackageRow';
@@ -10,6 +9,7 @@ import SetRowsPerPage from './SetRowsPerPage';
 import { useSearchParams } from 'react-router-dom';
 import { usePointPackages } from '../../hooks/point-package/usePointPackages';
 import { toast } from 'react-hot-toast';
+import { Pagination } from 'antd'; // Import Pagination từ Ant Design
 
 const TableContainer = styled.div`
   display: flex;
@@ -29,32 +29,22 @@ function PackageTable() {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentPage = Number(searchParams.get('page')) || 1;
   const pageSize = Number(searchParams.get('size')) || 10;
-  const searchTerm = searchParams.get('search') || '';
+  const searchTerm = searchParams.get('searchName') || ''; // Đồng bộ với searchName
   const status = searchParams.get('status') || '';
 
-  const { pointPackages, error, isLoading, totalCount } = usePointPackages({
+  const { pointPackages, error, isLoading } = usePointPackages({
     page: currentPage,
     size: pageSize,
     searchName: searchTerm,
     status: status === "" ? null : status === "active",
   });
 
-  useEffect(() => {
-    if (pointPackages?.length === 0 && currentPage > 1 && !isLoading) {
-      setSearchParams({
-        page: (currentPage - 1).toString(),
-        size: pageSize.toString(),
-        ...(searchTerm && { search: searchTerm }),
-        ...(status && { status }),
-      });
-    }
-  }, [pointPackages, currentPage, pageSize, searchTerm, status, setSearchParams, isLoading]);
 
   const handlePageChange = (newPage) => {
     setSearchParams({
       page: newPage.toString(),
       size: pageSize.toString(),
-      ...(searchTerm && { search: searchTerm }),
+      ...(searchTerm && { searchName: searchTerm }), // Đồng bộ với searchName
       ...(status && { status }),
     });
   };
@@ -63,7 +53,7 @@ function PackageTable() {
     setSearchParams({
       size: newSize.toString(),
       page: '1',
-      ...(searchTerm && { search: searchTerm }),
+      ...(searchTerm && { searchName: searchTerm }), // Đồng bộ với searchName
       ...(status && { status }),
     });
   };
@@ -73,13 +63,16 @@ function PackageTable() {
     toast.error('Có lỗi khi tải danh sách gói điểm');
     return null;
   }
-  if (!pointPackages) {
+  if (!pointPackages || !pointPackages.data) {
     return <Empty resource='gói điểm' />;
   }
 
+  const packages = pointPackages.data.items || [];
+  const totalCount = pointPackages.data.total || 0;
+
   return (
     <TableContainer>
-      {!pointPackages.length ? (
+      {!packages.length ? (
         <Empty resource='gói điểm' />
       ) : (
         <Menus>
@@ -94,7 +87,7 @@ function PackageTable() {
             </Table.Header>
 
             <Table.Body
-              data={pointPackages}
+              data={packages}
               render={(pointPackage, index) => (
                 <PackageRow
                   key={pointPackage.id}
@@ -107,10 +100,12 @@ function PackageTable() {
             <Table.Footer>
               <FooterContainer>
                 <Pagination
-                  count={totalCount}
+                  current={currentPage}
                   pageSize={pageSize}
-                  currentPage={currentPage}
-                  onPageChange={handlePageChange}
+                  total={totalCount}
+                  onChange={handlePageChange}
+                  showSizeChanger
+                  onShowSizeChange={(current, size) => handlePageSizeChange(size)}
                 />
                 <SetRowsPerPage
                   size={pageSize}
@@ -125,4 +120,4 @@ function PackageTable() {
   );
 }
 
-export default PackageTable; 
+export default PackageTable;  

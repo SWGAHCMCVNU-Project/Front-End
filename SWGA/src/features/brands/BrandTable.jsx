@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Empty from "../../ui/Empty";
 import Menus from "../../ui/Menus";
@@ -11,17 +11,13 @@ import { useBrands } from "../../hooks/brand/useBrands";
 import { toast } from "react-hot-toast";
 
 function BrandTable() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
-  const [pageSize, setPageSize] = useState(Number(searchParams.get("size")) || 10);
-  const searchTerm = searchParams.get("searchName") || ""; 
+  const [searchParams, setSearchParams] = useSearchParams(); // Thêm setSearchParams
+  const currentPage = Number(searchParams.get("page")) || 1;
+  const pageSize = Number(searchParams.get("size")) || 10;
+  const searchTerm = searchParams.get("searchName") || "";
 
-  useEffect(() => {
-    setCurrentPage(Number(searchParams.get("page")) || 1);
-    setPageSize(Number(searchParams.get("size")) || 10);
-  }, [searchParams]);
 
-  const { brands, isLoading, error } = useBrands({
+  const { brands, isLoading, error, refetch } = useBrands({
     page: currentPage,
     size: pageSize,
     search: searchTerm,
@@ -38,24 +34,30 @@ function BrandTable() {
   };
 
   const handlePageChange = (newPage) => {
-    if (newPage > 0 && newPage <= brandData.totalPages) {
-      const params = new URLSearchParams(searchParams);
-      params.set("page", newPage.toString());
-      setSearchParams(params, { replace: true });
-    }
+    const params = new URLSearchParams(searchParams);
+    params.set("page", newPage.toString());
+    setSearchParams(params);
+    refetch(); // Thêm refetch để đảm bảo dữ liệu được làm mới
   };
 
   const handlePageSizeChange = (newSize) => {
     const params = new URLSearchParams(searchParams);
     params.set("size", newSize.toString());
     params.set("page", "1");
-    setSearchParams(params, { replace: true });
+    setSearchParams(params);
+    refetch(); // Thêm refetch
   };
 
   if (error) {
     toast.error("Có lỗi khi tải danh sách thương hiệu");
     return null;
   }
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  console.log("Brand Data after fetch:", brandData); // Debug dữ liệu trả về
 
   return (
     <div className="flex flex-col gap-8">
@@ -85,7 +87,12 @@ function BrandTable() {
             />
 
             <Table.Footer>
-              <Pagination count={brandData.total} pageSize={pageSize} currentPage={currentPage} onPageChange={handlePageChange} />
+              <Pagination
+                count={brandData.total}
+                pageSize={pageSize}
+                currentPage={currentPage}
+                onPageChange={handlePageChange}
+              />
               <BrandSetRowsPerPage pageSize={pageSize} setPageSize={handlePageSizeChange} />
             </Table.Footer>
           </Table>

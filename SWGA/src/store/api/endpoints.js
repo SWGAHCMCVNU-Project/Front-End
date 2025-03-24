@@ -76,5 +76,8 @@ export const AUTH_ENDPOINTS = {
     CREATE: "/PointPackage",
     UPDATE: "/PointPackage/{id}",
   }
+  export const PAYMENT = {
+    CREATE_PAYMENT: "/VNPAY/purchase-points"
+  }
 
 

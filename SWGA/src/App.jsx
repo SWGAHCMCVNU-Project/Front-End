@@ -46,11 +46,17 @@ import Account from "./pages/Account.jsx"; // Import the Account component
 import CampaignCreatePage from "./pages/CampaignManagement/CampaignCreatePage.jsx";
 import CampaignDetailsPage from "./pages/CampaignManagement/CampaignDetailsPage.jsx";
 import CampaignUpdatePage from "./pages/CampaignManagement/CampaignUpdatePage.jsx";
+import BuyPoints from "./pages/BuyPoints";
 
 function PrivateRoute({ children, allowedRoles = [] }) {
   const location = useLocation();
   const isAuthenticated = !!storageService.getAccessToken();
   const roleLogin = storageService.getRoleLogin();
+
+  // Không điều hướng nếu đang ở trang /sign-in
+  if (location.pathname === "/sign-in") {
+    return children;
+  }
 
   if (!isAuthenticated || !roleLogin) {
     return <Navigate to="/sign-in" state={{ from: location }} replace />;
@@ -330,6 +336,15 @@ function App() {
               element={
                 <PrivateRoute allowedRoles={["admin"]}>
                   <PackagePoint />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/buy-points"
+              exact
+              element={
+                <PrivateRoute allowedRoles={["brand"]}>
+                  <BuyPoints />
                 </PrivateRoute>
               }
             />

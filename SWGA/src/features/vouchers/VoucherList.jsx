@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom"; // Thêm useSearchParams
 import styled from "styled-components";
 import logoDefault from "../../assets/images/coupon.png";
 import greenBean from "../../assets/images/dauxanh.png";
@@ -28,7 +28,11 @@ const StyledButton = styled.div``;
 
 function VoucherList() {
   const navigate = useNavigate();
-  const { vouchers, isLoading } = useVouchers();
+  const [searchParams] = useSearchParams(); // Lấy search params từ URL
+  const search = searchParams.get("search") || ""; // Lấy giá trị của tham số 'search', mặc định là chuỗi rỗng
+
+  // Truyền tham số search vào useVouchers
+  const { vouchers, isLoading } = useVouchers({ search });
 
   if (isLoading) return <Spinner />;
   if (!vouchers?.data?.items?.length) return <Empty resourceName="ưu đãi" />;
@@ -68,9 +72,9 @@ function VoucherList() {
                 <div className="container-item">
                   <div>Còn lại: </div>
                   <div className="styled-number-item">
-                    {n. numberOfItemsAvailable} /  {n. numberOfItems}
+                    {n.numberOfItemsAvailable} / {n.numberOfItems}
                   </div>
-                  <div>  mã</div>
+                  <div> mã</div>
                 </div>
               </div>
             </StyledButton>

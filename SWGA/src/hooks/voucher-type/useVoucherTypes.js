@@ -12,9 +12,11 @@ export function useVoucherTypes({
     queryKey: ["voucherTypes", page, size, search, state, isAsc],
     queryFn: () =>
       getVoucherTypesAPI({ page, size, search, state, isAsc }),
-    staleTime: 0, // Tắt staleTime để luôn gọi lại API
-    refetchOnWindowFocus: true,
+    staleTime: 1000 * 60, // 1 phút
+    refetchOnWindowFocus: false, // Tắt refetch khi focus
   });
+
+  console.log("useVoucherTypes response:", response);
 
   return { isLoading, error, voucherTypes: response };
 }

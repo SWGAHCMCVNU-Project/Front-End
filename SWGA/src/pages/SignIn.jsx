@@ -24,27 +24,32 @@ function SignIn() {
   const handleLogin = async (values) => {
     try {
       setIsLoading(true);
+      console.log("🚀 Bắt đầu đăng nhập:", values);
+
       const response = await login(values.username.trim(), values.password);
+
+      console.log("✅ Kết quả đăng nhập:", response);
 
       if (response.success) {
         const { role, token, brandId, isVerify, loginId } = response.data;
-        
-        localStorage.setItem('roleLogin', role);
+
+        // Lưu dữ liệu vào storageService
+        localStorage.setItem("roleLogin", role);
         storageService.setAccessToken(token);
+        storageService.setNameLogin(values.username);
         if (brandId) storageService.setBrandId(brandId);
 
         if (!isVerify) {
-          // Lấy thông tin email từ account detail
           const accountResponse = await getAccountByIdAPI(loginId);
           if (!accountResponse.success) {
             toast.error("Không thể lấy thông tin tài khoản!");
             return;
           }
 
-          setLoginData({ 
-            userName: values.username, 
+          setLoginData({
+            userName: values.username,
             accountId: loginId,
-            email: accountResponse.data.email // Lấy email từ account detail
+            email: accountResponse.data.email,
           });
           setShowVerifyModal(true);
         } else {
@@ -55,17 +60,15 @@ function SignIn() {
         toast.error(response.message || "Tài khoản hoặc mật khẩu không đúng!");
       }
     } catch (error) {
-      console.error("Lỗi đăng nhập:", error);
+      console.error("❌ Lỗi đăng nhập:", error);
       toast.error("Lỗi hệ thống, vui lòng thử lại!");
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Chỉ reset isLoading trong finally
     }
   };
 
   const handleVerify = async (verificationCode) => {
     const code = verificationCode?.trim();
-    console.log('Verification code:', code, 'Length:', code?.length);
-
     if (!code || code.length < 6) {
       toast.error("Vui lòng nhập mã xác minh đầy đủ!");
       return;
@@ -74,12 +77,12 @@ function SignIn() {
     try {
       const result = await verifyUserAccount(
         loginData.accountId,
-        loginData.email, // Sử dụng email từ account detail
+        loginData.email,
         code
       );
 
       if (result.success) {
-        // toast.success("Xác minh thành công!");
+        storageService.setNameLogin(loginData.userName); // Lưu nameLogin sau khi xác minh
         setShowVerifyModal(false);
         navigate("/dashboard", { replace: true });
       } else {

@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { ProfileOutlined } from "@ant-design/icons";
+import { ProfileOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import {
   faBars,
   faBell,
@@ -32,7 +32,7 @@ function Sidenav({ color }) {
 
   useEffect(() => {
     if (!storageService.getAccessToken() || !roleLogin) {
-      navigate("/sign-in");
+      // navigate("/sign-in");
     }
   }, [roleLogin, navigate]);
 
@@ -262,6 +262,15 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <FontAwesomeIcon icon={faClockRotateLeft} />,
           labelPageName: "Lịch sử giao dịch",
+          allowedRoles: ["brand"],
+        },
+        {
+          key: "21",
+          linkURL: "/buy-points",
+          pageName: "buy-points",
+          color: color,
+          iconPage: <ShoppingCartOutlined />,
+          labelPageName: "Mua điểm",
           allowedRoles: ["brand"],
         },
       ],

@@ -14,26 +14,35 @@ function Main() {
   useEffect(() => {
     const token = storageService.getAccessToken();
     const nameLogin = storageService.getNameLogin();
-    if (token) {
-      try {
-        const tokenDecode = jwtDecode(token);
-        
-        if (nameLogin === "" || nameLogin === null) {
-          storageService.removeAccessToken();
-          storageService.removeNameLogin();
-          navigate('/sign-in');
-        }
-      } catch (error) {
-        storageService.removeAccessToken();
-        storageService.removeNameLogin();
+    
+    if (!token || !nameLogin) {
+      navigate('/sign-in');
+      return;
+    }
+
+    try {
+      const tokenDecode = jwtDecode(token);
+      const currentTime = Date.now() / 1000;
+      
+      if (tokenDecode.exp < currentTime) {
+        storageService.clearAll();
         navigate('/sign-in');
       }
-    } else {
-      storageService.removeAccessToken();
-      storageService.removeNameLogin();
+    } catch {
+      storageService.clearAll();
       navigate('/sign-in');
     }
-    
+
+    // Lắng nghe sự kiện token hết hạn
+    const handleTokenExpired = () => {
+      navigate('/sign-in');
+    };
+
+    window.addEventListener('tokenExpired', handleTokenExpired);
+
+    return () => {
+      window.removeEventListener('tokenExpired', handleTokenExpired);
+    };
   }, [navigate]);
 
   const [visible, setVisible] = useState(false);

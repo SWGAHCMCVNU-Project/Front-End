@@ -10,7 +10,6 @@ function BrandSetRowsPerPage({ pageSize, setPageSize }) {
     const numLimit = Number(newLimit);
     if (numLimit !== pageSize) {
       setPageSize(numLimit);
-      
       const params = new URLSearchParams(searchParams);
       params.set("size", newLimit);
       params.set("page", "1"); // Reset về trang 1 khi đổi size
@@ -36,7 +35,7 @@ function BrandSetRowsPerPage({ pageSize, setPageSize }) {
 
 BrandSetRowsPerPage.propTypes = {
   pageSize: PropTypes.number.isRequired,
-  setPageSize: PropTypes.func.isRequired
+  setPageSize: PropTypes.func.isRequired,
 };
 
 export default BrandSetRowsPerPage;
