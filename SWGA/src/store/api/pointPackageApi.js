@@ -23,7 +23,6 @@ export const getAllPointPackages = async ({
 
     const url = `${POINT_PACKAGE.GET_ALL}?${params}`;
     const response = await apiClient.get(url);
-
     if (!response.data) {
       return {
         status: response.status,

@@ -51,14 +51,14 @@ export const createAreaAPI = async (data) => {
   }
 };
 
-export const getAreasAPI = async ({ page = 1, size = 10, search = "", state = true, isAsc = true, brandId }) => {
+export const getAreasAPI = async ({ page = 1, size = 10, searchName = "", state = true, isAsc = true, brandId }) => {
   try {
     const validPage = Math.max(1, page);
 
     console.log("Fetching areas with params:", {
       page,
       size,
-      search,
+      searchName,
       state,
       isAsc,
       brandId,
@@ -68,8 +68,8 @@ export const getAreasAPI = async ({ page = 1, size = 10, search = "", state = tr
     params.append("page", validPage);
     params.append("size", size);
 
-    if (search && search.trim() !== "") {
-      params.append("search", search.trim());
+    if (searchName && searchName.trim() !== "") {
+      params.append("searchName", searchName.trim());
     }
 
     params.append("state", state.toString());

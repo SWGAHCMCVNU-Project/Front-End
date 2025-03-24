@@ -9,16 +9,24 @@ function CampaignTypeTableOperations() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
-    const params = new URLSearchParams(searchParams);
-    if (searchTerm.trim() !== "") {
-      params.set("searchName", searchTerm.trim());
-      params.set("page", "1");
-    } else {
-      params.delete("searchName");
-      params.set("page", "1");
-    }
-    setSearchParams(params);
-  }, [searchTerm, setSearchParams]);
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams(searchParams);
+      const currentSearchName = params.get("searchName") || "";
+  
+      // Chỉ cập nhật nếu searchTerm thực sự thay đổi
+      if (searchTerm.trim() !== currentSearchName) {
+        if (searchTerm.trim()) {
+          params.set("searchName", searchTerm.trim());
+        } else {
+          params.delete("searchName");
+        }
+        params.set("page", "1"); // Reset page chỉ khi searchTerm thay đổi
+        setSearchParams(params, { replace: true });
+      }
+    }, 500); // Thêm debounce để tránh reset liên tục khi gõ
+  
+    return () => clearTimeout(timer);
+  }, [searchTerm, searchParams, setSearchParams]);
 
   const handleSearch = (value) => {
     setSearchTerm(value);

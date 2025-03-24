@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import Empty from '../../ui/Empty';
-import Menus from '../../ui/Menus';
-import Pagination from '../../ui/Pagination';
-import Spinner from '../../ui/Spinner';
-import Table from '../../ui/Table';
-import CampaignTypeRow from './CampaignTypeRow';
-import SetRowsPerPage from './SetRowsPerPage';
-import { useSearchParams } from 'react-router-dom';
-import { useCampaignTypes } from '../../hooks/campaign-type/useCampaignTypes';
-import { toast } from 'react-hot-toast';
+import { useState } from "react";
+import styled from "styled-components";
+import Empty from "../../ui/Empty";
+import Menus from "../../ui/Menus";
+import Spinner from "../../ui/Spinner";
+import Table from "../../ui/Table";
+import CampaignTypeRow from "./CampaignTypeRow";
+import SetRowsPerPage from "./SetRowsPerPage";
+import { useSearchParams } from "react-router-dom";
+import { useCampaignTypes } from "../../hooks/campaign-type/useCampaignTypes";
+import { toast } from "react-hot-toast";
+import { Pagination } from "antd";
 
 const TableContainer = styled.div`
   display: flex;
@@ -17,14 +17,24 @@ const TableContainer = styled.div`
   gap: 2rem;
 `;
 
+const FooterContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+`;
+
 function CampaignTypeTable() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const currentPage = Number(searchParams.get('page')) || 1;
-  const pageSize = Number(searchParams.get('size')) || 10;
+  const rawPageSize = searchParams.get("size");
+  const pageSize =
+    rawPageSize && !isNaN(Number(rawPageSize)) ? Number(rawPageSize) : 10;
+  const currentPage = Number(searchParams.get("page")) || 1;
   const [sortOrder] = useState(true);
-  const searchTerm = searchParams.get('searchName') || '';
+  const searchTerm = searchParams.get("searchName") || "";
 
-  const { campaignTypes, error, isLoading, totalCount, totalPages } = useCampaignTypes({
+  const { campaignTypes, error, isLoading } = useCampaignTypes({
     page: currentPage,
     size: pageSize,
     searchName: searchTerm,
@@ -32,48 +42,39 @@ function CampaignTypeTable() {
     state: true,
   });
 
-  useEffect(() => {
-    if (campaignTypes?.length === 0 && currentPage > 1 && !isLoading) {
-      setSearchParams({
-        page: (currentPage - 1).toString(),
-        size: pageSize.toString(),
-        ...(searchTerm && { searchName: searchTerm }),
-      });
-    }
-  }, [campaignTypes, currentPage, pageSize, searchTerm, setSearchParams, isLoading]);
-
   const handlePageChange = (newPage) => {
-    setSearchParams({
-      page: newPage.toString(),
-      size: pageSize.toString(),
-      ...(searchTerm && { searchName: searchTerm }),
-    });
+    const params = new URLSearchParams(searchParams);
+    params.set("page", newPage.toString());
+    // KHÔNG set lại "size" hoặc các param khác ở đây
+    setSearchParams(params, { replace: true }); // Thêm { replace: true } để tránh re-render không cần thiết
   };
 
   const handlePageSizeChange = (newSize) => {
-    setSearchParams({
-      size: newSize.toString(),
-      page: '1',
-      ...(searchTerm && { searchName: searchTerm }),
-    });
+    const params = new URLSearchParams(searchParams);
+    params.set("size", newSize.toString());
+    params.set("page", "1"); // Reset về trang đầu tiên
+    setSearchParams(params);
   };
 
   if (isLoading) return <Spinner />;
   if (error) {
-    toast.error('Có lỗi khi tải danh sách loại chiến dịch');
+    toast.error("Có lỗi khi tải danh sách loại chiến dịch");
     return null;
   }
-  if (!campaignTypes) {
-    return <Empty resource='loại chiến dịch' />;
+  if (!campaignTypes || !campaignTypes.data) {
+    return <Empty resource="loại chiến dịch" />;
   }
+
+  const types = campaignTypes.data.items || [];
+  const totalCount = campaignTypes.data.total || 0;
 
   return (
     <TableContainer>
-      {!campaignTypes.length ? (
-        <Empty resource='loại chiến dịch' />
+      {!types.length ? (
+        <Empty resource="loại chiến dịch" />
       ) : (
         <Menus>
-          <Table columns='0.5fr 2fr 2fr 1fr 1fr'>
+          <Table columns="0.5fr 2fr 2fr 1fr 1fr">
             <Table.Header>
               <div>STT</div>
               <div>Tên loại chiến dịch</div>
@@ -83,7 +84,7 @@ function CampaignTypeTable() {
             </Table.Header>
 
             <Table.Body
-              data={campaignTypes}
+              data={types}
               render={(campaignType, index) => (
                 <CampaignTypeRow
                   key={campaignType.id}
@@ -94,17 +95,19 @@ function CampaignTypeTable() {
             />
 
             <Table.Footer>
-              
-              <SetRowsPerPage
-                pageSize={pageSize}
-                onLimitChange={handlePageSizeChange}
-              />
-              <Pagination
-                count={totalCount}
-                pageSize={pageSize}
-                currentPage={currentPage}
-                onPageChange={handlePageChange}
-              />
+              <FooterContainer>
+                <Pagination
+                  current={currentPage}
+                  pageSize={pageSize}
+                  total={totalCount}
+                  onChange={handlePageChange}
+                  showSizeChanger={false}
+                />
+                <SetRowsPerPage
+                  size={pageSize}
+                  onChange={handlePageSizeChange}
+                />
+              </FooterContainer>
             </Table.Footer>
           </Table>
         </Menus>

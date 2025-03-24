@@ -6,16 +6,14 @@ function SetRowsPerPage({ pageSize, onLimitChange }) {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const handleLimitChange = (newLimit) => {
-    const newSize = Number(newLimit);
-    if (newSize !== pageSize) {
-      const params = new URLSearchParams(searchParams);
-      params.set("size", newSize.toString());
-      params.set("page", "1");
-      setSearchParams(params, { replace: true }); // Thêm { replace: true }
+    if (Number(newLimit) !== pageSize) {
+      onLimitChange(newLimit);
+      searchParams.set("limit", newLimit);
+
+      searchParams.set("page", 1);
+      setSearchParams(searchParams);
     }
   };
-
-  // Đảm bảo pageSize có giá trị hợp lệ trước khi gọi toString()
 
   return (
     <TableOperations>
@@ -26,6 +24,7 @@ function SetRowsPerPage({ pageSize, onLimitChange }) {
           { value: "15", label: "15" },
           { value: "20", label: "20" },
         ]}
+        value={pageSize.toString()}
         onLimitChange={handleLimitChange}
       />
     </TableOperations>

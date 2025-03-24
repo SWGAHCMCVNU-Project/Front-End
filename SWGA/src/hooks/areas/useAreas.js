@@ -2,10 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { getAreasAPI } from "../../store/api/areasApi";
 import { toast } from "react-hot-toast";
 
-export function useAreas({ page = 1, size = 10, search = "", isAsc = true } = {}) {
+export function useAreas({ page = 1, size = 10, searchName  = "", isAsc = true } = {}) {
   const { isLoading, data, error } = useQuery({
-    queryKey: ["areas", page, size, search, isAsc],
-    queryFn: () => getAreasAPI({ page, size, search, isAsc }), // Remove state filter
+    queryKey: ["areas", page, size, searchName , isAsc],
+    queryFn: () => getAreasAPI({ page, size, searchName , isAsc }), // Remove state filter
     staleTime: 1000 * 60,
     keepPreviousData: true,
     onError: () => toast.error("Không thể tải danh sách khu vực"),

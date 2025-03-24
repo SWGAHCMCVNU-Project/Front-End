@@ -12,17 +12,19 @@ function BrandTableOperations() {
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
+    const prevSearch = params.get("searchName") || "";
 
-    if (debouncedSearch.trim()) {
-      params.set("searchName", debouncedSearch.trim());
-      params.set("page", "1");
-    } else {
-      params.delete("searchName"); // Xóa searchName khi rỗng
-      params.set("page", "1");
+    if (debouncedSearch.trim() !== prevSearch) {
+      if (debouncedSearch.trim()) {
+        params.set("searchName", debouncedSearch.trim());
+        params.set("page", "1"); // Reset về trang 1 khi search thay đổi
+      } else {
+        params.delete("searchName");
+        params.set("page", "1"); // Reset về trang 1 khi xóa search
+      }
+      setSearchParams(params, { replace: true });
     }
-
-    setSearchParams(params, { replace: true });
-  }, [debouncedSearch, searchParams, setSearchParams]);
+  }, [debouncedSearch, setSearchParams, searchParams]);  // Loại searchParams khỏi dependency để tránh loop
 
   const handleSearch = (value) => {
     setSearchTerm(value);
@@ -30,7 +32,7 @@ function BrandTableOperations() {
 
   return (
     <TableOperations>
-      <SearchBar 
+      <SearchBar
         type="text"
         value={searchTerm}
         onChange={handleSearch}
