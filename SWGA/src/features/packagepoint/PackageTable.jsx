@@ -104,7 +104,7 @@ function PackageTable() {
                   pageSize={pageSize}
                   total={totalCount}
                   onChange={handlePageChange}
-                  showSizeChanger
+                  //  
                   onShowSizeChange={(current, size) => handlePageSizeChange(size)}
                 />
                 <SetRowsPerPage

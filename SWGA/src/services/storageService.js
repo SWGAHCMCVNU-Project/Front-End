@@ -40,6 +40,23 @@ const StorageService = {
     }
     localStorage.setItem("brandId", brandId);
   },
+  // Thêm các phương thức cho campusId
+  getCampusId() {
+    const campusId = localStorage.getItem("campusId");
+    if (!campusId) {
+      return null;
+    }
+    return campusId;
+  },
+  setCampusId(campusId) {
+    if (!campusId) {
+      return;
+    }
+    localStorage.setItem("campusId", campusId);
+  },
+  removeCampusId() {
+    localStorage.removeItem("campusId");
+  },
   getUserRole() {
     const user = this.getUser();
     return user?.role || "";
@@ -94,6 +111,7 @@ const StorageService = {
     this.removeLoginId();
     this.removeAvatarLogin();
     localStorage.removeItem("brandId");
+    this.removeCampusId(); // Thêm xóa campusId
   },
 };
 

@@ -10,7 +10,7 @@ import Table from "../../ui/Table";
 import Empty from "./Empty";
 import SetRowsPerPage from "./SetRowsPerPage";
 import StoreRow from "./StoreRow";
-import { useStoresByBrandId } from "./useStoresByBrandId";
+import { useStores } from "../../hooks/store/useStores"; // Thay thế useStoresByBrandId bằng useStores
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -42,28 +42,54 @@ const StyledButton = styled.div`
 `;
 
 function StoresByBrandId() {
-  const [limit, setLimit] = useState();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [sortField, setSortField] = useState("Id");
   const [sortOrder, setSortOrder] = useState("desc");
-  const { storesByBrandId, isLoading: storesLoading } = useStoresByBrandId(
-    limit,
-    sortField,
-    sortOrder
-  );
 
-  const [currentPage, setCurrentPage] = useState(1);
+  // Gọi hook useStores với các tham số
+  const { stores, isLoading: storesLoading, error } = useStores({
+    page: currentPage,
+    size: pageSize,
+    sort: `${sortField}:${sortOrder}`,
+  });
+
+  // Debug: Log các giá trị để kiểm tra
+  console.log("StoresByBrandId - currentPage:", currentPage);
+  console.log("StoresByBrandId - pageSize:", pageSize);
+  console.log("StoresByBrandId - sort:", `${sortField}:${sortOrder}`);
+  console.log("StoresByBrandId - stores:", stores);
+  console.log("StoresByBrandId - isLoading:", storesLoading);
+  console.log("StoresByBrandId - error:", error);
+
   const onLimitChange = (newLimit) => {
-    setLimit(newLimit);
-    setCurrentPage(1);
+    setPageSize(newLimit);
+    setCurrentPage(1); // Reset về trang đầu khi thay đổi số dòng mỗi trang
   };
-  if (storesLoading) return <Spinner />;
-  if (!storesByBrandId?.result?.length)
-    return <Empty resourceName="cửa hàng" />;
 
   const handleStackedClick = (clickedColumn) => {
     setSortField(clickedColumn);
     setSortOrder((prevSortOrder) => (prevSortOrder === "asc" ? "desc" : "asc"));
+    setCurrentPage(1); // Reset về trang đầu khi thay đổi sắp xếp
   };
+
+  // Kiểm tra trạng thái loading
+  if (storesLoading) {
+    console.log("StoresByBrandId - Showing Spinner because storesLoading is true");
+    return <Spinner />;
+  }
+
+  // Kiểm tra lỗi
+  if (error) {
+    console.log("StoresByBrandId - Error occurred:", error);
+    return <div>Có lỗi xảy ra khi tải danh sách cửa hàng</div>;
+  }
+
+  // Kiểm tra dữ liệu rỗng
+  if (!stores?.result?.length) {
+    console.log("StoresByBrandId - No stores found. stores.result:", stores?.result);
+    return <Empty resourceName="cửa hàng" />;
+  }
 
   return (
     <>
@@ -86,12 +112,11 @@ function StoresByBrandId() {
               <div>Địa chỉ</div>
               <div>Liên hệ</div>
               <div>Thời gian làm việc</div>
-
               <StyledHeader>Trạng thái</StyledHeader>
             </Table.Header>
 
             <Table.Body
-              data={storesByBrandId?.result}
+              data={stores?.result}
               render={(store, index) => (
                 <StyledButton>
                   <StoreRow
@@ -99,10 +124,7 @@ function StoresByBrandId() {
                     store={store}
                     index={index + 1}
                     displayedIndex={
-                      (storesByBrandId.currentPage - 1) *
-                        storesByBrandId.pageSize +
-                      index +
-                      1
+                      (stores.currentPage - 1) * stores.pageSize + index + 1
                     }
                   />
                 </StyledButton>
@@ -110,14 +132,15 @@ function StoresByBrandId() {
             />
             <Table.Footer>
               <Pagination
-                count={storesByBrandId?.rowCount}
+                count={stores?.rowCount}
                 currentPage={currentPage}
-                pageSize={storesByBrandId?.pageSize}
-                pageCount={storesByBrandId?.pageCount}
-                totalCount={storesByBrandId?.totalCount}
+                pageSize={stores?.pageSize}
+                pageCount={stores?.pageCount}
+                totalCount={stores?.totalCount}
+                onPageChange={(page) => setCurrentPage(page)}
               />
               <SetRowsPerPage
-                pageSize={storesByBrandId?.pageSize}
+                pageSize={stores?.pageSize}
                 onLimitChange={onLimitChange}
               />
             </Table.Footer>

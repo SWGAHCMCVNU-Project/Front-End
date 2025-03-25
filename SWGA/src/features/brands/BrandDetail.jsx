@@ -10,11 +10,11 @@ import BrandDataBox from "./BrandDataBox";
 import { HiPencil } from "react-icons/hi2";
 import Modal from "../../ui/Modal";
 import Spinner from "../../ui/Spinner";
-import CreateBrandForm from "./CreateBrandForm";
 import HistoriesByBrandId from "./HistoriesByBrandId";
 import StoresByBrandId from "./StoresByBrandId";
 import VouchersBrand from "./VouchersBrand";
 import useBrand from "../../hooks/brand/useBrandId.js";
+// import CampaignsByBrandId from "./CampaignsByBrandId.jsx";
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -104,6 +104,11 @@ function BrandDetail() {
       label: "Ưu đãi",
       children: <VouchersBrand />,
     },
+    // {
+    //   key: "campaigns",
+    //   label: "Chiến dịch",
+    //   children: <CampaignsByBrandId />,
+    // },
   ];
 
   return (
@@ -130,9 +135,7 @@ function BrandDetail() {
               </StyledContainerButton>
             </Button>
           </Modal.Open>
-          <Modal.Window name="edit">
-            <CreateBrandForm brandToEdit={brand} />
-          </Modal.Window>
+        
         </Modal>
       </ButtonGroup>
 

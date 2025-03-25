@@ -77,7 +77,14 @@ export const AUTH_ENDPOINTS = {
     UPDATE: "/PointPackage/{id}",
   }
   export const PAYMENT = {
-    CREATE_PAYMENT: "/VNPAY/purchase-points"
-  }
+    CREATE_PAYMENT_CAMPUS: "/VNPAY/capus-purchase-points",
+    CREATE_PAYMENT_BRAND: "/VNPAY/brand-purchase-points"
 
+  }
+  export const CAMPUS = {
+    GET_ALL: "/Campus",
+    GET_BY_ID: "/Campus/{id}",
+    CREATE: "/Campus",
+    UPDATE: "/Campus/{id}",
+  }
 

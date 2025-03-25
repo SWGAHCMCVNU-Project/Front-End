@@ -207,8 +207,8 @@ function Sidenav({ color }) {
       menuSideNav: [
         {
           key: "12",
-          linkURL: "/universities",
-          pageName: "universities",
+          linkURL: "/campus",
+          pageName: "campus",
           color: color,
           iconPage: <FontAwesomeIcon icon={faBuildingColumns} />,
           labelPageName: "Đại học",
