@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+
+
 import styled from "styled-components";
 import Heading from "../../ui/Heading";
 import Menus from "../../ui/Menus";
@@ -8,9 +11,9 @@ import Spinner from "../../ui/Spinner";
 import StackedHeader from "../../ui/StackedHeader";
 import Table from "../../ui/Table";
 import Empty from "./Empty";
-import SetRowsPerPage from "./SetRowsPerPage";
+import BrandSetRowsPerPage from "./SetRowsPerPage";
 import StoreRow from "./StoreRow";
-import { useStores } from "../../hooks/store/useStores"; // Thay thế useStoresByBrandId bằng useStores
+import useStoresByBrandId from "../../hooks/store/useStoresByBrandId";
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -41,53 +44,56 @@ const StyledButton = styled.div`
   }
 `;
 
-function StoresByBrandId() {
+function StoresByBrandId({ brandId }) {
+  const [searchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(Number(searchParams.get("size")) || 10); // Khởi tạo 
   const [sortField, setSortField] = useState("Id");
   const [sortOrder, setSortOrder] = useState("desc");
 
-  // Gọi hook useStores với các tham số
-  const { stores, isLoading: storesLoading, error } = useStores({
-    page: currentPage,
-    size: pageSize,
-    sort: `${sortField}:${sortOrder}`,
-  });
 
-  // Debug: Log các giá trị để kiểm tra
-  console.log("StoresByBrandId - currentPage:", currentPage);
-  console.log("StoresByBrandId - pageSize:", pageSize);
-  console.log("StoresByBrandId - sort:", `${sortField}:${sortOrder}`);
-  console.log("StoresByBrandId - stores:", stores);
-  console.log("StoresByBrandId - isLoading:", storesLoading);
-  console.log("StoresByBrandId - error:", error);
+  useEffect(() => {
+    const urlPage = Number(searchParams.get('page')) || 1;
+    const urlSize = Number(searchParams.get('size')) || 10;
+    
+    if (urlPage !== currentPage) setCurrentPage(urlPage);
+    if (urlSize !== pageSize) setPageSize(urlSize);
+  }, [searchParams]);
+
+
+  const { stores, loading: storesLoading, error, pagination, refetch } = useStoresByBrandId(
+    brandId,
+    {
+      page: currentPage,
+      size: pageSize,
+      searchName: "",
+    }
+  );
+
 
   const onLimitChange = (newLimit) => {
     setPageSize(newLimit);
-    setCurrentPage(1); // Reset về trang đầu khi thay đổi số dòng mỗi trang
+    setCurrentPage(1);  // Reset về trang đầu tiên
+    refetch({ size: newLimit, page: 1 });  // Gọi API với tham số mới
   };
+
 
   const handleStackedClick = (clickedColumn) => {
     setSortField(clickedColumn);
     setSortOrder((prevSortOrder) => (prevSortOrder === "asc" ? "desc" : "asc"));
-    setCurrentPage(1); // Reset về trang đầu khi thay đổi sắp xếp
+    setCurrentPage(1);
+    refetch({ sort: `${clickedColumn}:${sortOrder === "asc" ? "desc" : "asc"}`, page: 1 });
   };
 
-  // Kiểm tra trạng thái loading
   if (storesLoading) {
-    console.log("StoresByBrandId - Showing Spinner because storesLoading is true");
     return <Spinner />;
   }
 
-  // Kiểm tra lỗi
   if (error) {
-    console.log("StoresByBrandId - Error occurred:", error);
-    return <div>Có lỗi xảy ra khi tải danh sách cửa hàng</div>;
+    return <div>Có lỗi xảy ra khi tải danh sách cửa hàng: {error}</div>;
   }
 
-  // Kiểm tra dữ liệu rỗng
-  if (!stores?.result?.length) {
-    console.log("StoresByBrandId - No stores found. stores.result:", stores?.result);
+  if (!Array.isArray(stores) || stores.length === 0) {
     return <Empty resourceName="cửa hàng" />;
   }
 
@@ -116,7 +122,7 @@ function StoresByBrandId() {
             </Table.Header>
 
             <Table.Body
-              data={stores?.result}
+              data={stores}
               render={(store, index) => (
                 <StyledButton>
                   <StoreRow
@@ -124,7 +130,7 @@ function StoresByBrandId() {
                     store={store}
                     index={index + 1}
                     displayedIndex={
-                      (stores.currentPage - 1) * stores.pageSize + index + 1
+                      (pagination.currentPage - 1) * pageSize + index + 1
                     }
                   />
                 </StyledButton>
@@ -132,15 +138,18 @@ function StoresByBrandId() {
             />
             <Table.Footer>
               <Pagination
-                count={stores?.rowCount}
-                currentPage={currentPage}
-                pageSize={stores?.pageSize}
-                pageCount={stores?.pageCount}
-                totalCount={stores?.totalCount}
-                onPageChange={(page) => setCurrentPage(page)}
+                count={pagination.totalItems}
+                currentPage={pagination.currentPage}
+                pageSize={pageSize}
+                pageCount={pagination.totalPages}
+                totalCount={pagination.totalItems}
+                onPageChange={(page) => {
+                  setCurrentPage(page);
+                  refetch({ page });
+                }}
               />
-              <SetRowsPerPage
-                pageSize={stores?.pageSize}
+              <BrandSetRowsPerPage
+                pageSize={pageSize}
                 onLimitChange={onLimitChange}
               />
             </Table.Footer>

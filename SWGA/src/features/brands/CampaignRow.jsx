@@ -17,7 +17,7 @@ const Station = styled.div`
   margin-left: ${(props) => (props.$isNullImage ? "2rem" : "0")};
 `;
 
-const Img = styled.img`
+const Img = styled.div`
   display: block;
   align-items: center;
   width: ${(props) => (props.src ? "50px" : "38px")};
@@ -39,11 +39,12 @@ const StationName = styled.div`
   -webkit-box-orient: vertical;
 `;
 
-const StackedTime = styled.span`
+const StackedTime = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
   font-weight: 500;
+  font-size: 1.4rem;
 `;
 
 const StackedTimeFrameAbove = styled.span`
@@ -52,6 +53,26 @@ const StackedTimeFrameAbove = styled.span`
 
 const StackedTimeFrameBelow = styled.span`
   color: red;
+`;
+
+const CostContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-weight: 500;
+  font-size: 1.4rem;
+`;
+
+// Thêm style cho span để căn chỉnh nhãn và giá trị
+const LabelValue = styled.span`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* Khoảng cách giữa nhãn và giá trị */
+`;
+
+const Label = styled.span`
+  min-width: 70px; /* Đảm bảo nhãn có độ dài cố định để thẳng hàng */
+  display: inline-block;
 `;
 
 const StationIndex = styled.div`
@@ -113,30 +134,31 @@ function CampaignRow({ campaign, displayedIndex }) {
       </Station>
 
       <StackedTime>
-        <span>
-          Bắt đầu:{" "}
+        <LabelValue>
+          <Label>Bắt đầu:</Label>
           <StackedTimeFrameAbove>
             {format(new Date(startOn), "dd MMM yyyy", { locale: vi })}
           </StackedTimeFrameAbove>
-        </span>
-        <span>
-          Kết thúc:{" "}
+        </LabelValue>
+        <LabelValue>
+          <Label>Kết thúc:</Label>
           <StackedTimeFrameBelow>
             {format(new Date(endOn), "dd MMM yyyy", { locale: vi })}
           </StackedTimeFrameBelow>
-        </span>
+        </LabelValue>
       </StackedTime>
 
-      <StackedTime>
-        <span>
-          Lợi nhuận:{" "}
+      <CostContainer>
+        <LabelValue>
+          <Label>Lợi nhuận:</Label>
           <StackedTimeFrameAbove>{totalIncome}</StackedTimeFrameAbove>
-        </span>
-        <span>
-          Chi tiêu:{" "}
+        </LabelValue>
+        <LabelValue>
+          <Label>Chi tiêu:</Label>
           <StackedTimeFrameBelow>{totalSpending}</StackedTimeFrameBelow>
-        </span>
-      </StackedTime>
+        </LabelValue>
+      </CostContainer>
+
       <Tag type={statusToTagName[currentState]}>{currentStateName}</Tag>
     </Table.Row>
   );

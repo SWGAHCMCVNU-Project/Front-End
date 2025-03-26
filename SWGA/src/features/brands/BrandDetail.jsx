@@ -1,5 +1,5 @@
 import { Tabs } from "antd";
-import { useNavigate, useParams } from "react-router-dom"; // Add useParams
+import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import Button from "../../ui/Button";
 import ButtonGroup from "../../ui/ButtonGroup";
@@ -10,11 +10,11 @@ import BrandDataBox from "./BrandDataBox";
 import { HiPencil } from "react-icons/hi2";
 import Modal from "../../ui/Modal";
 import Spinner from "../../ui/Spinner";
-import HistoriesByBrandId from "./HistoriesByBrandId";
+// import HistoriesByBrandId from "./HistoriesByBrandId";
 import StoresByBrandId from "./StoresByBrandId";
-import VouchersBrand from "./VouchersBrand";
 import useBrand from "../../hooks/brand/useBrandId.js";
-// import CampaignsByBrandId from "./CampaignsByBrandId.jsx";
+import CampaignsByBrandId from "./CampaignsByBrandId.jsx";
+import StorageService from "../../services/storageService.js"; // Import StorageService
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -52,14 +52,30 @@ const StyledButton = styled.div`
 `;
 
 function BrandDetail() {
-  const { brandId } = useParams(); // Extract brandId from the URL
-  const { brand, isLoading, error, refetch } = useBrand(brandId); // Pass brandId to useBrand
+  const { brandId: brandIdFromParams } = useParams(); // Lấy brandId từ URL
+  const brandIdFromStorage = StorageService.getBrandId(); // Lấy brandId từ StorageService
+  const brandId = brandIdFromParams || brandIdFromStorage; // Ưu tiên brandId từ URL, nếu không có thì dùng từ StorageService
+
+ 
+  const { brand, isLoading, error, refetch } = useBrand(brandId);
   const navigate = useNavigate();
 
-  // Handle loading state
+  if (!brandId) {
+    return (
+      <Container>
+        <Row type="horizontal">
+          <HeadingGroup>
+            <Heading as="h1">Thông tin thương hiệu</Heading>
+          </HeadingGroup>
+        </Row>
+        <p>Không tìm thấy brandId. Vui lòng kiểm tra URL hoặc đăng nhập lại.</p>
+        <Button onClick={() => navigate("/brands")}>Quay lại</Button>
+      </Container>
+    );
+  }
+
   if (isLoading) return <Spinner />;
 
-  // Handle error state
   if (error) {
     return (
       <Container>
@@ -74,7 +90,6 @@ function BrandDetail() {
     );
   }
 
-  // Handle case where brand is not found
   if (!brand) {
     return (
       <Container>
@@ -89,26 +104,21 @@ function BrandDetail() {
   }
 
   const items = [
-    {
-      key: "histories",
-      label: "Lịch sử",
-      children: <HistoriesByBrandId />,
-    },
+    // {
+    //   key: "histories",
+    //   label: "Lịch sử",
+    //   children: <HistoriesByBrandId />,
+    // },
     {
       key: "stores",
       label: "Cửa hàng",
-      children: <StoresByBrandId />,
+      children: <StoresByBrandId brandId={brandId} />,
     },
     {
-      key: "vouchers",
-      label: "Ưu đãi",
-      children: <VouchersBrand />,
+      key: "campaigns",
+      label: "Chiến dịch",
+      children: <CampaignsByBrandId brandId={brandId} />,
     },
-    // {
-    //   key: "campaigns",
-    //   label: "Chiến dịch",
-    //   children: <CampaignsByBrandId />,
-    // },
   ];
 
   return (
@@ -135,7 +145,6 @@ function BrandDetail() {
               </StyledContainerButton>
             </Button>
           </Modal.Open>
-        
         </Modal>
       </ButtonGroup>
 

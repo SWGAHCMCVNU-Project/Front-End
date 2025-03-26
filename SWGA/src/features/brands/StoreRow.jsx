@@ -64,7 +64,10 @@ const WorkingHours = styled.div`
   font-size: 1.4rem;
   font-weight: 500;
   color: var(--color-grey-600);
-  
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+
   span {
     &.open {
       color: var(--color-green-700);
@@ -74,7 +77,6 @@ const WorkingHours = styled.div`
     }
   }
 `;
-
 const StationIndex = styled.div`
   font-size: 1.4rem;
   font-weight: 500;
@@ -90,7 +92,7 @@ function StoreRow({ store, displayedIndex }) {
     phone,
     openingHours,
     closingHours,
-    state
+    state,
   } = store;
 
   return (
@@ -106,9 +108,13 @@ function StoreRow({ store, displayedIndex }) {
       <Address>{address}</Address>
       <Contact>{formatPhoneNumber(phone)}</Contact>
       <WorkingHours>
-        Mở cửa: <span className="open">{formattedHours(openingHours)}</span>
-        <br />
-        Đóng cửa: <span className="close">{formattedHours(closingHours)}</span>
+        <div>
+          Mở cửa: <span className="open">{formattedHours(openingHours)}</span>
+        </div>
+        <div>
+          Đóng cửa:{" "}
+          <span className="close">{formattedHours(closingHours)}</span>
+        </div>
       </WorkingHours>
       <Tag type={state ? "cyan" : "error"}>
         {state ? "Hoạt động" : "Không Hoạt Động"}

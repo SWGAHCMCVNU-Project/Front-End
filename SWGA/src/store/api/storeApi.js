@@ -187,3 +187,34 @@ export const updateStoreAPI = async (id, formData) => {
     };
   }
 };
+export const getStoresByBrandIdAPI = async (brandId, { page = 1, size = 10, searchName = "" } = {}) => {
+  try {
+    if (!brandId) {
+      throw new Error("Brand ID is required");
+    }
+
+    const url = STORE_ENDPOINTS.GET_STORE_BY_ID.replace("{id}", brandId);
+    const response = await apiClient.get(url, {
+      params: {
+        page,
+        size,
+        searchName,
+      },
+    });
+
+    return {
+      status: response.status,
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    console.error(`Error fetching stores for brand ${brandId}:`, error);
+    const errorMessage =
+      error.response?.data?.message || "Lấy danh sách cửa hàng theo thương hiệu thất bại";
+    return {
+      status: error.response?.status || 500,
+      success: false,
+      message: errorMessage,
+    };
+  }
+};

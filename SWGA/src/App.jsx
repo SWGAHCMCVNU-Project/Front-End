@@ -48,6 +48,7 @@ import CampaignUpdatePage from "./pages/CampaignManagement/CampaignUpdatePage.js
 import BuyPoints from "./pages/BuyPoints";
 import CampusDetailsPage from "./pages/CampusManagement/CampusDetailsPage.jsx";
 import CampusPage from "./pages/CampusManagement/CampusPage.jsx";
+import LuckyPrize from "./pages/LuckyPrizeManagement/LuckyPrize.jsx";
 
 function PrivateRoute({ children, allowedRoles = [] }) {
   const location = useLocation();
@@ -172,16 +173,24 @@ function App() {
                 </PrivateRoute>
               }
             />
-             <Route
-                path="/campus/:campusId"
-                exact
-                element={
-                  <PrivateRoute allowedRoles={["admin"]}>
-                    <CampusDetailsPage />
-                  </PrivateRoute>
-                }
-              />
-
+            <Route
+              path="/campus/:campusId"
+              exact
+              element={
+                <PrivateRoute allowedRoles={["admin"]}>
+                  <CampusDetailsPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/lucky-prizes"
+              exact
+              element={
+                <PrivateRoute allowedRoles={["admin"]}>
+                  <LuckyPrize />
+                </PrivateRoute>
+              }
+            />
             <Route
               path="/majors"
               exact

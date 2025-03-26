@@ -17,6 +17,7 @@ import {
   faUserGraduate,
   faUserTie,
 } from "@fortawesome/free-solid-svg-icons";
+import { faDice } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Divider, Menu } from "antd";
 import React, { useEffect } from "react";
@@ -232,6 +233,15 @@ function Sidenav({ color }) {
           labelPageName: "Gói điểm",
           allowedRoles: ["admin"],
         },
+        {
+          key: "22",
+          linkURL: "/lucky-prizes",
+          pageName: "lucky-prizes",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faDice} />, 
+          labelPageName: "Điểm may mắn",
+          allowedRoles: ["admin"],
+        }
       ],
     },
     {
@@ -273,6 +283,7 @@ function Sidenav({ color }) {
           labelPageName: "Mua điểm",
           allowedRoles: ["brand"],
         },
+        
       ],
     },
     {

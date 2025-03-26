@@ -48,6 +48,8 @@ export const AUTH_ENDPOINTS = {
     GET_ALL: "/Store",
     GET_BY_ID: "/Store/{id}",
     UPDATE: "/Store/{id}",
+    GET_STORE_BY_ID: "/Store/brand/{id}"
+
   };
   export const CAMPAIGN_ENDPOINTS = {
     GET_ALL: "/Campaign",
@@ -56,6 +58,7 @@ export const AUTH_ENDPOINTS = {
     UPDATE: "/Campaign/{id}",
     GET_ALL_CAMPAIGN: "Campaign/getAll",
     GET_STORE_BY_ID: "Campaign/getStoreByCampaignId/{id}",
+    GET_CAMPAIGN_BY_ID: "/Campaign/brand/{id}"
 
   };
   export const CAMPAIGN_DETAIL_ENDPOINTS = {
@@ -86,5 +89,10 @@ export const AUTH_ENDPOINTS = {
     GET_BY_ID: "/Campus/{id}",
     CREATE: "/Campus",
     UPDATE: "/Campus/{id}",
+  }
+  export const LUCKY_PRIZE = {
+    CREATE: "/LuckyPrize",
+    GET_ALL: "/LuckyPrize",
+    UPDATE: "/LuckyPrize/{id}"
   }
 
