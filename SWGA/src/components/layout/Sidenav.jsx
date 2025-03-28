@@ -17,12 +17,13 @@ import {
   faUserGraduate,
   faUserTie,
 } from "@fortawesome/free-solid-svg-icons";
+import { faDice } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Divider, Menu } from "antd";
 import React, { useEffect } from "react";
 import { HiMiniTicket } from "react-icons/hi2";
 import { NavLink, useNavigate } from "react-router-dom";
-import logo from "../../assets/images/logo_justB.png";
+import logo from "../../assets/images/S_WalletLogo.png";
 import storageService from "../../services/storageService";
 import { MenuItem } from "./MenuItem";
 
@@ -207,8 +208,8 @@ function Sidenav({ color }) {
       menuSideNav: [
         {
           key: "12",
-          linkURL: "/universities",
-          pageName: "universities",
+          linkURL: "/campus",
+          pageName: "campus",
           color: color,
           iconPage: <FontAwesomeIcon icon={faBuildingColumns} />,
           labelPageName: "Đại học",
@@ -232,6 +233,15 @@ function Sidenav({ color }) {
           labelPageName: "Gói điểm",
           allowedRoles: ["admin"],
         },
+        {
+          key: "22",
+          linkURL: "/lucky-prizes",
+          pageName: "lucky-prizes",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faDice} />, 
+          labelPageName: "Điểm may mắn",
+          allowedRoles: ["admin"],
+        }
       ],
     },
     {
@@ -273,6 +283,7 @@ function Sidenav({ color }) {
           labelPageName: "Mua điểm",
           allowedRoles: ["brand"],
         },
+        
       ],
     },
     {
@@ -299,11 +310,11 @@ function Sidenav({ color }) {
       <div className="brand" key="img-logo">
         <img
           style={{
-            width: "35%",
+            width: "60%",
             height: "40%",
             borderRadius: 10,
             marginRight: 20,
-            marginLeft: "47px",
+            marginLeft: "20px",
           }}
           src={logo}
           alt=""

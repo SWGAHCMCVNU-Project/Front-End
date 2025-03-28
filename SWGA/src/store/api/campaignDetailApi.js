@@ -13,12 +13,7 @@ export const getVouchersByCampaignId = async (
   size = 10
 ) => {
   try {
-    console.log("Calling getVouchersByCampaignId with params:", {
-      campaignId,
-      searchName,
-      page,
-      size,
-    });
+    
 
     const response = await apiClient.get(
       VOUCHER_ENDPOINTS.GET_VOUCHER_BY_ID.replace("{id}", campaignId),
@@ -31,7 +26,6 @@ export const getVouchersByCampaignId = async (
       }
     );
 
-    console.log("Raw Response Data:", response.data);
 
     // Kiểm tra nếu response.data là null hoặc undefined
     if (!response.data) {
@@ -75,7 +69,6 @@ export const getVouchersByCampaignId = async (
         }))
       : [];
 
-    console.log("Formatted Items:", formattedItems);
 
     const result = {
       items: formattedItems,
@@ -85,7 +78,6 @@ export const getVouchersByCampaignId = async (
         response.data.totalPages || Math.ceil(formattedItems.length / size),
     };
 
-    console.log("Final Result:", result);
     return result;
   } catch (error) {
     console.error("Error fetching vouchers:", {
@@ -117,12 +109,7 @@ export const getStoresByCampaignId = async (
   size = 10
 ) => {
   try {
-    console.log("Calling API with params:", {
-      campaignId,
-      searchName,
-      page,
-      size,
-    });
+    
 
     const response = await apiClient.get(
       CAMPAIGN_ENDPOINTS.GET_STORE_BY_ID.replace("{id}", campaignId),
@@ -135,7 +122,6 @@ export const getStoresByCampaignId = async (
       }
     );
 
-    console.log("Raw Response Data:", response.data);
 
     // Kiểm tra nếu response.data là null hoặc undefined
     if (!response.data) {
@@ -170,7 +156,6 @@ export const getStoresByCampaignId = async (
         }))
       : [];
 
-    console.log("Formatted Items:", formattedItems);
 
     const result = {
       items: formattedItems,
@@ -180,7 +165,6 @@ export const getStoresByCampaignId = async (
         response.data.totalPages || Math.ceil(formattedItems.length / size),
     };
 
-    console.log("Final Result:", result);
     return result;
   } catch (error) {
     console.error("Error fetching campaign stores:", {
@@ -205,17 +189,7 @@ export const getVoucherItemsByCampaignId = async ({
   isUsed = null,
 }) => {
   try {
-    console.log("Calling getVoucherItemsByCampaignId with params:", {
-      campaignDetailId,
-      state,
-      sort,
-      search,
-      page,
-      limit,
-      isLocked,
-      isBought,
-      isUsed,
-    });
+   
 
     // Đảm bảo campaignDetailId là array
     const campaignDetailIds = Array.isArray(campaignDetailId)
@@ -253,7 +227,6 @@ export const getVoucherItemsByCampaignId = async ({
       }
     );
 
-    console.log("Raw Response Data:", response.data);
 
     if (!response.data) {
       console.warn(
@@ -293,7 +266,6 @@ export const getVoucherItemsByCampaignId = async ({
       studentEmail: item.student?.email || "",
     }));
 
-    console.log("Formatted Items:", formattedItems);
 
     const result = {
       items: formattedItems,
@@ -306,7 +278,6 @@ export const getVoucherItemsByCampaignId = async ({
         : response.data.totalPages || Math.ceil(formattedItems.length / limit),
     };
 
-    console.log("Final Result:", result);
     return result;
   } catch (error) {
     console.error("Error fetching voucher items:", {

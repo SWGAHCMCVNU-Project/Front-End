@@ -2,9 +2,12 @@ import { Card, Typography, Button, Row, Col, message, Spin } from 'antd';
 import styled from 'styled-components';
 import { ShoppingCartOutlined, CheckOutlined } from '@ant-design/icons';
 import { usePointPackages } from '../hooks/point-package/usePointPackages';
-import { usePurchasePoints } from '../hooks/buy-point/usePurchasePoints';
+import { usePurchasePointsCampus } from '../hooks/buy-point/usePurchasePointsCampus';
+import { usePurchasePointsBrand } from '../hooks/buy-point/usePurchasePointsBrand';
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom'; // Import useLocation to read query params
+import { useLocation } from 'react-router-dom';
+import StorageService from '../services/storageService';
+import { useBrand } from '../hooks/brand/useBrand';
 
 const { Title, Text } = Typography;
 
@@ -99,40 +102,63 @@ function BuyPoints() {
     status: true,
     size: 100,
   });
-  
-  const { buyPoints, isPurchasing } = usePurchasePoints();
+
+  const { brand, isLoading: isBrandLoading } = useBrand();
+  const role = StorageService.getRoleLogin();
+  const campusId = StorageService.getCampusId();
+  const brandId = StorageService.getBrandId();
+
+  const { buyPoints: buyPointsCampus, isPurchasing: isPurchasingCampus } = usePurchasePointsCampus();
+  const { buyPoints: buyPointsBrand, isPurchasing: isPurchasingBrand } = usePurchasePointsBrand();
+
   const [selectedPackageId, setSelectedPackageId] = useState(null);
-  const location = useLocation(); // Use useLocation to access query params
+  const location = useLocation();
+
+  // Debug: Chỉ giữ log campusId
+  useEffect(() => {
+    console.log('BuyPoints - campusId:', campusId);
+  }, [campusId]);
 
   useEffect(() => {
-    console.log('Point Packages:', pointPackages);
 
-    // Check for VNPay callback in the URL
     const urlParams = new URLSearchParams(location.search);
     const status = urlParams.get('status');
     const messageText = urlParams.get('message');
 
     if (status === 'success') {
       message.success(messageText || 'Thanh toán thành công!');
-      setSelectedPackageId(null); // Reset selected package
+      setSelectedPackageId(null);
     } else if (status === 'error') {
       message.error(messageText || 'Thanh toán thất bại. Vui lòng thử lại.');
-      setSelectedPackageId(null); // Reset selected package
+      setSelectedPackageId(null);
     }
-  }, [location.search, pointPackages]); // Re-run when location.search changes
+  }, [location.search, pointPackages]);
 
   const handleBuyPackage = async (packageInfo) => {
     try {
-      const campusId = "HCMFPT"; // Replace with dynamic logic if needed
-      setSelectedPackageId(packageInfo.id); // Track the selected package
-      await buyPoints(packageInfo.id, campusId);
+      setSelectedPackageId(packageInfo.id);
+
+      if (role === 'campus') {
+        if (!campusId) {
+          throw new Error('Không tìm thấy campusId. Vui lòng đăng nhập lại.');
+        }
+        await buyPointsCampus(packageInfo.id, campusId, null);
+      } else if (role === 'brand') {
+        if (!brandId) {
+          throw new Error('Không tìm thấy brandId. Vui lòng đăng nhập lại.');
+        }
+        await buyPointsBrand(packageInfo.id, null, brandId);
+      } else {
+        throw new Error('Vai trò không hợp lệ. Vui lòng đăng nhập lại.');
+      }
     } catch (error) {
       console.error('Error in handleBuyPackage:', error);
-      setSelectedPackageId(null); // Reset on error
+      message.error(error.message || 'Có lỗi xảy ra khi mua gói điểm.');
+      setSelectedPackageId(null);
     }
   };
 
-  if (isLoading) {
+  if (isLoading || isBrandLoading) {
     return (
       <LoadingContainer>
         <Spin size="large" />
@@ -154,6 +180,8 @@ function BuyPoints() {
     'Hỗ trợ 24/7 nếu có vấn đề',
     'Ưu đãi hấp dẫn',
   ];
+
+  const isPurchasing = role === 'campus' ? isPurchasingCampus : isPurchasingBrand;
 
   return (
     <PageContainer>

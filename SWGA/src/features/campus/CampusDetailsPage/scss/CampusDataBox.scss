@@ -1,0 +1,23 @@
+.link-web-uni {
+    margin-top: 10px;
+
+    label {
+        font: {
+            size: 17px;
+            weight: bold;
+        }
+        color: black;
+    }
+
+    span {
+        font: {
+            size: 17px;
+            weight: bold;
+        }
+        font-style: italic;
+    }
+}
+
+.link-website:hover {
+    color: #2ecc71;
+}

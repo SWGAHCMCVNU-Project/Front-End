@@ -38,8 +38,21 @@ import {
     return value.toLocaleString("it-IT");
   };
   
-  export const formattedHours = (hours) =>
-    format(new Date(`2000-01-01T${hours}`), "h:mm a");
+ // helpers.js
+export const formattedHours = (hours) => {
+  // Kiểm tra nếu hours là null, undefined, không phải chuỗi, hoặc không đúng định dạng HH:mm:ss
+  if (!hours || typeof hours !== "string" || !/^\d{2}:\d{2}:\d{2}$/.test(hours)) {
+    return "Chưa thiết lập"; // Giá trị mặc định khi thời gian không hợp lệ
+  }
+
+  try {
+    const date = new Date(`2000-01-01T${hours}`);
+    return format(date, "h:mm a"); // Định dạng thành "9:00 AM"
+  } catch (error) {
+    console.error("Error formatting hours:", error);
+    return "Lỗi định dạng"; // Thông báo nếu có lỗi bất ngờ
+  }
+};
   
   export const formatDateTime = (dateString) => {
     const dateCreated = new Date(dateString);

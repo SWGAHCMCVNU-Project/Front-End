@@ -20,7 +20,6 @@ import Brands from "./pages/BrandManagement/Brands.jsx";
 import Brand from "./pages/BrandManagement/Brand.jsx";
 import Students from "./pages/StudentManagement/Students.jsx";
 import Student from "./pages/StudentManagement/Student.jsx";
-import UniversityPage from "./pages/UniversityManagement/UniversityPage.jsx";
 import MajorPage from "./pages/MajorManagement/MajorPage.jsx";
 import StorePage from "./pages/StoreManagement/StorePage.jsx";
 import VoucherType from "./pages/VoucherType/VoucherType.jsx";
@@ -47,6 +46,9 @@ import CampaignCreatePage from "./pages/CampaignManagement/CampaignCreatePage.js
 import CampaignDetailsPage from "./pages/CampaignManagement/CampaignDetailsPage.jsx";
 import CampaignUpdatePage from "./pages/CampaignManagement/CampaignUpdatePage.jsx";
 import BuyPoints from "./pages/BuyPoints";
+import CampusDetailsPage from "./pages/CampusManagement/CampusDetailsPage.jsx";
+import CampusPage from "./pages/CampusManagement/CampusPage.jsx";
+import LuckyPrize from "./pages/LuckyPrizeManagement/LuckyPrize.jsx";
 
 function PrivateRoute({ children, allowedRoles = [] }) {
   const location = useLocation();
@@ -163,11 +165,29 @@ function App() {
               }
             />
             <Route
-              path="/universities"
+              path="/campus"
               exact
               element={
-                <PrivateRoute allowedRoles={["admin", "campus"]}>
-                  <UniversityPage />
+                <PrivateRoute allowedRoles={["admin"]}>
+                  <CampusPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/campus/:campusId"
+              exact
+              element={
+                <PrivateRoute allowedRoles={["admin"]}>
+                  <CampusDetailsPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/lucky-prizes"
+              exact
+              element={
+                <PrivateRoute allowedRoles={["admin"]}>
+                  <LuckyPrize />
                 </PrivateRoute>
               }
             />

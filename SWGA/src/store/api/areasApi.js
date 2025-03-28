@@ -5,7 +5,6 @@ import toast from 'react-hot-toast';
 
 export const createAreaAPI = async (data) => {
   try {
-    console.log("Calling createAreaAPI with data:", data);
 
     const formData = new FormData();
     formData.append("areaName", data.areaName);
@@ -16,9 +15,7 @@ export const createAreaAPI = async (data) => {
       formData.append("image", data.image);
     }
 
-    for (let pair of formData.entries()) {
-      console.log(`${pair[0]}: ${pair[1]}`);
-    }
+   
 
     const response = await apiClient.post(AREA_ENDPOINTS.CREATE, formData, {
       headers: {
@@ -26,7 +23,6 @@ export const createAreaAPI = async (data) => {
       },
     });
 
-    console.log("API Response:", response);
     // toast.success("Tạo khu vực thành công!");
 
     return {
@@ -55,14 +51,6 @@ export const getAreasAPI = async ({ page = 1, size = 10, searchName = "", state 
   try {
     const validPage = Math.max(1, page);
 
-    console.log("Fetching areas with params:", {
-      page,
-      size,
-      searchName,
-      state,
-      isAsc,
-      brandId,
-    });
 
     const params = new URLSearchParams();
     params.append("page", validPage);
@@ -79,10 +67,8 @@ export const getAreasAPI = async ({ page = 1, size = 10, searchName = "", state 
     }
 
     const url = `${AREA_ENDPOINTS.GET_ALL}?${params}`;
-    console.log(`Making request to: ${url}`);
 
     const response = await apiClient.get(url);
-    console.log("Areas API raw response:", response.data);
 
     if (!response.data) {
       console.warn("No data received from API");
@@ -109,7 +95,6 @@ export const getAreasAPI = async ({ page = 1, size = 10, searchName = "", state 
       },
     };
 
-    console.log("Processed response data:", responseData);
     return responseData;
   } catch (error) {
     console.error("Error fetching areas:", error);

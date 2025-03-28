@@ -100,7 +100,7 @@ const TimeFrameHalf = styled.div`
 function StoreFormCreate() {
   const { isCreating, createStore, error } = useCreateStore();
   const brandId = storageService.getBrandId(); // Sử dụng getBrandId thay vì getLoginId
-  // console.log("brandId from StorageService:", brandId);
+  console.log("brandId from StorageService:", brandId);
 
 
   const { areas, isLoading: isLoadingAreas } = useAreas({ state: true });
@@ -150,8 +150,11 @@ function StoreFormCreate() {
   };
 
   const handleAvatarChange = (event) => {
-    const selectedFile = event.target.files[0];
+    const files = event.target.files;
+    const selectedFile = files?.[0];
     setFileCard(selectedFile);
+    
+    
   };
 
   // Hàm xác thực thời gian đóng cửa
@@ -171,7 +174,7 @@ function StoreFormCreate() {
     }
 
     // Log dữ liệu trước khi gửi để debug
-    // console.log("Form Data before submission:", { ...data, brandId, avatar });
+    console.log("Form Data before submission:", { ...data, brandId, avatar });
 
     createStore({ ...data, brandId, avatar });
   }
@@ -378,8 +381,8 @@ function StoreFormCreate() {
             </StyledDataBox>
 
             <StyledDataBox>
-              <Header>
-                <div>Thời gian làm việc</div>
+              <Header >
+                <div >Thời gian làm việc</div>
               </Header>
               <TimeFrameContainer>
                 <TimeFrameHalf>

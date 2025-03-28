@@ -10,11 +10,11 @@ export const useCampaignTypes = ({
   state,
 } = {}) => {
   const params = {
-    page: Number(page) || 1,
-    size: Number(size) || 10,
-    searchName: searchName || "",
-    isAsc: Boolean(isAsc),
-    state: state !== undefined ? Boolean(state) : null,
+    page,
+    size,
+    searchName,
+    isAsc,
+    state: state !== undefined ? state : null, // Đảm bảo state được truyền đúng
   };
 
   const { data, error, isLoading } = useQuery({
@@ -25,9 +25,15 @@ export const useCampaignTypes = ({
     onError: () => toast.error("Không thể tải danh sách loại chiến dịch"),
   });
 
-  // Trả về dữ liệu trực tiếp từ API mà không ánh xạ lại
+  // Đảm bảo dữ liệu trả về có cấu trúc mong muốn
+  const campaignTypes = data?.data?.items || [];
+  const totalCount = data?.data?.total || 0;
+  const totalPages = data?.data?.totalPages || 0;
+
   return {
-    campaignTypes: data, // Trả về toàn bộ object từ getAllCampaignTypes
+    campaignTypes, // Đây là mảng các campaign types
+    totalCount,
+    totalPages,
     error,
     isLoading,
   };

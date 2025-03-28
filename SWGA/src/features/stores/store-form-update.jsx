@@ -110,40 +110,26 @@ function StoreFormUpdate() {
   const [storeToEdit, setStoreToEdit] = useState(location.state?.store);
 
   if (!storeToEdit) {
-    // console.log("No store data found in location.state");
+    console.log("No store data found in location.state");
     return <div>Không tìm thấy dữ liệu cửa hàng để chỉnh sửa. Vui lòng quay lại trang chi tiết cửa hàng.</div>;
   }
 
-  // Debug the storeToEdit data
-  // console.log("storeToEdit:", storeToEdit);
-
-  const { areas, isLoading: isLoadingAreas } = useAreas();
+  const { areas, isLoading: isLoadingAreas } = useAreas({ state: true });
   const [areaOptions, setAreaOptions] = useState([]);
   const [areaValid, setAreaValid] = useState(null);
   const [fileCard, setFileCard] = useState(null);
 
-  // Memoize editValues with fallback values
+  // Memoize editValues to prevent unnecessary re-renders
   const { id: editId, openingHours, closingHours, ...editValues } = useMemo(
-    () => ({
-      storeName: storeToEdit.storeName || "",
-      description: storeToEdit.description || "",
-      address: storeToEdit.address || "",
-      areaId: storeToEdit.areaId || "",
-      state: storeToEdit.state ?? true,
-      avatar: storeToEdit.avatar || "",
-      openingHours: storeToEdit.openingHours || "",
-      closingHours: storeToEdit.closingHours || "",
-      id: storeToEdit.id,
-    }),
+    () => storeToEdit,
     [storeToEdit]
   );
 
   // Stabilize the areas dependency
-  const stableAreas = useMemo(() => areas, [areas]);
+  const stableAreas = useMemo(() => areas, [areas?.result]);
 
   const getDataSelectBox = () => {
     if (stableAreas?.result && Array.isArray(stableAreas.result)) {
-      // Filter active areas for the dropdown
       const filteredAreas = stableAreas.result.filter((c) => c.state);
       if (filteredAreas.length > 0) {
         const newOptions = filteredAreas.map((c) => ({ value: c.id, label: c.areaName }));
@@ -153,14 +139,10 @@ function StoreFormUpdate() {
           }
           return prevOptions;
         });
-      }
-
-      // Check if the store's areaId exists in the full list of areas
-      const selectedArea = stableAreas.result.find((area) => area.id === editValues.areaId);
-      if (selectedArea) {
-        setAreaValid(selectedArea.id);
-      } else {
-        setAreaValid(null);
+        const check = filteredAreas.find((area) => area.id === editValues.areaId);
+        if (check) {
+          setAreaValid((prevValid) => (prevValid !== check.id ? check.id : prevValid));
+        }
       }
     }
   };
@@ -218,7 +200,7 @@ function StoreFormUpdate() {
     console.log("Form errors:", errors);
   }
 
-  // Memoize the value for SelectForm
+  // Memoize the value for SelectForm to prevent unnecessary re-renders
   const selectValue = useMemo(
     () =>
       editValues.areaId === areaValid

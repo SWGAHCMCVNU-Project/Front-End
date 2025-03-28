@@ -7,7 +7,7 @@ export function useBrands({ page = 1, size = 10, search = "", state = true, isAs
   const { brand, isLoading: isLoadingBrand } = useBrand();
   const brandId = brand?.id || "";
 
-  console.log("useBrands called with page:", page); // Debug giá trị page nhận được
+  // console.log("useBrands called with page:", page); // Debug giá trị page nhận được
 
   const {
     isLoading: isLoadingBrands,
@@ -23,7 +23,7 @@ export function useBrands({ page = 1, size = 10, search = "", state = true, isAs
     staleTime: 0, // Tạm thời vô hiệu hóa cache
     cacheTime: 0, // Tạm thời vô hiệu hóa cache
     onSuccess: (data) => {
-      console.log("Data fetched:", data);
+      // console.log("Data fetched:", data);
     },
     onError: () => {
       toast.error("Không thể tải danh sách thương hiệu");

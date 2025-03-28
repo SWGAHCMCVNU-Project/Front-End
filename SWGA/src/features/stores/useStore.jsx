@@ -41,12 +41,10 @@ export function StoreProvider({ children }) {
   const handlePageChange = (newPage) => {
     setPage(newPage);
   };
-
-  const handleLimitChange = (newLimit) => {
-    setLimit(newLimit);
-    setPage(1); // Reset về trang 1 khi thay đổi số lượng
+  const handleLimitChange = (newSize) => {
+    setLimit(newSize);
+    setPage(1); // Reset về trang đầu tiên
   };
-
   const value = {
     stores,
     isLoading,

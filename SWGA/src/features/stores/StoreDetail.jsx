@@ -55,7 +55,7 @@ function StoreDetail() {
   if (isLoadingStore || isLoadingArea) return <Spinner />;
   if (storeError || areaError) return <div>Lỗi khi tải dữ liệu: {storeError?.message || areaError?.message}</div>;
   if (!store) return <div>Không tìm thấy cửa hàng</div>;
-  // console.log("Store from StoreDetail:", store); // Log the store object
+
   const storeWithArea = {
     ...store,
     areaName: area?.areaName || store.areaName,
@@ -73,7 +73,7 @@ function StoreDetail() {
         <ButtonText onClick={() => navigate("/stores")}>
           ← Quay lại
         </ButtonText>
-        <Link  to={`/stores/edit/${store.id}`}  state={{ store }}>
+        <Link className="link-navigate" to={`/stores/edit/${storeId}`} state={{ store: storeWithArea }}>
           <ButtonCustom>
             <StyledContainerButton>
               <StyledButton>

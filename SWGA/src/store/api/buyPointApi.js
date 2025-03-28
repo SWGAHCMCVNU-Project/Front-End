@@ -1,35 +1,36 @@
-import apiClient from './apiClient'; // Giả sử apiClient nằm trong file bạn đã cung cấp
-import { PAYMENT } from './endpoints'; // Giả sử các endpoint được export từ file endpoints.js
+import apiClient from './apiClient';
+import { PAYMENT } from './endpoints';
 
+// API cho campus mua điểm
+export const purchasePointsCampus = async (pointPackageId, campusId, brandId = null) => {
+  try {
+    const payload = {
+      pointPackageId,
+      campusId,
+      brandId, // brandId sẽ là null cho campus
+    };
 
-export const purchasePoints = async (pointPackageId, campusId) => {
-    try {
-      // Tạo payload từ dữ liệu đầu vào
-      const payload = {
-        pointPackageId: pointPackageId,
-        campusId: campusId,
-      };
-  
-      // Gọi API sử dụng apiClient
-      const response = await apiClient.post(PAYMENT.CREATE_PAYMENT, payload);
-  
-      // Trả về dữ liệu từ response
-      return response.data;
-    } catch (error) {
-      // Xử lý lỗi
-      console.error('Error purchasing points:', error);
-      throw error.response?.data || error.message;
-    }
-  };
-  
-  // Ví dụ sử dụng hàm purchasePoints
-  const buyPoints = async () => {
-    try {
-      const pointPackageId = "12345"; // Thay bằng ID thực tế
-      const campusId = "67890"; // Thay bằng ID thực tế
-      const result = await purchasePoints(pointPackageId, campusId);
-      console.log('Purchase successful:', result);
-    } catch (error) {
-      console.error('Purchase failed:', error);
-    }
-  };
+    const response = await apiClient.post(PAYMENT.CREATE_PAYMENT_CAMPUS, payload);
+    return response.data;
+  } catch (error) {
+    console.error('Error purchasing points for campus:', error);
+    throw error.response?.data || error.message;
+  }
+};
+
+// API cho brand mua điểm
+export const purchasePointsBrand = async (pointPackageId, campusId = null, brandId) => {
+  try {
+    const payload = {
+      pointPackageId,
+      campusId, // campusId sẽ là null cho brand
+      brandId,
+    };
+
+    const response = await apiClient.post(PAYMENT.CREATE_PAYMENT_BRAND, payload);
+    return response.data;
+  } catch (error) {
+    console.error('Error purchasing points for brand:', error);
+    throw error.response?.data || error.message;
+  }
+};

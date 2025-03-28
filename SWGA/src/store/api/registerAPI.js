@@ -1,16 +1,15 @@
 // store/api/registerApi.js
 import apiClient from "./apiClient";
 import { ACCOUNT_ENDPOINTS } from "./endpoints";
-import toast from 'react-hot-toast';
-import StorageService from "../../services/storageService"
-
+import toast from "react-hot-toast";
+import StorageService from "../../services/storageService";
 
 export const registerBrandAPI = async (formData, coverPhoto) => {
   try {
     // Định dạng dữ liệu từ UI trước khi gửi lên server
     const formatBrandData = (formData, coverPhoto) => {
-      const [openingHours, openingMinutes] = formData.openingHours.split(':');
-      const [closingHours, closingMinutes] = formData.closingHours.split(':');
+      const [openingHours, openingMinutes] = formData.openingHours.split(":");
+      const [closingHours, closingMinutes] = formData.closingHours.split(":");
 
       return {
         userName: formData.userName,
@@ -22,10 +21,16 @@ export const registerBrandAPI = async (formData, coverPhoto) => {
         address: formData.address,
         coverPhoto: coverPhoto,
         link: formData.link || "",
-        openingHours: `${openingHours.padStart(2, '0')}:${openingMinutes.padStart(2, '0')}:00`, // Định dạng "HH:mm:ss"
-        closingHours: `${closingHours.padStart(2, '0')}:${closingMinutes.padStart(2, '0')}:00`, // Định dạng "HH:mm:ss"
+        openingHours: `${openingHours.padStart(
+          2,
+          "0"
+        )}:${openingMinutes.padStart(2, "0")}:00`, // Định dạng "HH:mm:ss"
+        closingHours: `${closingHours.padStart(
+          2,
+          "0"
+        )}:${closingMinutes.padStart(2, "0")}:00`, // Định dạng "HH:mm:ss"
         description: formData.description || "",
-        state: true
+        state: true,
       };
     };
 
@@ -34,26 +39,26 @@ export const registerBrandAPI = async (formData, coverPhoto) => {
 
     // Tạo FormData object
     const apiFormData = new FormData();
-    apiFormData.append('userName', brandData.userName);
-    apiFormData.append('password', brandData.password);
-    apiFormData.append('phone', brandData.phone);
-    apiFormData.append('email', brandData.email);
-    apiFormData.append('brandName', brandData.brandName);
-    apiFormData.append('acronym', brandData.acronym || '');
-    apiFormData.append('address', brandData.address);
+    apiFormData.append("userName", brandData.userName);
+    apiFormData.append("password", brandData.password);
+    apiFormData.append("phone", brandData.phone);
+    apiFormData.append("email", brandData.email);
+    apiFormData.append("brandName", brandData.brandName);
+    apiFormData.append("acronym", brandData.acronym || "");
+    apiFormData.append("address", brandData.address);
 
     // Xử lý ảnh: Chuyển base64 thành file
     if (brandData.coverPhoto) {
       const base64Response = await fetch(brandData.coverPhoto);
       const blob = await base64Response.blob();
-      apiFormData.append('coverPhoto', blob, 'cover.jpg');
+      apiFormData.append("coverPhoto", blob, "cover.jpg");
     }
 
-    apiFormData.append('link', brandData.link || '');
-    apiFormData.append('openingHours', brandData.openingHours); // Gửi trực tiếp chuỗi HH:mm:ss
-    apiFormData.append('closingHours', brandData.closingHours); // Gửi trực tiếp chuỗi HH:mm:ss
-    apiFormData.append('description', brandData.description || '');
-    apiFormData.append('state', brandData.state);
+    apiFormData.append("link", brandData.link || "");
+    apiFormData.append("openingHours", brandData.openingHours); // Gửi trực tiếp chuỗi HH:mm:ss
+    apiFormData.append("closingHours", brandData.closingHours); // Gửi trực tiếp chuỗi HH:mm:ss
+    apiFormData.append("description", brandData.description || "");
+    apiFormData.append("state", brandData.state);
 
     // Gửi yêu cầu lên server
     const response = await apiClient.post(
@@ -61,8 +66,8 @@ export const registerBrandAPI = async (formData, coverPhoto) => {
       apiFormData,
       {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          "Content-Type": "multipart/form-data",
+        },
       }
     );
 
@@ -77,11 +82,11 @@ export const registerBrandAPI = async (formData, coverPhoto) => {
       return {
         status: response.status,
         success: false,
-        message: 'Không nhận được dữ liệu từ server!',
+        message: "Không nhận được dữ liệu từ server!",
       };
     }
   } catch (error) {
-    console.error('Register API Error:', error);
+    console.error("Register API Error:", error);
     const errorMessage = error.response?.data?.message || "Đăng ký thất bại";
     return {
       status: error.response?.status || 500,
@@ -91,84 +96,87 @@ export const registerBrandAPI = async (formData, coverPhoto) => {
   }
 };
 
-
-
 export const registerStore = async (formData) => {
   try {
-    // Lấy brandId từ StorageService
-    const brandIdFromStorage = StorageService.getBrandId();
-    console.log("brandId from StorageService:", brandIdFromStorage);
-
-    // Tách dữ liệu thành query parameters
-    const queryParams = new URLSearchParams({
-      brandId: brandIdFromStorage || formData.brandId || "",
+    const brandId = StorageService.getBrandId();
+    const [openH, openM] = formData.openingHours.split(":");
+    const [closeH, closeM] = formData.closingHours.split(":");
+    const syncedEmail = formData.email || "";
+    const storeData = {
+      brandId: brandId || formData.brandId || "",
       areaId: formData.areaId || "",
       storeName: formData.storeName || "",
-      phone: formData.storePhone || formData.phone || "", // Dùng phone từ form
-      email: formData.storeEmail || formData.email || "", // Dùng email từ form
+      phone: formData.phone || "",
+      email: syncedEmail || "",
       address: formData.address || "",
-      hour: formData.hour || 0,
-      minute: formData.minute || 0,
+      openingHours: `${openH.padStart(2, "0")}:${openM.padStart(2, "0")}:00`,
+      closingHours: `${closeH.padStart(2, "0")}:${closeM.padStart(2, "0")}:00`,
       description: formData.description || "",
-      state: formData.state !== undefined ? formData.state : true,
-    });
+      state: formData.state ?? true,
+      userName: formData.userName || "",
+      password: formData.password || "",
+      avatar: formData.avatar, // Không gán mặc định null ở đây
+    };
 
-    // Chuẩn bị FormData cho body
     const data = new FormData();
-    data.append("userName", formData.userName || "");
-    data.append("password", formData.password || "");
-    data.append("phone", formData.accountPhone || formData.phone || ""); // Phone trong body
-    data.append("email", formData.accountEmail || formData.email || ""); // Email trong body
-    if (formData.avatar && formData.avatar instanceof File) {
-      data.append("avatar", formData.avatar);
+    data.append("userName", storeData.userName);
+    data.append("password", storeData.password);
+    data.append("phone", storeData.phone);
+    data.append("email", syncedEmail);
+
+    // Xử lý avatar
+    // Thay thế phần xử lý avatar bằng:
+    // Xử lý avatar
+    if (storeData.avatar) {
+      // Xử lý cả trường hợp là FileList
+      const avatarFile =
+        storeData.avatar instanceof FileList
+          ? storeData.avatar[0]
+          : storeData.avatar;
+
+      if (avatarFile instanceof File) {
+        data.append("avatar", avatarFile, avatarFile.name);
+      }
     }
+    const queryParams = new URLSearchParams({
+      brandId: storeData.brandId,
+      areaId: storeData.areaId,
+      storeName: storeData.storeName,
+      address: storeData.address,
+      openingHours: storeData.openingHours,
+      closingHours: storeData.closingHours,
+      description: storeData.description,
+      state: storeData.state,
+    }).toString();
 
-    // Log để kiểm tra
-    console.log("Query Params:", queryParams.toString());
-    console.log("FormData contents:");
-    for (let [key, value] of data.entries()) {
-      console.log(`${key}: ${value}`);
-    }
+    const response = await apiClient.post(
+      `${ACCOUNT_ENDPOINTS.RegisterStore}?${queryParams}`,
+      data,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
 
-    // Gửi yêu cầu với query parameters và body
-    const url = `${ACCOUNT_ENDPOINTS.RegisterStore}?${queryParams.toString()}`;
-    const response = await apiClient.post(url, data, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        "Accept": "text/plain", // Thêm header giống curl nếu cần
-      },
-    });
-
-    // Xử lý phản hồi từ API
     if (response.data) {
-      toast.success("Đăng ký store thành công!");
-      return {
-        status: response.status,
-        success: true,
-        data: response.data,
-      };
-    } else {
-      toast.error("Đăng ký store thất bại!");
-      return {
-        status: response.status,
-        success: false,
-        message: "Không nhận được dữ liệu từ server!",
-      };
+      // toast.success("Đăng ký store thành công!");
+      return { status: response.status, success: true, data: response.data };
     }
+    toast.error("Đăng ký store thất bại!");
+    return {
+      status: response.status,
+      success: false,
+      message: "No data from server!",
+    };
   } catch (error) {
-    console.error("Register Store API Error:", error.response?.data || error);
-    const errorMessage = error.response?.data?.message || "Đã xảy ra lỗi khi đăng ký store";
-    toast.error(errorMessage);
+    const msg = error.response?.data?.message || "Lỗi đăng ký store";
+    toast.error(msg);
     return {
       status: error.response?.status || 500,
       success: false,
-      message: errorMessage,
+      message: msg,
     };
   }
 };
-
-
-
 
 // store/api/registerApi.js (updated getAccountByIdAPI)
 
@@ -206,8 +214,12 @@ export const getAccountByIdAPI = async (id) => {
       };
     }
   } catch (error) {
-    console.error("Get Account By ID API Error:", error.response?.data || error);
-    const errorMessage = error.response?.data?.message || "Lấy thông tin tài khoản thất bại";
+    console.error(
+      "Get Account By ID API Error:",
+      error.response?.data || error
+    );
+    const errorMessage =
+      error.response?.data?.message || "Lấy thông tin tài khoản thất bại";
     return {
       status: error.response?.status || 500,
       success: false,
@@ -226,13 +238,17 @@ export const updateAccountIdAPI = async (id, oldPassword, updatedData) => {
     if (oldPassword) queryParams.append("oldPassword", oldPassword);
     if (updatedData.phone) queryParams.append("phone", updatedData.phone);
     if (updatedData.email) queryParams.append("email", updatedData.email);
-    if (updatedData.password) queryParams.append("newPassword", updatedData.password);
+    if (updatedData.password)
+      queryParams.append("newPassword", updatedData.password);
 
     console.log("Updating account with ID:", accountId);
     console.log("Query Params:", queryParams.toString());
 
     const response = await apiClient.put(
-      `${ACCOUNT_ENDPOINTS.UPDATEACCOUNT.replace("{id}", accountId)}?${queryParams.toString()}`,
+      `${ACCOUNT_ENDPOINTS.UPDATEACCOUNT.replace(
+        "{id}",
+        accountId
+      )}?${queryParams.toString()}`,
       {}, // Không cần body vì tất cả dữ liệu đã nằm trong query params
       {
         headers: {
@@ -248,8 +264,16 @@ export const updateAccountIdAPI = async (id, oldPassword, updatedData) => {
       throw new Error("Failed to update account");
     }
   } catch (error) {
-    console.error("❌ Update Account API Error:", error.response?.data || error.message);
-    toast.error(error.response?.data?.message || "Cập nhật tài khoản thất bại!");
-    return { success: false, message: error.response?.data?.message || error.message };
+    console.error(
+      "❌ Update Account API Error:",
+      error.response?.data || error.message
+    );
+    toast.error(
+      error.response?.data?.message || "Cập nhật tài khoản thất bại!"
+    );
+    return {
+      success: false,
+      message: error.response?.data?.message || error.message,
+    };
   }
 };

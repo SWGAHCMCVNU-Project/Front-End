@@ -1,15 +1,14 @@
 import styled from "styled-components";
 import Tag from "../../ui/Tag";
 import Table from "../../ui/Table";
-import { useNavigate } from "react-router-dom";
-
+import { useEffect, useState } from "react";
 import {
   formatPhoneNumber,
   formattedHours,
   handleValidImageURL,
 } from "../../utils/helpers";
 import logoDefault from "../../assets/images/logo-slack.svg";
-import { useEffect, useState } from "react";
+
 const Station = styled.div`
   display: flex;
   align-items: center;
@@ -64,7 +63,10 @@ const WorkingHours = styled.div`
   font-size: 1.4rem;
   font-weight: 500;
   color: var(--color-grey-600);
-  
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+
   span {
     &.open {
       color: var(--color-green-700);
@@ -90,14 +92,27 @@ function StoreRow({ store, displayedIndex }) {
     phone,
     openingHours,
     closingHours,
-    state
+    state,
+    avatar, // Thêm avatar vào destructuring
   } = store;
+
+  const [isValidImage, setIsValidImage] = useState(true);
+
+  useEffect(() => {
+    if (avatar) {
+      handleValidImageURL(avatar)
+        .then((isValid) => setIsValidImage(isValid))
+        .catch(() => setIsValidImage(false));
+    } else {
+      setIsValidImage(false); // Nếu không có avatar, dùng logoDefault
+    }
+  }, [avatar]);
 
   return (
     <Table.Row>
       <StationIndex>{displayedIndex}</StationIndex>
       <Station>
-        <Img src={logoDefault} />
+        <Img src={isValidImage && avatar ? avatar : logoDefault} />
         <div>
           <StationName>{storeName}</StationName>
           <StyledCode>Khu vực: {areaName}</StyledCode>
@@ -106,9 +121,13 @@ function StoreRow({ store, displayedIndex }) {
       <Address>{address}</Address>
       <Contact>{formatPhoneNumber(phone)}</Contact>
       <WorkingHours>
-        Mở cửa: <span className="open">{formattedHours(openingHours)}</span>
-        <br />
-        Đóng cửa: <span className="close">{formattedHours(closingHours)}</span>
+        <div>
+          Mở cửa: <span className="open">{formattedHours(openingHours)}</span>
+        </div>
+        <div>
+          Đóng cửa:{" "}
+          <span className="close">{formattedHours(closingHours)}</span>
+        </div>
       </WorkingHours>
       <Tag type={state ? "cyan" : "error"}>
         {state ? "Hoạt động" : "Không Hoạt Động"}
