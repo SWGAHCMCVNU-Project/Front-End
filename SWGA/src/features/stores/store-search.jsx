@@ -4,6 +4,7 @@ import { useDebounced } from "../../hooks/useDebounced";
 import SearchBar from "../../ui/SearchBar";
 import { NavigateCreateButton } from "../../ui/custom/Button/Button";
 import styled from "styled-components";
+import { useStore } from "./useStore"; // Import useStore để đồng bộ searchName
 
 const ProductFilterHeader = styled.div`
   display: flex;
@@ -13,7 +14,8 @@ const ProductFilterHeader = styled.div`
 `;
 
 function StoreSearch() {
-  const [searchTerm, setSearchTerm] = useState("");
+  const { searchName, setSearchName } = useStore(); // Lấy searchName và setSearchName từ useStore
+  const [searchTerm, setSearchTerm] = useState(searchName || ""); // Đồng bộ với searchName từ context
   const debouncedSearch = useDebounced(searchTerm, 500);
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -24,12 +26,17 @@ function StoreSearch() {
       searchParams.delete("search");
     }
     setSearchParams(searchParams);
-  }, [debouncedSearch, searchParams, setSearchParams]);
+    setSearchName(debouncedSearch); // Cập nhật searchName trong useStore
+  }, [debouncedSearch, searchParams, setSearchParams, setSearchName]);
 
   return (
     <ProductFilterHeader>
       <div className="filtertabs-search-product">
-        <SearchBar onChange={setSearchTerm} placeholder="Tìm kiếm cửa hàng" />
+        <SearchBar
+          value={searchTerm} // Sử dụng searchTerm thay vì trực tiếp từ useStore
+          onChange={setSearchTerm}
+          placeholder="Tìm kiếm cửa hàng"
+        />
       </div>
       <div>
         <NavigateCreateButton navigateCreateURL="/stores/create" label="cửa hàng" />

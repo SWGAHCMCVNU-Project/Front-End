@@ -191,7 +191,7 @@ function CampaignList() {
         dataSource={data}
         handleSort={handleSort}
         limit={size}
-        label="Chiến dịch / Trang"
+        label=""
         page={page}
         elements={campaigns?.totalCount}
         setPage={handlePageChange}

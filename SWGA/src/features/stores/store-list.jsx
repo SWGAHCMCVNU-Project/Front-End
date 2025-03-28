@@ -1,29 +1,26 @@
-import { Avatar, Spin, Tag, Typography, Table, Pagination, Select } from "antd";
-import { HiPencil, HiTrash } from "react-icons/hi2";
+import { Avatar, Spin, Tag, Typography } from "antd";
+import { HiEye, HiPencil } from "react-icons/hi2";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import imgDefaultStore from "../../assets/images/store.png";
 import Empty from "../../ui/Empty";
-import Modal from "../../ui/Modal";
 import { ButtonAction } from "../../ui/custom/Button/Button";
-import ConfirmDeleteItem from "../../ui/custom/Modal/ModalConfirm";
+import { TableItem } from "../../ui/custom/Table/TableItem";
 import {
   formatPhoneNumber,
   formattedHours,
   useImageValidity,
 } from "../../utils/helpers";
 import { useStore } from "./useStore";
-import SetRowsPerPage from "./SetRowsPerPage";
 
 const Stacked = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  margin-left: 1rem; /* Added margin-left for alignment */
+  margin-left: 1rem;
   & span:first-child {
     font-weight: 500;
   }
-
   & span:last-child {
     color: var(--color-grey-500);
     font-size: 1.2rem;
@@ -35,7 +32,7 @@ const StackedTime = styled.span`
   flex-direction: column;
   gap: 0.2rem;
   font-weight: 500;
-  margin-left: 1rem; /* Consistent margin-left for alignment */
+  margin-left: 1rem;
 `;
 
 const StackedTimeFrameAbove = styled.span`
@@ -49,12 +46,12 @@ const StackedTimeFrameBelow = styled.span`
 const StyledAvatarGroup = styled(Avatar.Group)`
   display: flex;
   align-items: center;
-  margin-left: 1rem; /* Consistent margin-left for alignment */
+  margin-left: 1rem;
 `;
 
 const StyledTagContainer = styled.div`
   display: flex;
-  justify-content: center; /* Ensure the tag is centered */
+  justify-content: center;
   align-items: center;
 `;
 
@@ -62,72 +59,57 @@ function StoreList() {
   const { Title } = Typography;
   const {
     isLoading,
-    isDeleting,
     stores,
     page,
     limit,
     handlePageChange,
     handleLimitChange,
     setSort,
-    removeStore,
-    isModalVisible,
-    setIsModalVisible,
   } = useStore();
   const navigate = useNavigate();
 
-  const storeImages = stores?.result?.map((store) => store.avatar);
-  const isValidImages = useImageValidity(stores?.result, storeImages);
+  // Kiểm tra dữ liệu stores trước khi sử dụng
+  const storeImages = stores?.result?.map((store) => store.avatar) || [];
+  const isValidImages = useImageValidity(stores?.result || [], storeImages);
 
-  const handleSort = (sorter) => {
+  const handleSort = (pagination, filters, sorter) => {
+    if (!sorter.field || !sorter.order) return; // Ngăn lỗi khi sorter rỗng
     const sortOrder = sorter.order === "ascend" ? "asc" : "desc";
-    setSort(`${sorter.field},${sortOrder}`);
+    switch (sorter.field) {
+      case "StoreName":
+        setSort(`${sorter.field},${sortOrder}`);
+        break;
+      case "Hours":
+        setSort(`${sorter.field},${sortOrder}`);
+        break;
+      default:
+        break;
+    }
   };
 
   const columns = [
-    {
-      title: "STT",
-      dataIndex: "number",
-      key: "number",
-      align: "center",
-    },
-    {
-      title: "Cửa hàng",
-      dataIndex: "StoreName",
-      key: "StoreName",
-      width: "18%",
-      sorter: true,
-    },
-    {
-      title: "Liên hệ",
-      dataIndex: "Contact",
-      key: "Contact",
-    },
-    {
-      title: "Thời gian làm việc",
-      dataIndex: "Hours",
-      key: "Hours",
-    },
-    {
-      title: "Trạng thái",
-      dataIndex: "State",
-      key: "State",
-      align: "center",
-    },
-    {
-      title: "Hành động",
-      dataIndex: "action",
-      key: "action",
-      align: "center",
-    },
+    { title: "STT", dataIndex: "number", key: "number", align: "center" },
+    { title: "Cửa hàng", dataIndex: "StoreName", key: "StoreName", sorter: true },
+    { title: "Liên hệ", dataIndex: "Contact", key: "Contact" },
+    { title: "Thời gian làm việc", dataIndex: "Hours", key: "Hours", sorter: true },
+    { title: "Trạng thái", dataIndex: "State", key: "State", align: "center" },
+    { title: "Hành động", dataIndex: "action", key: "action", align: "center" },
   ];
 
   if (isLoading) {
-    return <Spin />;
+    return (
+      <Spin>
+        <TableItem columns={columns} dataSource={[]} pagination={false} />
+      </Spin>
+    );
   }
 
-  if (!stores?.result?.length) return <Empty resourceName="cửa hàng" />;
+  // Kiểm tra stores chặt chẽ hơn
+  if (!stores || !stores.result || !Array.isArray(stores.result)) {
+    return <Empty resourceName="cửa hàng" />;
+  }
 
-  const dataSource = stores?.result?.map((store, index) => {
+  const data = stores.result.map((store, index) => {
     const dataIndex = (page - 1) * limit + index + 1;
     const isValid = isValidImages[index];
     const avatarSrc = isValid ? store.avatar : imgDefaultStore;
@@ -137,37 +119,15 @@ function StoreList() {
 
     return {
       key: store.id,
-      number: dataIndex,
+      number: <div className="number-header"><span>{dataIndex}</span></div>,
       StoreName: (
         <StyledAvatarGroup>
-          <Avatar
-            className="shape-avatar-product"
-            shape="square"
-            src={avatarSrc}
-          />
+          <Avatar className="shape-avatar-product" shape="square" src={avatarSrc} />
           <div className="avatar-info">
-            <Title className="title-product-name" level={5}>
-              {store.storeName}
-            </Title>
-            <p className="p-column-table">Khu vực: {store.areaName}</p>
+            <Title className="title-product-name" level={5}>{store.storeName || "Không tên"}</Title>
+            <p className="p-column-table">Khu vực: {store.areaName || "Chưa xác định"}</p>
           </div>
         </StyledAvatarGroup>
-      ),
-      Hours: (
-        <StackedTime>
-          <span>
-            Mở cửa:{" "}
-            <StackedTimeFrameAbove>
-              {formattedHours(openingHours)}
-            </StackedTimeFrameAbove>
-          </span>
-          <span>
-            Đóng cửa:{" "}
-            <StackedTimeFrameBelow>
-              {formattedHours(closingHours)}
-            </StackedTimeFrameBelow>
-          </span>
-        </StackedTime>
       ),
       Contact: (
         <Stacked>
@@ -175,17 +135,17 @@ function StoreList() {
             <span style={{ fontSize: 14 }}>Chưa cập nhật</span>
           ) : (
             <>
-              <span>
-                {store.email !== null ? store.email : "Chưa cập nhật Email"}
-              </span>
-              <span>
-                {store.phone !== null
-                  ? formatPhoneNumber(store.phone)
-                  : "Chưa cập nhật số điện thoại"}
-              </span>
+              <span>{store.email !== null ? store.email : "Chưa cập nhật Email"}</span>
+              <span>{store.phone !== null ? formatPhoneNumber(store.phone) : "Chưa cập nhật số điện thoại"}</span>
             </>
           )}
         </Stacked>
+      ),
+      Hours: (
+        <StackedTime>
+          <span>Mở cửa: <StackedTimeFrameAbove>{formattedHours(openingHours)}</StackedTimeFrameAbove></span>
+          <span>Đóng cửa: <StackedTimeFrameBelow>{formattedHours(closingHours)}</StackedTimeFrameBelow></span>
+        </StackedTime>
       ),
       State: (
         <StyledTagContainer>
@@ -196,55 +156,38 @@ function StoreList() {
       ),
       action: (
         <div className="ant-employed-actions">
+          <Link className="link-details" to={`/stores/${store.id}`}>
+            <ButtonAction><HiEye /></ButtonAction>
+          </Link>
           <Link to={`/stores/edit/${store.id}`} state={{ store }}>
-            <ButtonAction>
-              <HiPencil />
-            </ButtonAction>
+            <ButtonAction><HiPencil /></ButtonAction>
           </Link>
         </div>
       ),
     };
   });
 
+  const handleRowClick = (record, event) => {
+    if (event.target.tagName === "BUTTON" || event.target.tagName === "svg" || event.target.tagName === "path") {
+      return;
+    }
+    navigate(`/stores/${record.key}`);
+  };
+
   return (
     <Spin spinning={isLoading}>
-      <Table
+      <TableItem
         columns={columns}
-        dataSource={dataSource}
-        pagination={false}
-        onChange={(pagination, filters, sorter) => handleSort(sorter)}
-        rowKey="key"
-        onRow={(record) => ({
-          onClick: (event) => {
-            if (
-              event.target.tagName === "BUTTON" ||
-              event.target.tagName === "svg" ||
-              event.target.tagName === "path"
-            ) {
-              return;
-            }
-            navigate(`/stores/${record.key}`);
-          },
-        })}
+        dataSource={data}
+        handleSort={handleSort}
+        limit={limit}
+        label=""
+        page={page}
+        elements={stores.totalCount || 0}
+        setPage={handlePageChange}
+        setLimit={handleLimitChange}
+        handleRowClick={handleRowClick}
       />
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          gap: "16px",
-          alignItems: "center",
-          marginTop: 16,
-        }}
-      >
-        <Pagination
-          current={page}
-          total={stores?.totalCount}
-          pageSize={limit}
-          showSizeChanger={false}
-          onChange={handlePageChange}
-        />
-        <SetRowsPerPage size={limit} onChange={handleLimitChange} />
-      </div>
     </Spin>
   );
 }
