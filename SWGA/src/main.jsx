@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import favicon from "./assets/images/ảnh ví.png";
+import favicon from "./assets/images/S_WalletLogo.png";
 import "./assets/styles/App.scss";
 import "./assets/styles/responsive.scss";
 import GlobalStyles from "./styles/GlobalStyles.js"; // Import GlobalStyles

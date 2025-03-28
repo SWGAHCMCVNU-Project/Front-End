@@ -1,15 +1,14 @@
 import styled from "styled-components";
 import Tag from "../../ui/Tag";
 import Table from "../../ui/Table";
-import { useNavigate } from "react-router-dom";
-
+import { useEffect, useState } from "react";
 import {
   formatPhoneNumber,
   formattedHours,
   handleValidImageURL,
 } from "../../utils/helpers";
 import logoDefault from "../../assets/images/logo-slack.svg";
-import { useEffect, useState } from "react";
+
 const Station = styled.div`
   display: flex;
   align-items: center;
@@ -77,6 +76,7 @@ const WorkingHours = styled.div`
     }
   }
 `;
+
 const StationIndex = styled.div`
   font-size: 1.4rem;
   font-weight: 500;
@@ -93,13 +93,26 @@ function StoreRow({ store, displayedIndex }) {
     openingHours,
     closingHours,
     state,
+    avatar, // Thêm avatar vào destructuring
   } = store;
+
+  const [isValidImage, setIsValidImage] = useState(true);
+
+  useEffect(() => {
+    if (avatar) {
+      handleValidImageURL(avatar)
+        .then((isValid) => setIsValidImage(isValid))
+        .catch(() => setIsValidImage(false));
+    } else {
+      setIsValidImage(false); // Nếu không có avatar, dùng logoDefault
+    }
+  }, [avatar]);
 
   return (
     <Table.Row>
       <StationIndex>{displayedIndex}</StationIndex>
       <Station>
-        <Img src={logoDefault} />
+        <Img src={isValidImage && avatar ? avatar : logoDefault} />
         <div>
           <StationName>{storeName}</StationName>
           <StyledCode>Khu vực: {areaName}</StyledCode>

@@ -23,7 +23,7 @@ import { Divider, Menu } from "antd";
 import React, { useEffect } from "react";
 import { HiMiniTicket } from "react-icons/hi2";
 import { NavLink, useNavigate } from "react-router-dom";
-import logo from "../../assets/images/logo_justB.png";
+import logo from "../../assets/images/S_WalletLogo.png";
 import storageService from "../../services/storageService";
 import { MenuItem } from "./MenuItem";
 
@@ -310,11 +310,11 @@ function Sidenav({ color }) {
       <div className="brand" key="img-logo">
         <img
           style={{
-            width: "35%",
+            width: "60%",
             height: "40%",
             borderRadius: 10,
             marginRight: 20,
-            marginLeft: "47px",
+            marginLeft: "20px",
           }}
           src={logo}
           alt=""

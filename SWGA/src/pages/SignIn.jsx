@@ -3,7 +3,7 @@ import { Button, Card, Col, Form, Input, Layout, Modal } from "antd";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { NavLink, useNavigate } from "react-router-dom";
-import signinbg from "../assets/images/ảnh ví.png";
+import S_WalletLogo from "../assets/images/S_WalletLogo.png";
 import { login } from "../store/api/authApi";
 import { useVerifyAccount } from "../hooks/account/useVerifyAccount";
 import storageService from "../services/storageService";
@@ -24,11 +24,9 @@ function SignIn() {
   const handleLogin = async (values) => {
     try {
       setIsLoading(true);
-      console.log("🚀 Bắt đầu đăng nhập:", values);
 
       const response = await login(values.username.trim(), values.password);
 
-      console.log("✅ Kết quả đăng nhập:", response);
 
       if (response.success) {
         const { role, token, brandId, isVerify, loginId } = response.data;
@@ -122,8 +120,8 @@ function SignIn() {
         <Content className="signin-content">
           <Row className="signin-row">
             <Col className="signin-form-login">
-              <div className="sign-img">
-                <img src={signinbg} alt="Sign In Background" />
+              <div style={{marginRight: "12px"}}  className="sign-img">
+                <img src={S_WalletLogo}  alt="Sign In Background" />
               </div>
               <div>
                 <Heading className="header-login" fontSize="36px" marginTop="20px">

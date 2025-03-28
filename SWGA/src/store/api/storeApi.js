@@ -9,7 +9,7 @@ export const getAllStoresAPI = async ({
   searchName = "",
   page = 1,
   size = 10,
-  // brandID // Thêm brandID vào tham số
+  brandId // Thêm brandId vào params
 } = {}) => {
   try {
     const response = await apiClient.get(STORE_ENDPOINTS.GET_ALL, {
@@ -17,7 +17,7 @@ export const getAllStoresAPI = async ({
         searchName,
         page,
         size,
-        // ...(brandID && { brandID }) // Thêm brandID vào params nếu có
+        ...(brandId && { brandId }) // Truyền brandId lên API nếu có
       },
     });
 

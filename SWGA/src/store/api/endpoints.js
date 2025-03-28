@@ -45,7 +45,7 @@ export const AUTH_ENDPOINTS = {
     UPDATE: "/CampaignType/{id}",
   };
   export const STORE_ENDPOINTS = {
-    GET_ALL: "/Store",
+    GET_ALL: "/Store/brand",
     GET_BY_ID: "/Store/{id}",
     UPDATE: "/Store/{id}",
     GET_STORE_BY_ID: "/Store/brand/{id}"
