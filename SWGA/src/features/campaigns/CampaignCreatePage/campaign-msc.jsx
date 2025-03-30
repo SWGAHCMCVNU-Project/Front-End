@@ -7,7 +7,7 @@ import CampaignStore from "./CampaignStore";
 import "./scss/campaign.scss";
 
 function CampaignMSC() {
-    const { current, setCurrent, newCampaign, setNewCampaign } = useContext(NextPrevContext);
+    const { current, setCurrent, newCampaign, setNewCampaign,completedSteps, setCompletedSteps } = useContext(NextPrevContext);
     const [selectedItemStores, setSelectedItemStores] = useState([]);
     const { register, handleSubmit, reset, getValues, setValue, formState } = useForm({
         defaultValues: newCampaign ? newCampaign : {}
@@ -31,25 +31,22 @@ function CampaignMSC() {
     };
 
     function onSubmit(data) {
-        // console.log("Selected Item Stores in CampaignMSC:", selectedItemStores); // Debug log
         const checkOptionValid = {
-            campaignStores: selectedItemStores
+          campaignStores: selectedItemStores,
         };
-
+      
         const validationErrors = validateCampaignMSC(checkOptionValid);
         if (validationErrors) {
-            // console.log("Validation errors:", validationErrors);
-            return;
+          return;
         }
-
+      
         setNewCampaign({
-            ...newCampaign,
-            campaignStores: selectedItemStores
+          ...newCampaign,
+          campaignStores: selectedItemStores,
         });
-
-        // Chuyển sang bước tiếp theo
+        setCompletedSteps((prev) => [...new Set([...prev, 1])]); // Đánh dấu bước 1 hoàn thành
         setCurrent(current + 1);
-    }
+      }
 
     function onSubmitPrev(data) {
         setNewCampaign({

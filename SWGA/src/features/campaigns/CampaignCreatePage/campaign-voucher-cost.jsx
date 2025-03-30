@@ -9,7 +9,7 @@ import "./scss/campaign.scss";
 import toast from "react-hot-toast";
 
 function CampaignVoucherCost() {
-  const { current, setCurrent, newCampaign, setNewCampaign } = useContext(NextPrevContext);
+  const { current, setCurrent, newCampaign, setNewCampaign,completedSteps, setCompletedSteps } = useContext(NextPrevContext);
   const [isLoading, setIsLoading] = useState(false);
 
   const { handleSubmit } = useForm({
@@ -37,6 +37,7 @@ function CampaignVoucherCost() {
         toast.error("Vui lòng chọn ít nhất một ưu đãi");
         return;
       }
+      setCompletedSteps((prev) => [...new Set([...prev, 2])]); // Đánh dấu bước 2 hoàn thành
       setCurrent(current + 1);
     } catch {
       toast.error("Có lỗi xảy ra, vui lòng thử lại");

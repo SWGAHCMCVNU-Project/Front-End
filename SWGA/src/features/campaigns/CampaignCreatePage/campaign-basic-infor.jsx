@@ -82,7 +82,7 @@ function CampaignBasicInformation() {
     const [campaignTypesOptions, setCampaignTypesOptions] = useState([]);
     const [typeError, setTypeError] = useState("");
     const [fileCard, setFileCard] = useState(null);
-    const { newCampaign, setNewCampaign, current, setCurrent } = useContext(NextPrevContext);
+    const { newCampaign, setNewCampaign, current, setCurrent,completedSteps, setCompletedSteps } = useContext(NextPrevContext);
     const brandId = storageService.getLoginId();
     const isMounted = useRef(false);
 
@@ -218,39 +218,34 @@ function CampaignBasicInformation() {
         const image = typeof data.image === "string" ? data.image : data.image[0];
         const formattedStartOn = data.startOn ? data.startOn.format("YYYY-MM-DD") : null;
         const formattedEndOn = data.endOn ? data.endOn.format("YYYY-MM-DD") : null;
-
+      
         if (!formattedStartOn || !formattedEndOn) {
-            // console.log("Invalid date values:", { startOn: formattedStartOn, endOn: formattedEndOn });
-            return;
-        }
-
-        const checkCampaignType = data.typeId;
-        const timeRange = {
-            startOn: formattedStartOn,
-            endOn: formattedEndOn
-        };
-
-        const validationErrors = validateCampaign(brandId, checkCampaignType, timeRange);
-        if (validationErrors) {
-         
-            return;
-        }
-
-        if (isMounted.current) {
-            setNewCampaign({
-                ...data,
-                brandId: brandId,
-                image: image ? image : newCampaign?.image,
-                startOn: formattedStartOn,
-                endOn: formattedEndOn
-            });
-            
-            setCurrent(current + 1);
-           
+          return;
         }
       
-    }
-
+        const checkCampaignType = data.typeId;
+        const timeRange = {
+          startOn: formattedStartOn,
+          endOn: formattedEndOn,
+        };
+      
+        const validationErrors = validateCampaign(brandId, checkCampaignType, timeRange);
+        if (validationErrors) {
+          return;
+        }
+      
+        if (isMounted.current) {
+          setNewCampaign({
+            ...data,
+            brandId: brandId,
+            image: image ? image : newCampaign?.image,
+            startOn: formattedStartOn,
+            endOn: formattedEndOn,
+          });
+          setCompletedSteps((prev) => [...new Set([...prev, 0])]); // Đánh dấu bước 0 hoàn thành
+          setCurrent(current + 1);
+        }
+      }
     function onError(errors) {
         // console.log("Form errors:", errors);
     }

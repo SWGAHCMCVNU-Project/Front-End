@@ -4,10 +4,10 @@ import { ACCOUNT_ENDPOINTS } from "./endpoints";
 import toast from "react-hot-toast";
 import StorageService from "../../services/storageService";
 
-export const registerBrandAPI = async (formData, coverPhoto) => {
+export const registerBrandAPI = async (formData, coverPhoto, logo) => {
   try {
     // Định dạng dữ liệu từ UI trước khi gửi lên server
-    const formatBrandData = (formData, coverPhoto) => {
+    const formatBrandData = (formData, coverPhoto, logo) => {
       const [openingHours, openingMinutes] = formData.openingHours.split(":");
       const [closingHours, closingMinutes] = formData.closingHours.split(":");
 
@@ -19,6 +19,7 @@ export const registerBrandAPI = async (formData, coverPhoto) => {
         brandName: formData.brandName,
         acronym: formData.acronym || "",
         address: formData.address,
+        logo: logo,
         coverPhoto: coverPhoto,
         link: formData.link || "",
         openingHours: `${openingHours.padStart(
@@ -35,7 +36,7 @@ export const registerBrandAPI = async (formData, coverPhoto) => {
     };
 
     // Format dữ liệu từ UI
-    const brandData = formatBrandData(formData, coverPhoto);
+    const brandData = formatBrandData(formData, coverPhoto, logo);
 
     // Tạo FormData object
     const apiFormData = new FormData();
@@ -53,10 +54,14 @@ export const registerBrandAPI = async (formData, coverPhoto) => {
       const blob = await base64Response.blob();
       apiFormData.append("coverPhoto", blob, "cover.jpg");
     }
-
+    if (brandData.logo) {
+      const base64Response = await fetch(brandData.logo);
+      const blob = await base64Response.blob();
+      apiFormData.append("logo", blob, "logo.jpg");
+    }
     apiFormData.append("link", brandData.link || "");
-    apiFormData.append("openingHours", brandData.openingHours); // Gửi trực tiếp chuỗi HH:mm:ss
-    apiFormData.append("closingHours", brandData.closingHours); // Gửi trực tiếp chuỗi HH:mm:ss
+    apiFormData.append("openingHours", brandData.openingHours);
+    apiFormData.append("closingHours", brandData.closingHours);
     apiFormData.append("description", brandData.description || "");
     apiFormData.append("state", brandData.state);
 
@@ -95,7 +100,6 @@ export const registerBrandAPI = async (formData, coverPhoto) => {
     };
   }
 };
-
 export const registerStore = async (formData) => {
   try {
     const brandId = StorageService.getBrandId();

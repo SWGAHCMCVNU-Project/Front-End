@@ -158,7 +158,7 @@ function CampusList() {
         dataSource={data}
         handleSort={handleSort}
         limit={limit}
-        label="Campus / Trang"
+        label=""
         page={page}
         elements={campuses?.total} // Sửa từ totalCount thành total để khớp với dữ liệu API
         setPage={handlePageChange}

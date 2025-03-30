@@ -144,7 +144,7 @@ function VoucherTypeTable() {
                   pageSize={pageSize}
                   total={totalCount}
                   onChange={handlePageChange}
-                  showSizeChanger
+                  // showSizeChanger
                   onShowSizeChange={(current, size) => handlePageSizeChange(size)}
                 />
                 <SetRowsPerPage
