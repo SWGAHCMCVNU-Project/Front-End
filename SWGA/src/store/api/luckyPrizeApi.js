@@ -19,9 +19,11 @@ export const createLuckyPrizeAPI = async (prizeData) => {
   }
 };
 
-export const getAllLuckyPrizesAPI = async () => {
+export const getAllLuckyPrizesAPI = async (params = {}) => {
   try {
-    const response = await apiClient.get(LUCKY_PRIZE.GET_ALL);
+    const response = await apiClient.get(LUCKY_PRIZE.GET_ALL, {
+      params: params // Thêm params vào request
+    });
     return {
       status: response.status,
       success: true,

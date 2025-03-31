@@ -4,10 +4,10 @@ import { ACCOUNT_ENDPOINTS } from "./endpoints";
 import toast from "react-hot-toast";
 import StorageService from "../../services/storageService";
 
-export const registerBrandAPI = async (formData, coverPhoto) => {
+export const registerBrandAPI = async (formData, coverPhoto, logo) => {
   try {
     // Định dạng dữ liệu từ UI trước khi gửi lên server
-    const formatBrandData = (formData, coverPhoto) => {
+    const formatBrandData = (formData, coverPhoto, logo) => {
       const [openingHours, openingMinutes] = formData.openingHours.split(":");
       const [closingHours, closingMinutes] = formData.closingHours.split(":");
 
@@ -19,6 +19,7 @@ export const registerBrandAPI = async (formData, coverPhoto) => {
         brandName: formData.brandName,
         acronym: formData.acronym || "",
         address: formData.address,
+        logo: logo,
         coverPhoto: coverPhoto,
         link: formData.link || "",
         openingHours: `${openingHours.padStart(
@@ -35,7 +36,7 @@ export const registerBrandAPI = async (formData, coverPhoto) => {
     };
 
     // Format dữ liệu từ UI
-    const brandData = formatBrandData(formData, coverPhoto);
+    const brandData = formatBrandData(formData, coverPhoto, logo);
 
     // Tạo FormData object
     const apiFormData = new FormData();
@@ -53,10 +54,14 @@ export const registerBrandAPI = async (formData, coverPhoto) => {
       const blob = await base64Response.blob();
       apiFormData.append("coverPhoto", blob, "cover.jpg");
     }
-
+    if (brandData.logo) {
+      const base64Response = await fetch(brandData.logo);
+      const blob = await base64Response.blob();
+      apiFormData.append("logo", blob, "logo.jpg");
+    }
     apiFormData.append("link", brandData.link || "");
-    apiFormData.append("openingHours", brandData.openingHours); // Gửi trực tiếp chuỗi HH:mm:ss
-    apiFormData.append("closingHours", brandData.closingHours); // Gửi trực tiếp chuỗi HH:mm:ss
+    apiFormData.append("openingHours", brandData.openingHours);
+    apiFormData.append("closingHours", brandData.closingHours);
     apiFormData.append("description", brandData.description || "");
     apiFormData.append("state", brandData.state);
 
@@ -95,7 +100,6 @@ export const registerBrandAPI = async (formData, coverPhoto) => {
     };
   }
 };
-
 export const registerStore = async (formData) => {
   try {
     const brandId = StorageService.getBrandId();
@@ -274,6 +278,53 @@ export const updateAccountIdAPI = async (id, oldPassword, updatedData) => {
     return {
       success: false,
       message: error.response?.data?.message || error.message,
+    };
+  }
+};
+export const registerCampusAPI = async (formData, campusId) => {
+  try {
+    const campusData = {
+      userName: formData.userName || "",
+      password: formData.password || "",
+      phone: formData.phone || "",
+      email: formData.email || "",
+    };
+
+    const data = new FormData();
+    data.append("userName", campusData.userName);
+    data.append("password", campusData.password);
+    data.append("phone", campusData.phone);
+    data.append("email", campusData.email);
+
+    const queryParams = new URLSearchParams({
+      campusId: campusId || "",
+    }).toString();
+
+    const response = await apiClient.post(
+      `${ACCOUNT_ENDPOINTS.RegisterCampus}?${queryParams}`,
+      data,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+
+    if (response.data) {
+      toast.success("Đăng ký tài khoản campus thành công!");
+      return { status: response.status, success: true, data: response.data };
+    }
+    toast.error("Đăng ký tài khoản campus thất bại!");
+    return {
+      status: response.status,
+      success: false,
+      message: "Không nhận được dữ liệu từ server!",
+    };
+  } catch (error) {
+    const msg = error.response?.data?.message || "Lỗi đăng ký tài khoản campus";
+    toast.error(msg);
+    return {
+      status: error.response?.status || 500,
+      success: false,
+      message: msg,
     };
   }
 };

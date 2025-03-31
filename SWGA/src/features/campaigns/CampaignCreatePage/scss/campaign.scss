@@ -10,13 +10,13 @@
 // Campaign MSC styles
 .container-table {
     display: block;
-    height: 400px;
+    height: 300px;
     overflow: auto;
     overflow-x: hidden;
 }
 
 .tbl-msc tbody {
-    height: 300px;
+    height: 100px;
 }
 
 .btn-next-prev {
@@ -29,10 +29,13 @@
 .msc-container {
     display: flex;
     flex-direction: column;
-    gap: 5rem;
-    margin-bottom: 100px;
-}
-
+    gap: 1rem; // Giảm từ 5rem xuống 1rem
+    margin-bottom: 60px; // Giảm từ 100px
+    
+    .card-noti {
+      margin-bottom: 12px; // Giảm khoảng cách với phần dưới
+    }
+  }
 .card-noti {
     margin-bottom: 20px;
 
@@ -179,19 +182,20 @@
 }
 
 .ant-steps-item-finish > .ant-steps-item-container > .ant-steps-item-content > .ant-steps-item-title {
-    color: #2ECC71;
+    color: #2ECC71 !important; // Màu xanh đã có sẵn
+    font-weight: 600; // Làm chữ đậm hơn để nổi bật
 }
 
 .ant-steps-horizontal:not(.ant-steps-label-vertical) .ant-steps-item-tail {
     display: none;
 }
 
-.ant-steps-item-process>.ant-steps-item-container>.ant-steps-item-content>.ant-steps-item-title::after {
-    background-color: #9ca3af;
+.ant-steps-item-process > .ant-steps-item-container > .ant-steps-item-content > .ant-steps-item-title {
+    color: #2ECC71 ;
+    font-weight: 600;
 }
-
-.ant-steps-item-wait>.ant-steps-item-container>.ant-steps-item-content>.ant-steps-item-title::after {
-    background-color: #9ca3af;
+.ant-steps-item-wait > .ant-steps-item-container > .ant-steps-item-content > .ant-steps-item-title {
+    color: #6b7280 !important; // Màu xám mặc định
 }
 
 .ant-steps-item-finish>.ant-steps-item-container>.ant-steps-item-content>.ant-steps-item-title::after {
@@ -212,6 +216,42 @@
 }
 
 // Campaign Store styles
+// Sửa phần store-container
+.store-container {
+    margin-bottom: 60px;
+    
+    .ant-card {
+      .ant-card-body {
+        padding: 16px !important; // Giảm padding tổng thể
+      }
+    }
+  
+    .header {
+      margin-bottom: 0 !important; // Loại bỏ margin dưới tiêu đề
+      padding-bottom: 8px; // Thêm padding dưới thay cho margin
+    }
+  
+    .select-campaign-major {
+      margin-top: 0 !important; // Loại bỏ margin top của select
+      padding-top: 0 !important;
+    }
+    
+    .container-table {
+      margin-top: 16px; // Giữ khoảng cách với phần select
+    }
+  }
+  .ant-select-multiple .ant-select-selection-item {
+    margin-top: 4px !important;
+    margin-bottom: 4px !important;
+  }
+  .store-selector-wrapper {
+    margin-top: 0;
+    padding-top: 0;
+    
+    .ant-select-selector {
+      border-radius: 4px !important;
+    }
+  }
 .select-campaign-container {
     display: flex;
     flex-direction: row;
@@ -223,7 +263,7 @@
     .select-campaign-container {
         .div-option-major {
             img {
-                margin-top: 5px !important;
+                margin-top: 6px !important;
             }
         }
     }

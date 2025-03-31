@@ -5,7 +5,7 @@ import SearchBar from "../../ui/SearchBar";
 import TableOperations from "../../ui/TableOperations";
 import AddLuckyPrize from "./AddLuckyPrize";
 
-export default function LuckyPrizeTableOperations() {
+export default function LuckyPrizeTableOperations({ refetch, onPrizeAdded }) {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounced(searchTerm, 500);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -16,14 +16,13 @@ export default function LuckyPrizeTableOperations() {
     } else {
       searchParams.delete("search");
     }
-
     setSearchParams(searchParams);
   }, [debouncedSearch, searchParams, setSearchParams]);
 
   return (
     <TableOperations>
       <SearchBar onChange={setSearchTerm} placeholder="Tìm kiếm điểm may mắn" />
-      <AddLuckyPrize />
+      <AddLuckyPrize onSuccess={onPrizeAdded || refetch} />
     </TableOperations>
   );
 }

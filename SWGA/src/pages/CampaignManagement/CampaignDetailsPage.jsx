@@ -47,223 +47,266 @@ const StyledButton = styled.div`
     transition: all 0.3s;
   }
 `;
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 16px; /* Thêm margin dưới để tách biệt với phần dưới */
+`;
 
+const LeftActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+`;
+
+const RightActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+`;
+
+const StateUpdateWrapper = styled.div`
+  margin-top: 16px; /* Thêm margin trên để tách biệt với phần trên */
+`;
 function CampaignDetailsPage() {
-    const navigate = useNavigate();
-    const { campaignId } = useParams();
-    const role = storageService.getRoleLogin();
-    const [visible, setVisible] = useState(false);
-    const [activeOption, setActiveOption] = useState("campaignCampus");
+  const navigate = useNavigate();
+  const { campaignId } = useParams();
+  const role = storageService.getRoleLogin();
+  const [visible, setVisible] = useState(false);
+  const [activeOption, setActiveOption] = useState("campaignCampus");
 
-    // Lấy dữ liệu campaign bằng useGetCampaignById
-    const { data: campaign, isLoading: isLoadingCampaign } = useGetCampaignById(campaignId);
+  // Lấy dữ liệu campaign bằng useGetCampaignById
+  const { data: campaign, isLoading: isLoadingCampaign } =
+    useGetCampaignById(campaignId);
 
-    // Hook để cập nhật campaign
-    const { mutate: updateCampaign, isLoading: isUpdating } = useUpdateCampaign();
+  // Hook để cập nhật campaign
+  const { mutate: updateCampaign, isLoading: isUpdating } = useUpdateCampaign();
 
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
-    const month = String(currentDate.getMonth() + 1).padStart(2, "0");
-    const day = String(currentDate.getDate()).padStart(2, "0");
-    const formattedDate = `${year}-${month}-${day}`;
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+  const day = String(currentDate.getDate()).padStart(2, "0");
+  const formattedDate = `${year}-${month}-${day}`;
 
-    const CampaignCampuses = () => (
-        <CampaignCampusProvider>
-            <Card bordered={false} className="criclebox tablespace mb-24" title="Danh sách cơ sở tổ chức">
-                <CampaignCampus />
-            </Card>
-        </CampaignCampusProvider>
-    );
+  const CampaignCampuses = () => (
+    <CampaignCampusProvider>
+      <Card
+        bordered={false}
+        className="criclebox tablespace mb-24"
+        title="Danh sách cơ sở tổ chức"
+      >
+        <CampaignCampus />
+      </Card>
+    </CampaignCampusProvider>
+  );
 
-    const handleTabClick = (option) => {
-        setVisible(false);
-        setActiveOption(option);
-    };
+  const handleTabClick = (option) => {
+    setVisible(false);
+    setActiveOption(option);
+  };
 
-    const content = (
-        <div className="tab-options">
-            <div
-                className={`tab-option ${activeOption === "campaignCampus" ? "active" : ""}`}
-                onClick={() => handleTabClick("campaignCampus")}
-            >
-                Cơ sở
-            </div>
-        </div>
-    );
+  const content = (
+    <div className="tab-options">
+      <div
+        className={`tab-option ${
+          activeOption === "campaignCampus" ? "active" : ""
+        }`}
+        onClick={() => handleTabClick("campaignCampus")}
+      >
+        Cơ sở
+      </div>
+    </div>
+  );
 
-    const itemsTab = [
-        {
-            label: "Ưu đãi",
-            key: "campaignVoucher",
-            children: (
-                <CampaignVoucherProvider>
-                    <CampaignVoucher />
-                </CampaignVoucherProvider>
-            ),
-        },
-        {
-            label: "Đơn hàng",
-            key: "campaignVoucherItem",
-            children: (
-                <CampaignVoucherItemProvider>
-                    <div className="tabled">
-                        <Row gutter={[24, 0]}>
-                            <Col xs={24} xl={24}>
-                                <Card bordered={false} className="criclebox tablespace mb-24">
-                                    <ItemFilter />
-                                </Card>
-                            </Col>
-                        </Row>
-                    </div>
-                </CampaignVoucherItemProvider>
-            ),
-        },
-        {
-            label: "Cửa hàng",
-            key: "campaignStore",
-            children: (
-                <CampaignStoreProvider>
-                    <div className="tabled">
-                        <Row>
-                            <Col xl={24}>
-                                <Card
-                                    bordered={false}
-                                    className="criclebox tablespace mb-24"
-                                    title="Danh sách cửa hàng tổ chức"
-                                >
-                                    <CampaignStore />
-                                </Card>
-                            </Col>
-                        </Row>
-                    </div>
-                </CampaignStoreProvider>
-            ),
-        },
-        {
-            label: (
-                <Popover
-                    content={content}
-                    open={visible}
-                    onOpenChange={setVisible}
-                    trigger="click"
-                    placement="bottom"
+  const itemsTab = [
+    {
+      label: "Ưu đãi",
+      key: "campaignVoucher",
+      children: (
+        <CampaignVoucherProvider>
+          <CampaignVoucher />
+        </CampaignVoucherProvider>
+      ),
+    },
+    {
+      label: "Đơn hàng",
+      key: "campaignVoucherItem",
+      children: (
+        <CampaignVoucherItemProvider>
+          <div className="tabled">
+            <Row gutter={[24, 0]}>
+              <Col xs={24} xl={24}>
+                <Card bordered={false} className="criclebox tablespace mb-24">
+                  <ItemFilter />
+                </Card>
+              </Col>
+            </Row>
+          </div>
+        </CampaignVoucherItemProvider>
+      ),
+    },
+    {
+      label: "Cửa hàng",
+      key: "campaignStore",
+      children: (
+        <CampaignStoreProvider>
+          <div className="tabled">
+            <Row>
+              <Col xl={24}>
+                <Card
+                  bordered={false}
+                  className="criclebox tablespace mb-24"
+                  title="Danh sách cửa hàng tổ chức"
                 >
-                    <div>Đối tượng</div>
-                </Popover>
-            ),
-            key: "campaignCampusStore",
-            children: <CampaignCampuses />,
-        },
-        {
-            label: "Lịch sử",
-            key: "campaignActivity",
-            children: (
-                <CampaignActivityProvider>
-                    <div className="tabled">
-                        <Row>
-                            <Col xl={24}>
-                                <Card
-                                    bordered={false}
-                                    className="criclebox tablespace mb-24"
-                                    title="Trạng thái đã trải qua"
-                                >
-                                    <CampaignActivity />
-                                </Card>
-                            </Col>
-                        </Row>
-                    </div>
-                </CampaignActivityProvider>
-            ),
-        },
-    ];
+                  <CampaignStore />
+                </Card>
+              </Col>
+            </Row>
+          </div>
+        </CampaignStoreProvider>
+      ),
+    },
+    {
+      label: (
+        <Popover
+          content={content}
+          open={visible}
+          onOpenChange={setVisible}
+          trigger="click"
+          placement="bottom"
+        >
+          <div>Đối tượng</div>
+        </Popover>
+      ),
+      key: "campaignCampusStore",
+      children: <CampaignCampuses />,
+    },
+    {
+      label: "Lịch sử",
+      key: "campaignActivity",
+      children: (
+        <CampaignActivityProvider>
+          <div className="tabled">
+            <Row>
+              <Col xl={24}>
+                <Card
+                  bordered={false}
+                  className="criclebox tablespace mb-24"
+                  title="Trạng thái đã trải qua"
+                >
+                  <CampaignActivity />
+                </Card>
+              </Col>
+            </Row>
+          </div>
+        </CampaignActivityProvider>
+      ),
+    },
+  ];
 
-    // Hàm xử lý cập nhật trạng thái campaign
-    const handleUpdateState = (newStateId) => {
-        const updatedCampaign = {
-            id: campaignId,
-            params: {
-                stateId: newStateId, // Giả sử API yêu cầu stateId
-                // Các tham số khác nếu cần (ví dụ: reason)
-            },
-        };
-        updateCampaign(updatedCampaign, {
-            onSuccess: () => {
-                console.log("Cập nhật trạng thái thành công!");
-            },
-            onError: (err) => {
-                console.error("Lỗi khi cập nhật trạng thái:", err);
-            },
-        });
+  // Hàm xử lý cập nhật trạng thái campaign
+  const handleUpdateState = (newStateId) => {
+    const updatedCampaign = {
+      id: campaignId,
+      params: {
+        stateId: newStateId, // Giả sử API yêu cầu stateId
+        // Các tham số khác nếu cần (ví dụ: reason)
+      },
     };
+    updateCampaign(updatedCampaign, {
+      onSuccess: () => {
+        console.log("Cập nhật trạng thái thành công!");
+      },
+      onError: (err) => {
+        console.error("Lỗi khi cập nhật trạng thái:", err);
+      },
+    });
+  };
 
-    if (isLoadingCampaign) return <div>Loading...</div>; // Hiển thị loading khi đang lấy dữ liệu
+  if (isLoadingCampaign) return <div>Loading...</div>; // Hiển thị loading khi đang lấy dữ liệu
 
-    return (
-        <>
-            <div className="title-table-list">
-                <Title className="title-name-table-list" level={2}>
-                    Chi tiết chiến dịch
-                </Title>
-            </div>
-            <div className="btn-header">
-                <div className="btn-nav-camp-details">
-                    <ButtonText onClick={() => navigate("/campaigns")}>← Quay lại</ButtonText>
-                    {role === "brand" &&
-                    (campaign?.startOn > formattedDate && campaign?.currentStateId === 7) ? null : (
-                        role === "brand" &&
-                        campaign?.startOn > formattedDate && (
-                            <Link
-                                className="link-navigate"
-                                to={`/campaigns/edit/${campaignId}`}
-                                state={{ campaign }}
-                            >
-                                <ButtonCustom>
-                                    <StyledContainerButton>
-                                        <StyledButton>
-                                            <HiPencil />
-                                        </StyledButton>
-                                        Chỉnh sửa
-                                    </StyledContainerButton>
-                                </ButtonCustom>
-                            </Link>
-                        )
-                    )}
+  return (
+    <>
+      <div className="title-table-list">
+        <Title className="title-name-table-list" level={2}>
+          Chi tiết chiến dịch
+        </Title>
+      </div>
+
+      <ButtonContainer>
+        <LeftActions>
+          <ButtonText onClick={() => navigate("/campaigns")}>
+            ← Quay lại
+          </ButtonText>
+        </LeftActions>
+
+        <RightActions>
+          {role === "brand" &&
+          campaign?.startOn > formattedDate &&
+          campaign?.currentStateId === 7
+            ? null
+            : role === "brand" &&
+              campaign?.startOn > formattedDate && (
+                <Link
+                  className="link-navigate"
+                  to={`/campaigns/edit/${campaignId}`}
+                  state={{ campaign }}
+                >
+                  <ButtonCustom>
+                    <StyledContainerButton>
+                      <StyledButton>
+                        <HiPencil />
+                      </StyledButton>
+                      Chỉnh sửa
+                    </StyledContainerButton>
+                  </ButtonCustom>
+                </Link>
+              )}
+        </RightActions>
+      </ButtonContainer>
+
+      <StateUpdateWrapper>
+        <CampaignUpdateState
+          isUpdating={isUpdating}
+          onUpdateState={handleUpdateState}
+        />
+      </StateUpdateWrapper>
+
+      <Row className="campaign-row-tab">
+        <Col xl={24}>
+          <Card className="product-details-card">
+            <div className="campaign-flex-layout">
+              <Col xl={9} className="campaign-image-layout">
+                <CampaignImage campaign={campaign} />{" "}
+                {/* Truyền campaign qua props */}
+              </Col>
+              <Col xl={15} className="campaign-information-layout">
+                <div>
+                  <CampaignLogoBrand campaign={campaign} />{" "}
+                  {/* Truyền campaign qua props */}
+                  <CampaignDescription campaign={campaign} />{" "}
+                  {/* Truyền campaign qua props */}
                 </div>
                 <div>
-                    {/* Truyền handleUpdateState vào CampaignUpdateState */}
-                    <CampaignUpdateState isUpdating={isUpdating} onUpdateState={handleUpdateState} />
+                  <hr className="line-break-product-details" />
                 </div>
+                <div>
+                  <CampaignInformation campaign={campaign} />{" "}
+                  {/* Truyền campaign qua props */}
+                </div>
+              </Col>
             </div>
+          </Card>
+        </Col>
+      </Row>
 
-            <Row className="campaign-row-tab">
-                <Col xl={24}>
-                    <Card className="product-details-card">
-                        <div className="campaign-flex-layout">
-                            <Col xl={9} className="campaign-image-layout">
-                                <CampaignImage campaign={campaign} /> {/* Truyền campaign qua props */}
-                            </Col>
-                            <Col xl={15} className="campaign-information-layout">
-                                <div>
-                                    <CampaignLogoBrand campaign={campaign} /> {/* Truyền campaign qua props */}
-                                    <CampaignDescription campaign={campaign} /> {/* Truyền campaign qua props */}
-                                </div>
-                                <div>
-                                    <hr className="line-break-product-details" />
-                                </div>
-                                <div>
-                                    <CampaignInformation campaign={campaign} /> {/* Truyền campaign qua props */}
-                                </div>
-                            </Col>
-                        </div>
-                    </Card>
-                </Col>
-            </Row>
-
-            <Row className="campaign-row-tabs">
-                <Tabs defaultActiveKey="campaignVoucher" items={itemsTab} />
-            </Row>
-        </>
-    );
+      <Row className="campaign-row-tabs">
+        <Tabs defaultActiveKey="campaignVoucher" items={itemsTab} />
+      </Row>
+    </>
+  );
 }
 
 export default CampaignDetailsPage;

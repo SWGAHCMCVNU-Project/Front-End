@@ -1,11 +1,10 @@
-// StoreFilter.js
 import { useEffect } from "react";
 import { StateOptions } from "../../ui/custom/Filter/Radio/RadioOptions";
 import { SelectFilter } from "../../ui/custom/Select/SelectFilter/SelectFilter";
-import { useAreas } from "../../hooks/areas/useAreas"; // Thay thế useAreaFilter bằng useAreas
+import { useAreas } from "../../hooks/areas/useAreas";
 import StoreList from "./store-list";
 import { useStore } from "./useStore";
-import SearchBar from "../../ui/SearchBar";
+// import StoreSearch from "./StoreSearch"; // Import StoreSearch
 import styled from "styled-components";
 
 const FilterTab = styled.div`
@@ -43,14 +42,14 @@ const filters = [
 ];
 
 function StoreFilter() {
-  const { areas, isLoading: isLoadingAreas } = useAreas({ state: true }); // Lấy danh sách khu vực với state = true
-  const { areasFilter, setAreasFilter, setAreasFilterValue, state, setState, searchName, setSearchName } = useStore();
+  const { areas, isLoading: isLoadingAreas } = useAreas({ state: true });
+  const { areasFilter, setAreasFilter, setAreasFilterValue, state, setState } = useStore();
 
   useEffect(() => {
     if (areas?.result) {
       setAreasFilter(areas.result);
     }
-  }, [areas]);
+  }, [areas, setAreasFilter]);
 
   const handleChangeState = (selectedOptionState) => {
     setState(selectedOptionState);
@@ -62,7 +61,7 @@ function StoreFilter() {
         <div>
           <StateOptions state={state} onChange={handleChangeState} />
         </div>
-        <CustomSelectContainer>
+        {/* <CustomSelectContainer>
           {filters}
           <div>
             <SelectFilter
@@ -75,14 +74,10 @@ function StoreFilter() {
               onClear={setAreasFilterValue}
               disabled={isLoadingAreas}
             />
-            <SearchBar
-              value={searchName}
-              onChange={setSearchName}
-              placeholder="Tìm kiếm cửa hàng..."
-            />
           </div>
-        </CustomSelectContainer>
+        </CustomSelectContainer> */}
       </FilterTab>
+      {/* <StoreSearch /> Thay SearchBar bằng StoreSearch */}
       <div>
         <StoreList />
       </div>

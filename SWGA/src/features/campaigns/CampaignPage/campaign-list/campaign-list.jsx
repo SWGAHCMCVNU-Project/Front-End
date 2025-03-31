@@ -38,6 +38,12 @@ const TotalSpending = styled.span`
   font-weight: 600;
 `;
 
+const MoneyWrapper = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
 function CampaignList() {
   const { Title } = Typography;
   const {
@@ -48,20 +54,18 @@ function CampaignList() {
     size,
     handlePageChange,
     handleLimitChange: handleSizeChange,
-    setSort
+    setSort,
   } = useCampaign();
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  
-  
-  const campaignImages = campaigns?.result?.map(campaign => campaign.image) || [];
+  const campaignImages = campaigns?.result?.map((campaign) => campaign.image) || [];
   const isValidImages = useImageValidity(campaigns?.result || [], campaignImages);
 
   const currentDate = new Date();
   const year = currentDate.getFullYear();
-  const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-  const day = String(currentDate.getDate()).padStart(2, '0');
+  const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+  const day = String(currentDate.getDate()).padStart(2, "0");
   const formattedDate = `${year}-${month}-${day}`;
 
   const handleSort = (pagination, filters, sorter) => {
@@ -93,14 +97,22 @@ function CampaignList() {
 
   const getStatusTagColor = (stateCurrent) => {
     switch (stateCurrent) {
-      case "Chờ duyệt": return 'orange';
-      case "Từ chối": return 'purple';
-      case "Hoạt động": return 'cyan';
-      case "Không hoạt động": return 'default';
-      case "Kết thúc": return 'volcano';
-      case "Đóng": return 'red';
-      case "Hủy": return 'error';
-      default: return 'default-color';
+      case "Chờ duyệt":
+        return "orange";
+      case "Từ chối":
+        return "purple";
+      case "Hoạt động":
+        return "cyan";
+      case "Không hoạt động":
+        return "default";
+      case "Kết thúc":
+        return "volcano";
+      case "Đóng":
+        return "red";
+      case "Hủy":
+        return "error";
+      default:
+        return "default-color";
     }
   };
 
@@ -111,7 +123,7 @@ function CampaignList() {
     { title: "Thời gian diễn ra", dataIndex: "StartOn", key: "StartOn", sorter: true },
     { title: "Chi phí", key: "TotalIncome", dataIndex: "TotalIncome", sorter: true },
     { title: "Trạng thái", key: "State", dataIndex: "State", align: "center" },
-    { title: "Hành động", key: "action", dataIndex: "action", align: "center" }
+    { title: "Hành động", key: "action", dataIndex: "action", align: "center" },
   ];
 
   if (isLoading) {
@@ -128,22 +140,28 @@ function CampaignList() {
 
   if (!campaigns?.result?.length) return <Empty resourceName="chiến dịch" />;
 
-  // console.log('🔍 Campaigns result trong CampaignList:', campaigns?.result);
-
   const data = campaigns?.result?.map((campaign, index) => {
-    const dataIndex = !isNaN((page - 1) * size + index + 1) ? (page - 1) * size + index + 1 : index + 1;
+    const dataIndex = !isNaN((page - 1) * size + index + 1)
+      ? (page - 1) * size + index + 1
+      : index + 1;
     const isValid = isValidImages[index];
     const avatarSrc = isValid ? campaign.image : imgDefaultCampaign;
     const campaignStatus = determineCampaignStatus(campaign.startOn, campaign.endOn);
 
     return {
       key: campaign.id,
-      number: <div className="number-header"><span>{dataIndex}</span></div>,
+      number: (
+        <div className="number-header">
+          <span>{dataIndex}</span>
+        </div>
+      ),
       CampaignName: (
         <Avatar.Group>
           <Avatar className="shape-avatar-product" shape="square" src={avatarSrc} />
           <div className="avatar-info">
-            <Title className="title-product-name" level={5}>{campaign.campaignName}</Title>
+            <Title className="title-product-name" level={5}>
+              {campaign.campaignName}
+            </Title>
             <p className="p-column-table">Thể loại {campaign.typeName}</p>
           </div>
         </Avatar.Group>
@@ -151,34 +169,62 @@ function CampaignList() {
       BrandName: <div className="campaign-brand-row">{campaign.brandName}</div>,
       StartOn: (
         <StackedTime>
-          <span>Bắt đầu: <StackedTimeFrameAbove>{formatDate(campaign.startOn)}</StackedTimeFrameAbove></span>
-          <span>Kết thúc: <StackedTimeFrameBelow>{formatDate(campaign.endOn)}</StackedTimeFrameBelow></span>
+          <span>
+            Bắt đầu: <StackedTimeFrameAbove>{formatDate(campaign.startOn)}</StackedTimeFrameAbove>
+          </span>
+          <span>
+            Kết thúc: <StackedTimeFrameBelow>{formatDate(campaign.endOn)}</StackedTimeFrameBelow>
+          </span>
         </StackedTime>
       ),
       TotalIncome: (
         <StackedTime>
-          <span>Hạn mức: <TotalIncome>{campaign.totalIncome.toLocaleString("vi-VN")}<img className="shape-avatar-campaign-bean" src={greenBean} /></TotalIncome></span>
-          <span>Đã chi: <TotalSpending>{campaign.totalSpending.toLocaleString("vi-VN")}<img className="shape-avatar-campaign-bean" src={greenBean} /></TotalSpending></span>
+          <span>
+            Hạn mức:{" "}
+            <MoneyWrapper>
+              <TotalIncome>{campaign.totalIncome.toLocaleString("vi-VN")}</TotalIncome>
+              <img className="shape-avatar-campaign-bean" src={greenBean} />
+            </MoneyWrapper>
+          </span>
+          <span>
+            Đã chi:{" "}
+            <MoneyWrapper>
+              <TotalSpending>{campaign.totalSpending.toLocaleString("vi-VN")}</TotalSpending>
+              <img className="shape-avatar-campaign-bean" src={greenBean} />
+            </MoneyWrapper>
+          </span>
         </StackedTime>
       ),
-      State: <Tag className="campaign-status-tag" color={getStatusTagColor(campaignStatus)}>{campaignStatus}</Tag>,
+      State: (
+        <Tag className="campaign-status-tag" color={getStatusTagColor(campaignStatus)}>
+          {campaignStatus}
+        </Tag>
+      ),
       action: (
         <div className="ant-employed-actions">
           <Link className="link-details" to={`/campaigns/${campaign.id}`}>
-            <ButtonAction><HiEye /></ButtonAction>
+            <ButtonAction>
+              <HiEye />
+            </ButtonAction>
           </Link>
-          {(new Date(campaign.startOn) > new Date(formattedDate)) && (
+          {new Date(campaign.startOn) > new Date(formattedDate) && (
             <Link to={`/campaigns/edit/${campaign.id}`} state={{ campaign }}>
-              <ButtonAction><HiPencil /></ButtonAction>
+              <ButtonAction>
+                <HiPencil />
+              </ButtonAction>
             </Link>
           )}
         </div>
-      )
+      ),
     };
   });
 
   const handleRowClick = (record, columnKey) => {
-    if (columnKey.target.tagName === "BUTTON" || columnKey.target.tagName === "svg" || columnKey.target.tagName === "path") {
+    if (
+      columnKey.target.tagName === "BUTTON" ||
+      columnKey.target.tagName === "svg" ||
+      columnKey.target.tagName === "path"
+    ) {
       return;
     }
     navigate(`/campaigns/${record.key}`);
@@ -191,7 +237,7 @@ function CampaignList() {
         dataSource={data}
         handleSort={handleSort}
         limit={size}
-        label="Chiến dịch / Trang"
+        label=""
         page={page}
         elements={campaigns?.totalCount}
         setPage={handlePageChange}

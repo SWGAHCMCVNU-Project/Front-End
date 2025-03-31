@@ -6,72 +6,77 @@ import { useMoveBack } from "../../../hooks/useMoveBack";
 import ButtonText from "../../../ui/ButtonText";
 import CampaignBasicInformation from "./campaign-basic-infor";
 import CampaignMSC from "./campaign-msc";
-import CampaignReview from "./campaign-review";
 import CampaignVoucherCost from "./campaign-voucher-cost";
+import CampaignReview from "./campaign-review";
 import "./scss/campaign.scss";
 
 function CampaignStep() {
-    const moveBack = useMoveBack();
-    const { current, setCurrent } = useContext(NextPrevContext);
-    useEffect(() => {
-        const handleBeforeUnload = (event) => {
-            event.preventDefault();
-            event.returnValue = ''; // Hiển thị thông báo xác nhận gửi lại biểu mẫu
-        };
+  const moveBack = useMoveBack();
+  const { current, setCurrent, completedSteps, setCompletedSteps } =
+    useContext(NextPrevContext);
 
-        window.addEventListener('beforeunload', handleBeforeUnload);
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
+      event.returnValue = ""; // Hiển thị thông báo xác nhận gửi lại biểu mẫu
+    };
 
-        //Hủy đăng ký sự kiện khi component bị hủy
-        return () => {
-            window.removeEventListener('beforeunload', handleBeforeUnload);
-        };
-    }, []);
+    window.addEventListener("beforeunload", handleBeforeUnload);
 
-    const steps = [
-        {
-            title: 'Thông tin cơ bản',
-            content: <CampaignBasicInformation />
-        },
-        {
-            title: 'Nơi tổ chức chiến dịch',
-            content: <CampaignMSC />
-        },
-        {
-            title: 'Khuyến mãi',
-            content: <CampaignVoucherCost />
-        },
-        {
-            title: 'Xác nhận thông tin',
-            content: <CampaignReview />
-        }
-    ];
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
 
-    const items = steps.map((item) => ({
-        key: item.title,
-        title: item.title,
-    }));
+  const steps = [
+    {
+      title: "Thông tin cơ bản",
+      content: <CampaignBasicInformation />,
+    },
+    {
+      title: "Nơi tổ chức chiến dịch",
+      content: <CampaignMSC />,
+    },
+    {
+      title: "Khuyến mãi",
+      content: <CampaignVoucherCost />,
+    },
+    {
+      title: "Xác nhận thông tin",
+      content: <CampaignReview />,
+    },
+  ];
 
-    return (
-        <>
-            <div className="title-table-list">
-                <Title className="title-name-table-list" level={2}>
-                    Thêm chiến dịch mới
-                </Title>
-            </div>
-            <div>
-                <ButtonText onClick={moveBack}>&larr; Quay lại</ButtonText>
-            </div>
+  const items = steps.map((item, index) => ({
+    key: item.title,
+    title: item.title,
+    status: completedSteps.includes(index)
+      ? "finish" // Bước đã hoàn thành
+      : index === current
+      ? "process" // Bước hiện tại
+      : "wait", // Bước chưa hoàn thành
+  }));
 
-            <div>
-                <Card className="card-step">
-                    <Steps current={current} items={items} />
-                </Card>
+  return (
+    <>
+      <div className="title-table-list">
+        <Title className="title-name-table-list" level={2}>
+          Thêm chiến dịch mới
+        </Title>
+      </div>
+      <div>
+        <ButtonText onClick={moveBack}>&larr; Quay lại</ButtonText>
+      </div>
 
-                {steps[current].content}
-            </div>
+      <div>
+        <Card className="card-step">
+          <Steps current={current} items={items} />
+        </Card>
 
-        </>
-    );
+        {steps[current].content}
+      </div>
+    </>
+  );
 }
 
 export default CampaignStep;

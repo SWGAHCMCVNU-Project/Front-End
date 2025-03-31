@@ -110,7 +110,7 @@ function RegisterBrand() {
 
   const handleChangeLogo = async ({ fileList }) => {
     if (fileList.length > 0) {
-      const file = fileList[fileList.length - 1].originFileObj; // Lấy file mới nhất
+      const file = fileList[fileList.length - 1].originFileObj;
       if (file) {
         const base64 = await convertFileToBase64(file);
         setLogo(file);
@@ -153,16 +153,20 @@ function RegisterBrand() {
       toast.error("Vui lòng tải lên ảnh bìa!");
       return;
     }
+    if (!logoStorage) {
+      toast.error("Vui lòng tải lên logo!");
+      return;
+    }
 
     setIsLoading(true);
     try {
-      const result = await registerBrandAPI(data, coverPhotoStorage);
+      const result = await registerBrandAPI(data, coverPhotoStorage, logoStorage);
 
       if (result.success) {
         toast.success(
           "Đăng ký thành công! Vui lòng kiểm tra email để lấy mã xác minh."
         );
-        navigate("/sign-in"); // Chuyển thẳng về đăng nhập
+        navigate("/sign-in");
       } else {
         if (result.message?.includes("userName")) {
           toast.error("Tên tài khoản này đã được sử dụng!");
@@ -387,23 +391,16 @@ function RegisterBrand() {
                   listType="picture-card"
                   beforeUpload={() => false}
                   onChange={handleChangeLogo}
-                  fileList={
-                    logo
-                      ? [
-                          {
-                            uid: "-1",
-                            name: "logo.png",
-                            status: "done",
-                            url: logoStorage,
-                          },
-                        ]
-                      : []
-                  }
+                  fileList={logo ? [logo] : []}
                   onRemove={() => {
                     setLogo(null);
                     setLogoStorage(null);
                   }}
                   disabled={isLoading}
+                  showUploadList={{
+                    showPreviewIcon: false,
+                    showRemoveIcon: true,
+                  }}
                 >
                   {!logo && (
                     <div>

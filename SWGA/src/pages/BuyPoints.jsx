@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import StorageService from '../services/storageService';
 import { useBrand } from '../hooks/brand/useBrand';
-
+import useGetCampusByAccountId from '../hooks/campus/useGetCampusByAccount'
 const { Title, Text } = Typography;
 
 const PageContainer = styled.div`
@@ -104,8 +104,11 @@ function BuyPoints() {
   });
 
   const { brand, isLoading: isBrandLoading } = useBrand();
+  const accountId = StorageService.getAccountId(); // Thêm dòng này
+  const { data: campusResponse, isLoading: isCampusLoading } = useGetCampusByAccountId(accountId);
+
   const role = StorageService.getRoleLogin();
-  const campusId = StorageService.getCampusId();
+  const campusId = campusResponse?.data?.id 
   const brandId = StorageService.getBrandId();
 
   const { buyPoints: buyPointsCampus, isPurchasing: isPurchasingCampus } = usePurchasePointsCampus();
@@ -114,13 +117,14 @@ function BuyPoints() {
   const [selectedPackageId, setSelectedPackageId] = useState(null);
   const location = useLocation();
 
-  // Debug: Chỉ giữ log campusId
+  // Debug: Log thêm để kiểm tra
   useEffect(() => {
+    console.log('BuyPoints - accountId:', accountId);
+    console.log('BuyPoints - campusResponse:', campusResponse);
     console.log('BuyPoints - campusId:', campusId);
-  }, [campusId]);
+  }, [accountId, campusResponse, campusId]);
 
   useEffect(() => {
-
     const urlParams = new URLSearchParams(location.search);
     const status = urlParams.get('status');
     const messageText = urlParams.get('message');
@@ -158,7 +162,7 @@ function BuyPoints() {
     }
   };
 
-  if (isLoading || isBrandLoading) {
+  if (isLoading || isBrandLoading || isCampusLoading) {
     return (
       <LoadingContainer>
         <Spin size="large" />
@@ -181,7 +185,7 @@ function BuyPoints() {
     'Ưu đãi hấp dẫn',
   ];
 
-  const isPurchasing = role === 'campus' ? isPurchasingCampus : isPurchasingBrand;
+  const isPurchasing = role === 'brand' ? isPurchasingCampus : isPurchasingBrand;
 
   return (
     <PageContainer>

@@ -57,7 +57,17 @@ const TotalCost = styled.span`
   margin-left: 0.7rem;
   font-weight: 600;
   font-size: 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  img {
+    margin-bottom: 0;
+    vertical-align: middle;
+    height: 1.2em; // Điều chỉnh theo kích thước font
+  }
 `;
+
 
 const VoucherContainer = styled.div`
   margin-bottom: 60px;
@@ -412,11 +422,14 @@ function CampaignVoucher({ selectVoucher, cost, disabled = false, mode = "create
                 {price ? (
                   <>
                     {price.toLocaleString("vi-VN")}
-                    <img className="shape-avatar-campaign-bean" src={greenBean} alt="bean" />
+                    <img 
+                      className="shape-avatar-campaign-bean" 
+                      src={greenBean} 
+                      alt="bean" 
+                      style={{ marginLeft: "120px",marginTop: "-20px", verticalAlign: 'text-top' }} // Thêm style
+                    />
                   </>
-                ) : (
-                  "Chưa cập nhật"
-                )}
+                ) : "Chưa cập nhật"}
               </TotalIncome>
             </span>
           </StackedTime>
@@ -506,7 +519,7 @@ function CampaignVoucher({ selectVoucher, cost, disabled = false, mode = "create
 
   const footer = () => (
     <div className="cost-container">
-      <div>
+      <div style={{ display: "flex", alignItems: "baseline" }}>
         <label className="cost-label">Tổng cộng:</label>
         <TotalCost>
           {formatCurrency(total)}

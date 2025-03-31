@@ -134,7 +134,7 @@ function BrandDetail() {
           ← Quay lại
         </ButtonText>
 
-        <Modal>
+        {/* <Modal>
           <Modal.Open opens="edit">
             <Button $variations="primary">
               <StyledContainerButton>
@@ -145,7 +145,7 @@ function BrandDetail() {
               </StyledContainerButton>
             </Button>
           </Modal.Open>
-        </Modal>
+        </Modal> */}
       </ButtonGroup>
 
       <BrandDataBox brand={brand} />

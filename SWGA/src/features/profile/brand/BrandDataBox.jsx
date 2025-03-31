@@ -16,7 +16,7 @@ import {
   handleValidImageURL,
 } from "../../../utils/helpers";
 import DataItemDes from "./DataItemDes";
-import useAccount from "../../../hooks/account/useAccount"; // Import the useAccount hook
+import useAccount from "../../../hooks/account/useAccount";
 
 const StyledStationDataBox = styled.section`
   background-color: var(--color-grey-0);
@@ -60,16 +60,13 @@ const Infor = styled.div`
 const Price = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 1.6rem 3.2rem;
+  justify-content: center; /* Đảm bảo khoảng cách đều giữa các phần tử */
+  padding: 1.6rem 3rem;
   border-radius: var(--border-radius-sm);
-  margin-top: 2.4rem;
-  gap: 5rem;
-
-  background-color: ${(props) =>
-    props.isPaid ? "var(--color-green-100)" : "var(--color-yellow-100)"};
-  color: ${(props) =>
-    props.isPaid ? "var(--color-green-700)" : "var(--color-yellow-700)"};
+  margin-top: 2rem;
+  gap: 3rem; /* Giảm gap để tránh khoảng cách quá lớn */
+  background-color: var(--color-yellow-100);
+  color: var(--color-yellow-700);
 
   & p:last-child {
     text-transform: uppercase;
@@ -93,11 +90,14 @@ const HeadingGroup = styled.div`
 const StyledImageBean = styled.img`
   width: 25px;
   height: 25px;
+  vertical-align: middle; /* Căn giữa biểu tượng với văn bản */
+  margin-left: 0.5rem; /* Khoảng cách nhỏ giữa số và biểu tượng */
 `;
 
 const StyleGreenWallet = styled.div`
   color: var(--color-green-400);
-  display: inline-block;
+  display: inline-flex; /* Sử dụng inline-flex để căn giữa số và biểu tượng */
+  align-items: center;
   font-weight: bold;
   font-size: 16px;
 `;
@@ -132,7 +132,6 @@ const LogoBrand = styled.img`
 `;
 
 function BrandDataBox({ brand }) {
-  // Add a safeguard in case brand is null or undefined
   if (!brand) {
     return <div>No brand data available.</div>;
   }
@@ -161,10 +160,7 @@ function BrandDataBox({ brand }) {
     dateUpdated = "",
   } = brand;
 
-  // Fetch account details using the accountId from the brand
   const { account, loading: accountLoading, error: accountError } = useAccount(accountId);
-
-  // Use email and phone from the account data if available, otherwise fall back to defaults
   const email = account?.email ?? "Chưa cập nhật";
   const phone = account?.phone ?? "Chưa cập nhật";
 
@@ -176,12 +172,11 @@ function BrandDataBox({ brand }) {
   const [isValidCoverPhoto, setIsValidCoverPhoto] = useState(true);
   const [isValidLogo, setIsValidLogo] = useState(true);
 
-  // Hàm định dạng giờ từ chuỗi "HH:mm:ss" thành "HH:mm"
   const formatTime = (timeStr) => {
     if (!timeStr || typeof timeStr !== "string" || !timeStr.includes(":")) {
       return "Chưa cập nhật";
     }
-    return timeStr.slice(0, 5); // Lấy "HH:mm" từ "HH:mm:ss"
+    return timeStr.slice(0, 5);
   };
 
   useEffect(() => {
@@ -196,7 +191,6 @@ function BrandDataBox({ brand }) {
       .catch(() => setIsValidLogo(false));
   }, [logo]);
 
-  // Log đầy đủ dữ liệu của brand, bao gồm cả email và phone từ account
   useEffect(() => {
     console.log("Full Brand Data:", {
       id,
@@ -219,12 +213,12 @@ function BrandDataBox({ brand }) {
       description,
       state,
       status,
-      phone, // Use the phone from account
-      email, // Use the email from account
+      phone,
+      email,
       numberOfFollowers: numberOfFollowers ?? "Chưa cập nhật",
       greenWalletName: greenWalletName ?? "Chưa cập nhật",
       greenWalletBalance: greenWalletBalance ?? "Chưa cập nhật",
-      accountData: account, // Log the full account data for debugging
+      accountData: account,
       accountLoading,
       accountError,
     });
@@ -252,20 +246,17 @@ function BrandDataBox({ brand }) {
     greenWalletName,
     greenWalletBalance,
     isValidCoverPhoto,
-    account, // Add account as a dependency to re-log when account data changes
+    account,
     accountLoading,
     accountError,
   ]);
 
-  // Show a loading state while fetching account data
   if (accountLoading) {
     return <div>Loading account details...</div>;
   }
 
-  // Show an error if fetching account data fails
   if (accountError) {
     console.error("Error fetching account details:", accountError);
-    // You can choose to render the component with default values or show an error
   }
 
   return (
@@ -308,7 +299,7 @@ function BrandDataBox({ brand }) {
 
             <DataItem label={`${greenWalletName || "Ví xanh"}:`}>
               <StyleGreenWallet>
-                {formatCurrency(greenWalletBalance ?? 0)}{" "}
+                {formatCurrency(greenWalletBalance ?? 0)}
                 <StyledImageBean src={greenBean} alt="dau xanh" />
               </StyleGreenWallet>
             </DataItem>
@@ -316,14 +307,14 @@ function BrandDataBox({ brand }) {
             <StyledTotalBean>
               <DataItem label="Tổng nhận:">
                 <StyleGreenWallet>
-                  {formatCurrency(totalIncome ?? 0)}{" "}
+                  {formatCurrency(totalIncome ?? 0)}
                   <StyledImageBean src={greenBean} alt="dau xanh" />
                 </StyleGreenWallet>
               </DataItem>
               |
               <DataItem label="Tổng chi:">
                 <StyleGreenWallet>
-                  {formatCurrency(totalSpending ?? 0)}{" "}
+                  {formatCurrency(totalSpending ?? 0)}
                   <StyledImageBean src={greenBean} alt="dau xanh" />
                 </StyleGreenWallet>
               </DataItem>
