@@ -209,3 +209,34 @@ export const updateCampusAPI = async (id, formData) => {
     };
   }
 };
+export const getCampusByAccountIdAPI = async (accountId) => {
+  try {
+    const response = await apiClient.get(
+      CAMPUS.GET_BY_ID_ACCOUNT.replace("{id}", accountId)
+    );
+
+    if (response.data) {
+      console.log("getCampusByAccountIdAPI - Response:", response.data); // Debug
+      return {
+        status: response.status,
+        success: true,
+        data: response.data,
+      };
+    } else {
+      return {
+        status: response.status,
+        success: false,
+        message: "Không nhận được dữ liệu từ server!",
+      };
+    }
+  } catch (error) {
+    console.error("Get Campus By Account ID API Error:", error);
+    const errorMessage =
+      error.response?.data?.message || "Lấy thông tin campus theo account thất bại";
+    return {
+      status: error.response?.status || 500,
+      success: false,
+      message: errorMessage,
+    };
+  }
+};

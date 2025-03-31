@@ -1,11 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import Table from "../../ui/Table";
 import Empty from "../../ui/Empty";
-// import Pagination from "../../ui/Pagination";
-// import SetRowsPerPage from "./SetRowsPerPage";
-import StackedHeader from "../../ui/StackedHeader";
 import LuckyPrizeRow from "./LuckyPrizeRow";
 import useGetLuckyPrizes from "../../hooks/lucky-prize/useGetLuckyPrizes";
 import Spinner from "../../ui/Spinner";
@@ -22,7 +19,8 @@ const StyledHeaderCell = styled.div`
   padding: 1.2rem 0.8rem;
   font-weight: 600;
 `;
-export default function LuckyPrizeTable() {
+
+export default function LuckyPrizeTable({ setRefetch, setOnPrizeAdded }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const limit = Number(searchParams.get("limit")) || 10;
   const currentPage = Number(searchParams.get("page")) || 1;
@@ -30,8 +28,7 @@ export default function LuckyPrizeTable() {
   const [sortField, setSortField] = useState("Id");
   const [sortOrder, setSortOrder] = useState("desc");
 
-  // Sử dụng hook luckyPrize thay vì areas
-  const { prizes, loading, error, refetch } = useGetLuckyPrizes({
+  const { prizes: initialPrizes, loading, error, refetch } = useGetLuckyPrizes({
     page: currentPage,
     size: limit,
     searchName: searchParams.get("search") || "",
@@ -39,21 +36,28 @@ export default function LuckyPrizeTable() {
     isAsc: sortOrder === "asc",
   });
 
-  const onLimitChange = (newLimit) => {
-    searchParams.set("limit", newLimit);
-    searchParams.set("page", 1);
-    setSearchParams(searchParams);
+  const [prizes, setPrizes] = useState(initialPrizes);
+
+  // Cập nhật prizes khi initialPrizes thay đổi (từ API)
+  useEffect(() => {
+    setPrizes(initialPrizes);
+  }, [initialPrizes]);
+
+  const handlePrizeAdded = (newPrize) => {
+    // Trì hoãn 1.5 giây để hiển thị dữ liệu mới sau thông báo
+    setTimeout(() => {
+      setPrizes((prevPrizes) => [
+        ...prevPrizes,
+        { ...newPrize, id: newPrize.id || Date.now() }, // Đảm bảo có id
+      ]);
+    }, 1500); // 1.5 giây
   };
 
-  const onPageChange = (page) => {
-    searchParams.set("page", page);
-    setSearchParams(searchParams);
-  };
-
-  const handleStackedClick = (clickedColumn) => {
-    setSortField(clickedColumn);
-    setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
-  };
+  // Truyền refetch và handlePrizeAdded lên LuckyPrize
+  useEffect(() => {
+    setRefetch(() => refetch);
+    setOnPrizeAdded(() => handlePrizeAdded);
+  }, [refetch, setRefetch, setOnPrizeAdded]);
 
   if (loading) return <Spinner />;
   if (error) return <div>Error: {error}</div>;
@@ -75,21 +79,12 @@ export default function LuckyPrizeTable() {
           <LuckyPrizeRow
             key={prize.id}
             prize={prize}
-            index={index + 1}
             displayedIndex={(currentPage - 1) * limit + index + 1}
-            onSuccess={refetch} // Thêm dòng này
+            onSuccess={refetch} // Giữ refetch cho edit
           />
         )}
       />
-      <Table.Footer>
-        {/* <Pagination
-          count={prizes.totalCount || 0}
-          currentPage={currentPage}
-          pageSize={limit}
-          onPageChange={onPageChange}
-        />
-        <SetRowsPerPage pageSize={limit} onLimitChange={onLimitChange} /> */}
-      </Table.Footer>
+      <Table.Footer>{/* Có thể thêm pagination nếu cần */}</Table.Footer>
     </Table>
   );
 }

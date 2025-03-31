@@ -213,7 +213,7 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <FontAwesomeIcon icon={faBuildingColumns} />,
           labelPageName: "Đại học",
-          allowedRoles: ["admin", "campus"],
+          allowedRoles: ["admin",],
         },
         {
           key: "14",
@@ -272,7 +272,7 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <FontAwesomeIcon icon={faClockRotateLeft} />,
           labelPageName: "Lịch sử giao dịch",
-          allowedRoles: ["brand"],
+          allowedRoles: ["brand","campus"],
         },
         {
           key: "21",
@@ -281,7 +281,7 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <ShoppingCartOutlined />,
           labelPageName: "Mua điểm",
-          allowedRoles: ["brand"],
+          allowedRoles: ["brand","campus"],
         },
         
       ],

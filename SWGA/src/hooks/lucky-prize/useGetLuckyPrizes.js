@@ -8,6 +8,7 @@ const useGetLuckyPrizes = (params = {}) => {
   
     const fetchPrizes = async () => {
       try {
+        // Thêm params vào hàm gọi API
         const response = await getAllLuckyPrizesAPI(params);
         if (response.success) {
           setPrizes(response.data || []);

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import Spinner from "../ui/Spinner";
 import AccountPage from "../features/account/brand/AccountPage";
+import AccountPageCampus from "../features/account/campus/AccountPage"
 import storageService from "../services/storageService";
 
 const Account = () => {
@@ -24,6 +25,8 @@ const Account = () => {
       return <div>Admin Profile (To be implemented)</div>;
     case "brand":
       return <AccountPage accountId={accountId} />;
+      case "campus":
+      return <AccountPageCampus accountId={accountId} />;
     default:
       return <Navigate to="/sign-in" replace />;
   }

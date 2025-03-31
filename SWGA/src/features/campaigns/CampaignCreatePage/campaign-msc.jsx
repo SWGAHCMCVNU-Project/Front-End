@@ -74,9 +74,11 @@ function CampaignMSC() {
                     </div>
                 </Card>
             </div>
-            <div className="msc-container">
+            <div  className="msc-container">
                 <CampaignStore
+                
                     selectStore={setSelectedItemStores}
+                    
                     disabled={false}
                 />
             </div>

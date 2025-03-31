@@ -191,7 +191,7 @@ function App() {
                 </PrivateRoute>
               }
             />
-            <Route
+            {/* <Route
               path="/majors"
               exact
               element={
@@ -199,7 +199,7 @@ function App() {
                   <MajorPage />
                 </PrivateRoute>
               }
-            />
+            /> */}
             <Route
               path="/areas"
               exact
@@ -363,7 +363,7 @@ function App() {
               path="/buy-points"
               exact
               element={
-                <PrivateRoute allowedRoles={["brand"]}>
+                <PrivateRoute allowedRoles={["brand", "campus"]}>
                   <BuyPoints />
                 </PrivateRoute>
               }

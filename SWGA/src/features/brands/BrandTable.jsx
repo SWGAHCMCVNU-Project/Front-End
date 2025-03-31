@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Thêm useEffect
 import { useSearchParams } from "react-router-dom";
 import Empty from "../../ui/Empty";
 import Menus from "../../ui/Menus";
@@ -11,11 +11,10 @@ import { useBrands } from "../../hooks/brand/useBrands";
 import { toast } from "react-hot-toast";
 
 function BrandTable() {
-  const [searchParams, setSearchParams] = useSearchParams(); // Thêm setSearchParams
+  const [searchParams, setSearchParams] = useSearchParams();
   const currentPage = Number(searchParams.get("page")) || 1;
   const pageSize = Number(searchParams.get("size")) || 10;
   const searchTerm = searchParams.get("searchName") || "";
-
 
   const { brands, isLoading, error, refetch } = useBrands({
     page: currentPage,
@@ -33,11 +32,21 @@ function BrandTable() {
     totalPages: 1,
   };
 
+  // Reset currentPage về 1 nếu không có dữ liệu ở trang hiện tại
+  useEffect(() => {
+    if (!isLoading && !error && brandData.items.length === 0 && currentPage > 1) {
+      const params = new URLSearchParams(searchParams);
+      params.set("page", "1");
+      setSearchParams(params);
+      refetch();
+    }
+  }, [brandData.items, currentPage, isLoading, error, searchParams, setSearchParams, refetch]);
+
   const handlePageChange = (newPage) => {
     const params = new URLSearchParams(searchParams);
     params.set("page", newPage.toString());
     setSearchParams(params);
-    refetch(); // Thêm refetch để đảm bảo dữ liệu được làm mới
+    refetch();
   };
 
   const handlePageSizeChange = (newSize) => {
@@ -45,8 +54,11 @@ function BrandTable() {
     params.set("size", newSize.toString());
     params.set("page", "1");
     setSearchParams(params);
-    refetch(); // Thêm refetch
+    refetch();
   };
+
+  // Kiểm tra xem có dữ liệu hay không để vô hiệu hóa Pagination
+  const isDataEmpty = !brandData.items.length || brandData.total === 0;
 
   if (error) {
     toast.error("Có lỗi khi tải danh sách thương hiệu");
@@ -57,7 +69,7 @@ function BrandTable() {
     return <div>Loading...</div>;
   }
 
-  console.log("Brand Data after fetch:", brandData); // Debug dữ liệu trả về
+  console.log("Brand Data after fetch:", brandData);
 
   return (
     <div className="flex flex-col gap-8">
@@ -90,10 +102,14 @@ function BrandTable() {
               <Pagination
                 count={brandData.total}
                 pageSize={pageSize}
-                currentPage={currentPage}
+                currentPage={brandData.page}
                 onPageChange={handlePageChange}
+                disabled={isDataEmpty} // Vô hiệu hóa hoàn toàn nếu không có dữ liệu
               />
-              <BrandSetRowsPerPage pageSize={pageSize} setPageSize={handlePageSizeChange} />
+              <BrandSetRowsPerPage
+                pageSize={pageSize}
+                setPageSize={handlePageSizeChange}
+              />
             </Table.Footer>
           </Table>
         </Menus>

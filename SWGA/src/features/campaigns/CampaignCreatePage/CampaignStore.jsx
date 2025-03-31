@@ -27,8 +27,19 @@ const Header = styled.header`
 
 const StoreContainer = styled.div`
   margin-bottom: 60px;
-`;
+  
+  .ant-card-body {
+    padding-top: 12px;
+  }
 
+  .header {
+    margin-bottom: 8px;
+  }
+
+  .select-campaign-major {
+    margin-top: 8px;
+  }
+`;
 function CampaignStore({ selectStore, disabled = false, mode = "create" }) {
   const { Title } = Typography;
   const { newCampaign, setNewCampaign } = useContext(NextPrevContext);
@@ -201,7 +212,7 @@ function CampaignStore({ selectStore, disabled = false, mode = "create" }) {
       >
         {campaignStoreOptions.map(item => (
           <Select.Option key={item.value} value={item.value} label={item.label}>
-            <div className="select-campaign-container">
+            <div  className="select-campaign-container">
               <div className="div-option-major">
                 <img
                   src={item.image || imgDefaultStore}
@@ -226,12 +237,16 @@ function CampaignStore({ selectStore, disabled = false, mode = "create" }) {
 
   return (
     <StoreContainer>
-      <Spin spinning={isLoading}>
-        <Card className={mode === "review" ? "bottom-store-container" : ""}>
-          <Header>
-            <div>{mode === "create" ? "Chọn cửa hàng" : "Thông tin cửa hàng"}</div>
-          </Header>
+    <Spin spinning={isLoading}>
+      <Card className={mode === "review" ? "bottom-store-container" : ""}>
+        <Header>
+          <div>{mode === "create" ? "Chọn cửa hàng" : "Thông tin cửa hàng"}</div>
+        </Header>
+        
+        {/* Thêm div wrapper để kiểm soát khoảng cách tốt hơn */}
+        <div className="store-selector-wrapper">
           {mode === "create" && renderStoreSelector()}
+        </div>
           <div className="container-table">
             {isLoading ? (
               <div className="font-empty">

@@ -10,13 +10,21 @@ const Total = styled.span`
   font-weight: 600;
   font-size: 17px;
   margin-left: 5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+`;
+
+const CoinImage = styled.img`
+  height: 1em; // Sử dụng đơn vị em để đồng nhất với kích thước font
+  vertical-align: middle;
 `;
 
 function CampaignInformation() {
     const { campaignId } = useParams();
     const { isLoading, data: campaign } = getCampaignByIdAPI(campaignId);
 
-    if (isLoading || !campaign) return null; // Trả về null nếu đang tải hoặc campaign không tồn tại
+    if (isLoading || !campaign) return null;
 
     return (
         <>
@@ -28,22 +36,18 @@ function CampaignInformation() {
             <div className="campaign-details-information">
                 <div>
                     <label>Hạn mức: </label>
-                    <span>
-                        <Total>
-                            {(campaign.totalCost || 0).toLocaleString("vi-VN")}
-                            <img className="shape-avatar-campaign-bean" src={greenBean} />
-                        </Total>
-                    </span>
+                    <Total>
+                        {(campaign.totalCost || 0).toLocaleString("vi-VN")}
+                        <CoinImage src={greenBean} alt="bean" />
+                    </Total>
                 </div>
                 <span className="separator">|</span>
                 <div>
                     <label>Đã chi: </label>
-                    <span>
-                        <Total>
-                            {(campaign.usageCost || 0).toLocaleString("vi-VN")}
-                            <img className="shape-avatar-campaign-bean" src={greenBean} />
-                        </Total>
-                    </span>
+                    <Total>
+                        {(campaign.usageCost || 0).toLocaleString("vi-VN")}
+                        <CoinImage src={greenBean} alt="bean" />
+                    </Total>
                 </div>
             </div>
             <div className="campaign-details-participant-information">

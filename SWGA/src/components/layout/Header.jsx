@@ -67,7 +67,7 @@ function Header({ onPress, name, subName, handleSidenavColor, handleSidenavType,
             {userData?.role === "admin" && "Quản trị viên"}
             {userData?.role === "brand" && "Quản lí thương hiệu"}
             {userData?.role === "staff" && "Nhân viên"}
-            {userData?.role === "campus" && "Quản lí trường học"}
+            {userData?.role === "campus" && "Campus"}
           </div>
         </div>
       </Avatar.Group>

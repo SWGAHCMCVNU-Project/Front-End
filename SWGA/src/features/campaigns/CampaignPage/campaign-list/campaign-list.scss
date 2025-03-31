@@ -1,26 +1,26 @@
 .shape-avatar-campaign-bean {
     width: 20px;
     height: 20px;
-    margin-bottom: 0.4rem;
-    margin-left: 1rem;
-}
-
-.campaign-status-tag {
+    margin-left: 0.5rem; /* Giảm khoảng cách để gần số hơn */
+    margin-bottom: 0; /* Bỏ margin-bottom để không xuống dòng */
+    vertical-align: middle; /* Căn giữa theo chiều dọc với văn bản */
+  }
+  
+  .campaign-status-tag {
     font: {
-        weight: 600;
-        size: 13px;
+      weight: 600;
+      size: 13px;
     }
-
     width: 145px;
     height: 30px;
     text-align: center;
     border-radius: 5px;
     padding-top: 3px;
-}
-
-.campaign-brand-row {
+  }
+  
+  .campaign-brand-row {
     width: fit-content;
     max-width: 150px;
     white-space: break-spaces;
     margin-left: 40px;
-}
+  }

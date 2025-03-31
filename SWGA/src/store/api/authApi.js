@@ -7,7 +7,7 @@ const ROLE_MAPPING = {
   'Quản trị viên': 'admin',
   'Nhân viên': 'staff',
   'Thương hiệu': 'brand',
-  'Trường học': 'campus',
+  'Campus': 'campus',
 };
 
 const ERROR_MESSAGES = {

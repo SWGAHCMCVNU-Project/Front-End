@@ -1,5 +1,5 @@
-import { Avatar, Spin, Tag, Typography } from "antd";
-import { HiPencil } from "react-icons/hi2";
+import { Avatar, Spin, Tag, Typography, Tooltip } from "antd";
+import { HiPencil, HiUserPlus } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import imgDefaultCampus from "../../../assets/images/campus.png";
@@ -10,12 +10,37 @@ import { TableItem } from "../../../ui/custom/Table/TableItem";
 import { formatDate, formatPhoneNumber, useImageValidity } from "../../../utils/helpers";
 import { useCampuses } from "./useCampuses";
 import CampusFormUpdate from "../ModalCampusUpdate/campus-form-update";
+import CampusAccountForm from "../ModalCampusUpdate/campus-account-form";
 
 const Stacked = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
   font-size: 1.4rem;
+  justify-content: center;
+  height: 100%;
+`;
+
+const StatusContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+`;
+
+const ActionContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+`;
+
+const StyledButtonAction = styled(ButtonAction)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
 `;
 
 function CampusList() {
@@ -31,11 +56,9 @@ function CampusList() {
   } = useCampuses();
   const navigate = useNavigate();
 
-  // Sửa từ campuses.result thành campuses.items
   const campusImages = campuses?.items?.map((campus) => campus.image);
   const isValidImages = useImageValidity(campuses?.items, campusImages);
 
-  // Handle sorting for campuses
   const handleSort = (pagination, filters, sorter) => {
     const sortOrder = sorter.order === "ascend" ? "asc" : "desc";
     switch (sorter.field) {
@@ -53,7 +76,12 @@ function CampusList() {
     { title: "Liên hệ", dataIndex: "Contact", key: "Contact" },
     { title: "Ngày tạo", dataIndex: "DateCreated", key: "DateCreated", align: "center" },
     { title: "Trạng thái", key: "State", dataIndex: "State", align: "center" },
-    { title: <div className="header-login">Hành động</div>, key: "action", dataIndex: "action" },
+    { 
+      title: <div className="header-login">Hành động</div>, 
+      key: "action", 
+      dataIndex: "action", 
+      align: "center"
+    },
   ];
 
   if (isLoading) {
@@ -64,10 +92,8 @@ function CampusList() {
     );
   }
 
-  // Sửa từ campuses.result thành campuses.items
   if (!campuses?.items?.length) return <Empty resourceName="campus" />;
 
-  // Sửa từ campuses.result thành campuses.items
   const data = campuses?.items?.map((campus, index) => {
     const dataIndex = (page - 1) * limit + index + 1;
     const isValid = isValidImages[index];
@@ -110,26 +136,34 @@ function CampusList() {
       ),
       DateCreated: <>{formatDate(campus.dateCreated)}</>,
       State: (
-        <Tag className="status-tag" color={campus.state ? "cyan" : "error"}>
-          {campus.state ? "Hoạt động" : "Không hoạt động"}
-        </Tag>
+        <StatusContainer>
+          <Tag className="status-tag" color={campus.state ? "cyan" : "error"}>
+            {campus.state ? "Hoạt động" : "Không hoạt động"}
+          </Tag>
+        </StatusContainer>
       ),
       action: (
-        <div className="ant-employed-actions">
-          <div>
+        <ActionContainer className="ant-employed-actions">
+          
+          {campus.hasAccount ? (
+            <Tooltip title="Tài khoản đã được tạo cho campus này">
+              <StyledButtonAction disabled>
+                <HiUserPlus />
+              </StyledButtonAction>
+            </Tooltip>
+          ) : (
             <Modal>
-              <Modal.Open opens="edit">
-                <ButtonAction>
-                  <HiPencil />
-                </ButtonAction>
+              <Modal.Open opens="create-account">
+                <StyledButtonAction>
+                  <HiUserPlus />
+                </StyledButtonAction>
               </Modal.Open>
-              <Modal.Window name="edit">
-                <CampusFormUpdate campusToEdit={campus} />
+              <Modal.Window name="create-account">
+                <CampusAccountForm campusId={campus.id} campusName={campus.campusName} />
               </Modal.Window>
             </Modal>
-          </div>
-          <div></div>
-        </div>
+          )}
+        </ActionContainer>
       ),
     };
   });
@@ -148,7 +182,7 @@ function CampusList() {
     ) {
       return;
     }
-    navigate(`/campus/${record.key}`); // Sửa từ /campuses thành /campus
+    navigate(`/campus/${record.key}`);
   };
 
   return (
@@ -160,7 +194,7 @@ function CampusList() {
         limit={limit}
         label=""
         page={page}
-        elements={campuses?.total} // Sửa từ totalCount thành total để khớp với dữ liệu API
+        elements={campuses?.total}
         setPage={handlePageChange}
         setLimit={handleLimitChange}
         handleRowClick={handleRowClick}
