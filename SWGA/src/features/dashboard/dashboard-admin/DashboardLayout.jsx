@@ -1,13 +1,15 @@
+// DashboardLayout.js
 /* eslint-disable no-unused-vars */
 import styled from "styled-components";
 import Spinner from "../../../ui/Spinner";
 import RightRanking from "./RightRanking";
 import SalesChart from "./SalesChart";
 import Stats from "./Stats";
-import TodayActivity from "./TodayActivity";
-import { useBeans } from "./useBeans";
-import { useDataColumnChart } from "./useDataColumnChart";
-import { useTitles } from "./useTitles";
+import PackageActivity from "./PackageActivity";
+import { useBrands } from "../../../hooks/brand/useBrands";
+import useGetAllCampaignsAdmin from "../../../hooks/campaign/useGetAllCampaignsAdmin";
+import useGetAllCampuses from "../../../hooks/campus/useGetAllCampuses";
+import useGetAllStudents from "../../../hooks/student/useGetAllStudents";
 
 const StyledDashboardLayout = styled.div`
   display: grid;
@@ -17,21 +19,37 @@ const StyledDashboardLayout = styled.div`
 `;
 
 export default function DashboardLayout() {
-  const { titlesAdmin, isLoading: isLoadingTitle } = useTitles();
-  const { beansAdmin, isLoading: isLoadingBeans } = useBeans();
-  const { dataColumnChartAdmin, isLoading: isLoadingData } =
-    useDataColumnChart();
+  const { totalBrands, isLoading: isLoadingBrands } = useBrands();
+  const { 
+    totalCampaigns, 
+    isLoading: isLoadingCampaigns 
+  } = useGetAllCampaignsAdmin();
+  const { 
+    totalCampuses, 
+    isLoading: isLoadingCampuses 
+  } = useGetAllCampuses();
+  const { 
+    totalCount: totalStudents, 
+    isLoading: isLoadingStudents 
+  } = useGetAllStudents();
 
-  if (isLoadingTitle || isLoadingBeans || isLoadingData) return <Spinner />;
+  const titlesAdmin = {
+    numberOfBrands: totalBrands || 0,
+    numberOfCampaigns: totalCampaigns || 0,
+    numberOfStudents: totalStudents || 0,
+    numberOfCampuses: totalCampuses || 0
+  };
+
+  if (isLoadingBrands || isLoadingCampaigns || isLoadingCampuses || 
+      isLoadingStudents) 
+    return <Spinner />;
 
   return (
-    <>
-      <StyledDashboardLayout>
-        <Stats titles={titlesAdmin} />
-        <TodayActivity />
-        <RightRanking />
-        <SalesChart beans={beansAdmin} />
-      </StyledDashboardLayout>
-    </>
+    <StyledDashboardLayout>
+      <Stats titles={titlesAdmin} />
+      <PackageActivity />
+      <RightRanking />
+      <SalesChart />
+    </StyledDashboardLayout>
   );
 }

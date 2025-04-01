@@ -4,9 +4,9 @@ import RightRanking from "./RightRanking";
 import SalesChart from "./SalesChart";
 import Stats from "./Stats";
 import TodayActivity from "./TodayActivity";
-import { useBeans } from "./useBeans";
-import { useDataColumnChart } from "./useDataColumnChart";
-import { useTitles } from "./useTitles";
+import { useStores } from "../../../hooks/store/useStores";
+import { useVouchers } from "../../../hooks/voucher/useVouchers";
+import useGetAllCampaigns from "../../../hooks/campaign/useGetAllCampaigns";
 
 const StyledDashboardLayout = styled.div`
   display: grid;
@@ -16,21 +16,27 @@ const StyledDashboardLayout = styled.div`
 `;
 
 export default function DashboardLayout() {
-  const { titlesBrand, isLoading: isLoadingTitle } = useTitles();
-  const { beansBrand, isLoading: isLoadingBeans } = useBeans();
-  const { dataColumnChartBrand, isLoading: isLoadingData } =
-    useDataColumnChart();
+  const { stores, isLoading: isLoadingStores } = useStores();
+  const { totalVouchers, isLoading: isLoadingVouchers } = useVouchers();
+  const { totalCampaigns, isLoading: isLoadingCampaigns } = useGetAllCampaigns();
 
-  if (isLoadingTitle || isLoadingBeans || isLoadingData) return <Spinner />;
+  // Check if any data is still loading
+  if (isLoadingStores || isLoadingVouchers || isLoadingCampaigns) return <Spinner />;
+
+  // Aggregate stats for Stats component
+  const titles = {
+    numberOfCampaigns: totalCampaigns || 0,
+    numberOfStores: stores?.totalCount || 0,
+    numberOfVoucherItems: totalVouchers || 0,
+    balance: 0, // Placeholder: Assuming balance comes from another API
+  };
 
   return (
-    <>
-      <StyledDashboardLayout>
-        <Stats titles={titlesBrand} />
-        <TodayActivity />
-        <RightRanking />
-        <SalesChart beans={beansBrand} />
-      </StyledDashboardLayout>
-    </>
+    <StyledDashboardLayout>
+      <Stats titles={titles} />
+      <TodayActivity />
+      <RightRanking />
+      <SalesChart />
+    </StyledDashboardLayout>
   );
 }

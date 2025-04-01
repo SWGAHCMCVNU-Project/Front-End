@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import Empty from "../../ui/Empty";
@@ -9,7 +9,8 @@ import StackedHeader from "../../ui/StackedHeader";
 import Table from "../../ui/Table";
 import SetRowsPerPage from "./SetRowsPerPage";
 import StudentRow from "./StudentRow";
-import { useStudents } from "./useStudents";
+import useGetAllStudents from "../../hooks/student/useGetAllStudents";
+import useGetAllCampuses from "../../hooks/campus/useGetAllCampuses";
 
 const StyledHeader = styled.div`
   display: flex;
@@ -28,32 +29,65 @@ const StyledButton = styled.div`
 `;
 
 function StudentTable() {
-  const [limit, setLimit] = useState();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [sortField, setSortField] = useState("Id");
   const [sortOrder, setSortOrder] = useState("desc");
-  const { students, isLoading } = useStudents(limit, sortField, sortOrder);
-  const [currentPage, setCurrentPage] = useState(1);
-  const onLimitChange = (newLimit) => {
-    setLimit(newLimit);
-    setCurrentPage(1);
-  };
-  const [searchParams] = useSearchParams();
-  if (isLoading) return <Spinner />;
-  if (!students?.result?.length) return <Empty resourceName="sinh viên" />;
 
-  const filteredStudents = filterStudentsByState(
-    students.result,
-    searchParams.get("state")
-  );
+  // Lấy page, limit và search từ searchParams
+  const currentPage = parseInt(searchParams.get("page")) || 1;
+  const limit = parseInt(searchParams.get("limit")) || 10;
+  const search = searchParams.get("search") || "";
+
+  // Lấy danh sách sinh viên
+  const { students, totalCount, loading: isLoading } = useGetAllStudents({
+    page: currentPage,
+    size: limit,
+    search: search,
+  });
+
+  // Lấy danh sách campus
+  const { data: campusesData, isLoading: isLoadingCampuses } = useGetAllCampuses({
+    page: 1,
+    size: 100, // Lấy tất cả campus trong 1 trang
+  });
+
+  const campuses = campusesData?.items || [];
+
+  // Ánh xạ campusId với campusName
+  const campusMap = campuses.reduce((map, campus) => {
+    map[campus.id] = campus.campusName;
+    return map;
+  }, {});
+
+  const onLimitChange = (newLimit) => {
+    searchParams.set("limit", newLimit);
+    searchParams.set("page", 1); // Reset về trang 1 khi thay đổi limit
+    setSearchParams(searchParams);
+  };
+
+  const handlePageChange = (newPage) => {
+    searchParams.set("page", newPage);
+    setSearchParams(searchParams);
+  };
 
   const handleStackedClick = (clickedColumn) => {
     setSortField(clickedColumn);
     setSortOrder((prevSortOrder) => (prevSortOrder === "asc" ? "desc" : "asc"));
   };
 
+  if (isLoading || isLoadingCampuses) return <Spinner />;
+  if (!students?.length) return <Empty resourceName="sinh viên" />;
+
+  const filteredStudents = filterStudentsByState(students, searchParams.get("state")).map(
+    (student) => ({
+      ...student,
+      campusName: campusMap[student.campusId] || "Chưa cập nhật",
+    })
+  );
+
   return (
     <Menus>
-      <Table columns="0.4fr 1.8fr 1.7fr 0.9fr 1.7fr 1.2fr 1.1fr">
+      <Table columns="0.4fr 2fr 1.5fr 1fr 1fr">
         <Table.Header>
           <StyledHeader>STT</StyledHeader>
           <StackedHeader
@@ -63,10 +97,8 @@ function StudentTable() {
             active={sortField === "FullName"}
           />
           <div>Liên hệ</div>
-          <div>Đại học</div>
-          <StyledHeader>Chuyên ngành</StyledHeader>
+          <div>Campus</div>
           <StyledHeader>Trạng thái</StyledHeader>
-          <StyledHeader>Hành động</StyledHeader>
         </Table.Header>
 
         <Table.Body
@@ -77,25 +109,21 @@ function StudentTable() {
                 key={student.id}
                 student={student}
                 index={index + 1}
-                displayedIndex={
-                  (students.currentPage - 1) * students.pageSize + index + 1
-                }
+                displayedIndex={(currentPage - 1) * limit + index + 1}
               />
             </StyledButton>
           )}
         />
         <Table.Footer>
           <Pagination
-            count={students?.rowCount}
+            count={filteredStudents.length}
             currentPage={currentPage}
-            pageSize={students?.pageSize}
-            pageCount={students?.pageCount}
-            totalCount={students?.totalCount}
+            pageSize={limit}
+            pageCount={Math.ceil(totalCount / limit)}
+            totalCount={totalCount}
+            onPageChange={handlePageChange}
           />
-          <SetRowsPerPage
-            pageSize={students?.pageSize}
-            onLimitChange={onLimitChange}
-          />
+          <SetRowsPerPage pageSize={limit} onLimitChange={onLimitChange} />
         </Table.Footer>
       </Table>
     </Menus>
@@ -109,9 +137,5 @@ function filterStudentsByState(students, filterValue) {
     return students;
   }
 
-  const filteredStudents = students.filter((student) => {
-    return student.state === (filterValue === "true");
-  });
-
-  return filteredStudents;
+  return students.filter((student) => student.state === parseInt(filterValue));
 }

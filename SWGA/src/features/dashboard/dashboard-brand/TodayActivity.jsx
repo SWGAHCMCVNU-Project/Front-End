@@ -1,14 +1,10 @@
 import styled, { css } from "styled-components";
-import Spinner from "../../../ui/Spinner";
 import DataItemBrand from "../DataItemBrand";
-import { useCampaignRanking } from "./useCampaignRanking";
 
 const StyledToday = styled.div`
-  /* Box */
   background-color: var(--color-grey-0);
   border: 1px solid var(--color-grey-100);
   border-radius: var(--border-radius-md);
-
   padding: 3.2rem;
   display: flex;
   flex-direction: column;
@@ -20,7 +16,6 @@ const StyledToday = styled.div`
 const DataList = styled.ul`
   overflow: scroll;
   overflow-x: hidden;
-
   &::-webkit-scrollbar {
     width: 0 !important;
   }
@@ -52,36 +47,35 @@ const Heading = styled.h1`
     css`
       text-transform: uppercase;
     `}
-
   ${(props) => props.as === "h3" && css``}
-    color: #f9ad14;
-
+  color: #f9ad14;
   text-align: left;
   line-height: 1.4;
 `;
 
 function TodayActivity() {
-  const { campaignRankingBrand, isLoading } = useCampaignRanking();
+  // Fake campaign ranking data with proper structure for DataItemBrand
+  const fakeCampaignRanking = [
+    { id: 1, rank: 1, name: "Chiến dịch mùa hè", image: "", value: 450 },
+    { id: 2, rank: 2, name: "Chiến dịch học tập", image: "", value: 380 },
+    { id: 3, rank: 3, name: "Chiến dịch từ thiện", image: "", value: 320 },
+    { id: 4, rank: 4, name: "Chiến dịch xanh", image: "", value: 280 },
+  ];
 
   return (
     <StyledToday>
       <StyledHeading>
         <Heading as="h2">Bảng xếp hạng chiến dịch</Heading>
-        <Heading as="h3">Số lượng: {campaignRankingBrand?.length}</Heading>
+        <Heading as="h3">Số lượng: {fakeCampaignRanking.length}</Heading>
       </StyledHeading>
-
-      {!isLoading ? (
-        campaignRankingBrand?.length > 0 ? (
-          <DataList>
-            {campaignRankingBrand.map((activity, index) => (
-              <DataItemBrand key={index} activity={activity} />
-            ))}
-          </DataList>
-        ) : (
-          <NoActivity>Không có dữ liệu...</NoActivity>
-        )
+      {fakeCampaignRanking.length > 0 ? (
+        <DataList>
+          {fakeCampaignRanking.map((activity) => (
+            <DataItemBrand key={activity.id} activity={activity} />
+          ))}
+        </DataList>
       ) : (
-        <Spinner />
+        <NoActivity>Không có dữ liệu...</NoActivity>
       )}
     </StyledToday>
   );

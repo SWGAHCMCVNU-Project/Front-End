@@ -70,15 +70,17 @@ const Flag = styled.img`
 
 const StyledTotalBean = styled.div`
   display: flex;
-  gap: 2rem;
   align-items: center;
+  gap: 2rem;
 `;
 
 const StyleGreenWallet = styled.div`
   color: var(--color-green-400);
-  display: inline-block;
   font-weight: bold;
   font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 `;
 
 const StyledImageBean = styled.img`
@@ -141,7 +143,6 @@ function VoucherDataBox({ voucher }) {
       : "Ngày không hợp lệ"
     : "Chưa cập nhật";
 
-  // Chuẩn hóa state trước khi hiển thị
   const normalizedState = state === "true" || state === true ? "true" : "false";
 
   return (
@@ -163,7 +164,7 @@ function VoucherDataBox({ voucher }) {
             <StyledTotalBean>
               <DataItem label="Giá voucher:">
                 <StyleGreenWallet>
-                  {formatCurrency(price)}{" "}
+                  {formatCurrency(price)}
                   <StyledImageBean src={greenBean} alt="dau xanh" />
                 </StyleGreenWallet>
               </DataItem>

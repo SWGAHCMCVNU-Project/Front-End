@@ -7,8 +7,7 @@ import useOutsideClick from "../../hooks/useOutsideClick";
 import Button from "../../ui/Button";
 import Filter from "../../ui/Filter";
 import TableOperations from "../../ui/TableOperations";
-import { useMajorsFilter } from "./useMajorsFilter";
-import { useUniversitiesFilter } from "./useUniversitiesFilter";
+import useGetAllCampuses from "../../hooks/campus/useGetAllCampuses";
 
 const StyledContainerButton = styled.div`
   display: flex;
@@ -55,47 +54,26 @@ const StyledSelectWrapper = styled.div`
 function FilterOperations() {
   const [showFilters, setShowFilters] = useState(false);
   const ref = useOutsideClick(setShowFilters);
-  const [selectedOption, setSelectedOption] = useState([]);
-  const [selectedOptionUniversity, setSelectedOptionUniversity] = useState([]);
+  const [selectedOptionCampus, setSelectedOptionCampus] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const filterValue = searchParams.get("stateIds") || "";
 
-  const { majorsFilter } = useMajorsFilter();
-  const { universitiesFilter } = useUniversitiesFilter();
+  const { data: campusesData, isLoading: isLoadingCampuses } = useGetAllCampuses();
 
-  const options = majorsFilter?.result.map((major) => ({
-    value: major.id,
-    label: major.majorName,
-  }));
+  const optionsCampuses = campusesData?.result?.map((campus) => ({
+    value: campus.id,
+    label: campus.campusName,
+  })) || [];
 
-  const optionsUniversities = universitiesFilter?.result.map((university) => ({
-    value: university.id,
-    label: university.universityName,
-  }));
-
-  const handleSelectChange = (selectedOptions) => {
-    const selectedValues = selectedOptions.map((option) => option.value);
-    if (selectedValues) {
-      searchParams.set("majors", selectedValues);
+  const handleSelectChangeCampus = (selectedOptionCampus) => {
+    const selectedValuesCampus = selectedOptionCampus.map((option) => option.value);
+    if (selectedValuesCampus.length) {
+      searchParams.set("campuses", selectedValuesCampus);
     } else {
-      searchParams.set("majors", null);
+      searchParams.delete("campuses");
     }
     setSearchParams(searchParams);
-    setSelectedOption(selectedOptions);
-  };
-
-  const handleSelectChangeUniversity = (selectedOptionUniversity) => {
-    const selectedValuesUniversity = selectedOptionUniversity.map(
-      (option) => option.value
-    );
-
-    if (selectedValuesUniversity) {
-      searchParams.set("universities", selectedValuesUniversity);
-    } else {
-      searchParams.set("universities", null);
-    }
-    setSearchParams(searchParams);
-    setSelectedOptionUniversity(selectedOptionUniversity);
+    setSelectedOptionCampus(selectedOptionCampus);
   };
 
   return (
@@ -112,6 +90,7 @@ function FilterOperations() {
         value={filterValue}
         onChange={(selectedValue) => {
           searchParams.set("filter", selectedValue);
+          setSearchParams(searchParams);
         }}
       />
 
@@ -133,21 +112,14 @@ function FilterOperations() {
             <StyledSelectWrapper>
               <Select
                 name="select"
-                placeholder="Đại học..."
-                options={optionsUniversities}
+                placeholder={isLoadingCampuses ? "Đang tải campus..." : "Campus..."}
+                options={optionsCampuses}
                 isMulti
-                value={selectedOptionUniversity}
-                onChange={handleSelectChangeUniversity}
+                value={selectedOptionCampus}
+                onChange={handleSelectChangeCampus}
+                isDisabled={isLoadingCampuses}
               />
             </StyledSelectWrapper>
-            <Select
-              name="select"
-              placeholder="Chuyên ngành..."
-              options={options}
-              isMulti
-              value={selectedOption}
-              onChange={handleSelectChange}
-            />
           </StyledFilterOptions>
         )}
       </StyledContainer>

@@ -1,4 +1,3 @@
-import { eachDayOfInterval, subDays } from "date-fns";
 import {
   Area,
   AreaChart,
@@ -11,8 +10,6 @@ import {
 import styled from "styled-components";
 import Heading from "../../../ui/Heading";
 import DashboardBox from "./DashboardBox";
-import { useBeans } from "./useBeans";
-
 import redBean from "../../../assets/images/daudo.png";
 import greenBean from "../../../assets/images/dauxanh.png";
 
@@ -20,8 +17,6 @@ const StyledSalesChart = styled(DashboardBox)`
   grid-column: 1 / -1;
   border: none;
   padding: 16px;
-
-  /* Hack to change grid line colors */
   & .recharts-cartesian-grid-horizontal line,
   & .recharts-cartesian-grid-vertical line {
     stroke: var(--color-grey-300);
@@ -29,30 +24,38 @@ const StyledSalesChart = styled(DashboardBox)`
 `;
 
 export default function SalesChart() {
-  const { beansBrand } = useBeans();
-  const isDarkMode = false;
+  // Fake coin data: purchased and used
+  const fakeCoins = [
+    { date: "2025-03-01", purchased: 5000, used: 3000 },
+    { date: "2025-03-02", purchased: 6000, used: 4500 },
+    { date: "2025-03-03", purchased: 7000, used: 2500 },
+    { date: "2025-03-04", purchased: 5500, used: 6000 },
+    { date: "2025-03-05", purchased: 8000, used: 4000 },
+    { date: "2025-03-06", purchased: 6500, used: 5500 },
+    { date: "2025-03-07", purchased: 9000, used: 3500 },
+  ];
 
-  if (!beansBrand?.result) return null;
+  const isDarkMode = false;
 
   const colors = isDarkMode
     ? {
-        red: { stroke: "#4f46e5", fill: "#4f46e5" },
-        green: { stroke: "#22c55e", fill: "#22c55e" },
+        used: { stroke: "#4f46e5", fill: "#4f46e5" },
+        purchased: { stroke: "#22c55e", fill: "#22c55e" },
         text: "#e5e7eb",
         background: "#18212f",
       }
     : {
-        red: { stroke: "var(--color-error-700)", fill: "orange" },
-        green: { stroke: "var(--color-green-400)", fill: "#dcfce7" },
+        used: { stroke: "var(--color-error-700)", fill: "orange" },
+        purchased: { stroke: "var(--color-green-400)", fill: "#dcfce7" },
         text: "#374151",
         background: "#fff",
       };
 
   return (
     <StyledSalesChart>
-      <Heading as="h2">Thống kê tổng đậu xanh giao dịch trong hệ thống</Heading>
+      <Heading as="h2">Thống kê tổng số coin mua và coin đã sử dụng trong hệ thống</Heading>
       <ResponsiveContainer height={300} width="100%">
-        <AreaChart data={beansBrand.result}>
+        <AreaChart data={fakeCoins}>
           <XAxis
             dataKey="date"
             tick={{ fill: colors.text }}
@@ -65,16 +68,16 @@ export default function SalesChart() {
           <CartesianGrid strokeDasharray="4" />
           <Tooltip contentStyle={{ backgroundColor: colors.background }} />
           <Area
-            dataKey="green"
+            dataKey="purchased"
             type="monotone"
-            stroke={colors.green.stroke}
-            fill={colors.green.fill}
+            stroke={colors.purchased.stroke}
+            fill={colors.purchased.fill}
             strokeWidth={2}
-            name="Green"
+            name="Tổng số coin mua"
             unit={
               <img
                 src={greenBean}
-                alt="Green Bean"
+                alt="Purchased Coin"
                 width="25"
                 height="25"
                 style={{ marginLeft: "5px" }}
@@ -82,16 +85,16 @@ export default function SalesChart() {
             }
           />
           <Area
-            dataKey="red"
+            dataKey="used"
             type="monotone"
-            stroke={colors.red.stroke}
-            fill={colors.red.fill}
+            stroke={colors.used.stroke}
+            fill={colors.used.fill}
             strokeWidth={2}
-            name="Red"
+            name="Tổng số coin đã sử dụng"
             unit={
               <img
-                src={redBean}
-                alt="Red Bean"
+                src={greenBean}
+                alt="Used Coin"
                 width="25"
                 height="25"
                 style={{ marginLeft: "5px" }}

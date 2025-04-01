@@ -1,15 +1,13 @@
-// store/hooks/useGetAllCampuses.js
+// useGetAllCampuses.js
 import { useQuery } from '@tanstack/react-query';
 import { getAllCampusesAPI } from '../../store/api/campusApi';
 import toast from 'react-hot-toast';
 
-// Hook to fetch all campuses
 const useGetAllCampuses = ({ searchName = "", page = 1, size = 10 } = {}) => {
-  return useQuery({
+  const queryResult = useQuery({
     queryKey: ['campuses', searchName, page, size],
     queryFn: async () => {
       const response = await getAllCampusesAPI({ searchName, page, size });
-      console.log("useGetAllCampuses Response:", response); // Kiểm tra dữ liệu từ API
       return response;
     },
     onError: (error) => {
@@ -17,5 +15,14 @@ const useGetAllCampuses = ({ searchName = "", page = 1, size = 10 } = {}) => {
       toast.error(error.message || 'Lấy danh sách campus thất bại');
     },
   });
+
+  // Kiểm tra các format khác nhau của response
+  const totalCampuses = queryResult.data?.total || queryResult.data?.data?.total || queryResult.data?.totalCount || 0;
+
+  return {
+    ...queryResult,
+    totalCampuses // Thử các field khác nhau
+  };
 };
+
 export default useGetAllCampuses;

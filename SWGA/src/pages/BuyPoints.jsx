@@ -5,10 +5,11 @@ import { usePointPackages } from '../hooks/point-package/usePointPackages';
 import { usePurchasePointsCampus } from '../hooks/buy-point/usePurchasePointsCampus';
 import { usePurchasePointsBrand } from '../hooks/buy-point/usePurchasePointsBrand';
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import StorageService from '../services/storageService';
 import { useBrand } from '../hooks/brand/useBrand';
-import useGetCampusByAccountId from '../hooks/campus/useGetCampusByAccount'
+import useGetCampusByAccountId from '../hooks/campus/useGetCampusByAccount';
+
 const { Title, Text } = Typography;
 
 const PageContainer = styled.div`
@@ -104,11 +105,11 @@ function BuyPoints() {
   });
 
   const { brand, isLoading: isBrandLoading } = useBrand();
-  const accountId = StorageService.getAccountId(); // Thêm dòng này
+  const accountId = StorageService.getAccountId();
   const { data: campusResponse, isLoading: isCampusLoading } = useGetCampusByAccountId(accountId);
-
+  const navigate = useNavigate();
   const role = StorageService.getRoleLogin();
-  const campusId = campusResponse?.data?.id 
+  const campusId = campusResponse?.data?.id;
   const brandId = StorageService.getBrandId();
 
   const { buyPoints: buyPointsCampus, isPurchasing: isPurchasingCampus } = usePurchasePointsCampus();
@@ -117,26 +118,35 @@ function BuyPoints() {
   const [selectedPackageId, setSelectedPackageId] = useState(null);
   const location = useLocation();
 
-  // Debug: Log thêm để kiểm tra
-  useEffect(() => {
-    console.log('BuyPoints - accountId:', accountId);
-    console.log('BuyPoints - campusResponse:', campusResponse);
-    console.log('BuyPoints - campusId:', campusId);
-  }, [accountId, campusResponse, campusId]);
-
+  // Xử lý redirect và callback từ VNPay
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
-    const status = urlParams.get('status');
-    const messageText = urlParams.get('message');
+    const vnpParams = Array.from(urlParams.entries()).filter(([key]) => key.startsWith('vnp_'));
 
-    if (status === 'success') {
-      message.success(messageText || 'Thanh toán thành công!');
-      setSelectedPackageId(null);
-    } else if (status === 'error') {
-      message.error(messageText || 'Thanh toán thất bại. Vui lòng thử lại.');
-      setSelectedPackageId(null);
+    // Nếu có params VNPay và đang ở trang chủ (/)
+    if (vnpParams.length > 0 && location.pathname === '/') {
+      // Chuyển hướng ngay đến /buy-point với giữ nguyên params
+      navigate(`/buy-point?${urlParams.toString()}`, { replace: true });
+      return;
     }
-  }, [location.search, pointPackages]);
+
+    // Xử lý callback VNPay khi đã ở trang /buy-point
+    if (vnpParams.length > 0 && location.pathname === '/buy-point') {
+      const vnpResponseCode = urlParams.get('vnp_ResponseCode');
+      const vnpAmount = urlParams.get('vnp_Amount');
+      const vnpTransactionStatus = urlParams.get('vnp_TransactionStatus');
+
+      if (vnpResponseCode === '00' && vnpTransactionStatus === '00') {
+        const amount = vnpAmount ? parseInt(vnpAmount) / 100 : 0;
+        message.success(`Thanh toán thành công ${amount.toLocaleString('vi-VN')} VNĐ`, 5);
+      } else if (vnpResponseCode) {
+        message.error('Thanh toán thất bại. Vui lòng thử lại.', 5);
+      }
+
+      // Xóa params sau khi xử lý
+      window.history.replaceState({}, '', '/buy-point');
+    }
+  }, [location, navigate]);
 
   const handleBuyPackage = async (packageInfo) => {
     try {
@@ -185,7 +195,7 @@ function BuyPoints() {
     'Ưu đãi hấp dẫn',
   ];
 
-  const isPurchasing = role === 'brand' ? isPurchasingCampus : isPurchasingBrand;
+  const isPurchasing = role === 'brand' ? isPurchasingBrand : isPurchasingCampus;
 
   return (
     <PageContainer>

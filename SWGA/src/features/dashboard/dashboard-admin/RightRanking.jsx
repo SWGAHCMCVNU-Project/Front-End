@@ -1,15 +1,12 @@
+// RightRanking.jsx
 import styled, { css } from "styled-components";
-
 import Spinner from "../../../ui/Spinner";
 import DataItem from "./DataItem";
-import { useStudentRanking } from "./useStudentRanking";
 
 const StyledToday = styled.div`
-  /* Box */
   background-color: var(--color-grey-0);
   border: 1px solid var(--color-grey-100);
   border-radius: var(--border-radius-md);
-
   padding: 3.2rem;
   display: flex;
   flex-direction: column;
@@ -60,8 +57,18 @@ const Heading = styled.h1`
   text-align: left;
   line-height: 1.4;
 `;
+
 function RightRanking() {
-  const { studentRankingAdmin, isLoading } = useStudentRanking();
+  // Fake data cho student ranking, cập nhật để phù hợp với DataItem
+  const fakeStudentRanking = [
+    { id: 1, rank: 1, name: "Nguyễn Văn A", image: "", value: 98 },
+    { id: 2, rank: 2, name: "Trần Thị B", image: "", value: 92 },
+    { id: 3, rank: 3, name: "Lê Văn C", image: "", value: 88 },
+    { id: 4, rank: 4, name: "Phạm Thị D", image: "", value: 85 },
+  ];
+
+  const studentRankingAdmin = fakeStudentRanking;
+  const isLoading = false;
 
   return (
     <StyledToday>
@@ -73,8 +80,8 @@ function RightRanking() {
       {!isLoading ? (
         studentRankingAdmin?.length > 0 ? (
           <TodayList>
-            {studentRankingAdmin.map((activity, index) => (
-              <DataItem key={index} activity={activity} />
+            {studentRankingAdmin.map((activity) => (
+              <DataItem key={activity.id} activity={activity} />
             ))}
           </TodayList>
         ) : (
