@@ -26,19 +26,30 @@ const StyledSalesChart = styled(DashboardBox)`
   }
 `;
 
-export default function SalesChart({ beans }) {
+export default function SalesChart() {
+  // Fake data cho coins
+  const fakeCoins = [
+    { date: "2025-03-01", available: 5000, consumed: 3000 },
+    { date: "2025-03-02", available: 6000, consumed: 4500 },
+    { date: "2025-03-03", available: 7000, consumed: 2500 },
+    { date: "2025-03-04", available: 5500, consumed: 6000 },
+    { date: "2025-03-05", available: 8000, consumed: 4000 },
+    { date: "2025-03-06", available: 6500, consumed: 5500 },
+    { date: "2025-03-07", available: 9000, consumed: 3500 },
+  ];
+
   const isDarkMode = false;
 
   const colors = isDarkMode
     ? {
-        red: { stroke: "#4f46e5", fill: "#4f46e5" },
-        green: { stroke: "#22c55e", fill: "#22c55e" },
+        available: { stroke: "#22c55e", fill: "#22c55e" },
+        consumed: { stroke: "#4f46e5", fill: "#4f46e5" },
         text: "#e5e7eb",
         background: "#18212f",
       }
     : {
-        red: { stroke: "var(--color-error-700)", fill: "orange" },
-        green: { stroke: "var(--color-green-400)", fill: "#dcfce7" },
+        available: { stroke: "var(--color-green-400)", fill: "#dcfce7" },
+        consumed: { stroke: "var(--color-error-700)", fill: "orange" },
         text: "#374151",
         background: "#fff",
       };
@@ -46,10 +57,10 @@ export default function SalesChart({ beans }) {
   return (
     <StyledSalesChart>
       <Heading as="h2">
-        Thống kê tổng đậu xanh và đậu đỏ giao dịch trong hệ thống
+        Thống kê số coin hiện có và số coin tiêu thụ trong hệ thống
       </Heading>
       <ResponsiveContainer height={300} width="100%">
-        <AreaChart data={beans}>
+        <AreaChart data={fakeCoins}>
           <XAxis
             dataKey="date"
             tick={{ fill: colors.text }}
@@ -62,16 +73,16 @@ export default function SalesChart({ beans }) {
           <CartesianGrid strokeDasharray="4" />
           <Tooltip contentStyle={{ backgroundColor: colors.background }} />
           <Area
-            dataKey="green"
+            dataKey="available"
             type="monotone"
-            stroke={colors.green.stroke}
-            fill={colors.green.fill}
+            stroke={colors.available.stroke}
+            fill={colors.available.fill}
             strokeWidth={2}
-            name="Green"
+            name="Available Coins"
             unit={
               <img
                 src={greenBean}
-                alt="Green Bean"
+                alt="Green Bean Coin"
                 width="25"
                 height="25"
                 style={{ marginLeft: "5px" }}
@@ -79,16 +90,16 @@ export default function SalesChart({ beans }) {
             }
           />
           <Area
-            dataKey="red"
+            dataKey="consumed"
             type="monotone"
-            stroke={colors.red.stroke}
-            fill={colors.red.fill}
+            stroke={colors.consumed.stroke}
+            fill={colors.consumed.fill}
             strokeWidth={2}
-            name="Red"
+            name="Consumed Coins"
             unit={
               <img
-                src={redBean}
-                alt="Red Bean"
+                src={greenBean}
+                alt="Red Bean Coin"
                 width="25"
                 height="25"
                 style={{ marginLeft: "5px" }}

@@ -1,23 +1,20 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useDebounced } from "../../hooks/useDebounced";
 import SearchBar from "../../ui/SearchBar";
 import TableOperations from "../../ui/TableOperations";
 
 function StudentTableOperations() {
   const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearch = useDebounced(searchTerm, 500);
   const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
-    if (debouncedSearch !== "") {
-      searchParams.set("search", debouncedSearch);
+    if (searchTerm !== "") {
+      searchParams.set("search", searchTerm);
     } else {
       searchParams.delete("search");
     }
-
     setSearchParams(searchParams);
-  }, [debouncedSearch, searchParams, setSearchParams]);
+  }, [searchTerm, searchParams, setSearchParams]);
 
   return (
     <TableOperations>

@@ -10,7 +10,6 @@ const StyledTodayItem = styled.li`
   grid-template-columns: 7rem 5rem 1fr 9rem;
   gap: 1.2rem;
   align-items: center;
-
   font-size: 1.4rem;
   padding: 0.8rem 0;
   border-bottom: 1px solid var(--color-grey-100);
@@ -30,13 +29,13 @@ export const Flag = styled.img`
   border-radius: 50%;
   display: block;
   border: ${(props) => (props.src ? "1px solid var(--color-grey-100)" : null)};
-
   content: url(${(props) => (props.src ? props.src : logoDefault)});
 `;
 
 const StyledImageBean = styled.img`
   width: 25px;
   height: 25px;
+  margin-left: 5px; /* Add spacing between the value and the image */
 `;
 
 const StarImage = styled.div`
@@ -62,10 +61,12 @@ const RankLabel = styled.span`
 
 const StyleGreenWallet = styled.div`
   color: var(--color-green-400);
-  display: inline-block;
   font-weight: bold;
   font-size: 16px;
-  text-align: end;
+  display: flex; /* Use flexbox for alignment */
+  align-items: center; /* Vertically center the items */
+  justify-content: flex-end; /* Align to the right */
+  gap: 5px; /* Ensure consistent spacing */
 `;
 
 function DataItem({ activity }) {
@@ -84,11 +85,10 @@ function DataItem({ activity }) {
         <StarIcon src={star} alt="Star" />
         <RankLabel>{rank}</RankLabel>
       </StarImage>
-
       <Flag src={isValidImage ? image : logoDefault} alt={`Image of ${name}`} />
       <Guest>{name}</Guest>
       <StyleGreenWallet>
-        {formatCurrency(value)}{" "}
+        {formatCurrency(value)}
         <StyledImageBean src={greenBean} alt="dau xanh" />
       </StyleGreenWallet>
     </StyledTodayItem>

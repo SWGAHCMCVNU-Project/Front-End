@@ -1,7 +1,5 @@
 import styled, { css } from "styled-components";
-import Spinner from "../../../ui/Spinner";
 import DataItem from "./DataItem";
-import { useStudentRanking } from "./useStudentRanking";
 
 const StyledToday = styled.div`
   background-color: var(--color-grey-0);
@@ -55,27 +53,27 @@ const Heading = styled.h1`
 `;
 
 function RightRanking() {
-  const { studentRankingCampus, isLoading } = useStudentRanking();
+  // Fake student ranking data (updated to match screenshot)
+  const fakeStudentRanking = [
+    { id: 1, rank: 3, name: "Lê Văn C", image: "", value: 85 },
+    { id: 2, rank: 4, name: "Phạm Thị D", image: "", value: 79 },
+    { id: 3, rank: 5, name: "Hoàng Văn E", image: "", value: 72 },
+  ];
 
   return (
     <StyledToday>
       <StyledHeading>
         <Heading as="h2">Bảng xếp hạng sinh viên</Heading>
-        <Heading as="h3">Số lượng: {studentRankingCampus?.length}</Heading>
+        <Heading as="h3">Số lượng: {fakeStudentRanking.length}</Heading>
       </StyledHeading>
-
-      {!isLoading ? (
-        studentRankingCampus?.length > 0 ? (
-          <TodayList>
-            {studentRankingCampus.map((activity, index) => (
-              <DataItem key={index} activity={activity} />
-            ))}
-          </TodayList>
-        ) : (
-          <NoActivity>Không có dữ liệu...</NoActivity>
-        )
+      {fakeStudentRanking.length > 0 ? (
+        <TodayList>
+          {fakeStudentRanking.map((activity) => (
+            <DataItem key={activity.id} activity={activity} />
+          ))}
+        </TodayList>
       ) : (
-        <Spinner />
+        <NoActivity>Không có dữ liệu...</NoActivity>
       )}
     </StyledToday>
   );

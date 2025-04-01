@@ -52,16 +52,16 @@ function CampaignVoucher() {
                   <label className="voucher-remaining">mã</label>
                 </div>
               </div>
-              <div className="container-quantity">
+              {/* <div className="container-quantity">
                 <span className="voucher-more">Xem thêm</span>
-              </div>
+              </div> */}
             </Card>
           ))}
         </div>
       </Modal.Open>
-      <Modal.Window name="voucher-campaign-details">
+      {/* <Modal.Window name="voucher-campaign-details">
         <p>Chi tiết voucher sẽ hiển thị khi tích hợp useGetVoucherDetailByCampaignId (ID: {voucherId})</p>
-      </Modal.Window>
+      </Modal.Window> */}
     </Modal>
   );
 }

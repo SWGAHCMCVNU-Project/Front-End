@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAllCampaignsAPI } from "../../store/api/campaignApi";
-
 import { toast } from "react-hot-toast";
 
 const useGetAllCampaigns = ({
@@ -31,14 +30,29 @@ const useGetAllCampaigns = ({
       campaignTypeIds?.join(","),
       params.statesFilterValue,
     ],
-    queryFn: () => getAllCampaignsAPI(params),
-
+    queryFn: async () => {
+      const response = await getAllCampaignsAPI(params);
+      return response;
+    },
     staleTime: 1000 * 60,
-    onError: () => toast.error("Không thể tải danh sách chiến dịch"),
+    onError: (error) => {
+      console.error("Error fetching campaigns:", error);
+      toast.error("Không thể tải danh sách chiến dịch");
+    },
     keepPreviousData: true,
   });
 
-  return queryResult;
+  // Handle different response formats
+  const totalCampaigns =
+    queryResult.data?.total ||
+    queryResult.data?.data?.total ||
+    queryResult.data?.totalCount ||
+    0;
+
+  return {
+    ...queryResult,
+    totalCampaigns,
+  };
 };
 
 export default useGetAllCampaigns;

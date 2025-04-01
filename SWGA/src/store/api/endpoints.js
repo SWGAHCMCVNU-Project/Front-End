@@ -98,4 +98,7 @@ export const AUTH_ENDPOINTS = {
     GET_ALL: "/LuckyPrize",
     UPDATE: "/LuckyPrize/{id}"
   }
-
+  export const STUDENT = {
+    GET_ALL: "/Student",
+    GET_BY_ID: "/Student/{id}",
+  }

@@ -1,3 +1,4 @@
+// LuckyPrizeTable.jsx
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import styled from "styled-components";
@@ -12,6 +13,7 @@ const StyledHeader = styled.div`
   align-items: center;
   justify-content: center;
 `;
+
 const StyledHeaderCell = styled.div`
   display: flex;
   align-items: center;
@@ -53,11 +55,11 @@ export default function LuckyPrizeTable({ setRefetch, setOnPrizeAdded }) {
     }, 1500); // 1.5 giây
   };
 
-  // Truyền refetch và handlePrizeAdded lên LuckyPrize
+  // Chỉ gọi setRefetch và setOnPrizeAdded một lần khi component mount
   useEffect(() => {
     setRefetch(() => refetch);
     setOnPrizeAdded(() => handlePrizeAdded);
-  }, [refetch, setRefetch, setOnPrizeAdded]);
+  }, []); // Dependency array rỗng để chỉ chạy một lần khi mount
 
   if (loading) return <Spinner />;
   if (error) return <div>Error: {error}</div>;

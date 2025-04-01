@@ -1,14 +1,10 @@
 import styled, { css } from "styled-components";
-import Spinner from "../../../ui/Spinner";
 import DataItem from "../DataItem";
-import { useStudentRanking } from "./useStudentRanking";
 
 const StyledToday = styled.div`
-  /* Box */
   background-color: var(--color-grey-0);
   border: 1px solid var(--color-grey-100);
   border-radius: var(--border-radius-md);
-
   padding: 3.2rem;
   display: flex;
   flex-direction: column;
@@ -20,7 +16,6 @@ const StyledToday = styled.div`
 const TodayList = styled.ul`
   overflow: scroll;
   overflow-x: hidden;
-
   &::-webkit-scrollbar {
     width: 0 !important;
   }
@@ -52,35 +47,36 @@ const Heading = styled.h1`
     css`
       text-transform: uppercase;
     `}
-
   ${(props) => props.as === "h3" && css``}
-    color: #f9ad14;
-
+  color: #f9ad14;
   text-align: left;
   line-height: 1.4;
 `;
+
 function RightRanking() {
-  const { studentRankingBrand, isLoading } = useStudentRanking();
+  // Fake student ranking data with proper structure for DataItem
+  const fakeStudentRanking = [
+    { id: 1, rank: 1, name: "Nguyễn Văn A", image: "", value: 95 },
+    { id: 2, rank: 2, name: "Trần Thị B", image: "", value: 88 },
+    { id: 3, rank: 3, name: "Lê Văn C", image: "", value: 85 },
+    { id: 4, rank: 4, name: "Phạm Thị D", image: "", value: 79 },
+    { id: 5, rank: 5, name: "Hoàng Văn E", image: "", value: 72 },
+  ];
 
   return (
     <StyledToday>
       <StyledHeading>
         <Heading as="h2">Bảng xếp hạng sinh viên</Heading>
-        <Heading as="h3">Số lượng: {studentRankingBrand?.length}</Heading>
+        <Heading as="h3">Số lượng: {fakeStudentRanking.length}</Heading>
       </StyledHeading>
-
-      {!isLoading ? (
-        studentRankingBrand?.length > 0 ? (
-          <TodayList>
-            {studentRankingBrand.map((activity, index) => (
-              <DataItem key={index} activity={activity} />
-            ))}
-          </TodayList>
-        ) : (
-          <NoActivity>Không có dữ liệu...</NoActivity>
-        )
+      {fakeStudentRanking.length > 0 ? (
+        <TodayList>
+          {fakeStudentRanking.map((activity) => (
+            <DataItem key={activity.id} activity={activity} />
+          ))}
+        </TodayList>
       ) : (
-        <Spinner />
+        <NoActivity>Không có dữ liệu...</NoActivity>
       )}
     </StyledToday>
   );

@@ -1,3 +1,4 @@
+// DataItem.jsx
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import greenBean from "../../../assets/images/dauxanh.png";
@@ -61,11 +62,13 @@ const RankLabel = styled.span`
 `;
 
 const StyleGreenWallet = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
   color: var(--color-green-400);
-  display: inline-block;
   font-weight: bold;
   font-size: 16px;
-  text-align: end;
 `;
 
 function DataItem({ activity }) {
@@ -88,7 +91,7 @@ function DataItem({ activity }) {
       <Flag src={isValidImage ? image : logoDefault} alt={`Image of ${name}`} />
       <Guest>{name}</Guest>
       <StyleGreenWallet>
-        {formatCurrency(value)}{" "}
+        <span>{formatCurrency(value)}</span>
         <StyledImageBean src={greenBean} alt="dau xanh" />
       </StyleGreenWallet>
     </StyledTodayItem>

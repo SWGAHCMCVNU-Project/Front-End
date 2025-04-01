@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import {
-  HiOutlineSquare3Stack3D,
+  HiOutlineAcademicCap ,
   HiOutlineTag,
   HiOutlineTicket,
   HiOutlineUsers,
@@ -14,25 +14,25 @@ export default function Stats({ titles }) {
         title="Thương hiệu"
         color="blue"
         icon={<HiOutlineTag />}
-        value={titles?.numberOfBrands}
+        value={titles?.numberOfBrands || 0}
       />
       <Stat
         title="Chiến dịch"
         color="green"
         icon={<HiOutlineTicket />}
-        value={titles?.numberOfCampagins}
+        value={titles?.numberOfCampaigns || 0}
       />
       <Stat
         title="Sinh viên"
         color="indigo"
         icon={<HiOutlineUsers />}
-        value={titles?.numberOfStudents}
+        value={titles?.numberOfStudents || 0}
       />
       <Stat
-        title="Sản phẩm"
+        title="Campus"
         color="yellow"
-        icon={<HiOutlineSquare3Stack3D />}
-        value={titles?.numberOfProducts}
+        icon={<HiOutlineAcademicCap  />}
+        value={titles?.numberOfCampuses || 0}
       />
     </>
   );

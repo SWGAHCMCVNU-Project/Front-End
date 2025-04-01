@@ -1,7 +1,5 @@
 import styled, { css } from "styled-components";
-import Spinner from "../../../ui/Spinner";
-import DataItem from "./DataItem"; // Tái sử dụng cho giảng viên
-import { useLecturerRanking } from "./useLecturerRanking"; // Hook mới
+import DataItem from "./DataItem";
 
 const StyledToday = styled.div`
   background-color: var(--color-grey-0);
@@ -55,27 +53,27 @@ const Heading = styled.h1`
 `;
 
 function TodayActivity() {
-  const { lecturerRankingCampus, isLoading } = useLecturerRanking();
+  // Fake lecturer ranking data (updated to match screenshot)
+  const fakeLecturerRanking = [
+    { id: 1, rank: 1, name: "Nguyễn Văn Hùng", image: "", value: 120 },
+    { id: 2, rank: 2, name: "Trần Thị Lan", image: "", value: 110 },
+    { id: 3, rank: 3, name: "Lê Minh Tuấn", image: "", value: 105 },
+  ];
 
   return (
     <StyledToday>
       <StyledHeading>
         <Heading as="h2">Bảng xếp hạng giảng viên</Heading>
-        <Heading as="h3">Số lượng: {lecturerRankingCampus?.length}</Heading>
+        <Heading as="h3">Số lượng: {fakeLecturerRanking.length}</Heading>
       </StyledHeading>
-
-      {!isLoading ? (
-        lecturerRankingCampus?.length > 0 ? (
-          <DataList>
-            {lecturerRankingCampus.map((activity, index) => (
-              <DataItem key={index} activity={activity} />
-            ))}
-          </DataList>
-        ) : (
-          <NoActivity>Không có dữ liệu...</NoActivity>
-        )
+      {fakeLecturerRanking.length > 0 ? (
+        <DataList>
+          {fakeLecturerRanking.map((activity) => (
+            <DataItem key={activity.id} activity={activity} />
+          ))}
+        </DataList>
       ) : (
-        <Spinner />
+        <NoActivity>Không có dữ liệu...</NoActivity>
       )}
     </StyledToday>
   );

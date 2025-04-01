@@ -9,10 +9,11 @@ function SetRowsPerPage({ pageSize, onLimitChange }) {
     if (Number(newLimit) !== pageSize) {
       onLimitChange(newLimit);
       searchParams.set("limit", newLimit);
-      searchParams.set("page", 1);
+      searchParams.set("page", 1); // Đảm bảo page luôn bắt đầu từ 1
       setSearchParams(searchParams);
     }
   };
+
   return (
     <TableOperations>
       <RowPerPage

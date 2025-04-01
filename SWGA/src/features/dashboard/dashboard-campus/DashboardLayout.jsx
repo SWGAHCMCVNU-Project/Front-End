@@ -1,13 +1,9 @@
 /* eslint-disable no-unused-vars */
 import styled from "styled-components";
-import Spinner from "../../../ui/Spinner";
 import RightRanking from "./RightRanking";
 import SalesChart from "./SalesChart";
 import Stats from "./Stats";
 import TodayActivity from "./TodayActivity";
-import { useBeans } from "./useBeans";
-import { useCampusStats } from "./useCampusState"; // Hook mới
-import { useStudentRanking } from "./useStudentRanking";
 
 const StyledDashboardLayout = styled.div`
   display: grid;
@@ -17,18 +13,31 @@ const StyledDashboardLayout = styled.div`
 `;
 
 export default function DashboardLayout() {
-  const { campusStats, isLoading: isLoadingStats } = useCampusStats(); // Hook mới
-  const { beansCampus, isLoading: isLoadingBeans } = useBeans(); // Hook sửa đổi
-  const { studentRankingCampus, isLoading: isLoadingRanking } = useStudentRanking(); // Hook sửa đổi
+  // Fake data for campus stats
+  const fakeCampusStats = {
+    numberOfStudents: 1200,
+    numberOfLecturers: 80,
+    numberOfInitiatives: 15,
+    numberOfPointPackages: 5,
+  };
 
-  if (isLoadingStats || isLoadingBeans || isLoadingRanking) return <Spinner />;
+  // Fake data for beans (used in SalesChart)
+  const fakeBeansCampus = [
+    { date: "2025-03-01", purchased: 5000, used: 3000 },
+    { date: "2025-03-02", purchased: 6000, used: 4500 },
+    { date: "2025-03-03", purchased: 7000, used: 2500 },
+    { date: "2025-03-04", purchased: 5500, used: 6000 },
+    { date: "2025-03-05", purchased: 8000, used: 4000 },
+    { date: "2025-03-06", purchased: 6500, used: 5500 },
+    { date: "2025-03-07", purchased: 9000, used: 3500 },
+  ];
 
   return (
     <StyledDashboardLayout>
-      <Stats titles={campusStats} />
+      <Stats titles={fakeCampusStats} />
       <TodayActivity />
       <RightRanking />
-      <SalesChart beans={beansCampus} />
+      <SalesChart beans={fakeBeansCampus} />
     </StyledDashboardLayout>
   );
 }
