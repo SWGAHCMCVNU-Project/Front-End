@@ -34,9 +34,7 @@ export const useStores = ({
       console.error("Error fetching stores:", error);
       toast.error("Không thể tải danh sách cửa hàng");
     },
-    onSuccess: (responseData) => {
-      console.log("API Response:", responseData);
-    },
+    
   });
 
   // Xử lý dữ liệu từ API với giá trị mặc định

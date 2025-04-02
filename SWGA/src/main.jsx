@@ -5,6 +5,7 @@ if (typeof global === "undefined") {
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { StrictMode } from "react";
+import { BrowserRouter } from 'react-router-dom';
 import { createRoot } from "react-dom/client";
 import favicon from "./assets/images/S_WalletLogo.png";
 import "./assets/styles/App.scss";
@@ -35,10 +36,12 @@ setFavicon(favicon);
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
+    <BrowserRouter>
       <GlobalStyles />
       <ChakraProvider value={defaultSystem}>
         <App />
       </ChakraProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   </StrictMode>
 );

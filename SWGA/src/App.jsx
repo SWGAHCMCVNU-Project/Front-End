@@ -1,14 +1,8 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */
+import { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import "antd/dist/reset.css";
 import { useState } from "react";
-import {
-  BrowserRouter,
-  Route,
-  Routes,
-  Navigate,
-  useLocation,
-} from "react-router-dom";
+import {  Route, Routes, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import "./assets/styles/App.scss";
 import "./assets/styles/responsive.scss";
@@ -35,13 +29,12 @@ import Main from "./components/layout/Main.jsx";
 import storageService from "./services/storageService";
 import VoucherCreatePage from "./pages/VoucherManagement/VoucherCreatePage.jsx";
 import Areas from "./pages/AreaManagement/Areas.jsx";
-// import Area from "./pages/AreaManagement/Area.jsx";
 import Profile from "./pages/Profile.jsx";
 import CampaignType from "./pages/CampaignType/CampaignType.jsx";
 import StoreCreatePage from "./pages/StoreManagement/StoreCreatePage.jsx";
 import StoreDetailsPage from "./pages/StoreManagement/StoreDetailsPage.jsx";
 import StoreUpdatePage from "./pages/StoreManagement/StoreUpdatePage.jsx";
-import Account from "./pages/Account.jsx"; // Import the Account component
+import Account from "./pages/Account.jsx";
 import CampaignCreatePage from "./pages/CampaignManagement/CampaignCreatePage.jsx";
 import CampaignDetailsPage from "./pages/CampaignManagement/CampaignDetailsPage.jsx";
 import CampaignUpdatePage from "./pages/CampaignManagement/CampaignUpdatePage.jsx";
@@ -55,7 +48,6 @@ function PrivateRoute({ children, allowedRoles = [] }) {
   const isAuthenticated = !!storageService.getAccessToken();
   const roleLogin = storageService.getRoleLogin();
 
-  // Không điều hướng nếu đang ở trang /sign-in
   if (location.pathname === "/sign-in") {
     return children;
   }
@@ -73,6 +65,19 @@ function PrivateRoute({ children, allowedRoles = [] }) {
 
 function App() {
   const [roleLogin, setRoleLogin] = useState(storageService.getRoleLogin());
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const vnpParams = Array.from(urlParams.entries()).filter(([key]) =>
+      key.startsWith("vnp_")
+    );
+
+    if (vnpParams.length > 0 && location.pathname === "/") {
+      navigate(`/buy-points?${urlParams.toString()}`, { replace: true });
+    }
+  }, [location, navigate]);
 
   const handleLogin = (newRoleLogin) => {
     storageService.setRoleLogin(newRoleLogin);
@@ -81,298 +86,277 @@ function App() {
 
   return (
     <>
-      <BrowserRouter>
-        <Routes>
+      <Routes>
+        <Route
+          path="/sign-in"
+          exact
+          element={<SignIn onLogin={handleLogin} />}
+        />
+        <Route path="/sign-up" exact element={<SignUp />} />
+        <Route path="/" element={<Main />}>
+          <Route path="/dashboard" exact element={<DashBoard />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/account" element={<Account />} />
           <Route
-            path="/sign-in"
+            path="/brands"
             exact
-            element={<SignIn onLogin={handleLogin} />}
+            element={
+              <PrivateRoute allowedRoles={["admin", "brand"]}>
+                <Brands />
+              </PrivateRoute>
+            }
           />
-          <Route path="/sign-up" exact element={<SignUp />} />
-          <Route path="/" element={<Main />}>
-            <Route path="/dashboard" exact element={<DashBoard />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/account" element={<Account />} />{" "}
-            {/* New route for "Hồ sơ" */}
-            <Route
-              path="/brands"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["admin", "brand"]}>
-                  <Brands />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="brands/:brandId"
-              element={
-                <PrivateRoute allowedRoles={["admin", "brand"]}>
-                  <Brand />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/campaigns"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["admin", "brand"]}>
-                  <CampaignPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/campaigns/create"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["admin", "brand"]}>
-                  <CampaignCreatePage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/campaigns/:campaignId"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["admin", "brand"]}>
-                  <CampaignDetailsPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/campaigns/edit/:campaignId"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["brand"]}>
-                  <CampaignUpdatePage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/students"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["admin"]}>
-                  <Students />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="students/:studentId"
-              element={
-                <PrivateRoute allowedRoles={["admin"]}>
-                  <Student />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/campus"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["admin"]}>
-                  <CampusPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/campus/:campusId"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["admin"]}>
-                  <CampusDetailsPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/lucky-prizes"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["admin"]}>
-                  <LuckyPrize />
-                </PrivateRoute>
-              }
-            />
-            {/* <Route
-              path="/majors"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["admin"]}>
-                  <MajorPage />
-                </PrivateRoute>
-              }
-            /> */}
-            <Route
-              path="/areas"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["admin"]}>
-                  <Areas />
-                </PrivateRoute>
-              }
-            />
-            {/* <Route
-              path="/areas/:areaId"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["admin"]}>
-                  <Area />
-                </PrivateRoute>
-              }
-            /> */}
-            <Route
-              path="/stores"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["brand"]}>
-                  <StorePage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/stores/create"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["brand"]}>
-                  <StoreCreatePage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/stores/:storeId"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["brand"]}>
-                  <StoreDetailsPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/stores/edit/:storeId"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["brand"]}>
-                  <StoreUpdatePage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/vouchers"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["brand"]}>
-                  <Vouchers />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/vouchers/create"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["brand"]}>
-                  <VoucherCreatePage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/vouchers/:voucherId"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["brand"]}>
-                  <Voucher />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/vouchers/edit/:voucherId"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["brand"]}>
-                  <VoucherCreatePage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/voucher-type"
-              element={
-                <PrivateRoute allowedRoles={["admin"]}>
-                  <VoucherType />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/campaign-type"
-              element={
-                <PrivateRoute allowedRoles={["admin"]}>
-                  <CampaignType />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/customers"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["brand"]}>
-                  <CustomerPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/transactions"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["brand"]}>
-                  <BrandTransactionPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/transactions/:id"
-              element={
-                <PrivateRoute allowedRoles={["brand"]}>
-                  <TransactionDetailPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/feedback"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["brand"]}>
-                  <FeedbackPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/lecturers"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["campus"]}>
-                  <Lecturers />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/point-packages"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["admin"]}>
-                  <PackagePoint />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/buy-points"
-              exact
-              element={
-                <PrivateRoute allowedRoles={["brand", "campus"]}>
-                  <BuyPoints />
-                </PrivateRoute>
-              }
-            />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Route>
-        </Routes>
-        <Toaster />
-      </BrowserRouter>
+          <Route
+            path="brands/:brandId"
+            element={
+              <PrivateRoute allowedRoles={["admin", "brand"]}>
+                <Brand />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/campaigns"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["admin", "brand"]}>
+                <CampaignPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/campaigns/create"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["admin", "brand"]}>
+                <CampaignCreatePage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/campaigns/:campaignId"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["admin", "brand"]}>
+                <CampaignDetailsPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/campaigns/edit/:campaignId"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["brand"]}>
+                <CampaignUpdatePage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/students"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["admin"]}>
+                <Students />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="students/:studentId"
+            element={
+              <PrivateRoute allowedRoles={["admin"]}>
+                <Student />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/campus"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["admin"]}>
+                <CampusPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/campus/:campusId"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["admin"]}>
+                <CampusDetailsPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/lucky-prizes"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["admin"]}>
+                <LuckyPrize />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/areas"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["admin"]}>
+                <Areas />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/stores"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["brand"]}>
+                <StorePage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/stores/create"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["brand"]}>
+                <StoreCreatePage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/stores/:storeId"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["brand"]}>
+                <StoreDetailsPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/stores/edit/:storeId"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["brand"]}>
+                <StoreUpdatePage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/vouchers"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["brand"]}>
+                <Vouchers />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/vouchers/create"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["brand"]}>
+                <VoucherCreatePage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/vouchers/:voucherId"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["brand"]}>
+                <Voucher />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/vouchers/edit/:voucherId"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["brand"]}>
+                <VoucherCreatePage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/voucher-type"
+            element={
+              <PrivateRoute allowedRoles={["admin"]}>
+                <VoucherType />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/campaign-type"
+            element={
+              <PrivateRoute allowedRoles={["admin"]}>
+                <CampaignType />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/customers"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["brand"]}>
+                <CustomerPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/transactions"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["brand"]}>
+                <BrandTransactionPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/transactions/:id"
+            element={
+              <PrivateRoute allowedRoles={["brand"]}>
+                <TransactionDetailPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/feedback"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["brand"]}>
+                <FeedbackPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/lecturers"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["campus"]}>
+                <Lecturers />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/point-packages"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["admin"]}>
+                <PackagePoint />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/buy-points"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["brand", "campus"]}>
+                <BuyPoints />
+              </PrivateRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Route>
+      </Routes>
+      <Toaster />
     </>
   );
 }

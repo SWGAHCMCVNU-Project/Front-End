@@ -1,14 +1,15 @@
-import { Card, Typography, Button, Row, Col, message, Spin } from 'antd';
+import { Card, Typography, Button, Row, Col, Spin } from 'antd';
 import styled from 'styled-components';
 import { ShoppingCartOutlined, CheckOutlined } from '@ant-design/icons';
 import { usePointPackages } from '../hooks/point-package/usePointPackages';
 import { usePurchasePointsCampus } from '../hooks/buy-point/usePurchasePointsCampus';
 import { usePurchasePointsBrand } from '../hooks/buy-point/usePurchasePointsBrand';
-import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import StorageService from '../services/storageService';
 import { useBrand } from '../hooks/brand/useBrand';
 import useGetCampusByAccountId from '../hooks/campus/useGetCampusByAccount';
+import { toast } from 'react-hot-toast';
 
 const { Title, Text } = Typography;
 
@@ -107,7 +108,6 @@ function BuyPoints() {
   const { brand, isLoading: isBrandLoading } = useBrand();
   const accountId = StorageService.getAccountId();
   const { data: campusResponse, isLoading: isCampusLoading } = useGetCampusByAccountId(accountId);
-  const navigate = useNavigate();
   const role = StorageService.getRoleLogin();
   const campusId = campusResponse?.data?.id;
   const brandId = StorageService.getBrandId();
@@ -116,37 +116,35 @@ function BuyPoints() {
   const { buyPoints: buyPointsBrand, isPurchasing: isPurchasingBrand } = usePurchasePointsBrand();
 
   const [selectedPackageId, setSelectedPackageId] = useState(null);
-  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const hasProcessedRef = useRef(false);
 
-  // Xử lý redirect và callback từ VNPay
   useEffect(() => {
-    const urlParams = new URLSearchParams(location.search);
-    const vnpParams = Array.from(urlParams.entries()).filter(([key]) => key.startsWith('vnp_'));
-
-    // Nếu có params VNPay và đang ở trang chủ (/)
-    if (vnpParams.length > 0 && location.pathname === '/') {
-      // Chuyển hướng ngay đến /buy-point với giữ nguyên params
-      navigate(`/buy-point?${urlParams.toString()}`, { replace: true });
-      return;
-    }
-
-    // Xử lý callback VNPay khi đã ở trang /buy-point
-    if (vnpParams.length > 0 && location.pathname === '/buy-point') {
-      const vnpResponseCode = urlParams.get('vnp_ResponseCode');
-      const vnpAmount = urlParams.get('vnp_Amount');
-      const vnpTransactionStatus = urlParams.get('vnp_TransactionStatus');
-
+    const vnpResponseCode = searchParams.get('vnp_ResponseCode');
+    const vnpAmount = searchParams.get('vnp_Amount');
+    const vnpTransactionStatus = searchParams.get('vnp_TransactionStatus');
+  
+    if (vnpResponseCode && vnpAmount && vnpTransactionStatus && !hasProcessedRef.current) {
+      hasProcessedRef.current = true;
+  
+      // Xóa params NGAY LẬP TỨC trước khi xử lý thông báo
+      setSearchParams({}, { replace: true });
+  
+      // Thay đổi URL mà không trigger re-render (nếu cần)
+      window.history.replaceState({}, '', window.location.pathname);
+  
       if (vnpResponseCode === '00' && vnpTransactionStatus === '00') {
-        const amount = vnpAmount ? parseInt(vnpAmount) / 100 : 0;
-        message.success(`Thanh toán thành công ${amount.toLocaleString('vi-VN')} VNĐ`, 5);
-      } else if (vnpResponseCode) {
-        message.error('Thanh toán thất bại. Vui lòng thử lại.', 5);
+        const amount = parseInt(vnpAmount) / 100;
+        toast.success(`Thanh toán thành công ${amount.toLocaleString('vi-VN')} VNĐ`, {
+          duration: 5000,
+        });
+      } else {
+        toast.error('Thanh toán thất bại. Vui lòng thử lại.', {
+          duration: 5000,
+        });
       }
-
-      // Xóa params sau khi xử lý
-      window.history.replaceState({}, '', '/buy-point');
     }
-  }, [location, navigate]);
+  }, [searchParams, setSearchParams]);
 
   const handleBuyPackage = async (packageInfo) => {
     try {
@@ -167,7 +165,9 @@ function BuyPoints() {
       }
     } catch (error) {
       console.error('Error in handleBuyPackage:', error);
-      message.error(error.message || 'Có lỗi xảy ra khi mua gói điểm.');
+      toast.error(error.message || 'Có lỗi xảy ra khi mua gói điểm.', {
+        duration: 5000,
+      });
       setSelectedPackageId(null);
     }
   };

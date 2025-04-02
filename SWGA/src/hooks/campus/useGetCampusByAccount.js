@@ -3,7 +3,6 @@ import { getCampusByAccountIdAPI } from '../../store/api/campusApi';
 import toast from 'react-hot-toast';
 
 const useGetCampusByAccountId = (accountId) => {
-  console.log("useGetCampusByAccountId - Fetching campus with accountId:", accountId); // Debug
   return useQuery({
     queryKey: ['campusByAccount', accountId],
     queryFn: () => getCampusByAccountIdAPI(accountId),
@@ -13,7 +12,6 @@ const useGetCampusByAccountId = (accountId) => {
       toast.error(error.message || 'Lấy thông tin campus theo account thất bại');
     },
     select: (response) => {
-      console.log("useGetCampusByAccountId - API Response:", response); // Debug
       return response;
     },
   });
