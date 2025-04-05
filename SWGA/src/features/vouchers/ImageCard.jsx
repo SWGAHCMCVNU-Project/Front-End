@@ -1,3 +1,4 @@
+import React from "react";
 import { AiFillExclamationCircle } from "react-icons/ai";
 import styled from "styled-components";
 
@@ -61,15 +62,15 @@ const StyledImagePreview = styled.div`
 const DropFilePreviewItem = styled.div`
   position: relative;
   display: flex;
+  flex-direction: column;
   margin-bottom: 10px;
   align-items: center;
   justify-content: center;
 `;
 
 const StyledImg = styled.img`
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   width: 100%;
-  /* height: "auto"; */
   height: 15rem;
 `;
 
@@ -84,12 +85,33 @@ const ButtonRemove = styled.span`
   font-weight: 500;
   font-size: 16px;
   color: var(--color-green-600);
-  margin-bottom: 20px;
+  margin-top: 10px;
   cursor: pointer;
   transition: opacity 0.3s ease;
-  padding: 1rem 2rem;
+  padding: 0.5rem 1rem;
   border: 1px solid;
-  border-radius: 10px;
+  border-radius: 5px;
+`;
+
+const CustomFileInput = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const FileInputLabel = styled.label`
+  font-size: 1.4rem;
+  color: var(--color-no-100);
+  background-color: var(--color-green-600);
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-green-600);
+  border-radius: 5px;
+`;
+
+const FileNameText = styled.span`
+  font-size: 1.4rem;
+  color: var(--color-grey-600);
 `;
 
 export default function ImageCard({
@@ -98,30 +120,62 @@ export default function ImageCard({
   children,
   file,
   fileRemove,
-  image,
+  avatar,
+  initialImage,
+  imageName,
 }) {
+  // Xử lý ảnh hiển thị
+  const displayImage = file ? URL.createObjectURL(file) : initialImage || avatar;
+
+  // Trích xuất tên file từ URL hoặc sử dụng imageName
+  const getFileName = () => {
+    if (file) return file.name; // Nếu là file mới
+    if (imageName) return imageName; // Nếu có imageName từ dữ liệu
+    if (initialImage || avatar) {
+      // Trích xuất tên file từ URL
+      const urlParts = (initialImage || avatar).split('/');
+      const fileNameFromUrl = urlParts[urlParts.length - 1];
+      return fileNameFromUrl || imageName || 'Chưa tệp nào được chọn';
+    }
+    return imageName || 'Chưa tệp nào được chọn';
+  };
+
+  const fileName = getFileName();
+
+  // Kiểm tra và lấy ID từ children an toàn
+  const getInputId = () => {
+    if (children && typeof children === 'object' && children.props && children.props.id) {
+      return children.props.id;
+    }
+    return `image-${Math.random().toString(36).substr(2, 9)}`; // ID mặc định nếu không có
+  };
+
+  const inputId = getInputId();
+
+  // Tùy chỉnh children để đảm bảo không hiển thị "Chưa tệp nào được chọn" mặc định
+  const modifiedChildren = React.cloneElement(children, {
+    style: { display: 'none' }, // Ẩn input gốc để tùy chỉnh giao diện
+  });
+
   return (
     <StyledFormRow>
-      {label && <Label htmlFor={children.props.id}>{label}</Label>}
-      {children}
+      {label && <Label htmlFor={inputId}>{label}</Label>}
+      <CustomFileInput>
+        {modifiedChildren}
+        <FileInputLabel htmlFor={inputId}>Chọn tệp</FileInputLabel>
+        <FileNameText>{fileName}</FileNameText>
+      </CustomFileInput>
 
-      {image && !file && (
+      {displayImage && (
         <StyledImagePreview>
           <DropFilePreviewItem>
             <InfoFile>
-              <StyledImg src={image} alt="Avatar" />
-            </InfoFile>
-          </DropFilePreviewItem>
-        </StyledImagePreview>
-      )}
-      {file && (
-        <StyledImagePreview>
-          <DropFilePreviewItem>
-            <InfoFile>
-              <ButtonRemove onClick={() => fileRemove(file)}>
-                Xóa ảnh
-              </ButtonRemove>
-              <StyledImg src={URL.createObjectURL(file)} alt={file.name} />
+              <StyledImg src={displayImage} alt={fileName} />
+              {file && (
+                <ButtonRemove onClick={() => fileRemove(file)}>
+                  Xóa ảnh
+                </ButtonRemove>
+              )}
             </InfoFile>
           </DropFilePreviewItem>
         </StyledImagePreview>

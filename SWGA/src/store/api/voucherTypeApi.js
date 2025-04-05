@@ -100,9 +100,9 @@ export const getVoucherTypesAPI = async ({
     params.append("isAsc", isAsc.toString());
 
     const url = `${VOUCHER_TYPE_ENDPOINTS.GET_ALL}?${params}`;
-    console.log("API URL:", url);
+    
     const response = await apiClient.get(url);
-    console.log("API response:", response.data);
+    
 
     if (!response.data) {
       return {

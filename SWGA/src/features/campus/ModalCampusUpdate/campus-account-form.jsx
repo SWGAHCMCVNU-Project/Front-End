@@ -43,7 +43,8 @@ function CampusAccountForm({ campusId, campusName, onCloseModal }) {
           }
         },
         onError: (error) => {
-          console.error("Tạo tài khoản thất bại:", error);
+          console.error("Tạo tài khoản thất bại:", error.message);
+          // Lỗi sẽ được hiển thị qua toast từ hook
         },
       }
     );

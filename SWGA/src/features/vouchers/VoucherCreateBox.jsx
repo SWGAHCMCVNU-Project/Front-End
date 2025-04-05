@@ -94,7 +94,7 @@ const RightFormHalf = styled.div`
 const ButtonGroup = styled.div`
   display: flex;
   gap: 1.2rem;
-  justify-content: space-between;
+  justify-content: flex-end;
   margin: 5px 1px 30px;
 `;
 
@@ -131,6 +131,16 @@ const CustomSelect = styled(Select)`
   }
 `;
 
+const FormContainer = styled.div`
+  position: relative;
+`;
+
+const BackButtonContainer = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+`;
+
 function VoucherCreateBox({ onCloseModal }) {
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -144,11 +154,10 @@ function VoucherCreateBox({ onCloseModal }) {
 
   const isWorking = isCreating || isEditing;
 
-  // Chuẩn hóa state trong defaultValues
   const defaultValues = isEditSession
     ? {
         ...editValues,
-        state: editValues.state === true || editValues.state === "true" // Chuẩn hóa state thành boolean
+        state: editValues.state === true || editValues.state === "true"
           ? true
           : false,
       }
@@ -194,7 +203,6 @@ function VoucherCreateBox({ onCloseModal }) {
     setValue("description", htmlContent);
   };
 
-  // Helper function to compare two objects for changes
   const hasChanges = (newData, originalData) => {
     const fieldsToCompare = [
       "voucherName",
@@ -206,21 +214,19 @@ function VoucherCreateBox({ onCloseModal }) {
       "state",
     ];
 
-    // Compare fields that exist in both objects
     for (const field of fieldsToCompare) {
       if (field in newData && field in originalData) {
         if (newData[field] !== originalData[field]) {
-          return true; // Found a change
+          return true;
         }
       }
     }
 
-    // Check if the image has changed
     if (fileImageVoucherType !== null && fileImageVoucherType !== originalData.image) {
-      return true; // Image has changed
+      return true;
     }
 
-    return false; // No changes detected
+    return false;
   };
 
   function onSubmit(data) {
@@ -232,11 +238,10 @@ function VoucherCreateBox({ onCloseModal }) {
     const voucherData = {
       ...data,
       image: fileImageVoucherType || (isEditSession ? editValues.image : null),
-      state: isEditSession ? data.state : true, // Đảm bảo state là boolean
+      state: isEditSession ? data.state : true,
     };
 
     if (isEditSession) {
-      // Compare the new data with the original data
       if (!hasChanges(voucherData, editValues)) {
         toast.info("Không có thay đổi để cập nhật.");
         onCloseModal?.();
@@ -259,7 +264,6 @@ function VoucherCreateBox({ onCloseModal }) {
     } else {
       createVoucher(voucherData, {
         onSuccess: (response) => {
-          // toast.success("Tạo voucher thành công!");
           reset();
           setFileImageVoucherType(null);
           onCloseModal?.();
@@ -273,17 +277,25 @@ function VoucherCreateBox({ onCloseModal }) {
     }
   }
 
+  const handleBackClick = () => {
+    navigate(isEditSession ? `/vouchers/${editId}` : `/vouchers`);
+  };
+
   return (
-    <div>
+    <FormContainer>
+      <BackButtonContainer>
+        <ButtonText onClick={handleBackClick}>
+          ← Quay lại
+        </ButtonText>
+      </BackButtonContainer>
+
       <Form onSubmit={handleSubmit(onSubmit)} type={onCloseModal ? "modal" : "regular"}>
         <ButtonGroup>
-          <ButtonText onClick={() => navigate(isEditSession ? `/vouchers/${editId}` : `/vouchers`)}>
-            ← Quay lại
-          </ButtonText>
           <Button disabled={isWorking}>
             {isEditSession ? "Cập nhật ưu đãi" : "Tạo ưu đãi mới"}
           </Button>
         </ButtonGroup>
+        
         <BrandFormContainer>
           <LeftFormHalf>
             <StyledStationDataBox>
@@ -407,7 +419,7 @@ function VoucherCreateBox({ onCloseModal }) {
                   <Select
                     id="state"
                     disabled={isWorking}
-                    value={getValues("state")?.toString()} // Chuẩn hóa giá trị hiển thị
+                    value={getValues("state")?.toString()}
                     onChange={(value) => setValue("state", value === "true", { shouldValidate: true })}
                     placeholder="Chọn trạng thái"
                   >
@@ -420,7 +432,7 @@ function VoucherCreateBox({ onCloseModal }) {
           </RightFormHalf>
         </BrandFormContainer>
       </Form>
-    </div>
+    </FormContainer>
   );
 }
 
