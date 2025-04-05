@@ -22,14 +22,8 @@ export const registerBrandAPI = async (formData, coverPhoto, logo) => {
         logo: logo,
         coverPhoto: coverPhoto,
         link: formData.link || "",
-        openingHours: `${openingHours.padStart(
-          2,
-          "0"
-        )}:${openingMinutes.padStart(2, "0")}:00`, // Định dạng "HH:mm:ss"
-        closingHours: `${closingHours.padStart(
-          2,
-          "0"
-        )}:${closingMinutes.padStart(2, "0")}:00`, // Định dạng "HH:mm:ss"
+        openingHours: `${openingHours.padStart(2, "0")}:${openingMinutes.padStart(2, "0")}:00`,
+        closingHours: `${closingHours.padStart(2, "0")}:${closingMinutes.padStart(2, "0")}:00`,
         description: formData.description || "",
         state: true,
       };
@@ -48,7 +42,6 @@ export const registerBrandAPI = async (formData, coverPhoto, logo) => {
     apiFormData.append("acronym", brandData.acronym || "");
     apiFormData.append("address", brandData.address);
 
-    // Xử lý ảnh: Chuyển base64 thành file
     if (brandData.coverPhoto) {
       const base64Response = await fetch(brandData.coverPhoto);
       const blob = await base64Response.blob();
@@ -93,6 +86,20 @@ export const registerBrandAPI = async (formData, coverPhoto, logo) => {
   } catch (error) {
     console.error("Register API Error:", error);
     const errorMessage = error.response?.data?.message || "Đăng ký thất bại";
+    
+    // Kiểm tra nếu lỗi là do userName trùng
+    if (
+      error.response?.status === 409 || // Conflict - thường dùng cho trùng lặp
+      errorMessage.toLowerCase().includes("username") ||
+      errorMessage.toLowerCase().includes("userName")
+    ) {
+      return {
+        status: error.response?.status || 500,
+        success: false,
+        message: "Tên tài khoản đã tồn tại!",
+      };
+    }
+
     return {
       status: error.response?.status || 500,
       success: false,
@@ -119,7 +126,7 @@ export const registerStore = async (formData) => {
       state: formData.state ?? true,
       userName: formData.userName || "",
       password: formData.password || "",
-      avatar: formData.avatar, // Không gán mặc định null ở đây
+      avatar: formData.avatar,
     };
 
     const data = new FormData();
@@ -128,20 +135,16 @@ export const registerStore = async (formData) => {
     data.append("phone", storeData.phone);
     data.append("email", syncedEmail);
 
-    // Xử lý avatar
-    // Thay thế phần xử lý avatar bằng:
-    // Xử lý avatar
     if (storeData.avatar) {
-      // Xử lý cả trường hợp là FileList
       const avatarFile =
         storeData.avatar instanceof FileList
           ? storeData.avatar[0]
           : storeData.avatar;
-
       if (avatarFile instanceof File) {
         data.append("avatar", avatarFile, avatarFile.name);
       }
     }
+
     const queryParams = new URLSearchParams({
       brandId: storeData.brandId,
       areaId: storeData.areaId,
@@ -162,7 +165,6 @@ export const registerStore = async (formData) => {
     );
 
     if (response.data) {
-      // toast.success("Đăng ký store thành công!");
       return { status: response.status, success: true, data: response.data };
     }
     toast.error("Đăng ký store thất bại!");
@@ -172,12 +174,21 @@ export const registerStore = async (formData) => {
       message: "No data from server!",
     };
   } catch (error) {
-    const msg = error.response?.data?.message || "Lỗi đăng ký store";
-    toast.error(msg);
+    const errorMessage = error.response?.data?.message || "Lỗi đăng ký store";
+    // Kiểm tra nếu lỗi là do trùng userName
+    if (error.response?.data?.message?.includes("userName")) {
+      toast.error("Tên tài khoản đã tồn tại!");
+      return {
+        status: error.response?.status || 409, // 409 Conflict cho trùng lặp
+        success: false,
+        message: "Tên tài khoản đã tồn tại!",
+      };
+    }
+    toast.error(errorMessage);
     return {
       status: error.response?.status || 500,
       success: false,
-      message: msg,
+      message: errorMessage,
     };
   }
 };
@@ -319,12 +330,21 @@ export const registerCampusAPI = async (formData, campusId) => {
       message: "Không nhận được dữ liệu từ server!",
     };
   } catch (error) {
-    const msg = error.response?.data?.message || "Lỗi đăng ký tài khoản campus";
-    toast.error(msg);
+    const errorMessage = error.response?.data?.message || "Lỗi đăng ký tài khoản campus";
+    // Kiểm tra nếu lỗi là do trùng userName
+    if (error.response?.data?.message?.includes("userName")) {
+      toast.error("Tên tài khoản đã tồn tại!");
+      return {
+        status: error.response?.status || 409,
+        success: false,
+        message: "Tên tài khoản đã tồn tại!",
+      };
+    }
+    toast.error(errorMessage);
     return {
       status: error.response?.status || 500,
       success: false,
-      message: msg,
+      message: errorMessage,
     };
   }
 };

@@ -8,7 +8,6 @@ export const getAllCampusesAPI = async ({ searchName = "", page = 1, size = 10 }
     const response = await apiClient.get(CAMPUS.GET_ALL, {
       params: { searchName, page, size },
     });
-    console.log("API Response:", response.data); // Kiểm tra dữ liệu từ server
     if (response.data) {
       return { status: response.status, success: true, data: response.data };
     } else {
@@ -89,10 +88,7 @@ export const createCampusAPI = async (formData) => {
     }
 
     // Log FormData contents for debugging
-    console.log("FormData contents:");
-    for (let [key, value] of apiFormData.entries()) {
-      console.log(`${key}: ${value}`);
-    }
+    
 
     // Gửi POST request chỉ với URL gốc (không có query parameters)
     const response = await apiClient.post(CAMPUS.CREATE, apiFormData, {
@@ -169,10 +165,7 @@ export const updateCampusAPI = async (id, formData) => {
     }
 
     // Log dữ liệu để debug
-    console.log("Sending data to API:");
-    for (let [key, value] of apiFormData.entries()) {
-      console.log(`${key}: ${value}`);
-    }
+  
 
     // Gửi yêu cầu PUT với body là FormData
     const url = CAMPUS.UPDATE.replace("{id}", id); // Chỉ gửi id trong URL
@@ -216,7 +209,6 @@ export const getCampusByAccountIdAPI = async (accountId) => {
     );
 
     if (response.data) {
-      console.log("getCampusByAccountIdAPI - Response:", response.data); // Debug
       return {
         status: response.status,
         success: true,

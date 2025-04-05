@@ -1,8 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAllStoresAPI } from "../../store/api/storeApi";
-import { useBrand } from "../brand/useBrand";
 import { toast } from "react-hot-toast";
-import StorageService from "../../services/storageService";
 
 export const useStores = ({
   searchName = "",
@@ -12,8 +10,7 @@ export const useStores = ({
   areaId,
   sort,
 } = {}) => {
-  const { brand } = useBrand();
-  const brandId = brand?.id || StorageService.getBrandId();
+
 
   const params = {
     searchName,
@@ -22,21 +19,17 @@ export const useStores = ({
     state,
     areaId,
     sort,
-    ...(brandId && { brandId }),
   };
 
   const { data, error, isLoading } = useQuery({
-    queryKey: ["stores", searchName, page, size, state, areaId, sort, brandId],
+    queryKey: ["stores", searchName, page, size, state, areaId, sort, ],
     queryFn: () => getAllStoresAPI(params),
     staleTime: 1000 * 60,
-    enabled: !!brandId,
     onError: (error) => {
       console.error("Error fetching stores:", error);
       toast.error("Không thể tải danh sách cửa hàng");
     },
-    onSuccess: (responseData) => {
-      console.log("API Response:", responseData);
-    },
+    
   });
 
   // Xử lý dữ liệu từ API với giá trị mặc định

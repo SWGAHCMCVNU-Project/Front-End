@@ -20,16 +20,16 @@ const useCreateStore = () => {
 
       if (response.success) {
         setData(response.data);
-        toast.success('Đăng ký store thành công!');
-        navigate('/stores', { replace: true }); // Điều hướng sau khi đăng ký thành công
+        toast.success("Đăng ký store thành công!");
+        navigate("/stores", { replace: true });
       } else {
         setError(response.message);
-        toast.error(response.message);
+        toast.error(response.message); // Hiển thị "Tên tài khoản đã tồn tại!" nếu trùng
       }
 
       return response;
     } catch (err) {
-      const errorMessage = err.message || 'Đã xảy ra lỗi khi đăng ký store';
+      const errorMessage = err.message || "Đã xảy ra lỗi khi đăng ký store";
       setError(errorMessage);
       toast.error(errorMessage);
       return {

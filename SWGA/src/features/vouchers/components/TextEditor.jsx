@@ -1,47 +1,46 @@
-/* eslint-disable react/display-name */
-import { forwardRef, useState } from "react";
+import { useState, useEffect } from "react";
 import { EditorState, convertToRaw, ContentState } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
 import draftToHtml from "draftjs-to-html";
 import htmlToDraft from "html-to-draftjs";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 
-const TextEditor = forwardRef(({ initialContent, onContentChange }, ref) => {
+const TextEditor = ({ initialValue, onContentChange }) => {
   const [editorState, setEditorState] = useState(() => {
-    if (initialContent) {
-      const blocksFromHTML = htmlToDraft(initialContent);
-      const contentState = ContentState.createFromBlockArray(
-        blocksFromHTML.contentBlocks,
-        blocksFromHTML.entityMap
-      );
-      return EditorState.createWithContent(contentState);
-    }
     return EditorState.createEmpty();
   });
 
-  const handleEditorStateChange = (newEditorState) => {
+  useEffect(() => {
+    if (initialValue) {
+      const blocksFromHtml = htmlToDraft(initialValue);
+      const { contentBlocks, entityMap } = blocksFromHtml;
+      const contentState = ContentState.createFromBlockArray(contentBlocks, entityMap);
+      setEditorState(EditorState.createWithContent(contentState));
+    } else {
+      setEditorState(EditorState.createEmpty());
+    }
+  }, [initialValue]);
+
+  const onEditorStateChange = (newEditorState) => {
     setEditorState(newEditorState);
-    const content = convertToHtml(newEditorState);
+    const content = draftToHtml(convertToRaw(newEditorState.getCurrentContent()));
     onContentChange(content);
   };
 
-  // Function to convert EditorState to HTML
-  const convertToHtml = (editorState) => {
-    const rawContentState = convertToRaw(editorState.getCurrentContent());
-    return draftToHtml(rawContentState);
-  };
-
   return (
-    <div>
+    <div style={{ border: "1px solid #f1f1f1", minHeight: "200px" }}>
       <Editor
-        ref={ref}
         editorState={editorState}
-        wrapperClassName="demo-wrapper"
-        editorClassName="demo-editor"
-        onEditorStateChange={handleEditorStateChange}
+        onEditorStateChange={onEditorStateChange}
+        toolbar={{
+          options: ["inline", "blockType", "list", "textAlign", "link"],
+          inline: {
+            options: ["bold", "italic", "underline"],
+          },
+        }}
       />
     </div>
   );
-});
+};
 
 export default TextEditor;

@@ -1,485 +1,662 @@
-import { PlusOutlined } from "@ant-design/icons";
-import { Card, Col, Row, Typography, Upload } from "antd";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
-import signupbg from "../../assets/images/ảnh ví.png";
-import { useMoveBack } from "../../hooks/useMoveBack";
-import ButtonText from "../../ui/ButtonText";
-import Input from "../../ui/Input";
-import Textarea from "../../ui/Textarea";
-import { RegisterButton } from "../../ui/custom/Button/Button";
-import { CustomFormRow } from "../../ui/custom/Form/InputItem/CustomFormItem";
-import { toast } from "react-hot-toast";
-import { registerBrandAPI } from "../../store/api/registerAPI";
+// import { PlusOutlined } from "@ant-design/icons";
+// import { Button, Card, Col, Form, Input, Row, Typography, Upload } from "antd";
+// import { useEffect, useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import {
+//   faUser,
+//   faLock,
+//   faBuilding,
+//   faPhone,
+//   faEnvelope,
+//   faMapMarkerAlt,
+//   faClock,
+//   faLink,
+//   faImage,
+//   faFileAlt,
+// } from "@fortawesome/free-solid-svg-icons";
+// import { useMoveBack } from "../../hooks/useMoveBack";
+// import ButtonText from "../../ui/ButtonText";
+// import { toast } from "react-hot-toast";
+// import { registerBrandAPI } from "../../store/api/registerAPI";
+// import { Heading } from "@chakra-ui/react";
 
-// Styled components (giữ nguyên)
-const StyledDataBox = styled.section`
-  background-color: var(--color-grey-0);
-  border: 1px solid var(--color-grey-100);
-  border-radius: var(--border-radius-lg);
-  padding: 2.4rem 4rem;
-  overflow: hidden;
-  margin-bottom: 3rem;
-`;
+// // Background image (same as SignIn)
+// import backgroundImage from "../../assets/images/background.jpg";
 
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow: hidden;
-  font-size: 1.4rem;
-  background-color: #dcfce7;
-  padding-bottom: 20px;
-  padding-top: 20px;
-`;
+// // Custom styles for the form
+// const customStyles = `
+//   /* Split layout */
+//   .split-background {
+//     flex: 1;
+//     background-image: url(${backgroundImage});
+//     background-size: cover;
+//     background-position: center;
+//     position: relative;
+//   }
 
-const HeaderLogin = styled.div`
-  color: var(--color-green-700);
-`;
+//   .split-background::before {
+//     content: '';
+//     position: absolute;
+//     top: 0;
+//     left: 0;
+//     right: 0;
+//     bottom: 0;
+//     background: rgba(46, 204, 113, 0.3); /* Emerald green overlay */
+//   }
 
-const Header = styled.header`
-  color: var(--color-green-600);
-  font-size: 1.7rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding-bottom: 2rem;
-  padding-top: 2rem;
-`;
+//   .split-form {
+//     flex: 1;
+//     background: #2a3b3c; /* Same as SignIn */
+//     display: flex;
+//     justify-content: center;
+//     align-items: flex-start;
+//     padding: 40px 20px;
+//     overflow-y: auto; /* Allow scrolling */
+//   }
 
-const RegisterFormContainer = styled.div`
-  width: 40%;
-  gap: 3rem;
-`;
+//   .wallet-form-container {
+//     width: 100%;
+//     max-width: 400px; /* Same as SignIn */
+//   }
 
-const TimeFrameContainer = styled.div`
-  display: flex;
-  gap: 3rem;
-  padding-top: 12px;
-`;
+//   /* Input field styling */
+//   .wallet-input {
+//     border-radius: 8px;
+//     padding: 12px 40px;
+//     background: #4a5b5c !important;
+//     border: 1px solid #2ecc71;
+//     color: #fff !important;
+//     transition: all 0.3s ease;
+//   }
 
-const TimeFrameHalf = styled.div`
-  flex: 1;
-`;
+//   .wallet-input:focus-within {
+//     border-color: #27ae60;
+//     background: #4a5b5c !important;
+//     box-shadow: 0 0 8px rgba(46, 204, 113, 0.3);
+//   }
 
-const LeftFormHalf = styled.div`
-  flex: 1;
-`;
+//   /* Target the input element inside wallet-input */
+//   .wallet-input .ant-input,
+//   .wallet-input .ant-input-password,
+//   .wallet-input textarea {
+//     background: transparent !important;
+//     color: #fff !important;
+//   }
 
-function RegisterBrand() {
-  const { Title } = Typography;
-  const moveBack = useMoveBack();
-  const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-  const [logo, setLogo] = useState(null);
-  const [logoStorage, setLogoStorage] = useState(null);
-  const [coverPhoto, setCoverPhoto] = useState(null);
-  const [coverPhotoStorage, setCoverPhotoStorage] = useState(null);
+//   /* Placeholder styling */
+//   .wallet-input .ant-input::placeholder,
+//   .wallet-input .ant-input-password::placeholder,
+//   .wallet-input textarea::placeholder {
+//     color: #a9b7b8 !important;
+//     opacity: 1;
+//   }
 
-  useEffect(() => {
-    const handleBeforeUnload = (event) => {
-      event.preventDefault();
-      event.returnValue = "";
-    };
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, []);
+//   /* Upload component styling */
+//   .ant-upload.ant-upload-select-picture-card {
+//     background: #4a5b5c !important;
+//     border: 1px solid #2ecc71 !important;
+//     border-radius: 8px;
+//   }
 
-  const { register, handleSubmit, getValues, formState } = useForm();
-  const { errors } = formState;
+//   .ant-upload.ant-upload-select-picture-card:hover {
+//     border-color: #27ae60 !important;
+//   }
 
-  const handlePhoneInput = (event) => {
-    event.target.value = event.target.value.replace(/\D/g, "");
-  };
+//   .ant-upload-list-item {
+//     background: #4a5b5c !important;
+//     border: 1px solid #2ecc71 !important;
+//     border-radius: 8px;
+//   }
 
-  const convertFileToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      if (!(file instanceof Blob)) {
-        reject(new Error("Invalid file type"));
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  };
+//   .ant-upload-list-item-name,
+//   .ant-upload-list-item-info {
+//     color: #fff !important;
+//   }
 
-  const handleChangeLogo = async ({ fileList }) => {
-    if (fileList.length > 0) {
-      const file = fileList[fileList.length - 1].originFileObj;
-      if (file) {
-        const base64 = await convertFileToBase64(file);
-        setLogo(file);
-        setLogoStorage(base64);
-      }
-    } else {
-      setLogo(null);
-      setLogoStorage(null);
-    }
-  };
+//   /* Validation error messages */
+//   .ant-form-item-explain-error {
+//     color: #f0e68c !important; /* Light yellow to match SignIn */
+//     font-size: 14px;
+//     margin-top: 5px;
+//   }
 
-  const handleChangeCoverPhoto = async ({ fileList }) => {
-    if (fileList.length > 0) {
-      const file = fileList[fileList.length - 1].originFileObj;
-      if (file) {
-        const base64 = await convertFileToBase64(file);
-        setCoverPhoto(file);
-        setCoverPhotoStorage(base64);
-      }
-    } else {
-      setCoverPhoto(null);
-      setCoverPhotoStorage(null);
-    }
-  };
+//   /* Card styling for Upload components */
+//   .card-product-media {
+//     background: transparent !important;
+//     border: none !important;
+//   }
 
-  const validateClosingTime = (value) => {
-    const openingTime = getValues("openingHours");
-    return (
-      value > openingTime || "Thời gian đóng cửa phải sau thời gian mở cửa"
-    );
-  };
+//   /* Button text styling */
+//   .btn-header-signup {
+//     position: absolute;
+//     top: 20px;
+//     left: 20px;
+//   }
 
-  const validatePasswordConfirmation = (value) => {
-    const password = getValues("password");
-    return value === password || "Mật khẩu không khớp!";
-  };
+//   .btn-header-signup button {
+//     color: #2ecc71;
+//     font-weight: 600;
+//   }
 
-  const onSubmit = async (data) => {
-    if (!coverPhotoStorage) {
-      toast.error("Vui lòng tải lên ảnh bìa!");
-      return;
-    }
-    if (!logoStorage) {
-      toast.error("Vui lòng tải lên logo!");
-      return;
-    }
+//   .btn-header-signup button:hover {
+//     color: #27ae60;
+//   }
 
-    setIsLoading(true);
-    try {
-      const result = await registerBrandAPI(data, coverPhotoStorage, logoStorage);
+//   .header-row {
+//     display: flex;
+//     flex-direction: column;
+//     align-items: center;
+//     justify-content: center;
+//     gap: 10px;
+//     margin-bottom: 20px;
+//   }
 
-      if (result.success) {
-        toast.success(
-          "Đăng ký thành công! Vui lòng kiểm tra email để lấy mã xác minh."
-        );
-        navigate("/sign-in");
-      } else {
-        if (result.message?.includes("userName")) {
-          toast.error("Tên tài khoản này đã được sử dụng!");
-        } else {
-          toast.error(result.message || "Đăng ký thất bại!");
-        }
-      }
-    } catch (error) {
-      console.error("Register error:", error);
-      toast.error("Có lỗi xảy ra khi đăng ký. Vui lòng thử lại!");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+//   .form-label {
+//     color: #fff;
+//     font-size: 16px;
+//     font-weight: 500;
+//   }
 
-  const onError = (errors) => {
-    console.log("Form errors:", errors);
-  };
+//   .section-header {
+//     color: #2ecc71;
+//     font-size: 1.7rem;
+//     font-weight: 600;
+//     text-align: center;
+//     padding: 1.5rem 0;
+//   }
 
-  return (
-    <>
-      <div className="header-login">
-        <Title style={{ color: "#15803d" }}>
-          Đăng Kí Tài Khoản Thương Hiệu
-        </Title>
-      </div>
-      <div className="btn-header-signup">
-        <ButtonText onClick={moveBack}>← Quay lại đăng nhập</ButtonText>
-      </div>
+//   .wallet-button {
+//     background: #2ecc71;
+//     border: none;
+//     border-radius: 8px;
+//     height: 50px;
+//     font-size: 16px;
+//     font-weight: 600;
+//     transition: all 0.3s ease;
+//   }
 
-      <Form onSubmit={handleSubmit(onSubmit, onError)}>
-        <RegisterFormContainer>
-          <LeftFormHalf>
-            <StyledDataBox>
-              <Header>Thông tin đăng nhập</Header>
-              <CustomFormRow
-                label="Tên tài khoản"
-                error={errors?.userName?.message}
-              >
-                <Input
-                  type="text"
-                  id="userName"
-                  placeholder="Nhập tên tài khoản..."
-                  disabled={isLoading}
-                  {...register("userName", {
-                    required: "Vui lòng nhập tên tài khoản",
-                    maxLength: {
-                      value: 50,
-                      message: "Tên tài khoản tối đa 50 kí tự",
-                    },
-                    pattern: {
-                      value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/,
-                      message:
-                        "Tên tài khoản phải chứa ít nhất 5 kí tự, bao gồm chữ cái viết thường và ít nhất một chữ số và không có kí tự đặc biệt",
-                    },
-                  })}
-                />
-              </CustomFormRow>
+//   .wallet-button:hover {
+//     background: #27ae60;
+//     transform: scale(1.05);
+//   }
 
-              <CustomFormRow label="Mật khẩu" error={errors?.password?.message}>
-                <Input
-                  type="password"
-                  id="password"
-                  placeholder="Nhập mật khẩu..."
-                  disabled={isLoading}
-                  {...register("password", {
-                    required: "Vui lòng nhập mật khẩu",
-                    minLength: {
-                      value: 8,
-                      message: "Mật khẩu phải có ít nhất 8 kí tự",
-                    },
-                    maxLength: {
-                      value: 50,
-                      message: "Mật khẩu tối đa 50 kí tự",
-                    },
-                  })}
-                />
-              </CustomFormRow>
+//   .wallet-icon {
+//     color: #2ecc71;
+//     margin-right: 10px;
+//   }
 
-              <CustomFormRow
-                label="Xác nhận mật khẩu"
-                error={errors?.passwordConfirmed?.message}
-              >
-                <Input
-                  type="password"
-                  id="passwordConfirmed"
-                  placeholder="Nhập lại mật khẩu..."
-                  disabled={isLoading}
-                  {...register("passwordConfirmed", {
-                    required: "Vui lòng nhập lại mật khẩu",
-                    validate: validatePasswordConfirmation,
-                  })}
-                />
-              </CustomFormRow>
+//   /* Responsive adjustments */
+//   @media (max-width: 768px) {
+//     .split-background {
+//       display: none;
+//     }
 
-              <Header>Thông tin cơ bản</Header>
-              <CustomFormRow
-                label="Tên thương hiệu"
-                error={errors?.brandName?.message}
-              >
-                <Input
-                  type="text"
-                  id="brandName"
-                  placeholder="Nhập tên thương hiệu..."
-                  disabled={isLoading}
-                  {...register("brandName", {
-                    required: "Vui lòng nhập tên thương hiệu",
-                  })}
-                />
-              </CustomFormRow>
+//     .split-form {
+//       flex: 1;
+//       padding: 20px;
+//     }
 
-              <CustomFormRow
-                label="Tên viết tắt"
-                error={errors?.acronym?.message}
-              >
-                <Input
-                  type="text"
-                  id="acronym"
-                  placeholder="Nhập tên viết tắt..."
-                  disabled={isLoading}
-                  {...register("acronym", {
-                    required: "Vui lòng nhập tên viết tắt",
-                  })}
-                />
-              </CustomFormRow>
+//     .wallet-form-container {
+//       max-width: 100%;
+//     }
 
-              <CustomFormRow
-                label="Số điện thoại"
-                error={errors?.phone?.message}
-              >
-                <Input
-                  type="tel"
-                  id="phone"
-                  placeholder="Ví dụ: 0909339779"
-                  disabled={isLoading}
-                  {...register("phone", {
-                    required: "Vui lòng nhập số điện thoại",
-                    pattern: {
-                      value: /^[0-9]{10,11}$/,
-                      message: "Số điện thoại hợp lệ phải từ 10 đến 11 số",
-                    },
-                  })}
-                  onInput={handlePhoneInput}
-                />
-              </CustomFormRow>
+//     .wallet-button {
+//       height: 45px;
+//       font-size: 14px;
+//     }
 
-              <CustomFormRow label="Email" error={errors?.email?.message}>
-                <Input
-                  type="email"
-                  id="email"
-                  placeholder="Nhập địa chỉ email..."
-                  disabled={isLoading}
-                  {...register("email", {
-                    required: "Vui lòng nhập email",
-                    pattern: {
-                      value: /^(?!\.)[a-zA-Z0-9]+@[a-zA-Z0-9.]+\.[a-zA-Z]{2,}$/,
-                      message: "Định dạng email không hợp lệ",
-                    },
-                  })}
-                />
-              </CustomFormRow>
+//     .header-row {
+//       flex-direction: column;
+//       gap: 10px;
+//     }
+//   }
 
-              <CustomFormRow label="Địa chỉ" error={errors?.address?.message}>
-                <Input
-                  type="text"
-                  id="address"
-                  placeholder="Số nhà, đường, thôn/xóm/ấp, tổ/khu phố"
-                  disabled={isLoading}
-                  {...register("address", {
-                    required: "Vui lòng nhập địa chỉ",
-                    validate: {
-                      noWhiteSpace: (value) =>
-                        value.trim().length >= 3 || "Địa chỉ không hợp lệ",
-                    },
-                    maxLength: {
-                      value: 200,
-                      message: "Địa chỉ tối đa 200 kí tự",
-                    },
-                  })}
-                />
-              </CustomFormRow>
+//   @media (max-width: 480px) {
+//     .split-form {
+//       padding: 15px;
+//     }
 
-              <Header>Thời gian hoạt động</Header>
-              <TimeFrameContainer>
-                <TimeFrameHalf>
-                  <CustomFormRow
-                    label="Giờ mở cửa"
-                    error={errors?.openingHours?.message}
-                  >
-                    <Input
-                      type="time"
-                      id="openingHours"
-                      disabled={isLoading}
-                      {...register("openingHours", {
-                        required: "Vui lòng nhập giờ mở cửa",
-                      })}
-                    />
-                  </CustomFormRow>
-                </TimeFrameHalf>
-                <TimeFrameHalf>
-                  <CustomFormRow
-                    label="Giờ đóng cửa"
-                    error={errors?.closingHours?.message}
-                  >
-                    <Input
-                      type="time"
-                      id="closingHours"
-                      disabled={isLoading}
-                      {...register("closingHours", {
-                        required: "Vui lòng nhập giờ đóng cửa",
-                        validate: validateClosingTime,
-                      })}
-                    />
-                  </CustomFormRow>
-                </TimeFrameHalf>
-              </TimeFrameContainer>
+//     .wallet-input {
+//       padding: 10px 35px;
+//     }
+//   }
+// `;
 
-              <Header>Logo</Header>
-              <Card className="card-product-media">
-                <Upload
-                  accept="image/*"
-                  listType="picture-card"
-                  beforeUpload={() => false}
-                  onChange={handleChangeLogo}
-                  fileList={logo ? [logo] : []}
-                  onRemove={() => {
-                    setLogo(null);
-                    setLogoStorage(null);
-                  }}
-                  disabled={isLoading}
-                  showUploadList={{
-                    showPreviewIcon: false,
-                    showRemoveIcon: true,
-                  }}
-                >
-                  {!logo && (
-                    <div>
-                      <PlusOutlined />
-                      <div style={{ marginTop: 8 }}>Tải ảnh lên</div>
-                    </div>
-                  )}
-                </Upload>
-              </Card>
+// function RegisterBrand() {
+//   const { Title } = Typography;
+//   const moveBack = useMoveBack();
+//   const navigate = useNavigate();
+//   const [isLoading, setIsLoading] = useState(false);
+//   const [logo, setLogo] = useState(null);
+//   const [logoStorage, setLogoStorage] = useState(null);
+//   const [coverPhoto, setCoverPhoto] = useState(null);
+//   const [coverPhotoStorage, setCoverPhotoStorage] = useState(null);
+//   const [form] = Form.useForm();
 
-              <Header>Ảnh bìa</Header>
-              <Card className="card-product-media">
-                <Upload
-                  accept="image/*"
-                  id="coverPhoto"
-                  listType="picture-card"
-                  beforeUpload={() => false}
-                  onChange={handleChangeCoverPhoto}
-                  fileList={coverPhoto ? [coverPhoto] : []}
-                  disabled={isLoading}
-                  showUploadList={{
-                    showPreviewIcon: false,
-                    showRemoveIcon: true,
-                  }}
-                >
-                  {!coverPhoto && (
-                    <div>
-                      <PlusOutlined />
-                      <div style={{ marginTop: 8 }}>Tải ảnh lên</div>
-                    </div>
-                  )}
-                </Upload>
-              </Card>
+//   useEffect(() => {
+//     const handleBeforeUnload = (event) => {
+//       event.preventDefault();
+//       event.returnValue = "";
+//     };
+//     window.addEventListener("beforeunload", handleBeforeUnload);
+//     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+//   }, []);
 
-              <Header>Mô tả thương hiệu</Header>
-              <CustomFormRow label="Mô tả" error={errors?.description?.message}>
-                <Textarea
-                  id="description"
-                  placeholder="Nhập mô tả về thương hiệu..."
-                  disabled={isLoading}
-                  {...register("description", {
-                    maxLength: {
-                      value: 500,
-                      message: "Mô tả tối đa 500 kí tự",
-                    },
-                  })}
-                />
-              </CustomFormRow>
+//   const convertFileToBase64 = (file) => {
+//     return new Promise((resolve, reject) => {
+//       if (!(file instanceof Blob)) {
+//         reject(new Error("Invalid file type"));
+//         return;
+//       }
+//       const reader = new FileReader();
+//       reader.onload = () => resolve(reader.result);
+//       reader.onerror = reject;
+//       reader.readAsDataURL(file);
+//     });
+//   };
 
-              <Header>Liên kết</Header>
-              <CustomFormRow label="Link website" error={errors?.link?.message}>
-                <Input
-                  type="url"
-                  id="link"
-                  placeholder="Nhập link website (ví dụ: https://example.com)"
-                  disabled={isLoading}
-                  {...register("link", {
-                    pattern: {
-                      value:
-                        /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/,
-                      message: "Link không hợp lệ",
-                    },
-                  })}
-                />
-              </CustomFormRow>
-            </StyledDataBox>
-          </LeftFormHalf>
-        </RegisterFormContainer>
+//   const handleChangeLogo = async ({ fileList }) => {
+//     if (fileList.length > 0) {
+//       const file = fileList[fileList.length - 1].originFileObj;
+//       if (file) {
+//         const base64 = await convertFileToBase64(file);
+//         setLogo(file);
+//         setLogoStorage(base64);
+//       }
+//     } else {
+//       setLogo(null);
+//       setLogoStorage(null);
+//     }
+//   };
 
-        <Row className="row-register-button">
-          <RegisterButton
-            type="submit"
-            label="Đăng kí tài khoản"
-            isLoading={isLoading}
-          />
-        </Row>
-      </Form>
-    </>
-  );
-}
+//   const handleChangeCoverPhoto = async ({ fileList }) => {
+//     if (fileList.length > 0) {
+//       const file = fileList[fileList.length - 1].originFileObj;
+//       if (file) {
+//         const base64 = await convertFileToBase64(file);
+//         setCoverPhoto(file);
+//         setCoverPhotoStorage(base64);
+//       }
+//     } else {
+//       setCoverPhoto(null);
+//       setCoverPhotoStorage(null);
+//     }
+//   };
 
-export default RegisterBrand;
+//   const handlePhoneInput = (value) => {
+//     return value.replace(/\D/g, "");
+//   };
+
+//   const onFinish = async (values) => {
+//     if (!coverPhotoStorage) {
+//       toast.error("Vui lòng tải lên ảnh bìa!");
+//       return;
+//     }
+//     if (!logoStorage) {
+//       toast.error("Vui lòng tải lên logo!");
+//       return;
+//     }
+
+//     setIsLoading(true);
+//     try {
+//       const result = await registerBrandAPI(
+//         {
+//           userName: values.userName,
+//           password: values.password,
+//           passwordConfirmed: values.passwordConfirmed,
+//           brandName: values.brandName,
+//           acronym: values.acronym,
+//           phone: values.phone,
+//           email: values.email,
+//           address: values.address,
+//           openingHours: values.openingHours,
+//           closingHours: values.closingHours,
+//           description: values.description,
+//           link: values.link,
+//         },
+//         coverPhotoStorage,
+//         logoStorage
+//       );
+
+//       if (result.success) {
+//         toast.success(
+//           "Đăng ký thành công! Vui lòng kiểm tra email để lấy mã xác minh."
+//         );
+//         navigate("/sign-in");
+//       } else {
+//         if (result.message?.includes("userName")) {
+//           toast.error("Tên tài khoản này đã được sử dụng!");
+//         } else {
+//           toast.error(result.message || "Đăng ký thất bại!");
+//         }
+//       }
+//     } catch (error) {
+//       console.error("Register error:", error);
+//       toast.error("Có lỗi xảy ra khi đăng ký. Vui lòng thử lại!");
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   const onFinishFailed = (errors) => {
+//     console.log("Form errors:", errors);
+//   };
+
+//   return (
+//     <div style={{ display: "flex", flexDirection: "row", minHeight: "100vh" }}>
+//       <style>{customStyles}</style>
+//       <div className="split-background" />
+//       <div className="split-form">
+//         <div className="wallet-form-container">
+//           <div className="btn-header-signup">
+//             <ButtonText onClick={moveBack}>← Quay lại đăng nhập</ButtonText>
+//           </div>
+//           <Row className="header-row">
+//             <Col>
+//               <Heading fontSize="36px" color="#2ecc71">
+//                 Đăng Kí Tài Khoản Thương Hiệu
+//               </Heading>
+//             </Col>
+//           </Row>
+//           <Form
+//             form={form}
+//             onFinish={onFinish}
+//             onFinishFailed={onFinishFailed}
+//             layout="vertical"
+//             style={{ marginTop: "20px" }}
+//           >
+//             <div className="section-header">Thông tin đăng nhập</div>
+//             <Form.Item
+//               name="userName"
+//               label={<span className="form-label">Tên tài khoản <span style={{ color: "#ff0000" }}>*</span></span>}
+//               rules={[
+//                 { required: true, message: "Vui lòng nhập tên tài khoản" },
+//                 { max: 50, message: "Tên tài khoản tối đa 50 kí tự" },
+//                 {
+//                   pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/,
+//                   message:
+//                     "Tên tài khoản phải chứa ít nhất 5 kí tự, bao gồm chữ cái viết thường và ít nhất một chữ số và không có kí tự đặc biệt",
+//                 },
+//               ]}
+//             >
+//               <Input
+//                 prefix={<FontAwesomeIcon icon={faUser} className="wallet-icon" />}
+//                 placeholder="Nhập tên tài khoản..."
+//                 className="wallet-input"
+//               />
+//             </Form.Item>
+
+//             <Form.Item
+//               name="password"
+//               label={<span className="form-label">Mật khẩu <span style={{ color: "#ff0000" }}>*</span></span>}
+//               rules={[
+//                 { required: true, message: "Vui lòng nhập mật khẩu" },
+//                 { min: 8, message: "Mật khẩu phải có ít nhất 8 kí tự" },
+//                 { max: 50, message: "Mật khẩu tối đa 50 kí tự" },
+//               ]}
+//             >
+//               <Input.Password
+//                 prefix={<FontAwesomeIcon icon={faLock} className="wallet-icon" />}
+//                 placeholder="Nhập mật khẩu..."
+//                 className="wallet-input"
+//               />
+//             </Form.Item>
+
+//             <Form.Item
+//               name="passwordConfirmed"
+//               label={<span className="form-label">Xác nhận mật khẩu <span style={{ color: "#ff0000" }}>*</span></span>}
+//               dependencies={["password"]}
+//               rules={[
+//                 { required: true, message: "Vui lòng nhập lại mật khẩu" },
+//                 ({ getFieldValue }) => ({
+//                   validator(_, value) {
+//                     if (!value || getFieldValue("password") === value) {
+//                       return Promise.resolve();
+//                     }
+//                     return Promise.reject(new Error("Mật khẩu không khớp!"));
+//                   },
+//                 }),
+//               ]}
+//             >
+//               <Input.Password
+//                 prefix={<FontAwesomeIcon icon={faLock} className="wallet-icon" />}
+//                 placeholder="Nhập lại mật khẩu..."
+//                 className="wallet-input"
+//               />
+//             </Form.Item>
+
+//             <div className="section-header">Thông tin cơ bản</div>
+//             <Form.Item
+//               name="brandName"
+//               label={<span className="form-label">Tên thương hiệu <span style={{ color: "#ff0000" }}>*</span></span>}
+//               rules={[{ required: true, message: "Vui lòng nhập tên thương hiệu" }]}
+//             >
+//               <Input
+//                 prefix={<FontAwesomeIcon icon={faBuilding} className="wallet-icon" />}
+//                 placeholder="Nhập tên thương hiệu..."
+//                 className="wallet-input"
+//               />
+//             </Form.Item>
+
+//             <Form.Item
+//               name="acronym"
+//               label={<span className="form-label">Tên viết tắt <span style={{ color: "#ff0000" }}>*</span></span>}
+//               rules={[{ required: true, message: "Vui lòng nhập tên viết tắt" }]}
+//             >
+//               <Input
+//                 prefix={<FontAwesomeIcon icon={faBuilding} className="wallet-icon" />}
+//                 placeholder="Nhập tên viết tắt..."
+//                 className="wallet-input"
+//               />
+//             </Form.Item>
+
+//             <Form.Item
+//               name="phone"
+//               label={<span className="form-label">Số điện thoại <span style={{ color: "#ff0000" }}>*</span></span>}
+//               rules={[
+//                 { required: true, message: "Vui lòng nhập số điện thoại" },
+//                 {
+//                   pattern: /^[0-9]{10,11}$/,
+//                   message: "Số điện thoại hợp lệ phải từ 10 đến 11 số",
+//                 },
+//               ]}
+//               normalize={handlePhoneInput}
+//             >
+//               <Input
+//                 prefix={<FontAwesomeIcon icon={faPhone} className="wallet-icon" />}
+//                 placeholder="Ví dụ: 0909339779"
+//                 className="wallet-input"
+//               />
+//             </Form.Item>
+
+//             <Form.Item
+//               name="email"
+//               label={<span className="form-label">Email <span style={{ color: "#ff0000" }}>*</span></span>}
+//               rules={[
+//                 { required: true, message: "Vui lòng nhập email" },
+//                 {
+//                   pattern: /^(?!\.)[a-zA-Z0-9]+@[a-zA-Z0-9.]+\.[a-zA-Z]{2,}$/,
+//                   message: "Định dạng email không hợp lệ",
+//                 },
+//               ]}
+//             >
+//               <Input
+//                 prefix={<FontAwesomeIcon icon={faEnvelope} className="wallet-icon" />}
+//                 placeholder="Nhập địa chỉ email..."
+//                 className="wallet-input"
+//               />
+//             </Form.Item>
+
+//             <Form.Item
+//               name="address"
+//               label={<span className="form-label">Địa chỉ <span style={{ color: "#ff0000" }}>*</span></span>}
+//               rules={[
+//                 { required: true, message: "Vui lòng nhập địa chỉ" },
+//                 {
+//                   validator(_, value) {
+//                     if (value && value.trim().length >= 3) {
+//                       return Promise.resolve();
+//                     }
+//                     return Promise.reject(new Error("Địa chỉ không hợp lệ"));
+//                   },
+//                 },
+//                 { max: 200, message: "Địa chỉ tối đa 200 kí tự" },
+//               ]}
+//             >
+//               <Input
+//                 prefix={<FontAwesomeIcon icon={faMapMarkerAlt} className="wallet-icon" />}
+//                 placeholder="Số nhà, đường, thôn/xóm/ấp, tổ/khu phố"
+//                 className="wallet-input"
+//               />
+//             </Form.Item>
+
+//             <div className="section-header">Thời gian hoạt động</div>
+//             <Form.Item
+//               name="openingHours"
+//               label={<span className="form-label">Giờ mở cửa <span style={{ color: "#ff0000" }}>*</span></span>}
+//               rules={[{ required: true, message: "Vui lòng nhập giờ mở cửa" }]}
+//             >
+//               <Input
+//                 type="time"
+//                 prefix={<FontAwesomeIcon icon={faClock} className="wallet-icon" />}
+//                 className="wallet-input"
+//               />
+//             </Form.Item>
+
+//             <Form.Item
+//               name="closingHours"
+//               label={<span className="form-label">Giờ đóng cửa <span style={{ color: "#ff0000" }}>*</span></span>}
+//               dependencies={["openingHours"]}
+//               rules={[
+//                 { required: true, message: "Vui lòng nhập giờ đóng cửa" },
+//                 ({ getFieldValue }) => ({
+//                   validator(_, value) {
+//                     if (!value || !getFieldValue("openingHours")) {
+//                       return Promise.resolve();
+//                     }
+//                     if (value > getFieldValue("openingHours")) {
+//                       return Promise.resolve();
+//                     }
+//                     return Promise.reject(new Error("Thời gian đóng cửa phải sau thời gian mở cửa"));
+//                   },
+//                 }),
+//               ]}
+//             >
+//               <Input
+//                 type="time"
+//                 prefix={<FontAwesomeIcon icon={faClock} className="wallet-icon" />}
+//                 className="wallet-input"
+//               />
+//             </Form.Item>
+
+//             <div className="section-header">Logo</div>
+//             <Card className="card-product-media">
+//               <Form.Item name="logo" noStyle>
+//                 <Upload
+//                   accept="image/*"
+//                   listType="picture-card"
+//                   beforeUpload={() => false}
+//                   onChange={handleChangeLogo}
+//                   fileList={logo ? [logo] : []}
+//                   onRemove={() => {
+//                     setLogo(null);
+//                     setLogoStorage(null);
+//                   }}
+//                   disabled={isLoading}
+//                   showUploadList={{
+//                     showPreviewIcon: false,
+//                     showRemoveIcon: true,
+//                   }}
+//                 >
+//                   {!logo && (
+//                     <div>
+//                       <PlusOutlined style={{ color: "#fff" }} />
+//                       <div style={{ marginTop: 8, color: "#fff" }}>Tải ảnh lên</div>
+//                     </div>
+//                   )}
+//                 </Upload>
+//               </Form.Item>
+//             </Card>
+
+//             <div className="section-header">Ảnh bìa</div>
+//             <Card className="card-product-media">
+//               <Form.Item name="coverPhoto" noStyle>
+//                 <Upload
+//                   accept="image/*"
+//                   listType="picture-card"
+//                   beforeUpload={() => false}
+//                   onChange={handleChangeCoverPhoto}
+//                   fileList={coverPhoto ? [coverPhoto] : []}
+//                   onRemove={() => {
+//                     setCoverPhoto(null);
+//                     setCoverPhotoStorage(null);
+//                   }}
+//                   disabled={isLoading}
+//                   showUploadList={{
+//                     showPreviewIcon: false,
+//                     showRemoveIcon: true,
+//                   }}
+//                 >
+//                   {!coverPhoto && (
+//                     <div>
+//                       <PlusOutlined style={{ color: "#fff" }} />
+//                       <div style={{ marginTop: 8, color: "#fff" }}>Tải ảnh lên</div>
+//                     </div>
+//                   )}
+//                 </Upload>
+//               </Form.Item>
+//             </Card>
+
+//             <div className="section-header">Mô tả thương hiệu</div>
+//             <Form.Item
+//               name="description"
+//               label={<span className="form-label">Mô tả</span>}
+//               rules={[{ max: 500, message: "Mô tả tối đa 500 kí tự" }]}
+//             >
+//               <Input.TextArea
+//                 placeholder="Nhập mô tả về thương hiệu..."
+//                 className="wallet-input"
+//                 rows={4}
+//                 prefix={<FontAwesomeIcon icon={faFileAlt} className="wallet-icon" />}
+//               />
+//             </Form.Item>
+
+//             <div className="section-header">Liên kết</div>
+//             <Form.Item
+//               name="link"
+//               label={<span className="form-label">Link website</span>}
+//               rules={[
+//                 {
+//                   pattern: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/,
+//                   message: "Link không hợp lệ",
+//                 },
+//               ]}
+//             >
+//               <Input
+//                 prefix={<FontAwesomeIcon icon={faLink} className="wallet-icon" />}
+//                 placeholder="Nhập link website (ví dụ: https://example.com)"
+//                 className="wallet-input"
+//               />
+//             </Form.Item>
+
+//             <Form.Item>
+//               <Button
+//                 type="primary"
+//                 htmlType="submit"
+//                 loading={isLoading}
+//                 disabled={isLoading}
+//                 block
+//                 className="wallet-button"
+//               >
+//                 Đăng kí tài khoản
+//               </Button>
+//             </Form.Item>
+//           </Form>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default RegisterBrand;

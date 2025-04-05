@@ -11,10 +11,15 @@ import SpinnerMini from "../../ui/SpinnerMini";
 import Textarea from "../../ui/Textarea";
 import { CreateUpdateButton } from "../../ui/custom/Button/Button";
 import { CustomFormRow } from "../../ui/custom/Form/InputItem/CustomFormItem";
-import { SelectForm, SelectFormState } from "../../ui/custom/Select/SelectBox/SelectForm";
+import {
+  SelectForm,
+  SelectFormState,
+} from "../../ui/custom/Select/SelectBox/SelectForm";
 import { ReviewImageUpload } from "../../ui/custom/Upload/UploadImage";
 import { useAreas } from "../../hooks/areas/useAreas";
 import { useUpdateStore } from "../../hooks/store/useUpdateStore";
+import toast from "react-hot-toast";
+import Button from "../../ui/Button";
 
 const StyledDataBox = styled.section`
   background-color: var(--color-grey-0);
@@ -108,10 +113,16 @@ function StoreFormUpdate() {
   const { isEditing, isLoading, editStore } = useUpdateStore();
   const location = useLocation();
   const [storeToEdit, setStoreToEdit] = useState(location.state?.store);
+  const isWorking = isEditing || isLoading;
 
   if (!storeToEdit) {
     console.log("No store data found in location.state");
-    return <div>Không tìm thấy dữ liệu cửa hàng để chỉnh sửa. Vui lòng quay lại trang chi tiết cửa hàng.</div>;
+    return (
+      <div>
+        Không tìm thấy dữ liệu cửa hàng để chỉnh sửa. Vui lòng quay lại trang
+        chi tiết cửa hàng.
+      </div>
+    );
   }
 
   const { areas, isLoading: isLoadingAreas } = useAreas({ state: true });
@@ -119,29 +130,36 @@ function StoreFormUpdate() {
   const [areaValid, setAreaValid] = useState(null);
   const [fileCard, setFileCard] = useState(null);
 
-  // Memoize editValues to prevent unnecessary re-renders
-  const { id: editId, openingHours, closingHours, ...editValues } = useMemo(
-    () => storeToEdit,
-    [storeToEdit]
-  );
+  const {
+    id: editId,
+    openingHours,
+    closingHours,
+    ...editValues
+  } = useMemo(() => storeToEdit, [storeToEdit]);
 
-  // Stabilize the areas dependency
   const stableAreas = useMemo(() => areas, [areas?.result]);
 
   const getDataSelectBox = () => {
     if (stableAreas?.result && Array.isArray(stableAreas.result)) {
       const filteredAreas = stableAreas.result.filter((c) => c.state);
       if (filteredAreas.length > 0) {
-        const newOptions = filteredAreas.map((c) => ({ value: c.id, label: c.areaName }));
+        const newOptions = filteredAreas.map((c) => ({
+          value: c.id,
+          label: c.areaName,
+        }));
         setAreaOptions((prevOptions) => {
           if (JSON.stringify(prevOptions) !== JSON.stringify(newOptions)) {
             return newOptions;
           }
           return prevOptions;
         });
-        const check = filteredAreas.find((area) => area.id === editValues.areaId);
+        const check = filteredAreas.find(
+          (area) => area.id === editValues.areaId
+        );
         if (check) {
-          setAreaValid((prevValid) => (prevValid !== check.id ? check.id : prevValid));
+          setAreaValid((prevValid) =>
+            prevValid !== check.id ? check.id : prevValid
+          );
         }
       }
     }
@@ -151,10 +169,11 @@ function StoreFormUpdate() {
     getDataSelectBox();
   }, [stableAreas]);
 
-  const { register, handleSubmit, reset, getValues, setValue, formState } = useForm({
-    defaultValues: editValues,
-  });
-  const { errors } = formState;
+  const { register, handleSubmit, reset, getValues, setValue, formState } =
+    useForm({
+      defaultValues: editValues,
+    });
+  const { errors, isSubmitting } = formState;
 
   const handleAreaOptions = (selectedOption) => {
     setValue("areaId", selectedOption, {
@@ -177,30 +196,40 @@ function StoreFormUpdate() {
 
   const validateClosingTime = (value) => {
     const openingTime = getValues("openingHours");
-    return value > openingTime || "Thời gian đóng cửa phải sau thời gian mở cửa";
+    return (
+      value > openingTime || "Thời gian đóng cửa phải sau thời gian mở cửa"
+    );
   };
 
   const formattedOpeningHours = openingHours ? openingHours.slice(0, 5) : "";
   const formattedClosingHours = closingHours ? closingHours.slice(0, 5) : "";
 
   function onSubmit(data) {
-    const avatar = typeof data.avatar === "string" ? data.avatar : data.avatar[0];
-    editStore(
-      { id: editId, storeData: { ...data, avatar } },
-      {
-        onSuccess: (data) => {
-          setStoreToEdit(data);
-          moveBack();
-        },
-      }
-    );
+    return new Promise((resolve, reject) => {
+      const avatar =
+        typeof data.avatar === "string" ? data.avatar : data.avatar[0];
+      editStore(
+        { id: editId, storeData: { ...data, avatar } },
+        {
+          onSuccess: (data) => {
+            setStoreToEdit(data);
+            toast.success("Cập nhật cửa hàng thành công!");
+            moveBack();
+            resolve();
+          },
+          onError: (err) => {
+            toast.error("Cập nhật cửa hàng thất bại: " + err.message);
+            reject(err);
+          },
+        }
+      );
+    });
   }
 
   function onError(errors) {
     console.log("Form errors:", errors);
   }
 
-  // Memoize the value for SelectForm to prevent unnecessary re-renders
   const selectValue = useMemo(
     () =>
       editValues.areaId === areaValid
@@ -223,7 +252,10 @@ function StoreFormUpdate() {
                 <div>Thông tin cơ bản</div>
               </Header>
 
-              <CustomFormRow label="Tên Cửa Hàng" error={errors?.storeName?.message}>
+              <CustomFormRow
+                label="Tên Cửa Hàng"
+                error={errors?.storeName?.message}
+              >
                 <Input
                   type="text"
                   id="storeName"
@@ -233,7 +265,8 @@ function StoreFormUpdate() {
                     required: "Vui lòng nhập tên cửa hàng",
                     validate: {
                       noWhiteSpace: (value) =>
-                        value.trim().length >= 3 || "Tên cửa hàng phải chứa ít nhất 3 kí tự",
+                        value.trim().length >= 3 ||
+                        "Tên cửa hàng phải chứa ít nhất 3 kí tự",
                     },
                     maxLength: {
                       value: 50,
@@ -252,7 +285,8 @@ function StoreFormUpdate() {
                   {...register("description", {
                     required: "Vui lòng nhập mô tả",
                     validate: {
-                      noWhiteSpace: (value) => value.trim().length >= 3 || "Mô tả ít nhất 3 kí tự",
+                      noWhiteSpace: (value) =>
+                        value.trim().length >= 3 || "Mô tả ít nhất 3 kí tự",
                     },
                     maxLength: {
                       value: 500,
@@ -271,11 +305,16 @@ function StoreFormUpdate() {
                   {...register("address", {
                     required: "Vui lòng nhập địa chỉ",
                     validate: {
-                      noWhiteSpace: (value) => value.trim().length >= 3 || "Địa chỉ không hợp lệ",
+                      notEmpty: (value) =>
+                        value.trim().length > 0 ||
+                        "Địa chỉ không được để trống",
+                      minLength: (value) =>
+                        value.trim().length >= 3 ||
+                        "Địa chỉ phải có ít nhất 3 ký tự",
                     },
                     maxLength: {
                       value: 100,
-                      message: "Địa chỉ tối đa 100 kí tự",
+                      message: "Địa chỉ tối đa 100 ký tự",
                     },
                   })}
                 />
@@ -310,7 +349,10 @@ function StoreFormUpdate() {
               </Header>
               <TimeFrameContainer>
                 <TimeFrameHalf>
-                  <CustomFormRow label="Mở cửa" error={errors?.openingHours?.message}>
+                  <CustomFormRow
+                    label="Mở cửa"
+                    error={errors?.openingHours?.message}
+                  >
                     <Input
                       type="time"
                       id="openingHours"
@@ -324,7 +366,10 @@ function StoreFormUpdate() {
                 </TimeFrameHalf>
 
                 <TimeFrameHalf>
-                  <CustomFormRow label="Đóng cửa" error={errors?.closingHours?.message}>
+                  <CustomFormRow
+                    label="Đóng cửa"
+                    error={errors?.closingHours?.message}
+                  >
                     <Input
                       type="time"
                       id="closingHours"
@@ -332,7 +377,15 @@ function StoreFormUpdate() {
                       disabled={isEditing}
                       {...register("closingHours", {
                         required: "Vui lòng thêm giờ",
-                        validate: validateClosingTime,
+                        validate: {
+                          afterOpening: (value, formValues) => {
+                            const openingTime = formValues.openingHours;
+                            return (
+                              (openingTime && value > openingTime) ||
+                              "Giờ đóng cửa phải sau giờ mở cửa"
+                            );
+                          },
+                        },
                       })}
                     />
                   </CustomFormRow>
@@ -379,7 +432,9 @@ function StoreFormUpdate() {
                 <SelectFormState
                   id="state"
                   disabled={isEditing}
-                  value={editValues?.state === true ? "Hoạt động" : "Không hoạt động"}
+                  value={
+                    editValues?.state === true ? "Hoạt động" : "Không hoạt động"
+                  }
                   {...register("state", {
                     required: "Vui lòng chọn trạng thái",
                   })}
@@ -400,7 +455,11 @@ function StoreFormUpdate() {
           </RightFormHalf>
         </CampusFormContainer>
 
-        <CreateUpdateButton onClick={handleSubmit(onSubmit, onError)} isLoading={isEditing} label="Lưu thay đổi" />
+        <ButtonGroup>
+          <Button disabled={isWorking || isSubmitting}>
+            {isWorking || isSubmitting ? <SpinnerMini /> : "Cập nhật cửa hàng"}
+          </Button>
+        </ButtonGroup>
       </Form>
     </div>
   );

@@ -154,7 +154,6 @@ export const getVoucherByIdAPI = async (id) => {
 
 export const updateVoucherAPI = async (id, data) => {
   try {
-    console.log("Calling updateVoucherAPI with id:", id, "and data:", data);
 
     const brandId = StorageService.getBrandId();
     if (!brandId) {
@@ -167,8 +166,8 @@ export const updateVoucherAPI = async (id, data) => {
     formData.append("voucherName", data.voucherName);
     formData.append("price", Math.floor(Number(data.price)));
     formData.append("rate", Number(data.rate));
-    formData.append("condition", data.condition);
-    formData.append("description", data.description);
+    formData.append("condition", data.condition || ""); // Tránh giá trị undefined
+    formData.append("description", data.description || "");
     formData.append("state", data.state === true ? "true" : "false");
     if (data.image) {
       formData.append("image", data.image);

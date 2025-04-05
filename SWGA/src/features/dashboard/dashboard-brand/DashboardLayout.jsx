@@ -20,15 +20,13 @@ export default function DashboardLayout() {
   const { totalVouchers, isLoading: isLoadingVouchers } = useVouchers();
   const { totalCampaigns, isLoading: isLoadingCampaigns } = useGetAllCampaigns();
 
-  // Check if any data is still loading
   if (isLoadingStores || isLoadingVouchers || isLoadingCampaigns) return <Spinner />;
 
-  // Aggregate stats for Stats component
   const titles = {
     numberOfCampaigns: totalCampaigns || 0,
     numberOfStores: stores?.totalCount || 0,
     numberOfVoucherItems: totalVouchers || 0,
-    balance: 0, // Placeholder: Assuming balance comes from another API
+    balance: 0,
   };
 
   return (

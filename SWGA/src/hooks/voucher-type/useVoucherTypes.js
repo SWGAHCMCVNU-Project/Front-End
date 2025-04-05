@@ -16,7 +16,6 @@ export function useVoucherTypes({
     refetchOnWindowFocus: false, // Tắt refetch khi focus
   });
 
-  console.log("useVoucherTypes response:", response);
 
   return { isLoading, error, voucherTypes: response };
 }
