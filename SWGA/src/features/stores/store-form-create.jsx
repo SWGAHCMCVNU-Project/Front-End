@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 // store/components/StoreFormCreate.js (giả định đường dẫn)
 import { useEffect, useState, useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import styled, { css } from "styled-components";
 import { useMoveBack } from "../../hooks/useMoveBack";
 import storageService from "../../services/storageService";
@@ -103,7 +103,6 @@ function StoreFormCreate() {
 
   const { areas, isLoading: isLoadingAreas } = useAreas({ state: true });
   const [areaOptions, setAreaOptions] = useState([]);
-  const [areaError, setAreaError] = useState("");
   const [fileCard, setFileCard] = useState(null);
   const moveBack = useMoveBack();
 
@@ -122,22 +121,13 @@ function StoreFormCreate() {
     setAreaOptions(computedAreaOptions);
   }, [computedAreaOptions]);
 
-  const { register, handleSubmit, reset, getValues, setValue, formState } =
+  const { control, handleSubmit, reset, getValues, setValue, formState } =
     useForm({
-      // defaultValues: {
-      //   openingHours: "08:00", // Giá trị mặc định để tránh lỗi
-      //   closingHours: "17:00",
-      // },
+      defaultValues: {
+        areaId: "", // Ensure a default value to avoid undefined
+      },
     });
   const { errors } = formState;
-
-  const handleAreaOptions = (value) => {
-    setValue("areaId", value, {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-    setAreaError("");
-  };
 
   const handlePhoneInput = (event) => {
     event.target.value = event.target.value.replace(/\D/g, "");
@@ -167,10 +157,8 @@ function StoreFormCreate() {
     const avatar =
       typeof data.avatar === "string" ? data.avatar : data.avatar[0];
     if (!data.areaId) {
-      setAreaError("Vui lòng chọn khu vực");
+      // This check is redundant with Controller validation, but kept for extra safety
       return;
-    } else {
-      setAreaError("");
     }
 
     createStore({ ...data, brandId, avatar });
@@ -211,7 +199,7 @@ function StoreFormCreate() {
                       message: "Tên tài khoản tối đa 50 kí tự",
                     },
                     pattern: {
-                      value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/,
+                      value: /^(?=.*[a-z])(?=.*\d)[a-z\d]{5,}$/,
                       message:
                         "Tên tài khoản phải chứa ít nhất 5 kí tự, bao gồm chữ cái viết thường và ít nhất một chữ số",
                     },
@@ -380,17 +368,24 @@ function StoreFormCreate() {
                 <div>Khu vực</div>
               </Header>
               <CustomFormRow error={errors?.areaId?.message}>
-                <FormSelect
-                  id="areaId"
-                  placeholder={
-                    isLoadingAreas ? "Đang tải khu vực..." : "Chọn khu vực"
-                  }
-                  disabled={isCreating || isLoadingAreas}
-                  onChange={handleAreaOptions}
-                  options={areaOptions}
-                  {...register("areaId", {
-                    required: "Vui lòng chọn khu vực",
-                  })}
+                <Controller
+                  name="areaId"
+                  control={control}
+                  rules={{ required: "Vui lòng chọn khu vực" }}
+                  render={({ field }) => (
+                    <FormSelect
+                      id="areaId"
+                      placeholder={
+                        isLoadingAreas ? "Đang tải khu vực..." : "Chọn khu vực"
+                      }
+                      disabled={isCreating || isLoadingAreas}
+                      options={areaOptions}
+                      value={field.value}
+                      onChange={(value) => {
+                        field.onChange(value); // Update form state
+                      }}
+                    />
+                  )}
                 />
               </CustomFormRow>
             </StyledDataBox>
