@@ -144,6 +144,15 @@ const DataLabel = styled.div`
   color: var(--color-grey-700);
 `;
 
+const SuccessMessage = styled.div`
+  font-size: 1.6rem;
+  color: var(--color-green-700);
+  text-align: center;
+  padding: 1.2rem;
+  background-color: var(--color-green-100);
+  border-radius: var(--border-radius-sm);
+`;
+
 // Components
 function FormRow({ label, error, children }) {
   return (
@@ -228,6 +237,7 @@ AccountDataBox.propTypes = {
 
 function AccountPage({ accountId }) {
   const [activeTab, setActiveTab] = useState("info");
+  const [successMessage, setSuccessMessage] = useState(null);
   const { account, loading, error, updateLocalAccount } = useAccount(accountId);
   const { updateAccount, loading: updateLoading } = useUpdateAccount(updateLocalAccount);
 
@@ -245,6 +255,14 @@ function AccountPage({ accountId }) {
       });
     }
   }, [account, reset]);
+
+  // Clear success message after 3 seconds
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
 
   if (loading) return <p>Đang tải...</p>;
   if (error) return <p>Lỗi: {error}</p>;
@@ -265,6 +283,11 @@ function AccountPage({ accountId }) {
       const response = await updateAccount(accountId, data.oldPassword, updatedData);
 
       if (response.success) {
+        setSuccessMessage(
+          activeTab === "info" 
+            ? "Cập nhật thông tin thành công!" 
+            : "Cập nhật mật khẩu thành công!"
+        );
         // Reset form mật khẩu nếu đang ở tab password
         if (activeTab === "password") {
           reset({
@@ -301,7 +324,6 @@ function AccountPage({ accountId }) {
           active={activeTab === "password"} 
           onClick={() => {
             setActiveTab("password");
-            // Reset password fields when switching to password tab
             reset({
               ...getValues(),
               oldPassword: "",
@@ -313,6 +335,8 @@ function AccountPage({ accountId }) {
           Mật khẩu
         </TabButton>
       </TabContainer>
+
+      {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
 
       <Form onSubmit={handleSubmit(onSubmit)}>
         {activeTab === "info" && (
@@ -358,6 +382,7 @@ function AccountPage({ accountId }) {
                     id="password"
                     disabled={isLoading}
                     {...register("password", {
+                      required: "Hãy nhập mật khẩu mới",
                       minLength: { value: 6, message: "Mật khẩu ít nhất 6 kí tự" },
                     })}
                   />
@@ -388,4 +413,4 @@ AccountPage.propTypes = {
   accountId: PropTypes.string.isRequired,
 };
 
-export default AccountPage; 
+export default AccountPage;
