@@ -351,7 +351,8 @@ function SignUp() {
       setIsLoading(false);
     }
   };
-
+  const onFinishFailed = (errors) => {
+  };
   return (
     <Layout style={{ minHeight: "100vh", display: "flex", flexDirection: "row" }}>
       <style>{customStyles}</style>

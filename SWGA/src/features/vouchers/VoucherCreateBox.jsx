@@ -375,6 +375,7 @@ function VoucherCreateBox({ onCloseModal }) {
                   type="number"
                   id="price"
                   disabled={isWorking}
+                  readOnly={isEditSession} // Make price read-only in edit mode
                   {...register("price", { validate: validatePrice })}
                 />
               </FormRowUnit>
@@ -388,6 +389,7 @@ function VoucherCreateBox({ onCloseModal }) {
                   type="text"
                   id="rate"
                   disabled={isWorking}
+                  readOnly={isEditSession} // Make rate read-only in edit mode
                   {...register("rate", { validate: validateRate })}
                 />
               </FormRow>
