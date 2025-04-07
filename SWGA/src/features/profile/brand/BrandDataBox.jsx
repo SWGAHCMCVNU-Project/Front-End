@@ -297,7 +297,7 @@ function BrandDataBox({ brand }) {
               {numberOfFollowers ?? "Chưa cập nhật"}
             </DataItem>
 
-            <DataItem label={`${greenWalletName || "Ví xanh"}:`}>
+            <DataItem label={`${greenWalletName || "Ví"}:`}>
               <StyleGreenWallet>
                 {formatCurrency(greenWalletBalance ?? 0)}
                 <StyledImageBean src={greenBean} alt="dau xanh" />

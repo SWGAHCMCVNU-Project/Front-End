@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 // store/components/StoreFormCreate.js (giả định đường dẫn)
 import { useEffect, useState, useMemo } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import styled, { css } from "styled-components";
 import { useMoveBack } from "../../hooks/useMoveBack";
 import storageService from "../../services/storageService";
@@ -101,8 +101,10 @@ function StoreFormCreate() {
   const { isCreating, createStore, error } = useCreateStore();
   const brandId = storageService.getBrandId(); // Sử dụng getBrandId thay vì getLoginId
 
+
   const { areas, isLoading: isLoadingAreas } = useAreas({ state: true });
   const [areaOptions, setAreaOptions] = useState([]);
+  const [areaError, setAreaError] = useState("");
   const [fileCard, setFileCard] = useState(null);
   const moveBack = useMoveBack();
 
@@ -121,13 +123,21 @@ function StoreFormCreate() {
     setAreaOptions(computedAreaOptions);
   }, [computedAreaOptions]);
 
-  const { control, handleSubmit, reset, getValues, setValue, formState } =
-    useForm({
-      defaultValues: {
-        areaId: "", // Ensure a default value to avoid undefined
-      },
-    });
+  const { register, handleSubmit, reset, getValues, setValue, formState } = useForm({
+    // defaultValues: {
+    //   openingHours: "08:00", // Giá trị mặc định để tránh lỗi
+    //   closingHours: "17:00",
+    // },
+  });
   const { errors } = formState;
+
+  const handleAreaOptions = (value) => {
+    setValue("areaId", value, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setAreaError("");
+  };
 
   const handlePhoneInput = (event) => {
     event.target.value = event.target.value.replace(/\D/g, "");
@@ -142,23 +152,24 @@ function StoreFormCreate() {
     const files = event.target.files;
     const selectedFile = files?.[0];
     setFileCard(selectedFile);
+    
+    
   };
 
   // Hàm xác thực thời gian đóng cửa
   const validateClosingTime = (value) => {
     const openingTime = getValues("openingHours");
     if (!openingTime || !value) return "Vui lòng nhập thời gian hợp lệ";
-    return (
-      value > openingTime || "Thời gian đóng cửa phải sau thời gian mở cửa"
-    );
+    return value > openingTime || "Thời gian đóng cửa phải sau thời gian mở cửa";
   };
 
   function onSubmit(data) {
-    const avatar =
-      typeof data.avatar === "string" ? data.avatar : data.avatar[0];
+    const avatar = typeof data.avatar === "string" ? data.avatar : data.avatar[0];
     if (!data.areaId) {
-      // This check is redundant with Controller validation, but kept for extra safety
+      setAreaError("Vui lòng chọn khu vực");
       return;
+    } else {
+      setAreaError("");
     }
 
     createStore({ ...data, brandId, avatar });
@@ -183,10 +194,7 @@ function StoreFormCreate() {
               <Header>
                 <div>Thông tin đăng nhập</div>
               </Header>
-              <CustomFormRow
-                label="Tên tài khoản"
-                error={errors?.userName?.message}
-              >
+              <CustomFormRow label="Tên tài khoản" error={errors?.userName?.message}>
                 <Input
                   type="text"
                   id="userName"
@@ -199,9 +207,8 @@ function StoreFormCreate() {
                       message: "Tên tài khoản tối đa 50 kí tự",
                     },
                     pattern: {
-                      value: /^(?=.*[a-z])(?=.*\d)[a-z\d]{5,}$/,
-                      message:
-                        "Tên tài khoản phải chứa ít nhất 5 kí tự, bao gồm chữ cái viết thường và ít nhất một chữ số",
+                      value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/,
+                      message: "Tên tài khoản phải chứa ít nhất 5 kí tự, bao gồm chữ cái viết thường và ít nhất một chữ số",
                     },
                   })}
                 />
@@ -232,10 +239,7 @@ function StoreFormCreate() {
               <Header>
                 <div>Thông tin cơ bản</div>
               </Header>
-              <CustomFormRow
-                label="Tên Cửa Hàng"
-                error={errors?.storeName?.message}
-              >
+              <CustomFormRow label="Tên Cửa Hàng" error={errors?.storeName?.message}>
                 <Input
                   type="text"
                   id="storeName"
@@ -245,8 +249,7 @@ function StoreFormCreate() {
                     required: "Vui lòng nhập tên cửa hàng",
                     validate: {
                       noWhiteSpace: (value) =>
-                        value.trim().length >= 3 ||
-                        "Tên cửa hàng phải chứa ít nhất 3 kí tự",
+                        value.trim().length >= 3 || "Tên cửa hàng phải chứa ít nhất 3 kí tự",
                     },
                     maxLength: {
                       value: 50,
@@ -256,10 +259,7 @@ function StoreFormCreate() {
                 />
               </CustomFormRow>
 
-              <CustomFormRow
-                label="Số điện thoại"
-                error={errors?.phone?.message}
-              >
+              <CustomFormRow label="Số điện thoại" error={errors?.phone?.message}>
                 <Input
                   type="tel"
                   id="phone"
@@ -301,8 +301,7 @@ function StoreFormCreate() {
                   {...register("description", {
                     required: "Vui lòng nhập mô tả",
                     validate: {
-                      noWhiteSpace: (value) =>
-                        value.trim().length >= 3 || "Mô tả ít nhất 3 kí tự",
+                      noWhiteSpace: (value) => value.trim().length >= 3 || "Mô tả ít nhất 3 kí tự",
                     },
                     maxLength: {
                       value: 500,
@@ -326,12 +325,11 @@ function StoreFormCreate() {
                   {...register("address", {
                     required: "Vui lòng nhập địa chỉ",
                     validate: {
-                      noWhiteSpace: (value) =>
-                        value.trim().length >= 3 || "Địa chỉ ít nhất 3 kí tự",
+                      noWhiteSpace: (value) => value.trim().length >= 3 || "Địa chỉ không hợp lệ",
                     },
                     maxLength: {
-                      value: 500,
-                      message: "Địa chỉ tối đa 500 kí tự",
+                      value: 200,
+                      message: "Địa chỉ tối đa 200 kí tự",
                     },
                   })}
                 />
@@ -367,39 +365,24 @@ function StoreFormCreate() {
               <Header>
                 <div>Khu vực</div>
               </Header>
-              <CustomFormRow error={errors?.areaId?.message}>
-                <Controller
-                  name="areaId"
-                  control={control}
-                  rules={{ required: "Vui lòng chọn khu vực" }}
-                  render={({ field }) => (
-                    <FormSelect
-                      id="areaId"
-                      placeholder={
-                        isLoadingAreas ? "Đang tải khu vực..." : "Chọn khu vực"
-                      }
-                      disabled={isCreating || isLoadingAreas}
-                      options={areaOptions}
-                      value={field.value}
-                      onChange={(value) => {
-                        field.onChange(value); // Update form state
-                      }}
-                    />
-                  )}
+              <CustomFormRow error={areaError}>
+                <FormSelect
+                  id="areaId"
+                  placeholder={isLoadingAreas ? "Đang tải khu vực..." : "Chọn khu vực"}
+                  disabled={isCreating || isLoadingAreas}
+                  onChange={handleAreaOptions}
+                  options={areaOptions}
                 />
               </CustomFormRow>
             </StyledDataBox>
 
             <StyledDataBox>
-              <Header>
-                <div>Thời gian làm việc</div>
+              <Header >
+                <div >Thời gian làm việc</div>
               </Header>
               <TimeFrameContainer>
                 <TimeFrameHalf>
-                  <CustomFormRow
-                    label="Mở cửa"
-                    error={errors?.openingHours?.message}
-                  >
+                  <CustomFormRow label="Mở cửa" error={errors?.openingHours?.message}>
                     <Input
                       type="time"
                       id="openingHours"
@@ -412,10 +395,7 @@ function StoreFormCreate() {
                 </TimeFrameHalf>
 
                 <TimeFrameHalf>
-                  <CustomFormRow
-                    label="Đóng cửa"
-                    error={errors?.closingHours?.message}
-                  >
+                  <CustomFormRow label="Đóng cửa" error={errors?.closingHours?.message}>
                     <Input
                       type="time"
                       id="closingHours"
@@ -432,11 +412,7 @@ function StoreFormCreate() {
           </RightFormHalf>
         </StaffFormContainer>
 
-        <CreateUpdateButton
-          onClick={handleSubmit(onSubmit, onError)}
-          isLoading={isCreating}
-          label="Tạo cửa hàng"
-        />
+        <CreateUpdateButton onClick={handleSubmit(onSubmit, onError)} isLoading={isCreating} label="Tạo cửa hàng" />
         {error && <div style={{ color: "red" }}>Lỗi: {error}</div>}
       </Form>
     </>
