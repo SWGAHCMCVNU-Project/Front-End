@@ -152,6 +152,7 @@ function CampusFormUpdate({ campusToEdit = {}, onCloseModal }) {
           placeholder="Nhập địa chỉ..."
           disabled={isWorking}
           {...register("address", {
+            required: "Vui lòng nhập địa chỉ",
             validate: {
               noWhiteSpace: (value) =>
                 !value ||
@@ -201,9 +202,15 @@ function CampusFormUpdate({ campusToEdit = {}, onCloseModal }) {
           defaultValue={link !== "null" && link}
           disabled={isWorking}
           placeholder="Nhập link website..."
-          {...register("link")}
+          {...register("link", {
+            required: "Vui lòng nhập link website",
+            pattern: {
+              value: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/,
+              message: "Link website không hợp lệ",
+            },
+          })}
         />
-      </FormRow>
+</FormRow>
 
       {isEditSession ? (
         <FormRow label="Ảnh campus">
@@ -237,6 +244,9 @@ function CampusFormUpdate({ campusToEdit = {}, onCloseModal }) {
             onChange={handleChangeImage}
             showUploadList={false}
             disabled={isWorking}
+            {...register("image", {
+              required: "Vui lòng tải ảnh lên",
+            })}
           >
             {image && image.name ? (
               <img
@@ -261,6 +271,7 @@ function CampusFormUpdate({ campusToEdit = {}, onCloseModal }) {
           placeholder="Nhập mô tả..."
           disabled={isWorking}
           {...register("description", {
+            required: "Vui lòng nhập description",
             validate: {
               noWhiteSpace: (value) =>
                 !value || value.trim().length >= 3 || "Mô tả ít nhất 3 kí tự",
@@ -269,7 +280,6 @@ function CampusFormUpdate({ campusToEdit = {}, onCloseModal }) {
           })}
         />
       </FormRow>
-
       {isEditSession ? (
         <FormRow label="Trạng thái hoạt động" error={errors?.state?.message}>
           <SelectFormState

@@ -319,9 +319,10 @@ function CampaignBasicInformation() {
                                 label="Mô tả"
                                 error={errors?.description?.message}>
                                 <MyEditor
-                                    id="description"
-                                    initialContent={newCampaign?.description ? newCampaign.description : ""}
-                                    onContentChange={handleDescriptionChange}
+                                   id="description"
+                                   initialContent={newCampaign?.description || ""}
+                                   onContentChange={handleDescriptionChange}
+                                   disabled={typesLoading}
                                     {...register("description", {
                                         required: "Vui lòng nhập mô tả",
                                         validate: {

@@ -14,7 +14,9 @@
     overflow: auto;
     overflow-x: hidden;
 }
-
+.tbl-msc{
+    margin-top:10px;
+}
 .tbl-msc tbody {
     height: 100px;
 }
@@ -37,10 +39,10 @@
     }
   }
 .card-noti {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 
     label {
-        font-size: 16px;
+        font-size: 17px;
         font-weight: 600;
         color: red;
     }

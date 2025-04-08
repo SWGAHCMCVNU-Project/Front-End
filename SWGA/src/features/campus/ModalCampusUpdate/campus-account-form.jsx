@@ -61,12 +61,7 @@ function CampusAccountForm({ campusId, campusName, onCloseModal }) {
       type={onCloseModal ? "modal" : "regular"}
     >
       <FormRow label="Campus">
-        <Input
-          type="text"
-          id="campusName"
-          value={campusName}
-          disabled
-        />
+        <Input type="text" id="campusName" value={campusName} disabled />
       </FormRow>
 
       <FormRow label="Tên đăng nhập" error={errors?.userName?.message}>
@@ -116,6 +111,7 @@ function CampusAccountForm({ campusId, campusName, onCloseModal }) {
           placeholder="Nhập địa chỉ email..."
           disabled={isCreating}
           {...register("email", {
+            required: "Vui lòng nhập email",
             pattern: {
               value: /^(?!\.)[a-zA-Z0-9]+@[a-zA-Z0-9.]+\.[a-zA-Z]{2,}$/,
               message: "Định dạng email không hợp lệ",
@@ -131,6 +127,7 @@ function CampusAccountForm({ campusId, campusName, onCloseModal }) {
           placeholder="Ví dụ: 0909339779"
           disabled={isCreating}
           {...register("phone", {
+            required: "Vui lòng nhập phone",
             pattern: {
               value: /^[0-9]{10,11}$/,
               message: "Số điện thoại hợp lệ phải từ 10 đến 11 số",

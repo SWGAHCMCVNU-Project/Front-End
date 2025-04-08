@@ -145,24 +145,8 @@ function Sidenav({ color }) {
           labelPageName: "Loại chiến dịch",
           allowedRoles: ["admin"], // Changed to admin only
         },
-        {
-          key: "4",
-          linkURL: "/orders",
-          pageName: "orders",
-          color: color,
-          iconPage: billing,
-          labelPageName: "Đơn hàng",
-          allowedRoles: ["admin", "staff"],
-        },
-        {
-          key: "5",
-          linkURL: "/requests",
-          pageName: "requests",
-          color: color,
-          iconPage: <FontAwesomeIcon icon={faBell} />,
-          labelPageName: "Yêu cầu",
-          allowedRoles: ["admin"],
-        },
+        
+        
       ],
     },
     {
@@ -189,15 +173,7 @@ function Sidenav({ color }) {
           labelPageName: "Thương hiệu",
           allowedRoles: ["admin"],
         },
-        {
-          key: "9",
-          linkURL: "/stations",
-          pageName: "stations",
-          color: color,
-          iconPage: <FontAwesomeIcon icon={faLocationDot} />,
-          labelPageName: "Trạm nhận hàng",
-          allowedRoles: ["admin", "staff"],
-        },
+        
       ],
     },
     {

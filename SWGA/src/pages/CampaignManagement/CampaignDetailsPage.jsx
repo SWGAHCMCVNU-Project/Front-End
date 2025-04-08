@@ -8,14 +8,10 @@ import CampaignDescription from "../../features/campaigns/CampaignDetailPage/cam
 import CampaignImage from "../../features/campaigns/CampaignDetailPage/campaign-image/campaign-image";
 import CampaignInformation from "../../features/campaigns/CampaignDetailPage/campaign-information/campaign-information";
 import CampaignLogoBrand from "../../features/campaigns/CampaignDetailPage/campaign-logo-brand/campaign-logo-brand";
-import CampaignActivity from "../../features/campaigns/CampaignDetailPage/campaign-tab/campaign-activity";
-import CampaignCampus from "../../features/campaigns/CampaignDetailPage/campaign-tab/campaign-campus";
 import CampaignStore from "../../features/campaigns/CampaignDetailPage/campaign-tab/campaign-store";
 import CampaignVoucher from "../../features/campaigns/CampaignDetailPage/campaign-tab/campaign-voucher";
 import ItemFilter from "../../features/campaigns/CampaignDetailPage/campaign-tab/filter-item";
 import { CampaignUpdateState } from "../../features/campaigns/CampaignDetailPage/campaign-update-state/campaign-update-state";
-import { CampaignActivityProvider } from "../../features/campaigns/CampaignDetailPage/useCampaignActivity";
-import { CampaignCampusProvider } from "../../features/campaigns/CampaignDetailPage/useCampaignCampus";
 import { CampaignStoreProvider } from "../../features/campaigns/CampaignDetailPage/useCampaignStore";
 import { CampaignVoucherProvider } from "../../features/campaigns/CampaignDetailPage/useCampaignVoucher";
 import { CampaignVoucherItemProvider } from "../../features/campaigns/CampaignDetailPage/useCampaignVoucherItem";
@@ -90,35 +86,10 @@ function CampaignDetailsPage() {
   const day = String(currentDate.getDate()).padStart(2, "0");
   const formattedDate = `${year}-${month}-${day}`;
 
-  const CampaignCampuses = () => (
-    <CampaignCampusProvider>
-      <Card
-        bordered={false}
-        className="criclebox tablespace mb-24"
-        title="Danh sách cơ sở tổ chức"
-      >
-        <CampaignCampus />
-      </Card>
-    </CampaignCampusProvider>
-  );
-
   const handleTabClick = (option) => {
     setVisible(false);
     setActiveOption(option);
   };
-
-  const content = (
-    <div className="tab-options">
-      <div
-        className={`tab-option ${
-          activeOption === "campaignCampus" ? "active" : ""
-        }`}
-        onClick={() => handleTabClick("campaignCampus")}
-      >
-        Cơ sở
-      </div>
-    </div>
-  );
 
   const itemsTab = [
     {
@@ -166,42 +137,6 @@ function CampaignDetailsPage() {
             </Row>
           </div>
         </CampaignStoreProvider>
-      ),
-    },
-    {
-      label: (
-        <Popover
-          content={content}
-          open={visible}
-          onOpenChange={setVisible}
-          trigger="click"
-          placement="bottom"
-        >
-          <div>Đối tượng</div>
-        </Popover>
-      ),
-      key: "campaignCampusStore",
-      children: <CampaignCampuses />,
-    },
-    {
-      label: "Lịch sử",
-      key: "campaignActivity",
-      children: (
-        <CampaignActivityProvider>
-          <div className="tabled">
-            <Row>
-              <Col xl={24}>
-                <Card
-                  bordered={false}
-                  className="criclebox tablespace mb-24"
-                  title="Trạng thái đã trải qua"
-                >
-                  <CampaignActivity />
-                </Card>
-              </Col>
-            </Row>
-          </div>
-        </CampaignActivityProvider>
       ),
     },
   ];
