@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"; // Thêm useEffect
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import Empty from "../../ui/Empty";
 import Menus from "../../ui/Menus";
@@ -32,7 +32,7 @@ function BrandTable() {
     totalPages: 1,
   };
 
-  // Reset currentPage về 1 nếu không có dữ liệu ở trang hiện tại
+  // Reset currentPage to 1 if there is no data on the current page
   useEffect(() => {
     if (!isLoading && !error && brandData.items.length === 0 && currentPage > 1) {
       const params = new URLSearchParams(searchParams);
@@ -57,7 +57,7 @@ function BrandTable() {
     refetch();
   };
 
-  // Kiểm tra xem có dữ liệu hay không để vô hiệu hóa Pagination
+  // Check if there is no data to disable Pagination
   const isDataEmpty = !brandData.items.length || brandData.total === 0;
 
   if (error) {
@@ -104,7 +104,7 @@ function BrandTable() {
                 pageSize={pageSize}
                 currentPage={brandData.page}
                 onPageChange={handlePageChange}
-                disabled={isDataEmpty} // Vô hiệu hóa hoàn toàn nếu không có dữ liệu
+                disabled={isDataEmpty}
               />
               <BrandSetRowsPerPage
                 pageSize={pageSize}
