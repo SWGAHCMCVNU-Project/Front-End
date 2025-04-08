@@ -96,7 +96,6 @@ function EditBrandForm({ brandToEdit = {}, onCloseModal }) {
       closingHours: formatTime(data.closingHours || formattedClosingHours),
     };
 
-    console.log("Submitting brandData:", brandData); // Log dữ liệu trước khi gửi
 
     updateBrand(
       { brandData },
@@ -109,7 +108,6 @@ function EditBrandForm({ brandToEdit = {}, onCloseModal }) {
   }
 
   function onError(errors) {
-    console.log("Validation errors:", errors);
   }
 
   return (

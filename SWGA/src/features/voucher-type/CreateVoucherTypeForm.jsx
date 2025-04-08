@@ -46,12 +46,10 @@ const CreateVoucherTypeForm = ({ onCloseModal }) => {
 
     if (typeImage) {
       formData.image = typeImage;
-      console.log("Image to be uploaded:", typeImage);
     }
 
     createVoucherType(formData, {
       onSuccess: (response) => {
-        console.log("Create voucher type response:", response);
         if (response.status >= 200 && response.status < 300) {
           toast.success("Tạo loại ưu đãi thành công!");
           reset();

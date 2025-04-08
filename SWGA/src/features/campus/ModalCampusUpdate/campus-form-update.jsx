@@ -90,7 +90,6 @@ function CampusFormUpdate({ campusToEdit = {}, onCloseModal }) {
   }
 
   function onError(errors) {
-    console.log("Lỗi validation form:", errors);
   }
 
   const areaOptions =
@@ -119,7 +118,6 @@ function CampusFormUpdate({ campusToEdit = {}, onCloseModal }) {
               style={{ width: "100%" }}
               value={field.value}
               onChange={(value) => {
-                console.log("Selected areaId:", value); // Log giá trị khi chọn
                 field.onChange(value);
               }}
               getPopupContainer={(triggerNode) => triggerNode.parentNode}

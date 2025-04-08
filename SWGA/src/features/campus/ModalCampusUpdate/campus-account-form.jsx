@@ -51,7 +51,6 @@ function CampusAccountForm({ campusId, campusName, onCloseModal }) {
   }
 
   function onError(errors) {
-    console.log("Lỗi validation form:", errors);
   }
 
   return (

@@ -1,12 +1,70 @@
 import { Tag } from "antd";
-import { HiOutlineEnvelope, HiOutlineHomeModern, HiOutlinePhone } from "react-icons/hi2";
+import {
+  HiOutlineEnvelope,
+  HiOutlineHomeModern,
+  HiOutlinePhone,
+} from "react-icons/hi2";
 import styled from "styled-components";
 import imgDefaultCampus from "../../../assets/images/universityLogo.png"; // Đổi tên ảnh mặc định nếu cần
-import DataItem from "../../../ui/DataItem";
 import { Flag } from "../../../ui/Flag";
 import Heading from "../../../ui/Heading";
-import { formatDateTime, formatPhoneNumber, useImageValidity } from "../../../utils/helpers";
+import {
+  formatDateTime,
+  formatPhoneNumber,
+  useImageValidity,
+} from "../../../utils/helpers";
 import "./scss/CampusDataBox.scss";
+
+// Styled component for DataItem with strict alignment
+const DataItemStyled = styled.div`
+  display: flex;
+  align-items: baseline; /* Thay đổi từ center sang baseline */
+  gap: 0.8rem;
+  height: 100%;
+
+  & > svg {
+    height: 2.4rem;
+    width: 2.4rem;
+    flex-shrink: 0;
+    margin-top: 3px; /* Dịch icon xuống 3px */
+  }
+
+  & > span {
+    font-size: 1.6rem;
+    line-height: 2.4rem; /* Đặt line-height bằng chiều cao icon */
+    display: flex;
+  }
+
+  & > span:first-of-type {
+    font-weight: 500;
+    white-space: nowrap;
+    margin-right: 0.4rem; /* Thêm khoảng cách giữa label và nội dung */
+  }
+
+  & > span:last-of-type {
+    color: var(--color-grey-700);
+    word-break: break-all;
+    align-self: center; /* Căn giữa theo chiều dọc */
+  }
+`;
+const PriceContent = styled.div`
+  display: flex;
+  align-items: baseline; /* Căn theo baseline */
+  gap: 5rem;
+  width: 100%;
+  justify-content: center;
+  padding: 4px 0; /* Thêm padding để cân bằng */
+`;
+// Updated DataItem component
+function DataItem({ icon, label, children }) {
+  return (
+    <DataItemStyled>
+      {icon}
+      <span>{label}</span>
+      <span>{children}</span>
+    </DataItemStyled>
+  );
+}
 
 const StyledStationDataBox = styled.section`
   background-color: var(--color-grey-0);
@@ -79,12 +137,11 @@ const Infor = styled.div`
 
 const Price = styled.div`
   display: flex;
-  align-items: center;
+  align-items: center; /* Đảm bảo căn giữa theo chiều dọc */
   justify-content: center;
   padding: 1.6rem 3.2rem;
   border-radius: var(--border-radius-sm);
   gap: 5rem;
-
   background-color: ${(props) =>
     props.isPaid ? "var(--color-green-100)" : "var(--color-yellow-100)"};
   color: ${(props) =>
@@ -146,7 +203,11 @@ function CampusDataBox({ campus }) {
 
       <Section>
         <Guest>
-          <Flag src={isValidImages.find(() => true) ? campusImage : imgDefaultCampus} />
+          <Flag
+            src={
+              isValidImages.find(() => true) ? campusImage : imgDefaultCampus
+            }
+          />
 
           <Infor>
             <HeadingGroup>
@@ -177,7 +238,12 @@ function CampusDataBox({ campus }) {
               <div className="link-web-uni">
                 <label>Website: </label>
                 <span>
-                  <a className="link-website" href={link} target="_blank" rel="noopener noreferrer">
+                  <a
+                    className="link-website"
+                    href={link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     {link}
                   </a>
                 </span>
@@ -187,12 +253,14 @@ function CampusDataBox({ campus }) {
         </Guest>
 
         <Price>
-          <DataItem icon={<HiOutlineEnvelope />} label="Gmail">
-            {email || "Chưa cập nhật"}
-          </DataItem>
-          <DataItem icon={<HiOutlinePhone />} label="Số điện thoại">
-            {phone ? formatPhoneNumber(phone) : "Chưa cập nhật"}
-          </DataItem>
+          <PriceContent>
+            <DataItem icon={<HiOutlineEnvelope />} label="Gmail">
+              {email || "Chưa cập nhật"}
+            </DataItem>
+            <DataItem icon={<HiOutlinePhone />} label="Số điện thoại">
+              {phone ? formatPhoneNumber(phone) : "Chưa cập nhật"}
+            </DataItem>
+          </PriceContent>
         </Price>
       </Section>
 

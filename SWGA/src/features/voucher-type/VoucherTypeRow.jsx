@@ -102,18 +102,15 @@ function VoucherTypeRow({ id, typeName, image, description, state, displayedInde
     }
 
     if (modalElement) {
-      console.log("Found modal element:", modalElement);
       modalElement.close();
     } else {
       console.warn("Modal element not found for edit-", id);
       // Log tất cả dialog elements để debug
       const allDialogs = document.querySelectorAll("dialog");
-      console.log("All dialog elements in DOM:", allDialogs);
     }
 
     // Fallback: Sử dụng ref nếu selector không tìm thấy
     if (modalRef.current) {
-      console.log("Closing modal via ref for edit-", id);
       modalRef.current.close();
     }
   };
@@ -151,7 +148,6 @@ function VoucherTypeRow({ id, typeName, image, description, state, displayedInde
               isLoading={isLoading}
               onClose={handleCloseModal}
               onSuccess={(updatedData) => {
-                console.log("onSuccess called with:", updatedData);
                 onUpdate(updatedData);
               }}
             />

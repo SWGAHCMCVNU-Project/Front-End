@@ -9,7 +9,7 @@ function BrandSetRowsPerPage({ pageSize, setPageSize }) {
   const handleLimitChange = (newLimit) => {
     const numLimit = Number(newLimit);
     if (numLimit !== pageSize) {
-      console.log("Changing pageSize to:", numLimit);
+     
       setPageSize(numLimit); // Call the parent function to update pageSize
       const params = new URLSearchParams(searchParams);
       params.set("size", numLimit.toString());

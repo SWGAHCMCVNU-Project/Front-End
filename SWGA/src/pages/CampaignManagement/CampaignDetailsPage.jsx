@@ -152,7 +152,6 @@ function CampaignDetailsPage() {
     };
     updateCampaign(updatedCampaign, {
       onSuccess: () => {
-        console.log("Cập nhật trạng thái thành công!");
       },
       onError: (err) => {
         console.error("Lỗi khi cập nhật trạng thái:", err);

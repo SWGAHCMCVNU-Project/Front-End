@@ -6,7 +6,6 @@ import StorageService from '../../services/storageService';
 
 export const createVoucherAPI = async (data) => {
   try {
-    console.log("Calling createVoucherAPI with data:", data);
 
     // Lấy brandId từ StorageService
     const brandId = StorageService.getBrandId();

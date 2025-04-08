@@ -74,7 +74,6 @@ function TransactionList() {
         setSort
     } = useBrandTransaction();
 
-    console.log("Transaction data:", transactionBrand); // Debug log
 
     const formatDate = (timestamp) => {
         try {

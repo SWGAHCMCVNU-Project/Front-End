@@ -21,7 +21,6 @@ const useGetStoresByCampaignId = (campaignId, searchName = "", page = 1, size = 
       try {
         setLoading(true);
         const data = await getStoresByCampaignId(campaignId, searchName, page, size);
-        console.log('Data from API:', data);
         
         setStores(data.items || []);
         setPagination({

@@ -176,7 +176,6 @@ function StoreFormCreate() {
   }
 
   function onError(errors) {
-    console.log("Form Errors:", errors);
   }
 
   return (

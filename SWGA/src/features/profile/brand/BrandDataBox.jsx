@@ -191,66 +191,6 @@ function BrandDataBox({ brand }) {
       .catch(() => setIsValidLogo(false));
   }, [logo]);
 
-  useEffect(() => {
-    console.log("Full Brand Data:", {
-      id,
-      accountId,
-      brandName,
-      acronym,
-      address,
-      coverPhoto: {
-        url: coverPhoto ?? "Chưa có ảnh bìa",
-        fileName: coverFileName ?? "N/A",
-        isValid: isValidCoverPhoto,
-      },
-      link,
-      openingHours,
-      closingHours,
-      totalIncome: totalIncome ?? "N/A",
-      totalSpending: totalSpending ?? "N/A",
-      dateCreated,
-      dateUpdated: dateUpdated ?? "Chưa cập nhật",
-      description,
-      state,
-      status,
-      phone,
-      email,
-      numberOfFollowers: numberOfFollowers ?? "Chưa cập nhật",
-      greenWalletName: greenWalletName ?? "Chưa cập nhật",
-      greenWalletBalance: greenWalletBalance ?? "Chưa cập nhật",
-      accountData: account,
-      accountLoading,
-      accountError,
-    });
-  }, [
-    id,
-    accountId,
-    brandName,
-    acronym,
-    address,
-    coverPhoto,
-    coverFileName,
-    link,
-    openingHours,
-    closingHours,
-    totalIncome,
-    totalSpending,
-    dateCreated,
-    dateUpdated,
-    description,
-    state,
-    status,
-    phone,
-    email,
-    numberOfFollowers,
-    greenWalletName,
-    greenWalletBalance,
-    isValidCoverPhoto,
-    account,
-    accountLoading,
-    accountError,
-  ]);
-
   if (accountLoading) {
     return <div>Loading account details...</div>;
   }

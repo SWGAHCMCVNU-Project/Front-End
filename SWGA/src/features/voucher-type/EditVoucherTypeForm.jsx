@@ -109,7 +109,6 @@ function EditVoucherTypeForm({ voucherTypeToEdit, onSubmit, isLoading, onClose, 
       onClose();
       // Navigate sau khi modal đóng
       setTimeout(() => {
-        console.log("Navigating to /voucher-type");
         navigate("/voucher-type");
       }, 100);
     } catch (err) {

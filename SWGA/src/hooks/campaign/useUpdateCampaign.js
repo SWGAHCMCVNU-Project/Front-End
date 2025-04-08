@@ -6,7 +6,6 @@ const useUpdateCampaign = () => {
 
   const { isLoading, mutate } = useMutation({
     mutationFn: ({ campaignId, campaignData }) => {
-      console.log("Data sent to updateCampaignAPI:", { campaignId, campaignData });
       return updateCampaignAPI(campaignId, campaignData);
     },
     onSuccess: (_, variables) => {
