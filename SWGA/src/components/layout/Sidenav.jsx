@@ -128,25 +128,23 @@ function Sidenav({ color }) {
           allowedRoles: ["admin", "brand"],
         },
         {
-          key: "16", // Moved from brand section
+          key: "16",
           linkURL: "/voucher-type",
           pageName: "voucher-type",
           color: color,
           iconPage: <FontAwesomeIcon icon={faTicket} />,
           labelPageName: "Thể loại",
-          allowedRoles: ["admin"], // Changed to admin only
+          allowedRoles: ["admin"],
         },
         {
-          key: "18", // Moved from brand section
+          key: "18",
           linkURL: "/campaign-type",
           pageName: "campaign-type",
           color: color,
           iconPage: <FontAwesomeIcon icon={faCalendarDays} />,
           labelPageName: "Loại chiến dịch",
-          allowedRoles: ["admin"], // Changed to admin only
+          allowedRoles: ["admin"],
         },
-        
-        
       ],
     },
     {
@@ -173,7 +171,6 @@ function Sidenav({ color }) {
           labelPageName: "Thương hiệu",
           allowedRoles: ["admin"],
         },
-        
       ],
     },
     {
@@ -189,7 +186,7 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <FontAwesomeIcon icon={faBuildingColumns} />,
           labelPageName: "Đại học",
-          allowedRoles: ["admin",],
+          allowedRoles: ["admin"],
         },
         {
           key: "14",
@@ -214,10 +211,19 @@ function Sidenav({ color }) {
           linkURL: "/lucky-prizes",
           pageName: "lucky-prizes",
           color: color,
-          iconPage: <FontAwesomeIcon icon={faDice} />, 
+          iconPage: <FontAwesomeIcon icon={faDice} />,
           labelPageName: "Điểm may mắn",
           allowedRoles: ["admin"],
-        }
+        },
+        {
+          key: "23",
+          linkURL: "/challenges",
+          pageName: "challenges",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faPersonWalking} />,
+          labelPageName: "Thử thách",
+          allowedRoles: ["admin"],
+        },
       ],
     },
     {
@@ -248,7 +254,7 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <FontAwesomeIcon icon={faClockRotateLeft} />,
           labelPageName: "Lịch sử giao dịch",
-          allowedRoles: ["brand","campus"],
+          allowedRoles: ["brand", "campus"],
         },
         {
           key: "21",
@@ -257,9 +263,8 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <ShoppingCartOutlined />,
           labelPageName: "Mua điểm",
-          allowedRoles: ["brand","campus"],
+          allowedRoles: ["brand", "campus"],
         },
-        
       ],
     },
     {

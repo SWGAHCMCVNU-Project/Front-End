@@ -102,3 +102,8 @@ export const AUTH_ENDPOINTS = {
     GET_ALL: "/Student",
     GET_BY_ID: "/Student/{id}",
   }
+  export const CHALLENGE = {
+    CREATE: "/Challenge",
+    GET_ALL: "/Challenge",
+    UPDATE : "/Challenge/{id}"
+  }

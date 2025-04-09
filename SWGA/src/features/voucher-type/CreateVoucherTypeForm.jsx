@@ -44,16 +44,19 @@ const CreateVoucherTypeForm = ({ onCloseModal }) => {
       return;
     }
 
-    if (typeImage) {
-      formData.image = typeImage;
+    if (!typeImage) {
+      toast.error("Vui lòng upload hình ảnh");
+      return;
     }
+
+    formData.image = typeImage;
 
     createVoucherType(formData, {
       onSuccess: (response) => {
         if (response.status >= 200 && response.status < 300) {
           toast.success("Tạo loại ưu đãi thành công!");
           reset();
-          onCloseModal?.(); // Đóng modal khi thành công
+          onCloseModal?.();
           queryClient.invalidateQueries(["voucherTypes"]);
         } else {
           toast.error(response.data?.message || "Có lỗi xảy ra khi tạo loại ưu đãi");
@@ -73,22 +76,45 @@ const CreateVoucherTypeForm = ({ onCloseModal }) => {
           type="text"
           id="typeName"
           disabled={isCreating}
-          {...register("typeName", { required: "Hãy nhập tên loại ưu đãi" })}
+          {...register("typeName", { 
+            required: "Hãy nhập tên loại ưu đãi",
+            minLength: {
+              value: 3,
+              message: "Tên loại ưu đãi phải có ít nhất 3 ký tự",
+            },
+            maxLength: {
+              value: 50,
+              message: "Tên loại ưu đãi không được vượt quá 50 ký tự",
+            },
+          })}
         />
       </FormRow>
       <FormRow label="Mô tả" error={errors?.description?.message}>
         <Textarea
           id="description"
           disabled={isCreating}
-          {...register("description")}
+          {...register("description", { 
+            required: "Hãy nhập mô tả",
+            minLength: {
+              value: 3,
+              message: "Mô tả phải có ít nhất 3 ký tự",
+            },
+            maxLength: {
+              value: 50,
+              message: "Mô tả không được vượt quá 50 ký tự",
+            },
+          })}
         />
       </FormRow>
-      <FormRow label="Hình ảnh" error={errors?.image?.message}>
+      <FormRow label="Hình ảnh (*)" error={errors?.image?.message}>
         <FileInput
           id="image"
           accept="image/*"
           disabled={isCreating}
           onChange={handleImageChange}
+          {...register("image", { 
+            required: "Hãy upload hình ảnh cho loại ưu đãi",
+          })}
         />
         {typeImage && (
           <Button

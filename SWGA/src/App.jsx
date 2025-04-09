@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "antd/dist/reset.css";
 import { useState } from "react";
-import {  Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import "./assets/styles/App.scss";
 import "./assets/styles/responsive.scss";
@@ -14,7 +14,7 @@ import Brands from "./pages/BrandManagement/Brands.jsx";
 import Brand from "./pages/BrandManagement/Brand.jsx";
 import Students from "./pages/StudentManagement/Students.jsx";
 import Student from "./pages/StudentManagement/Student.jsx";
-import MajorPage from "./pages/MajorManagement/MajorPage.jsx";
+import ChallengePage from "./pages/ChallengeManagement/ChallengePage.jsx";
 import StorePage from "./pages/StoreManagement/StorePage.jsx";
 import VoucherType from "./pages/VoucherType/VoucherType.jsx";
 import Vouchers from "./pages/VoucherManagement/Vouchers.jsx";
@@ -341,6 +341,15 @@ function App() {
             element={
               <PrivateRoute allowedRoles={["admin"]}>
                 <PackagePoint />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/challenges"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["admin"]}>
+                <ChallengePage />
               </PrivateRoute>
             }
           />

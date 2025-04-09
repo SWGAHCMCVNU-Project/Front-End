@@ -72,6 +72,10 @@ function CreateLuckyPrizeForm({ prizeToEdit = {}, onCloseModal, onSuccess }) {
           disabled={isWorking}
           {...register("prizeName", {
             required: "Yêu cầu nhập tên giải thưởng",
+            minLength: {
+              value: 3,
+              message: "Tên giải thưởng phải ít nhất 3 kí tự",
+            },
             maxLength: {
               value: 50,
               message: "Tên giải thưởng tối đa 50 kí tự",

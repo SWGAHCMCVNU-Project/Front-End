@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import Button from "../../ui/Button";
 import SpinnerMini from "../../ui/SpinnerMini";
@@ -59,55 +59,64 @@ const ImagePreview = styled.img`
   margin-top: 0.8rem;
 `;
 
+const ErrorMessage = styled.span`
+  color: var(--color-red-700);
+  font-size: 1.2rem;
+`;
+
 function EditVoucherTypeForm({ voucherTypeToEdit, onSubmit, isLoading, onClose, onSuccess }) {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    typeName: voucherTypeToEdit.typeName || "",
-    image: voucherTypeToEdit.image || "",
-    description: voucherTypeToEdit.description || "",
-    state: voucherTypeToEdit.state || false,
+  const { register, handleSubmit, formState, watch, setValue } = useForm({
+    defaultValues: {
+      typeName: voucherTypeToEdit.typeName || "",
+      description: voucherTypeToEdit.description || "",
+      state: voucherTypeToEdit.state || false,
+      image: voucherTypeToEdit.image || "",
+    },
   });
-  const [newImageFile, setNewImageFile] = useState(null);
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
+  const { errors } = formState;
+  const newImageFile = watch("newImageFile");
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setNewImageFile(file);
+      setValue("newImageFile", file);
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onFormSubmit = async (data) => {
     try {
       const submitData = {
-        ...formData,
-        image: newImageFile || formData.image,
+        typeName: data.typeName?.trim() || "",
+        description: data.description?.trim() || "",
+        state: data.state,
+        image: data.newImageFile || data.image,
       };
+
+      if (!submitData.typeName) {
+        toast.error("Vui lòng nhập tên loại ưu đãi");
+        return;
+      }
+
+      if (!submitData.image && !data.newImageFile) {
+        toast.error("Vui lòng upload hình ảnh");
+        return;
+      }
+
       const response = await onSubmit(voucherTypeToEdit.id, submitData);
       toast.success("Cập nhật loại ưu đãi thành công!");
 
-      // Gọi onSuccess để thông báo dữ liệu mới lên component cha
       if (onSuccess) {
         onSuccess({
           id: voucherTypeToEdit.id,
           typeName: submitData.typeName,
-          image: newImageFile ? URL.createObjectURL(newImageFile) : submitData.image,
+          image: data.newImageFile ? URL.createObjectURL(data.newImageFile) : submitData.image,
           description: submitData.description,
           state: submitData.state,
         });
       }
 
-      // Đóng modal trước khi navigate
       onClose();
-      // Navigate sau khi modal đóng
       setTimeout(() => {
         navigate("/voucher-type");
       }, 100);
@@ -118,48 +127,72 @@ function EditVoucherTypeForm({ voucherTypeToEdit, onSubmit, isLoading, onClose, 
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={handleSubmit(onFormSubmit)}>
       <FormRow>
         <Label>Tên loại ưu đãi *</Label>
         <Input
           name="typeName"
-          value={formData.typeName}
-          onChange={handleChange}
-          required
           disabled={isLoading}
+          {...register("typeName", {
+            required: "Hãy nhập tên loại ưu đãi",
+            minLength: {
+              value: 3,
+              message: "Tên loại ưu đãi phải có ít nhất 3 ký tự",
+            },
+            maxLength: {
+              value: 50,
+              message: "Tên loại ưu đãi không được vượt quá 50 ký tự",
+            },
+          })}
         />
+        {errors.typeName && <ErrorMessage>{errors.typeName.message}</ErrorMessage>}
       </FormRow>
 
       <FormRow>
         <Label>Ảnh hiện tại</Label>
         {newImageFile ? (
           <ImagePreview src={URL.createObjectURL(newImageFile)} alt="New Voucher Type Image" />
-        ) : formData.image ? (
-          <ImagePreview src={formData.image} alt="Current Voucher Type Image" />
+        ) : voucherTypeToEdit.image ? (
+          <ImagePreview src={voucherTypeToEdit.image} alt="Current Voucher Type Image" />
         ) : (
           <p>Chưa có ảnh được chọn</p>
         )}
       </FormRow>
 
       <FormRow>
-        <Label>Upload ảnh mới (nếu muốn thay đổi)</Label>
+        <Label>Upload ảnh mới (* nếu thay đổi)</Label>
         <Input
           type="file"
           accept="image/*"
-          onChange={handleFileChange}
           disabled={isLoading}
+          {...register("newImageFile", {
+            validate: (value) =>
+              voucherTypeToEdit.image || value ? true : "Hãy upload hình ảnh nếu chưa có ảnh hiện tại",
+          })}
+          onChange={handleFileChange}
         />
+        {errors.newImageFile && <ErrorMessage>{errors.newImageFile.message}</ErrorMessage>}
       </FormRow>
 
       <FormRow>
-        <Label>Mô tả</Label>
+        <Label>Mô tả *</Label>
         <Textarea
           name="description"
-          value={formData.description}
-          onChange={handleChange}
-          rows={3}
           disabled={isLoading}
+          rows={3}
+          {...register("description", {
+            required: "Hãy nhập mô tả",
+            minLength: {
+              value: 3,
+              message: "Mô tả phải có ít nhất 3 ký tự",
+            },
+            maxLength: {
+              value: 50,
+              message: "Mô tả không được vượt quá 50 ký tự",
+            },
+          })}
         />
+        {errors.description && <ErrorMessage>{errors.description.message}</ErrorMessage>}
       </FormRow>
 
       <FormRow>
@@ -167,9 +200,8 @@ function EditVoucherTypeForm({ voucherTypeToEdit, onSubmit, isLoading, onClose, 
           <Checkbox
             type="checkbox"
             name="state"
-            checked={formData.state}
-            onChange={handleChange}
             disabled={isLoading}
+            {...register("state")}
           />
           <Label>Hoạt động</Label>
         </CheckboxWrapper>
