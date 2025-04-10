@@ -7,7 +7,6 @@ export const getAllStudents = async ({ page = 1, size = 10, search = "" } = {}) 
       const response = await apiClient.get(STUDENT.GET_ALL, {
         params: { page, size, search },
       });
-      console.log('Raw API Response:', response);
       return response.data;
     } catch (error) {
       console.error('Error fetching all students:', error);

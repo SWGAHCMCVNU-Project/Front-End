@@ -116,7 +116,6 @@ function StoreFormUpdate() {
   const isWorking = isEditing || isLoading;
 
   if (!storeToEdit) {
-    console.log("No store data found in location.state");
     return (
       <div>
         Không tìm thấy dữ liệu cửa hàng để chỉnh sửa. Vui lòng quay lại trang
@@ -227,7 +226,6 @@ function StoreFormUpdate() {
   }
 
   function onError(errors) {
-    console.log("Form errors:", errors);
   }
 
   const selectValue = useMemo(

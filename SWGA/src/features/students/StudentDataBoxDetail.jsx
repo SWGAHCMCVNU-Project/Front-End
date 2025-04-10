@@ -186,7 +186,6 @@ function StudentDataBoxDetail({ student }) {
     code,
     campusName,
     campusImage,
-    majorName,
     coinBalance: greenWalletBalance,
     totalSpending: redWalletBalance,
     studentCardBack,
@@ -324,13 +323,13 @@ function StudentDataBoxDetail({ student }) {
                   alt={`Image student card front of ${fullName}`}
                 />
               </SectionInfo>
-              <SectionInfo>
+              {/* <SectionInfo>
                 <LabelCard>Hình ảnh mặt sau thẻ sinh viên</LabelCard>
                 <ImageCard
                   src={isValidStudentCardBack ? studentCardBack : logoDefaultCard}
                   alt={`Image of student card back of ${fullName}`}
                 />
-              </SectionInfo>
+              </SectionInfo> */}
             </ContainerImageCard>
           </Guest>
         </Section>

@@ -57,7 +57,6 @@ function CampaignMSC() {
     }
 
     function onError(errors) {
-        console.log("Form errors:", errors);
     }
 
     return (

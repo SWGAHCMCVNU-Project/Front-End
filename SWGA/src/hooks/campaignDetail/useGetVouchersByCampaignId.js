@@ -21,7 +21,6 @@ const useGetVouchersByCampaignId = (campaignId, searchName = "", page = 1, size 
       try {
         setLoading(true);
         const data = await getVouchersByCampaignId(campaignId, searchName, page, size);
-        console.log('Data from API in hook:', data);
         
         setVouchers(data.items || []);
         setPagination({

@@ -68,7 +68,6 @@ function EditBrandForm({ brandToEdit = {}, onCloseModal }) {
   });
   const { errors } = formState;
 
-  // Định dạng giờ mở/đóng cửa từ chuỗi "HH:mm:ss" sang "HH:mm" cho input type="time"
   const formattedOpeningHours = openingHours
     ? openingHours.slice(0, 5)
     : "00:00";
@@ -85,7 +84,6 @@ function EditBrandForm({ brandToEdit = {}, onCloseModal }) {
     const logo = fileLogo || data.logo;
     const coverPhoto = file || data.coverPhoto;
 
-    // Chuyển đổi thời gian từ HH:mm sang HH:mm:ss (theo dữ liệu mẫu thực tế)
     const formatTime = (time) => (time ? `${time}:00` : "00:00:00");
 
     const brandData = {
@@ -95,8 +93,6 @@ function EditBrandForm({ brandToEdit = {}, onCloseModal }) {
       openingHours: formatTime(data.openingHours || formattedOpeningHours),
       closingHours: formatTime(data.closingHours || formattedClosingHours),
     };
-
-    console.log("Submitting brandData:", brandData); // Log dữ liệu trước khi gửi
 
     updateBrand(
       { brandData },
@@ -108,9 +104,7 @@ function EditBrandForm({ brandToEdit = {}, onCloseModal }) {
     );
   }
 
-  function onError(errors) {
-    console.log("Validation errors:", errors);
-  }
+  function onError(errors) {}
 
   return (
     <Form
@@ -145,6 +139,14 @@ function EditBrandForm({ brandToEdit = {}, onCloseModal }) {
               disabled={isLoading}
               {...register("acronym", {
                 required: "Hãy nhập tên viết tắt",
+                minLength: {
+                  value: 2,
+                  message: "Tên viết tắt ít nhất 2 kí tự",
+                },
+                maxLength: {
+                  value: 10,
+                  message: "Tên viết tắt tối đa 10 kí tự",
+                },
               })}
             />
           </FormRow>
@@ -186,23 +188,6 @@ function EditBrandForm({ brandToEdit = {}, onCloseModal }) {
               ]}
             />
           </FormRow>
-
-          {/* <ImageCardEditForm
-            label="Logo"
-            error={errors?.logo?.message}
-            file={fileLogo}
-            avatar={editValues.logo}
-            fileRemove={handleFileLogoRemove}
-          >
-            <FileInput
-              id="logo"
-              accept="image/*"
-              {...register("logo", {
-                required: !editValues.logo && !fileLogo ? "Thêm logo" : false,
-              })}
-              onChange={handleLogoChange}
-            />
-          </ImageCardEditForm> */}
         </FormHalf>
 
         <FormHalf>

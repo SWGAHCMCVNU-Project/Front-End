@@ -25,9 +25,8 @@ export function CampusProvider({ children }) {
     page,
     size: limit,
   });
-  console.log("campusesResponse:", campusesResponse); // Kiểm tra dữ liệu từ hook
   const campuses = campusesResponse?.success ? campusesResponse.data : null;
-  console.log("campuses:", campuses); // Kiểm tra dữ liệu sau khi xử l
+  
 
  
 

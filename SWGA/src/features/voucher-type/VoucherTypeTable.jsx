@@ -38,7 +38,6 @@ function VoucherTypeTable() {
   // Đồng bộ currentPage với searchParams khi searchParams thay đổi
   useEffect(() => {
     const pageFromParams = Number(searchParams.get("page")) || 1;
-    console.log("Page from searchParams:", pageFromParams);
     setCurrentPage(pageFromParams);
   }, [searchParams]);
 
@@ -66,7 +65,6 @@ function VoucherTypeTable() {
   }, [voucherTypes]);
 
   const handlePageChange = (newPage) => {
-    console.log("Changing to page:", newPage);
     setCurrentPage(newPage);
     setSearchParams({
       page: newPage.toString(),
@@ -76,7 +74,6 @@ function VoucherTypeTable() {
   };
 
   const handlePageSizeChange = (newSize) => {
-    console.log("Changing page size to:", newSize);
     setCurrentPage(1); // Reset về trang 1 khi thay đổi pageSize
     setSearchParams({
       size: newSize.toString(),
@@ -107,8 +104,7 @@ function VoucherTypeTable() {
   const totalCount = voucherTypeData.total || 0;
   const totalPages = voucherTypeData.totalPages || 0;
 
-  console.log("Voucher types:", voucherTypes);
-  console.log("Total count:", totalCount, "Total pages:", totalPages, "Current page:", currentPage, "Page size:", pageSize);
+  
 
   return (
     <TableContainer>

@@ -95,8 +95,7 @@ function EditCampusForm({ campusToEdit = {}, onCloseModal }) {
   })) || [];
 
   // Debug: Log the defaultValues and areaOptions
-  console.log("EditCampusForm - defaultValues:", editValues);
-  console.log("EditCampusForm - areaOptions:", areaOptions);
+  
 
   function onSubmit(data) {
     const image = fileImage || data.image;

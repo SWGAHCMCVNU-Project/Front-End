@@ -110,7 +110,7 @@ function BuyPoints() {
   const { data: campusResponse, isLoading: isCampusLoading } = useGetCampusByAccountId(accountId);
   const role = StorageService.getRoleLogin();
   const campusId = campusResponse?.data?.id;
-  const brandId = StorageService.getBrandId();
+  const [brandId, setBrandId] = useState(StorageService.getBrandId());
 
   const { buyPoints: buyPointsCampus, isPurchasing: isPurchasingCampus } = usePurchasePointsCampus();
   const { buyPoints: buyPointsBrand, isPurchasing: isPurchasingBrand } = usePurchasePointsBrand();
@@ -119,6 +119,24 @@ function BuyPoints() {
   const [searchParams, setSearchParams] = useSearchParams();
   const hasProcessedRef = useRef(false);
 
+  // Store campusId in StorageService after fetching
+  useEffect(() => {
+    if (campusId && role === 'campus') {
+      StorageService.setCampusId(campusId);
+    }
+  }, [campusId, role]);
+
+  useEffect(() => {
+    setBrandId(StorageService.getBrandId());
+    const handleStorageUpdate = () => {
+      setBrandId(StorageService.getBrandId());
+    };
+    window.addEventListener('storageUpdated', handleStorageUpdate);
+    return () => {
+      window.removeEventListener('storageUpdated', handleStorageUpdate);
+    };
+  }, []);
+
   useEffect(() => {
     const vnpResponseCode = searchParams.get('vnp_ResponseCode');
     const vnpAmount = searchParams.get('vnp_Amount');
@@ -126,11 +144,7 @@ function BuyPoints() {
   
     if (vnpResponseCode && vnpAmount && vnpTransactionStatus && !hasProcessedRef.current) {
       hasProcessedRef.current = true;
-  
-      // Xóa params NGAY LẬP TỨC trước khi xử lý thông báo
       setSearchParams({}, { replace: true });
-  
-      // Thay đổi URL mà không trigger re-render (nếu cần)
       window.history.replaceState({}, '', window.location.pathname);
   
       if (vnpResponseCode === '00' && vnpTransactionStatus === '00') {
@@ -138,6 +152,7 @@ function BuyPoints() {
         toast.success(`Thanh toán thành công ${amount.toLocaleString('vi-VN')} VNĐ`, {
           duration: 5000,
         });
+        window.dispatchEvent(new Event('walletBalanceUpdated'));
       } else {
         toast.error('Thanh toán thất bại. Vui lòng thử lại.', {
           duration: 5000,

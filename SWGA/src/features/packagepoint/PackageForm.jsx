@@ -27,14 +27,16 @@ const PackageForm = ({ packageToEdit = {}, onCloseModal }) => {
   const queryClient = useQueryClient();
 
   const { register, handleSubmit, reset, formState } = useForm({
-    defaultValues: isEditSession ? {
-      packageName: packageName || "",
-      point: point || 0,
-      price: price || 0,
-      status: status ?? true,
-    } : {
-      status: true
-    },
+    defaultValues: isEditSession
+      ? {
+          packageName: packageName || "",
+          point: point || 0,
+          price: price || 0,
+          status: status ?? true,
+        }
+      : {
+          status: true,
+        },
   });
   const { errors } = formState;
 
@@ -52,13 +54,16 @@ const PackageForm = ({ packageToEdit = {}, onCloseModal }) => {
     }
 
     if (isEditSession) {
-      update({ id: editId, data: formData }, {
-        onSuccess: () => {
-          reset();
-          onCloseModal?.();
-          queryClient.invalidateQueries(["pointPackages"]);
-        },
-      });
+      update(
+        { id: editId, data: formData },
+        {
+          onSuccess: () => {
+            reset();
+            onCloseModal?.();
+            queryClient.invalidateQueries(["pointPackages"]);
+          },
+        }
+      );
     } else {
       create(formData, {
         onSuccess: () => {
@@ -73,13 +78,26 @@ const PackageForm = ({ packageToEdit = {}, onCloseModal }) => {
   const isWorking = isCreating || isUpdating;
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)} type={onCloseModal ? "modal" : "regular"}>
+    <Form
+      onSubmit={handleSubmit(onSubmit)}
+      type={onCloseModal ? "modal" : "regular"}
+    >
       <FormRow label="Tên gói điểm" error={errors?.packageName?.message}>
         <StyledInput
           type="text"
           id="packageName"
           disabled={isWorking}
-          {...register("packageName", { required: "Hãy nhập tên gói điểm" })}
+          {...register("packageName", {
+            required: "Hãy nhập tên gói điểm",
+            minLength: {
+              value: 3,
+              message: "Tên gói điểm ít nhất 3 ký tự",
+            },
+            maxLength: {
+              value: 50,
+              message: "Tên gói điểm tối đa 50 ký tự",
+            },
+          })}
         />
       </FormRow>
       <FormRow label="Điểm" error={errors?.point?.message}>
@@ -87,9 +105,9 @@ const PackageForm = ({ packageToEdit = {}, onCloseModal }) => {
           type="number"
           id="point"
           disabled={isWorking}
-          {...register("point", { 
+          {...register("point", {
             required: "Hãy nhập số điểm",
-            min: { value: 0, message: "Điểm phải lớn hơn hoặc bằng 0" }
+            min: { value: 0, message: "Điểm phải lớn hơn hoặc bằng 0" },
           })}
         />
       </FormRow>
@@ -98,9 +116,9 @@ const PackageForm = ({ packageToEdit = {}, onCloseModal }) => {
           type="number"
           id="price"
           disabled={isWorking}
-          {...register("price", { 
+          {...register("price", {
             required: "Hãy nhập giá",
-            min: { value: 0, message: "Giá phải lớn hơn hoặc bằng 0" }
+            min: { value: 0, message: "Giá phải lớn hơn hoặc bằng 0" },
           })}
         />
       </FormRow>
@@ -142,4 +160,4 @@ PackageForm.propTypes = {
   onCloseModal: PropTypes.func,
 };
 
-export default PackageForm; 
+export default PackageForm;

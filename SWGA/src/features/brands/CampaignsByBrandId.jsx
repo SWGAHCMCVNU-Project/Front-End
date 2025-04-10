@@ -58,7 +58,6 @@ function CampaignsByBrandId({ brandId }) {
     }
   );
 
-  console.log("CampaignsByBrandId - campaigns:", campaigns);
 
   const onLimitChange = (newLimit) => {
     setPageSize(newLimit);

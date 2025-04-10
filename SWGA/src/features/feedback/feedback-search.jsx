@@ -18,7 +18,6 @@ function FeedbackSearch() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
-    console.log('Running useEffect in FeedbackSearch, debouncedSearch:', debouncedSearch);
     if (debouncedSearch !== "") {
       setSearchParams({ search: debouncedSearch });
     } else {

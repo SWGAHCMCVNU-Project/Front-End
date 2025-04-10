@@ -1,10 +1,8 @@
-// store/api/storeApi.js
 import apiClient from "./apiClient";
 import { STORE_ENDPOINTS } from "./endpoints";
 import toast from "react-hot-toast";
 
 // 1. Lấy danh sách tất cả cửa hàng
-
 export const getAllStoresAPI = async ({
   searchName = "",
   page = 1,
@@ -45,6 +43,7 @@ export const getAllStoresAPI = async ({
     };
   }
 };
+
 // 2. Lấy thông tin cửa hàng theo ID
 export const getStoreByIdAPI = async (id) => {
   try {
@@ -133,19 +132,6 @@ export const updateStoreAPI = async (id, formData) => {
     // Add fields to the body that are similar to registerStore (e.g., avatar)
     if (formData.avatar instanceof File) {
       apiFormData.append("avatar", formData.avatar);
-    } else if (formData.avatar && typeof formData.avatar === "string") {
-      // If avatar is a URL or base64, you might need to handle it differently
-      console.warn(
-        "Avatar is a string, skipping file upload:",
-        formData.avatar
-      );
-    }
-
-    // Log the query parameters and FormData for debugging
-    console.log("Query Params:", queryParams.toString());
-    console.log("FormData contents:");
-    for (let [key, value] of apiFormData.entries()) {
-      console.log(`${key}: ${value}`);
     }
 
     // Send the PUT request with query parameters and FormData body
@@ -187,6 +173,8 @@ export const updateStoreAPI = async (id, formData) => {
     };
   }
 };
+
+// 4. Lấy danh sách cửa hàng theo brandId
 export const getStoresByBrandIdAPI = async (brandId, { page = 1, size = 10, searchName = "" } = {}) => {
   try {
     if (!brandId) {

@@ -34,6 +34,7 @@ setFavicon(favicon);
 
 
 createRoot(document.getElementById("root")).render(
+  
   <StrictMode>
     <QueryClientProvider client={queryClient}>
     <BrowserRouter>

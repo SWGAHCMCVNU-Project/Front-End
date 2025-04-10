@@ -22,14 +22,12 @@ export const createVoucherTypeAPI = async (data) => {
     });
 
     if (response.status < 200 || response.status >= 300) {
-      toast.error("Tạo loại ưu đãi thất bại!");
       throw new Error("Invalid server response");
     }
 
     return { status: response.status, data: response.data };
   } catch (error) {
     console.error("Voucher type API error:", error);
-    toast.error(error.message || "Đã có lỗi xảy ra khi tạo loại ưu đãi!");
     throw {
       status: error.response?.status || 500,
       message: error.response?.data?.message || "Tạo loại ưu đãi thất bại",

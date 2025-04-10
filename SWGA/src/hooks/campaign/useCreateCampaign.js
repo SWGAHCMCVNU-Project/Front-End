@@ -11,10 +11,14 @@ const useCreateCampaign = () => {
   const mutation = useMutation({
     mutationFn: createCampaignAPI,
     onSuccess: () => {
-      // Invalidate query để làm mới danh sách campaigns sau khi tạo
+      // Invalidate query to refresh the campaigns list after creation
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
       
-      // Hiển thị message thành công và navigate
+      // Dispatch wallet balance update event
+      const event = new Event('walletBalanceUpdated');
+      window.dispatchEvent(event);
+
+      // Show success message and navigate
       message.success("Tạo thành công chiến dịch!", 1);
       navigate("/campaigns", { replace: true });
     },

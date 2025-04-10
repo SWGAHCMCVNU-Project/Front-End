@@ -13,7 +13,6 @@ const useAccount = (id) => {
     setError(null);
 
     try {
-      console.log("Fetching account ID:", id);
       const response = await getAccountByIdAPI(id, { noCache: true });
 
       if (response.success) {

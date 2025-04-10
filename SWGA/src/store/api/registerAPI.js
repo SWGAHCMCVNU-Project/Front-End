@@ -207,14 +207,12 @@ export const getAccountByIdAPI = async (id) => {
       };
     }
 
-    console.log("Fetching account details for ID:", accountId);
 
     const response = await apiClient.get(
       ACCOUNT_ENDPOINTS.AccountDetail.replace("{id}", accountId)
     );
 
     if (response.data) {
-      console.log("Account details fetched successfully:", response.data);
       return {
         status: response.status,
         success: true,
@@ -256,8 +254,7 @@ export const updateAccountIdAPI = async (id, oldPassword, updatedData) => {
     if (updatedData.password)
       queryParams.append("newPassword", updatedData.password);
 
-    console.log("Updating account with ID:", accountId);
-    console.log("Query Params:", queryParams.toString());
+    
 
     const response = await apiClient.put(
       `${ACCOUNT_ENDPOINTS.UPDATEACCOUNT.replace(

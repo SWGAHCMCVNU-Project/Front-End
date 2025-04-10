@@ -125,9 +125,7 @@ function CampusDataBox({ campus }) {
   }, [image]);
 
   // Debug: Log để kiểm tra areaId và areaName
-  console.log("CampusDataBox - areaId:", areaId);
-  console.log("CampusDataBox - areaName:", areaName);
-  console.log("CampusDataBox - areas:", areas?.result);
+ 
 
   return (
     <StyledCampusDataBox>

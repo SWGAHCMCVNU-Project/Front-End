@@ -17,7 +17,6 @@ const useStoresByBrandId = (brandId, initialParams = { page: 1, size: 10, search
 
     try {
       const response = await getStoresByBrandIdAPI(brandId, params);
-      console.log("useStoresByBrandId - API response:", response);
       if (response.success) {
         const fetchedStores = response.data.items || []; // Sử dụng items thay vì stores
         setStores(Array.isArray(fetchedStores) ? fetchedStores : []);

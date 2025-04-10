@@ -5,47 +5,88 @@ import { forwardRef, useState } from "react";
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 
-const MyEditor = forwardRef(({ initialContent, onContentChange, disabled }, ref) => {
+const MyEditor = forwardRef(
+  ({ initialContent, onContentChange, disabled, ...rest }, ref) => {
     const [editorState, setEditorState] = useState(() => {
-        if (initialContent) {
+      const initializeContent = () => {
+        if (initialContent && typeof initialContent === "string") {
+          try {
             const blocksFromHTML = htmlToDraft(initialContent);
-            const contentState = ContentState.createFromBlockArray(
+            if (blocksFromHTML && blocksFromHTML.contentBlocks) {
+              const contentState = ContentState.createFromBlockArray(
                 blocksFromHTML.contentBlocks,
                 blocksFromHTML.entityMap
-            );
+              );
+              return EditorState.createWithContent(contentState);
+            }
+          } catch (error) {
+            console.error("Error parsing initialContent:", error);
+            const contentState = ContentState.createFromText(initialContent);
             return EditorState.createWithContent(contentState);
+          }
         }
-        else {
-            return EditorState.createEmpty();
-        }
+        return EditorState.createEmpty();
+      };
+      return initializeContent();
     });
 
+    const convertToHtml = (editorState) => {
+      const rawContentState = convertToRaw(editorState.getCurrentContent());
+      return draftToHtml(rawContentState);
+    };
+
     const handleEditorStateChange = (newEditorState) => {
+      setEditorState(newEditorState);
+      const content = convertToHtml(newEditorState);
+      onContentChange(content);
+    };
+
+    const handlePastedText = (text, html) => {
+      try {
+        if (html) {
+          const blocksFromHTML = htmlToDraft(html);
+          if (blocksFromHTML && blocksFromHTML.contentBlocks) {
+            const contentState = ContentState.createFromBlockArray(
+              blocksFromHTML.contentBlocks,
+              blocksFromHTML.entityMap
+            );
+            const newEditorState = EditorState.createWithContent(contentState);
+            setEditorState(newEditorState);
+            const content = convertToHtml(newEditorState);
+            onContentChange(content);
+            return true;
+          }
+        }
+        const contentState = ContentState.createFromText(text);
+        const newEditorState = EditorState.createWithContent(contentState);
         setEditorState(newEditorState);
         const content = convertToHtml(newEditorState);
         onContentChange(content);
-    };
-
-    // Function to convert EditorState to HTML
-    const convertToHtml = (editorState) => {
-        const rawContentState = convertToRaw(editorState.getCurrentContent());
-        const html = draftToHtml(rawContentState);
-        return html;
+        return true;
+      } catch (error) {
+        console.error("Error handling pasted text:", error);
+        const emptyState = EditorState.createEmpty();
+        setEditorState(emptyState);
+        onContentChange("");
+        return true;
+      }
     };
 
     return (
-        <div>
-            <Editor
-                ref={ref}
-                readOnly={disabled}
-                editorState={editorState}
-                editorClassName="demo-editor"
-                onEditorStateChange={handleEditorStateChange}
-            />
-        </div>
+      <div>
+        <Editor
+          ref={ref}
+          readOnly={disabled}
+          editorState={editorState}
+          editorClassName="demo-editor"
+          onEditorStateChange={handleEditorStateChange}
+          handlePastedText={handlePastedText}
+          placeholder="Nhập nội dung..."
+          {...rest}
+        />
+      </div>
     );
-});
+  }
+);
 
 export default MyEditor;
-
-

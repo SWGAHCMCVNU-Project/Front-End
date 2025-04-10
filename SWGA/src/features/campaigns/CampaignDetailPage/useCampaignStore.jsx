@@ -30,7 +30,6 @@ export function CampaignStoreProvider({ children }) {
         limit
     );
 
-    console.log('Stores from hook:', stores);
 
     // Format dữ liệu cho component
     const campaignStores = {
@@ -51,7 +50,6 @@ export function CampaignStoreProvider({ children }) {
         totalPages
     };
 
-    console.log('Formatted campaign stores:', campaignStores);
 
     const value = {
         isLoading,

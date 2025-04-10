@@ -139,7 +139,7 @@ const customStyles = `
     border-radius: 8px;
     padding: 8px 16px;
     transition: all 0.3s ease;
-    margin-left: -630px;
+    margin-left: -500px;
   }
 
   .btn-header-signup button:hover {

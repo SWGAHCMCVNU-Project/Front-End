@@ -1,10 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Avatar, Badge, Col, Divider, Popover, Row, Typography, notification } from "antd";
 import { UserOutlined, HomeOutlined } from "@ant-design/icons";
 import avatarProfile from "../../assets/images/avatar-profile.png";
 import storageService from "../../services/storageService";
+import walletService from "../../store/api/walletApi";
 import ButtonCustom from "../../ui/custom/Button/ButtonCustom";
+import point from "../../assets/images/dauxanh.png";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import useGetCampusByAccountId from "../../hooks/campus/useGetCampusByAccount";
+import { useBrand } from "../../hooks/brand/useBrand"; // Import hook useBrand
 
 const profileIcon = (
   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -21,33 +26,95 @@ const settingIcon = (
 function Header({ onPress, name, subName, handleSidenavColor, handleSidenavType, handleFixedNavbar }) {
   const { Title } = Typography;
   const navigate = useNavigate();
-  const [userData, setUserData] = useState(null);
-  // const hasNotified = useRef(false);
+  const [userData, setUserData] = useState(storageService.getUser());
+  const queryClient = useQueryClient();
+  const [campusId, setCampusId] = useState(storageService.getCampusId());
+
+  // Sử dụng hook useBrand để lấy brandId
+  const { brand, isLoading: isLoadingBrand, error: brandError } = useBrand();
+
+  const accountId = userData?.accountId;
+  const { data: campusResponse, isLoading: isCampusLoading } = useGetCampusByAccountId(accountId, {
+    enabled: !!accountId && userData?.role === 'campus' && !campusId,
+  });
 
   useEffect(() => {
-    const user = storageService.getUser();
-    if (user) {
-      setUserData(user);
-      // if (!hasNotified.current) {
-      //   notification.success({
-      //     // description: `Chào mừng ${user.userName || "bạn"} đã quay trở lại!`,
-      //     placement: "topRight",
-      //     duration: 3,
-      //   });
-      //   hasNotified.current = true;
-      // }
+    if (campusResponse?.data?.id && userData?.role === 'campus') {
+      storageService.setCampusId(campusResponse.data.id);
+      setCampusId(campusResponse.data.id);
+      window.dispatchEvent(new Event('campusIdUpdated'));
     }
-  }, []);
+  }, [campusResponse]);
+
+  // Lấy brandId từ useBrand hoặc storageService
+  const brandId = userData?.role === 'brand' && brand ? brand.id : storageService.getBrandId();
+
+  // Fetch wallet balance for campus and brand roles
+  const { data: walletBalance, isLoading: isLoadingWallet } = useQuery({
+    queryKey: ['walletBalance', userData?.role, campusId, brandId],
+    queryFn: async () => {
+      if (userData?.role === 'campus') {
+        if (!campusId) throw new Error('Campus ID not found in storage');
+        const walletData = await walletService.getWalletByCampusId();
+        return walletData?.balance || 0;
+      } else if (userData?.role === 'brand') {
+        if (!brandId) throw new Error('Brand ID not found');
+        const walletData = await walletService.getWalletByBrandId();
+        return walletData?.balance || 0;
+      }
+      return null;
+    },
+    enabled: !!userData?.role && ['campus', 'brand'].includes(userData?.role),
+    retry: false,
+  });
+
+  // Listen for storage and auth changes
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const newUser = storageService.getUser();
+      setUserData(newUser);
+      setCampusId(storageService.getCampusId());
+      if (newUser && ['campus', 'brand'].includes(newUser.role)) {
+        queryClient.invalidateQueries(['walletBalance']);
+      }
+    };
+
+    handleStorageChange();
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('authChange', handleStorageChange);
+    window.addEventListener('campusIdUpdated', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('authChange', handleStorageChange);
+      window.removeEventListener('campusIdUpdated', handleStorageChange);
+    };
+  }, [queryClient]);
+
+  // Listen for wallet balance updates
+  useEffect(() => {
+    const handleWalletBalanceUpdate = () => {
+      queryClient.invalidateQueries(['walletBalance']);
+    };
+
+    window.addEventListener('walletBalanceUpdated', handleWalletBalanceUpdate);
+    return () => {
+      window.removeEventListener('walletBalanceUpdated', handleWalletBalanceUpdate);
+    };
+  }, [queryClient]);
 
   const handleLogOut = () => {
     try {
       storageService.clearAll();
+      queryClient.clear();
       navigate("/sign-in");
       notification.success({
         message: "Đăng xuất thành công",
         placement: "topRight",
         duration: 2,
       });
+      window.dispatchEvent(new Event('authChange'));
     } catch (error) {
       notification.error({
         message: "Đăng xuất thất bại",
@@ -75,7 +142,7 @@ function Header({ onPress, name, subName, handleSidenavColor, handleSidenavType,
       <div style={{ marginBottom: '10px', marginLeft: "30px" }}>
         <Link to="/account" style={{ display: 'flex', alignItems: 'center', color: '#111827', fontSize: '14px' }}>
           <UserOutlined style={{ marginRight: '8px', fontSize: '16px' }} />
-         Hồ sơ
+          Hồ sơ
         </Link>
       </div>
       <div style={{ marginBottom: '15px', marginLeft: "30px" }}>
@@ -101,20 +168,17 @@ function Header({ onPress, name, subName, handleSidenavColor, handleSidenavType,
       style={{ 
         position: 'fixed', 
         top: 0, 
-        
         left: 290, 
         right: 0, 
         zIndex: 1000, 
         backgroundColor: '#fff', 
         boxShadow: '0 2px 8px rgba(255, 255, 255, 0.15)',
-        padding: '30 px 0',
+        padding: '30px 0',
         height: '70px',
-             // Đặt chiều cao cố định (tùy chỉnh theo ý bạn)
-  
       }}
     >
       <Row gutter={[24, 0]} align="middle">
-        <Col span={24} md={24} className="header-control" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end',marginTop: "30px" }}>
+        <Col span={24} md={24} className="header-control" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: "30px" }}>
           {userData ? (
             <>
               <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -122,9 +186,17 @@ function Header({ onPress, name, subName, handleSidenavColor, handleSidenavType,
                   Chào mừng, {userData.userName || "bạn"}!
                 </span>
                 <Avatar src={avatarProfile} size="small" style={{ marginLeft: '15px'}} />
+                {(userData.role === 'campus' || userData.role === 'brand') && (
+                  <div style={{ display: 'flex', alignItems: 'center', marginLeft: '10px' }}>
+                    <span style={{ fontSize: '16px', color: '#111827' }}>
+                      Ví: {isLoadingWallet || isCampusLoading || isLoadingBrand ? 'Loading...' : walletBalance ?? '0'}
+                    </span>
+                    <img src={point} alt="point icon" style={{ width: '16px', height: '16px', marginLeft: '5px' }} />
+                  </div>
+                )}
               </div>
               <Badge size="small" count={1} style={{ marginLeft: '30px' }}>
-                <Popover content={menu} trigger="click" placement="bottom" >
+                <Popover content={menu} trigger="click" placement="bottom">
                   {settingIcon}
                 </Popover>
               </Badge>

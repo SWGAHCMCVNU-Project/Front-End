@@ -18,6 +18,7 @@ import greenBean from "../../../assets/images/dauxanh.png";
 import { NextPrevContext } from "../../../context/NextPrevContext";
 import ButtonCustom from "../../../ui/custom/Button/ButtonCustom";
 import { formatCurrency } from "../../../utils/helpers";
+import walletService from "../../../store/api/walletApi"; // Import wallet service
 import "./scss/campaign.scss";
 import { useVouchers } from "../../../hooks/voucher/useVouchers";
 
@@ -68,7 +69,6 @@ const TotalCost = styled.span`
   }
 `;
 
-
 const VoucherContainer = styled.div`
   margin-bottom: 60px;
 `;
@@ -91,6 +91,23 @@ function CampaignVoucher({ selectVoucher, cost, disabled = false, mode = "create
   const [editingDescription, setEditingDescription] = useState("");
   const [editingKey, setEditingKey] = useState("");
   const [total, setTotal] = useState(0);
+  const [walletBalance, setWalletBalance] = useState(null); // State for wallet balance
+
+  // Fetch wallet balance on component mount
+  useEffect(() => {
+    const fetchWalletBalance = async () => {
+      try {
+        const walletData = await walletService.getWalletByBrandId();
+        setWalletBalance(walletData.balance);
+      } catch (error) {
+        console.error("Failed to fetch wallet balance:", error);
+        setWalletBalance(0);
+        toast.error("Không thể tải số dư ví");
+      }
+    };
+
+    fetchWalletBalance();
+  }, []);
 
   // Initialize voucher options when data is loaded
   useEffect(() => {
@@ -126,7 +143,7 @@ function CampaignVoucher({ selectVoucher, cost, disabled = false, mode = "create
     }
   }, [error]);
 
-  // Calculate total when selected vouchers change
+  // Calculate total when selected vouchers change and validate wallet balance
   useEffect(() => {
     if (!selectedVouchers?.length || !campaignVoucherOptions?.length) {
       setTotal(0);
@@ -145,12 +162,17 @@ function CampaignVoucher({ selectVoucher, cost, disabled = false, mode = "create
     }, 0);
 
     setTotal(newTotal);
+
+    // Validate wallet balance
+    if (walletBalance !== null && newTotal > walletBalance) {
+      toast.error(`Số dư ví không đủ! Cần ${newTotal} điểm, nhưng ví chỉ có ${walletBalance} điểm.`);
+    }
     
     if (mode === "create") {
       selectVoucher?.(selectedVouchers);
       cost?.(newTotal);
     }
-  }, [selectedVouchers, campaignVoucherOptions]);
+  }, [selectedVouchers, campaignVoucherOptions, walletBalance]);
 
   const isEditing = record => record.key === editingKey;
 
@@ -176,6 +198,7 @@ function CampaignVoucher({ selectVoucher, cost, disabled = false, mode = "create
       return;
     }
 
+    // Calculate the new total cost with the updated quantity
     const updatedVouchers = selectedVouchers.map(voucher =>
       voucher.voucherId === record.key
         ? {
@@ -185,6 +208,20 @@ function CampaignVoucher({ selectVoucher, cost, disabled = false, mode = "create
           }
         : voucher
     );
+
+    const newTotal = updatedVouchers.reduce((sum, voucher) => {
+      const option = campaignVoucherOptions.find(o => o.value === voucher.voucherId);
+      if (option?.price && option?.rate) {
+        return sum + (option.price * option.rate * (voucher.quantity || 1));
+      }
+      return sum;
+    }, 0);
+
+    // Check wallet balance before saving
+    if (walletBalance !== null && newTotal > walletBalance) {
+      toast.error(`Số dư ví không đủ! Cần ${newTotal} điểm, nhưng ví chỉ có ${walletBalance} điểm.`);
+      return;
+    }
 
     setSelectedVouchers(updatedVouchers);
     setEditingKey("");
@@ -207,6 +244,21 @@ function CampaignVoucher({ selectVoucher, cost, disabled = false, mode = "create
         state: true,
       };
     });
+
+    // Calculate the total cost of the updated vouchers
+    const newTotal = updatedVouchers.reduce((sum, voucher) => {
+      const option = campaignVoucherOptions.find(o => o.value === voucher.voucherId);
+      if (option?.price && option?.rate) {
+        return sum + (option.price * option.rate * (voucher.quantity || 1));
+      }
+      return sum;
+    }, 0);
+
+    // Check wallet balance before allowing the selection
+    if (walletBalance !== null && newTotal > walletBalance) {
+      toast.error(`Số dư ví không đủ! Cần ${newTotal} điểm, nhưng ví chỉ có ${walletBalance} điểm.`);
+      return;
+    }
 
     setSelectedVouchers(updatedVouchers);
     
@@ -580,4 +632,4 @@ CampaignVoucher.propTypes = {
   mode: PropTypes.oneOf(["create", "review"]),
 };
 
-export default CampaignVoucher; 
+export default CampaignVoucher;

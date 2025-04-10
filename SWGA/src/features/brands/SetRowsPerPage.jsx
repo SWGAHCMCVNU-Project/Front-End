@@ -3,16 +3,16 @@ import RowPerPage from "../../ui/RowPerPage";
 import TableOperations from "../../ui/TableOperations";
 import PropTypes from "prop-types";
 
-function BrandSetRowsPerPage({ pageSize, onLimitChange }) {
+function BrandSetRowsPerPage({ pageSize, setPageSize }) {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const handleLimitChange = (newLimit) => {
     const numLimit = Number(newLimit);
     if (numLimit !== pageSize) {
-      console.log("Changing pageSize to:", numLimit);
-      onLimitChange(numLimit); // Gọi hàm từ component cha
+     
+      setPageSize(numLimit); // Call the parent function to update pageSize
       const params = new URLSearchParams(searchParams);
-      params.set("size", newLimit);
+      params.set("size", numLimit.toString());
       params.set("page", "1");
       setSearchParams(params, { replace: true });
     }
@@ -36,7 +36,7 @@ function BrandSetRowsPerPage({ pageSize, onLimitChange }) {
 
 BrandSetRowsPerPage.propTypes = {
   pageSize: PropTypes.number.isRequired,
-  onLimitChange: PropTypes.func.isRequired,
+  setPageSize: PropTypes.func.isRequired,
 };
 
 export default BrandSetRowsPerPage;

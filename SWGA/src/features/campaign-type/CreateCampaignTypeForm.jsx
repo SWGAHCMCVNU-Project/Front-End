@@ -51,7 +51,6 @@ const CreateCampaignTypeForm = ({ onCloseModal }) => {
 
     createCampaignType(formData, {
       onSuccess: (response) => {
-        console.log("Create campaign type response:", response);
         if (response.status >= 200 && response.status < 300) {
           toast.success("Tạo loại chiến dịch thành công!"); // Updated message (already handled in API, but kept for consistency)
           reset();

@@ -12,7 +12,6 @@ const useGetAllStudents = ({ page = 1, size = 10, search = "" } = {}) => {
     setError(null);
     try {
       const response = await getAllStudents({ page, size, search });
-      console.log('API Response:', response);
       if (response && response.items) {
         setStudents(response.items);
         setTotalCount(response.total || 0);

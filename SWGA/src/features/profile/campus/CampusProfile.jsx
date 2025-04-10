@@ -54,7 +54,6 @@ function CampusProfile() {
   const accountId = StorageService.getAccountId();
 
   // Debug: Log accountId
-  console.log("CampusProfile - accountId:", accountId);
 
   // Nếu không có accountId, chuyển hướng về trang đăng nhập hoặc trang lỗi
   if (!accountId) {

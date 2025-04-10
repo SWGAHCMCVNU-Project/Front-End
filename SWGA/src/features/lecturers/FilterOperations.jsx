@@ -133,7 +133,6 @@ function FilterOperations({ onTabChange = () => {} }) {
       allocationDate: new Date().toISOString().split("T")[0],
       state: "active",
     }));
-    console.log("Phân bổ điểm hàng loạt:", newPoints);
     // Thêm logic để lưu vào mockLecturersPoints tại đây
     setIsOpenBulkForm(false);
   };
