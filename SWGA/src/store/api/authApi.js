@@ -1,6 +1,6 @@
 import apiClient from './apiClient';
 import toast from 'react-hot-toast';
-import StorageService from '../../services/storageService'; // Ensure this import is correct
+import StorageService from '../../services/storageService';
 import { AUTH_ENDPOINTS, EMAIL_ENDPOINTS } from './endpoints';
 
 const ROLE_MAPPING = {
@@ -19,6 +19,20 @@ const ERROR_MESSAGES = {
   LOGOUT_ERROR: 'Đã xảy ra lỗi khi đăng xuất!',
   VERIFY_ACCOUNT_ERROR: 'Xác minh tài khoản thất bại!',
   INVALID_VERIFY_DATA: 'Dữ liệu xác minh không hợp lệ!',
+};
+
+// Function to fetch campusId by accountId
+const fetchCampusByAccountId = async (accountId) => {
+  try {
+    const response = await apiClient.get(`/api/Campus/get-campus-by-account-id?accountId=${accountId}`);
+    if (response.status === 200 && response.data?.data?.id) {
+      return response.data.data.id;
+    }
+    throw new Error('Không thể lấy campusId từ API');
+  } catch (error) {
+    console.error('Error fetching campusId:', error.message);
+    throw error;
+  }
 };
 
 export const login = async (userName, password) => {
@@ -48,7 +62,7 @@ export const login = async (userName, password) => {
       return { success: false, message: ERROR_MESSAGES.NO_TOKEN };
     }
 
-    // Store data using StorageService methods
+    // Lưu tất cả dữ liệu vào storage trước khi phát sự kiện
     StorageService.setAccessToken(token);
 
     const mappedRole = ROLE_MAPPING[role] || role;
@@ -56,7 +70,7 @@ export const login = async (userName, password) => {
       role: mappedRole,
       accountId,
       userName,
-      isVerify, // Include isVerify in userData
+      isVerify,
     };
     if (brandId) userData.brandId = brandId;
 
@@ -66,12 +80,26 @@ export const login = async (userName, password) => {
     StorageService.setLoginId(accountId || '');
     if (brandId) StorageService.setBrandId(brandId);
 
-    // Use a custom method or localStorage directly if setItem isn't defined
+    // Fetch and store campusId for campus role
+    if (mappedRole === 'campus') {
+      try {
+        const campusId = await fetchCampusByAccountId(accountId);
+        StorageService.setCampusId(campusId);
+        userData.campusId = campusId;
+        console.log('Successfully fetched and stored campusId:', campusId);
+      } catch (error) {
+        console.error('Failed to fetch campusId during login:', error.message);
+      } finally {
+        window.dispatchEvent(new Event('campusIdUpdated'));
+      }
+    }
+
     StorageService.setItem
       ? StorageService.setItem('isVerify', isVerify)
-      : localStorage.setItem('isVerify', JSON.stringify(isVerify)); // Fallback
+      : localStorage.setItem('isVerify', JSON.stringify(isVerify));
 
-    // console.log('✅ Thông tin người dùng đã lưu:', userData);
+    // Phát sự kiện authChange sau khi tất cả dữ liệu đã được lưu
+    window.dispatchEvent(new Event('authChange'));
 
     return {
       success: true,
@@ -95,7 +123,6 @@ export const login = async (userName, password) => {
 
 export const verifyAccount = async (id, email, code) => {
   try {
-    // Nếu không có code, không gọi API verify
     if (!code) {
       return {
         success: false,
@@ -106,7 +133,7 @@ export const verifyAccount = async (id, email, code) => {
     const response = await apiClient.post(AUTH_ENDPOINTS.VERIFY_ACCOUNT, {
       id,
       email,
-      code: code.toString() // Đảm bảo code là string
+      code: code.toString()
     });
 
     if (response.status !== 200 || !response.data) {
@@ -126,7 +153,6 @@ export const verifyAccount = async (id, email, code) => {
       };
     }
 
-    // Xác thực thành công
     toast.success('Xác minh tài khoản thành công!');
     localStorage.setItem('isVerify', 'true');
 
@@ -156,7 +182,7 @@ export const logout = () => {
 export const resendVerificationCode = async (email) => {
   try {
     const response = await apiClient.post(EMAIL_ENDPOINTS.SEND_CODE_EMAIL_AGAIN, {}, {
-      params: { email }  // Gửi email qua query params
+      params: { email }
     });
 
     if (response.status === 200) {
@@ -170,7 +196,6 @@ export const resendVerificationCode = async (email) => {
       success: false,
       message: response.data?.message || "Không thể gửi lại mã xác minh"
     };
-
   } catch (error) {
     console.error('❌ Lỗi khi gửi lại mã:', error);
     return {

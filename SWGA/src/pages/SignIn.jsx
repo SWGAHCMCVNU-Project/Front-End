@@ -11,8 +11,6 @@ import { useVerifyAccount } from "../hooks/account/useVerifyAccount";
 import storageService from "../services/storageService";
 import VerificationCode from "../features/authentications/verification-code";
 import { getAccountByIdAPI } from "../store/api/registerAPI";
-
-// Background image (replace with your own wallet-themed emerald green background)
 import backgroundImage from "../assets/images/background.jpg";
 
 const { Content } = Layout;
@@ -30,11 +28,8 @@ function SignIn() {
       setIsLoading(true);
       const response = await login(values.username.trim(), values.password);
       if (response.success) {
-        const { role, token, brandId, isVerify, loginId } = response.data;
-        localStorage.setItem("roleLogin", role);
-        storageService.setAccessToken(token);
-        storageService.setNameLogin(values.username);
-        if (brandId) storageService.setBrandId(brandId);
+        const { role, isVerify, loginId } = response.data;
+
         if (!isVerify) {
           const accountResponse = await getAccountByIdAPI(loginId);
           if (!accountResponse.success) {
@@ -73,6 +68,7 @@ function SignIn() {
       if (result.success) {
         storageService.setNameLogin(loginData.userName);
         setShowVerifyModal(false);
+        window.dispatchEvent(new Event('authChange'));
         navigate("/dashboard", { replace: true });
       } else {
         toast.error(result.message || "Xác minh thất bại!");
@@ -103,9 +99,8 @@ function SignIn() {
     setShowVerifyModal(false);
     form.resetFields();
   };
-
   return (
-    <Layout style={{ minHeight: "100vh", display: "flex", flexDirection: "row" }}>
+    <>
       <style>
         {`
           .split-background {
@@ -123,12 +118,12 @@ function SignIn() {
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(46, 204, 113, 0.3); /* Emerald green overlay */
+            background: rgba(46, 204, 113, 0.3);
           }
 
           .split-form {
             flex: 1;
-            background: #2a3b3c; /* Lighter background with a green tint */
+            background: #2a3b3c;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -143,9 +138,9 @@ function SignIn() {
           .wallet-input {
             border-radius: 8px;
             padding: 12px 40px;
-            background: #4a5b5c !important; /* Enforce the background color */
+            background: #4a5b5c !important;
             border: 1px solid #2ecc71;
-            color: #fff; /* White color for typed text */
+            color: #fff;
             transition: all 0.3s ease;
           }
 
@@ -155,33 +150,29 @@ function SignIn() {
             box-shadow: 0 0 8px rgba(46, 204, 113, 0.3);
           }
 
-          /* Target the input element inside wallet-input */
           .wallet-input .ant-input,
           .wallet-input .ant-input-password {
-            background: #4a5b5c !important; /* Enforce the background color */
-            color: #fff; /* White color for typed text */
+            background: #4a5b5c !important;
+            color: #fff;
           }
 
           .wallet-input .ant-input-password input {
             background: transparent !important;
-            color: #fff; /* White color for typed text */
+            color: #fff;
           }
 
-          /* Target placeholder for regular input */
           .wallet-input .ant-input::placeholder {
-            color: #a9b7b8; /* Darker gray for better contrast */
+            color: #a9b7b8;
             opacity: 1;
           }
 
-          /* Target placeholder for password input */
           .wallet-input .ant-input-password input::placeholder {
-            color: #a9b7b8; /* Darker gray for better contrast */
+            color: #a9b7b8;
             opacity: 1;
           }
 
-          /* Ensure the suffix icon (like the eye for password) is visible */
           .wallet-input .ant-input-suffix {
-            color: #d1e8d5; /* Match placeholder color for consistency */
+            color: #d1e8d5;
           }
 
           .wallet-button {
@@ -236,9 +227,8 @@ function SignIn() {
             font-weight: 500;
           }
 
-          /* Style for the rules text */
           .ant-form-item-explain-error {
-            color: #f0e68c; /* Light yellow for better visibility against dark background */
+            color: #f0e68c;
             font-size: 14px;
             margin-top: 5px;
           }
@@ -279,98 +269,100 @@ function SignIn() {
           }
         `}
       </style>
-      <div className="split-background" />
-      <div className="split-form">
-        <div className="wallet-form-container">
-          <Row justify="center" style={{ marginBottom: "20px" }}>
-            <Col>
-              <div className="logo-container">
-                <img src={S_WalletLogo} alt="S_Wallet Logo" style={{ width: "120px" }} />
-                <Text fontSize="20px" color="#fff" textAlign="center">
-                  <FontAwesomeIcon icon={faCoins} style={{ marginRight: "6px", color: "#2ecc71" }} />
-                  S_WALLET
-                </Text>
-              </div>
-            </Col>
-          </Row>
-          <Row className="header-row">
-            <Col>
-              <Heading fontSize="36px" color="#2ecc71">
-                Đăng nhập
-              </Heading>
-            </Col>
-          </Row>
-          <Form
-            form={form}
-            onFinish={handleLogin}
-            layout="vertical"
-            style={{ marginTop: "20px" }}
-          >
-            <Form.Item
-              name="username"
-              label={<span className="form-label">Tài khoản <span style={{ color: "#ff0000" }}>*</span></span>}
-              rules={[{ required: true, message: "Vui lòng nhập tài khoản!" }]}
-            >
-              <Input
-                prefix={<FontAwesomeIcon icon={faUser} className="wallet-icon" />}
-                placeholder="Hãy điền tên tài khoản..."
-                className="wallet-input"
-              />
-            </Form.Item>
-            <Form.Item
-              name="password"
-              label={<span className="form-label">Mật khẩu <span style={{ color: "#ff0000" }}>*</span></span>}
-              rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
-            >
-              <Input.Password
-                prefix={<FontAwesomeIcon icon={faLock} className="wallet-icon" />}
-                placeholder="Hãy điền mật khẩu..."
-                className="wallet-input"
-              />
-            </Form.Item>
-            <Flex justify="flex-end" style={{ marginBottom: "20px" }}>
-              <Text fontSize="14px" color="#fff">
-                Bạn chưa có tài khoản?
-                <NavLink to="/sign-up">
-                  <Text as="span" className="wallet-link" marginLeft="5px">
-                    Tạo tài khoản mới
+      <Layout style={{ minHeight: "100vh", display: "flex", flexDirection: "row" }}>
+        <div className="split-background" />
+        <div className="split-form">
+          <div className="wallet-form-container">
+            <Row justify="center" style={{ marginBottom: "20px" }}>
+              <Col>
+                <div className="logo-container">
+                  <img src={S_WalletLogo} alt="S_Wallet Logo" style={{ width: "120px" }} />
+                  <Text fontSize="20px" color="#fff" textAlign="center">
+                    <FontAwesomeIcon icon={faCoins} style={{ marginRight: "6px", color: "#2ecc71" }} />
+                    S_WALLET
                   </Text>
-                </NavLink>
-              </Text>
-            </Flex>
-            <Form.Item>
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={isLoading}
-                disabled={isLoading}
-                block
-                className="wallet-button"
+                </div>
+              </Col>
+            </Row>
+            <Row className="header-row">
+              <Col>
+                <Heading fontSize="36px" color="#2ecc71">
+                  Đăng nhập
+                </Heading>
+              </Col>
+            </Row>
+            <Form
+              form={form}
+              onFinish={handleLogin}
+              layout="vertical"
+              style={{ marginTop: "20px" }}
+            >
+              <Form.Item
+                name="username"
+                label={<span className="form-label">Tài khoản <span style={{ color: "#ff0000" }}>*</span></span>}
+                rules={[{ required: true, message: "Vui lòng nhập tài khoản!" }]}
               >
-                <FontAwesomeIcon icon={faWallet} style={{ marginRight: "8px" }} />
-                Đăng nhập
-              </Button>
-            </Form.Item>
-          </Form>
+                <Input
+                  prefix={<FontAwesomeIcon icon={faUser} className="wallet-icon" />}
+                  placeholder="Hãy điền tên tài khoản..."
+                  className="wallet-input"
+                />
+              </Form.Item>
+              <Form.Item
+                name="password"
+                label={<span className="form-label">Mật khẩu <span style={{ color: "#ff0000" }}>*</span></span>}
+                rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
+              >
+                <Input.Password
+                  prefix={<FontAwesomeIcon icon={faLock} className="wallet-icon" />}
+                  placeholder="Hãy điền mật khẩu..."
+                  className="wallet-input"
+                />
+              </Form.Item>
+              <Flex justify="flex-end" style={{ marginBottom: "20px" }}>
+                <Text fontSize="14px" color="#fff">
+                  Bạn chưa có tài khoản?
+                  <NavLink to="/sign-up">
+                    <Text as="span" className="wallet-link" marginLeft="5px">
+                      Tạo tài khoản mới
+                    </Text>
+                  </NavLink>
+                </Text>
+              </Flex>
+              <Form.Item>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={isLoading}
+                  disabled={isLoading}
+                  block
+                  className="wallet-button"
+                >
+                  <FontAwesomeIcon icon={faWallet} style={{ marginRight: "8px" }} />
+                  Đăng nhập
+                </Button>
+              </Form.Item>
+            </Form>
+          </div>
         </div>
-      </div>
-      <Modal
-        open={showVerifyModal}
-        footer={null}
-        onCancel={handleCancel}
-        centered
-        style={{ borderRadius: "12px" }}
-      >
-        <VerificationCode
-          email={loginData?.email}
-          isLoading={isVerifying}
-          error={verifyError}
-          onVerify={handleVerify}
-          onSendAgain={handleSendAgain}
+        <Modal
+          open={showVerifyModal}
+          footer={null}
           onCancel={handleCancel}
-        />
-      </Modal>
-    </Layout>
+          centered
+          style={{ borderRadius: "12px" }}
+        >
+          <VerificationCode
+            email={loginData?.email}
+            isLoading={isVerifying}
+            error={verifyError}
+            onVerify={handleVerify}
+            onSendAgain={handleSendAgain}
+            onCancel={handleCancel}
+          />
+        </Modal>
+      </Layout>
+    </>
   );
 }
 

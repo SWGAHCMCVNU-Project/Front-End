@@ -107,3 +107,7 @@ export const AUTH_ENDPOINTS = {
     GET_ALL: "/Challenge",
     UPDATE : "/Challenge/{id}"
   }
+  export const WALLET = {
+    GET_WALLET: "/Wallet/get-wallet-by-brand-id",
+    GET_WALLET_CAMPUS: "/Wallet/get-wallet-by-campus-id"
+  }
