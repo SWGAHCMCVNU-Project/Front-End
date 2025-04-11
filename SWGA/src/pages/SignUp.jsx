@@ -376,7 +376,7 @@ function SignUp() {
                   <img src={S_WalletLogo} alt="S_Wallet Logo" style={{ width: "120px" }} />
                   <Text fontSize="20px" color="#fff" textAlign="center">
                     <FontAwesomeIcon icon={faCoins} style={{ marginRight: "6px", color: "#2ecc71" }} />
-                    S_WALLET
+                    SWALLET
                   </Text>
                 </div>
               </Col>
