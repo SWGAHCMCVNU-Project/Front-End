@@ -1,15 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { FaRegEdit } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
 import { Pagination } from "antd";
 import { useCampaignVoucherItem } from "../useCampaignVoucherItem";
 import Table from "../../../../ui/Table";
 import Spinner from "../../../../ui/Spinner";
 import Empty from "../../../../ui/Empty";
 import { formatCurrency } from "../../../../utils/helpers";
-import Button from "../../../../ui/Button";
-import ButtonGroup from "../../../../ui/ButtonGroup";
 import DataItem from "../../../../ui/DataItem";
 
 function CampaignVoucherItems() {
@@ -35,8 +32,8 @@ function CampaignVoucherItems() {
     const currentVoucherGroup = voucherGroups[selectedVoucherId] || {};
     const currentVoucherInfo = currentVoucherGroup.voucher || {};
 
-    // Định nghĩa columns cho Table
-    const columns = "5rem 15rem 20rem 15rem 15rem 15rem 10rem";
+    // Định nghĩa columns cho Table (đã bỏ cột Thao tác)
+    const columns = "5rem 15rem 20rem 15rem 15rem 15rem";
 
     return (
         <div className="table-container">
@@ -52,7 +49,6 @@ function CampaignVoucherItems() {
                     <div>Giá trị</div>
                     <div>Ngày tạo</div>
                     <div>Trạng thái</div>
-                    <div>Thao tác</div>
                 </Table.Header>
 
                 <Table.Body
@@ -73,23 +69,6 @@ function CampaignVoucherItems() {
                                 <div>{formatCurrency(currentVoucherInfo.price || 0)}</div>
                                 <div>{format(new Date(item.createdAt), "dd/MM/yyyy")}</div>
                                 <div>{item.status}</div>
-                                <div>
-                                    <ButtonGroup>
-                                        <Button
-                                            variation="secondary"
-                                            size="small"
-                                            onClick={() => navigate(`/voucher-items/${item.id}`)}
-                                        >
-                                            <FaRegEdit />
-                                        </Button>
-                                        <Button
-                                            variation="danger"
-                                            size="small"
-                                        >
-                                            <MdDelete />
-                                        </Button>
-                                    </ButtonGroup>
-                                </div>
                             </Table.Row>
                         );
                     }}

@@ -37,7 +37,7 @@ function ItemFilter() {
     const [selectedOption, setSelectedOption] = useState("");
 
     const optionStates = [
-        { value: "", label: "Chưa mua" },
+        { value: "", label: "Khả dụng" },
         { value: "bought", label: "Đã mua" },
         { value: "used", label: "Đã sử dụng" },
     ];

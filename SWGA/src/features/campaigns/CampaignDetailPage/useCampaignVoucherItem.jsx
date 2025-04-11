@@ -19,8 +19,9 @@ export function CampaignVoucherItemProvider({ children }) {
     const [sort, setSort] = useState("Id,desc");
     const [state, setState] = useState(null);
     const [isLocked, setIsLocked] = useState(null);
-    const [isBought, setIsBought] = useState(null);
-    const [isUsed, setIsUsed] = useState(null);
+    // Khởi tạo isBought và isUsed là false để áp dụng filter "Chưa mua" ngay từ đầu
+    const [isBought, setIsBought] = useState(false);
+    const [isUsed, setIsUsed] = useState(false);
     const [sortedVoucherItems, setSortedVoucherItems] = useState([]);
     const [selectedVoucherId, setSelectedVoucherId] = useState(null);
     const [voucherGroups, setVoucherGroups] = useState({});
@@ -56,7 +57,7 @@ export function CampaignVoucherItemProvider({ children }) {
             navigate(`/campaigns/${campaignId}?page=1`);
             baseHandlePageChange(1);
         }
-    }, [pagination?.total, page, limit, campaignId]);
+    }, [pagination?.total, page, limit, campaignId, navigate, baseHandlePageChange]);
 
     // Custom handle page change để validate page number
     const handlePageChange = (newPage) => {
@@ -78,7 +79,7 @@ export function CampaignVoucherItemProvider({ children }) {
         setSearchParams(searchParams);
     };
 
-    // Group voucher items theo voucherId và sắp xếp
+    // Group voucher items theo voucherId, lọc theo trạng thái và sắp xếp
     useEffect(() => {
         if (!campaignVoucherItems || !vouchers) return;
 
@@ -108,19 +109,36 @@ export function CampaignVoucherItemProvider({ children }) {
             setSelectedVoucher(groups[selectedVoucherId].voucher);
         }
 
-        // Sắp xếp items của voucher đang chọn
+        // Lấy items của voucher đang chọn
         const currentItems = groups[selectedVoucherId]?.items || [];
-        let sorted = [...currentItems];
 
-        // Sắp xếp theo ID (VI đầu)
+        // Lọc items theo trạng thái isBought và isUsed
+        let filteredItems = [...currentItems];
+
+        if (isBought === true && isUsed === true) {
+            // "Đã sử dụng": chỉ hiển thị các item có status là "Đã sử dụng"
+            filteredItems = filteredItems.filter(item => item.status === "Đã sử dụng");
+        } else if (isBought === true && isUsed === false) {
+            // "Đã mua": hiển thị các item có status là "Đã mua"
+            filteredItems = filteredItems.filter(item => item.status === "Đã mua");
+        } else if (isBought === false && isUsed === false) {
+            // "Chưa mua": hiển thị các item có status là "Khả dụng"
+            filteredItems = filteredItems.filter(item => item.status === "Khả dụng");
+        } else {
+            // Trường hợp mặc định (khi isBought hoặc isUsed là null): hiển thị tất cả
+            filteredItems = [...currentItems];
+        }
+
+        // Sắp xếp items (giữ nguyên logic sắp xếp theo ID)
+        let sorted = [...filteredItems];
         sorted.sort((a, b) => {
             if (a.id.startsWith('VI') && !b.id.startsWith('VI')) return -1;
-            if (!a.id.startsWith('VI') && b.id.startsWith('VI')) return 1;
+            if (!b.id.startsWith('VI') && b.id.startsWith('VI')) return 1;
             return a.id.localeCompare(b.id);
         });
 
         setSortedVoucherItems(sorted);
-    }, [campaignVoucherItems, selectedVoucherId, vouchers]);
+    }, [campaignVoucherItems, selectedVoucherId, vouchers, isBought, isUsed]);
 
     const value = {
         isLoading: isLoadingItems,
@@ -128,8 +146,8 @@ export function CampaignVoucherItemProvider({ children }) {
         campaignVoucherItems: sortedVoucherItems,
         pagination: {
             currentPage: page,
-            total: campaignVoucherItems?.length || 0,
-            totalPages: Math.max(1, Math.ceil((campaignVoucherItems?.length || 0) / limit))
+            total: sortedVoucherItems?.length || 0, // Cập nhật total dựa trên sortedVoucherItems
+            totalPages: Math.max(1, Math.ceil((sortedVoucherItems?.length || 0) / limit))
         },
         state,
         setState,
