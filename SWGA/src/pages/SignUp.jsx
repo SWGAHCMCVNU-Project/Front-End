@@ -12,7 +12,6 @@ import {
   faMapMarkerAlt,
   faClock,
   faLink,
-  faImage,
   faFileAlt,
   faCoins,
 } from "@fortawesome/free-solid-svg-icons";
@@ -109,7 +108,20 @@ const customStyles = `
 
   .ant-upload-list-item-name,
   .ant-upload-list-item-info {
-    color: #fff !important;
+    display: none !important; /* Hide the file name */
+  }
+
+  /* Ensure the image thumbnail fits properly */
+  .ant-upload-list-picture-card .ant-upload-list-item {
+    width: 100px;
+    height: 100px;
+    padding: 0;
+  }
+
+  .ant-upload-list-picture-card .ant-upload-list-item img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
   }
 
   /* Validation error messages */
@@ -128,7 +140,7 @@ const customStyles = `
   .btn-header-signup {
     position: absolute;
     top: 20px;
-    right: 3S00px;
+    right: 300px; /* Fixed typo: '3S00px' to '300px' */
   }
 
   .btn-header-signup button {
@@ -143,7 +155,7 @@ const customStyles = `
   }
 
   .btn-header-signup button:hover {
-   background: #2ecc71;
+    background: #2ecc71;
     color: #fff;
     border-color: #27ae60;
   }
@@ -219,6 +231,10 @@ const customStyles = `
       flex-direction: column;
       gap: 10px;
     }
+
+    .btn-header-signup {
+      right: 20px; /* Adjust for smaller screens */
+    }
   }
 
   @media (max-width: 480px) {
@@ -228,6 +244,10 @@ const customStyles = `
 
     .wallet-input {
       padding: 10px 35px;
+    }
+
+    .btn-header-signup {
+      right: 10px; /* Further adjust for very small screens */
     }
   }
 `;
@@ -269,7 +289,7 @@ function SignUp() {
       const file = fileList[fileList.length - 1].originFileObj;
       if (file) {
         const base64 = await convertFileToBase64(file);
-        setLogo(file);
+        setLogo({ ...file, url: base64 }); // Add base64 URL for thumbnail
         setLogoStorage(base64);
       }
     } else {
@@ -283,7 +303,7 @@ function SignUp() {
       const file = fileList[fileList.length - 1].originFileObj;
       if (file) {
         const base64 = await convertFileToBase64(file);
-        setCoverPhoto(file);
+        setCoverPhoto({ ...file, url: base64 }); // Add base64 URL for thumbnail
         setCoverPhotoStorage(base64);
       }
     } else {
@@ -305,7 +325,7 @@ function SignUp() {
       toast.error("Vui lòng tải lên logo!");
       return;
     }
-  
+
     setIsLoading(true);
     try {
       const result = await registerBrandAPI(
@@ -326,7 +346,7 @@ function SignUp() {
         coverPhotoStorage,
         logoStorage
       );
-  
+
       if (result.success) {
         toast.success(
           "Đăng ký thành công! Vui lòng kiểm tra email để lấy mã xác minh."
@@ -351,8 +371,9 @@ function SignUp() {
       setIsLoading(false);
     }
   };
-  const onFinishFailed = (errors) => {
-  };
+
+  const onFinishFailed = (errors) => {};
+
   return (
     <Layout style={{ minHeight: "100vh", display: "flex", flexDirection: "row" }}>
       <style>{customStyles}</style>
@@ -594,8 +615,9 @@ function SignUp() {
                     }}
                     disabled={isLoading}
                     showUploadList={{
-                      showPreviewIcon: false,
-                      showRemoveIcon: true,
+                      showPreviewIcon: false, // Disable preview icon
+                      showRemoveIcon: true,   // Keep remove icon
+                      showDownloadIcon: false, // Disable download icon
                     }}
                   >
                     {!logo && (
@@ -623,8 +645,9 @@ function SignUp() {
                     }}
                     disabled={isLoading}
                     showUploadList={{
-                      showPreviewIcon: false,
-                      showRemoveIcon: true,
+                      showPreviewIcon: false, // Disable preview icon
+                      showRemoveIcon: true,   // Keep remove icon
+                      showDownloadIcon: false, // Disable download icon
                     }}
                   >
                     {!coverPhoto && (
