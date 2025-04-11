@@ -167,7 +167,7 @@ function Header({ onPress, name, subName, handleSidenavColor, handleSidenavType,
     <div 
       style={{ 
         position: 'fixed', 
-        top: 0, 
+        top: -20, 
         left: 290, 
         right: 0, 
         zIndex: 1000, 
