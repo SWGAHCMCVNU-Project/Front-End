@@ -140,22 +140,23 @@ export const getStoresByCampaignId = async (
     // Format lại dữ liệu store từ response
     const items = response.data.items || response.data;
     const formattedItems = Array.isArray(items)
-      ? items.map((item) => ({
-          id: item.store?.id || "",
-          storeName: item.store?.storeName || "Cửa hàng không tên",
-          brandName: item.store?.brand?.brandName || "Thương hiệu không rõ",
-          avatar: item.store?.file || "",
-          email: item.store?.account?.email || "Chưa cập nhật",
-          phone: item.store?.account?.phoneNumber || "Chưa cập nhật",
-          address: item.store?.address || "Chưa cập nhật",
-          openingHours: item.store?.openingHours || "00:00",
-          closingHours: item.store?.closingHours || "00:00",
-          state: item.store?.state || false,
-          status: item.status || false,
-          campaignStoreId: item.id || "",
-        }))
-      : [];
-
+    ? items.map((item) => ({
+        id: item.store?.id || "",
+        storeName: item.store?.storeName || "Cửa hàng không tên",
+        // Lấy brandName từ item.store.brand?.brandName, nếu null thì lấy mặc định
+        // brandName: item.store?.brand?.brandName || "Thương hiệu không rõ",
+        avatar: item.store?.file || "",
+        // Lấy email và phone trực tiếp từ item, không qua store.account
+        email: item.email || "Chưa cập nhật",
+        phone: item.phone || "Chưa cập nhật",
+        address: item.store?.address || "Chưa cập nhật",
+        openingHours: item.store?.openingHours || "00:00",
+        closingHours: item.store?.closingHours || "00:00",
+        state: item.store?.state || false,
+        status: item.status || false,
+        campaignStoreId: item.id || "",
+      }))
+    : [];
 
     const result = {
       items: formattedItems,

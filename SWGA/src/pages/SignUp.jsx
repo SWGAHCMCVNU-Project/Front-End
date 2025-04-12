@@ -325,7 +325,7 @@ function SignUp() {
       toast.error("Vui lòng tải lên logo!");
       return;
     }
-
+  
     setIsLoading(true);
     try {
       const result = await registerBrandAPI(
@@ -346,20 +346,22 @@ function SignUp() {
         coverPhotoStorage,
         logoStorage
       );
-
+  
       if (result.success) {
         toast.success(
           "Đăng ký thành công! Vui lòng kiểm tra email để lấy mã xác minh."
         );
         navigate("/sign-in");
       } else {
-        if (result.message === "Tên tài khoản đã tồn tại!") {
+        const trimmedMessage = result.message?.trim(); // Trim để loại bỏ khoảng trắng
+        if (trimmedMessage === "Tên tài khoản đã tồn tại!") {
           form.setFields([
             {
               name: "userName",
               errors: ["Tên tài khoản đã tồn tại!"],
             },
           ]);
+          toast.error("Tên tài khoản đã tồn tại!");
         } else {
           toast.error(result.message || "Đăng ký thất bại!");
         }

@@ -1,3 +1,4 @@
+import { useEffect } from "react"; // Thêm import useEffect
 import { useForm } from "react-hook-form";
 import Form from "../../../ui/Form";
 import FormRow from "../../../ui/FormRow";
@@ -6,12 +7,13 @@ import ButtonCustom from "../../../ui/custom/Button/ButtonCustom";
 import { useCreateCampusAccount } from "../../../hooks/campus/useCreateAccountCampus";
 
 function CampusAccountForm({ campusId, campusName, onCloseModal }) {
-  const { createCampusAccount, isCreating } = useCreateCampusAccount();
+  const { createCampusAccount, isCreating, error: apiError } = useCreateCampusAccount(); // Thêm error từ hook
 
   const {
     register,
     handleSubmit,
     reset,
+    setError, // Thêm setError
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -21,6 +23,16 @@ function CampusAccountForm({ campusId, campusName, onCloseModal }) {
       phone: "",
     },
   });
+
+  // Xử lý lỗi từ API
+  useEffect(() => {
+    if (apiError) {
+      console.log("API Error in CampusAccountForm:", apiError.message); // Thêm log để kiểm tra
+      if (apiError.message === "Tên tài khoản đã tồn tại!") {
+        setError("userName", { type: "manual", message: apiError.message });
+      }
+    }
+  }, [apiError, setError]);
 
   const handlePhoneInput = (event) => {
     event.target.value = event.target.value.replace(/\D/g, "");
@@ -44,14 +56,13 @@ function CampusAccountForm({ campusId, campusName, onCloseModal }) {
         },
         onError: (error) => {
           console.error("Tạo tài khoản thất bại:", error.message);
-          // Lỗi sẽ được hiển thị qua toast từ hook
+          // Lỗi sẽ được hiển thị qua toast từ hook và trong form qua useEffect
         },
       }
     );
   }
 
-  function onError(errors) {
-  }
+  function onError(errors) {}
 
   return (
     <Form

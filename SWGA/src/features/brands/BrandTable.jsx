@@ -9,6 +9,19 @@ import BrandRow from "./BrandRow";
 import BrandSetRowsPerPage from "./SetRowsPerPage";
 import { useBrands } from "../../hooks/brand/useBrands";
 import { toast } from "react-hot-toast";
+import styled from "styled-components";
+
+// Đảm bảo Table.Row không ép nội dung xuống dòng
+Table.Row = styled(Table.Row)`
+  display: flex;
+  align-items: center;
+  & > div {
+    display: flex;
+    flex-direction: column; /* Đảm bảo nội dung trong cột hiển thị theo cột */
+    align-items: flex-start;
+    white-space: normal; /* Cho phép xuống dòng */
+  }
+`;
 
 function BrandTable() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -32,7 +45,6 @@ function BrandTable() {
     totalPages: 1,
   };
 
-  // Reset currentPage to 1 if there is no data on the current page
   useEffect(() => {
     if (!isLoading && !error && brandData.items.length === 0 && currentPage > 1) {
       const params = new URLSearchParams(searchParams);
@@ -57,7 +69,6 @@ function BrandTable() {
     refetch();
   };
 
-  // Check if there is no data to disable Pagination
   const isDataEmpty = !brandData.items.length || brandData.total === 0;
 
   if (error) {
@@ -77,14 +88,13 @@ function BrandTable() {
         <Empty resourceName="thương hiệu" />
       ) : (
         <Menus>
-          <Table columns="0.6fr 2fr 1.5fr 0.5fr 1.4fr 1fr">
+          <Table columns="0.5fr 2fr 1.5fr 1.5fr 1fr 1fr">
             <Table.Header>
               <div>STT</div>
               <StackedHeader label="Tên thương hiệu" />
               <div>Thời gian làm việc</div>
               <div>Tổng chi phí</div>
               <div>Trạng thái</div>
-              <div>Hành động</div>
             </Table.Header>
 
             <Table.Body

@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import Empty from "../../ui/Empty";
@@ -10,7 +9,7 @@ import Table from "../../ui/Table";
 import SetRowsPerPage from "./SetRowsPerPage";
 import StudentRow from "./StudentRow";
 import useGetAllStudents from "../../hooks/student/useGetAllStudents";
-import useGetAllCampuses from "../../hooks/campus/useGetAllCampuses";
+import { useState } from "react";
 
 const StyledHeader = styled.div`
   display: flex;
@@ -45,20 +44,6 @@ function StudentTable() {
     search: search,
   });
 
-  // Lấy danh sách campus
-  const { data: campusesData, isLoading: isLoadingCampuses } = useGetAllCampuses({
-    page: 1,
-    size: 100, // Lấy tất cả campus trong 1 trang
-  });
-
-  const campuses = campusesData?.items || [];
-
-  // Ánh xạ campusId với campusName
-  const campusMap = campuses.reduce((map, campus) => {
-    map[campus.id] = campus.campusName;
-    return map;
-  }, {});
-
   const onLimitChange = (newLimit) => {
     searchParams.set("limit", newLimit);
     searchParams.set("page", 1); // Reset về trang 1 khi thay đổi limit
@@ -75,15 +60,10 @@ function StudentTable() {
     setSortOrder((prevSortOrder) => (prevSortOrder === "asc" ? "desc" : "asc"));
   };
 
-  if (isLoading || isLoadingCampuses) return <Spinner />;
+  if (isLoading) return <Spinner />;
   if (!students?.length) return <Empty resourceName="sinh viên" />;
 
-  const filteredStudents = filterStudentsByState(students, searchParams.get("state")).map(
-    (student) => ({
-      ...student,
-      campusName: campusMap[student.campusId] || "Chưa cập nhật",
-    })
-  );
+  const filteredStudents = filterStudentsByState(students, searchParams.get("state"));
 
   return (
     <Menus>

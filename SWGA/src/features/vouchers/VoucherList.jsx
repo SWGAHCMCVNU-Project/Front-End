@@ -72,7 +72,7 @@ function VoucherList() {
                 <div className="container-item">
                   <div>Còn lại: </div>
                   <div className="styled-number-item">
-                    {n.numberOfItemsAvailable} / {n.numberOfItems}
+                     {n.numberOfItems}
                   </div>
                   <div> mã</div>
                 </div>

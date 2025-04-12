@@ -1,13 +1,11 @@
-import { HiEye } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Table from "../../ui/Table";
 import Tag from "../../ui/Tag";
 import { useEffect, useState } from "react";
 import logoDefault from "../../assets/images/brand.png";
-import Modal from "../../ui/Modal";
-import BrandDetailModal from "./BrandDetailModal";
 import { formatCurrency, formattedHours, handleValidImageURL } from "../../utils/helpers";
+import point from "../../assets/images/dauxanh.png";
 
 const Station = styled.div`
   display: flex;
@@ -28,25 +26,38 @@ const Img = styled.img`
 `;
 
 const StationName = styled.div`
-  white-space: nowrap; /* Không cắt chữ */
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 200px; /* Tăng giới hạn */
+  max-width: 200px;
 `;
 
 const StackedTime = styled.span`
   display: flex;
   flex-direction: column;
   font-weight: 500;
+  gap: 0.4rem; /* Khoảng cách giữa Tổng nhận và Tổng chi */
 `;
 
 const StackedTimeFrameAbove = styled.span`
   color: #2ecc71;
-  
 `;
 
 const StackedTimeFrameBelow = styled.span`
   color: red;
+`;
+
+const FinancialItem = styled.div`
+  display: flex;
+  align-items: center; /* Đảm bảo số và hình ảnh thẳng hàng */
+  gap: 0.4rem; /* Khoảng cách giữa số và hình ảnh point */
+  white-space: nowrap; /* Ngăn văn bản xuống dòng */
+  margin-left: 75px;
+`;
+
+const PointIcon = styled.img`
+  width: 16px;
+  height: 16px;
 `;
 
 const StyledButton = styled.button`
@@ -65,12 +76,12 @@ const StyledButton = styled.button`
   & svg {
     width: 2.4rem;
     height: 2.4rem;
-    color: var(--color-grey-600); /* Làm đậm */
+    color: var(--color-grey-600);
   }
 
   & svg:hover {
     color: var(--color-green-600);
-    transform: scale(1.1); /* Phóng to nhẹ */
+    transform: scale(1.1);
   }
 `;
 
@@ -82,23 +93,23 @@ const StyledAction = styled.div`
 `;
 
 function BrandRow({ brand, displayedIndex }) {
-  const { id: brandId, openingHours, closingHours, brandName, state, totalIncome, totalSpending, logo } = brand;
+  const { id: brandId, openingHours, closingHours, brandName, state, totalIncome, totalSpending, coverPhoto } = brand;
   const navigate = useNavigate();
   const [isValidImage, setIsValidImage] = useState(true);
 
   useEffect(() => {
-    handleValidImageURL(logo)
+    handleValidImageURL(coverPhoto)
       .then((isValid) => setIsValidImage(isValid))
       .catch(() => setIsValidImage(false));
-  }, [logo]);
+  }, [coverPhoto]);
 
   return (
     <Table.Row>
-      <div>{displayedIndex}</div> {/* Hiển thị số thứ tự */}
+      <div>{displayedIndex}</div>
       
       <div onClick={() => navigate(`/brands/${brandId}`)}>
         <Station>
-          <Img src={isValidImage ? logo || "" : logoDefault} />
+          <Img src={isValidImage ? coverPhoto || "" : logoDefault} />
           <StationName>{brandName}</StationName>
         </Station>
       </div>
@@ -112,29 +123,20 @@ function BrandRow({ brand, displayedIndex }) {
         </span>
       </StackedTime>
 
-      <StackedTime >
-        <span >
+      <StackedTime>
+        <FinancialItem>
           Tổng nhận: <StackedTimeFrameAbove>{formatCurrency(totalIncome)}</StackedTimeFrameAbove>
-        </span>
-        <span>
+          <PointIcon src={point} alt="point" />
+        </FinancialItem>
+        <FinancialItem>
           Tổng chi: <StackedTimeFrameBelow>{formatCurrency(totalSpending)}</StackedTimeFrameBelow>
-        </span>
+          <PointIcon src={point} alt="point" />
+        </FinancialItem>
       </StackedTime>
 
       <Tag type={state ? "cyan" : "error"}>{state ? "Hoạt động" : "Không hoạt động"}</Tag>
 
-      <StyledAction>
-        <Modal>
-          {/* <Modal.Open opens="view">
-            <StyledButton>
-              <HiEye />
-            </StyledButton>
-          </Modal.Open> */}
-          {/* <Modal.Window name="view">
-            <BrandDetailModal brand={brand} />
-          </Modal.Window> */}
-        </Modal>
-      </StyledAction>
+      <StyledAction />
     </Table.Row>
   );
 }

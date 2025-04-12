@@ -1,5 +1,3 @@
-/* eslint-disable no-undef */
-// store/components/StoreFormCreate.js (giả định đường dẫn)
 import { useEffect, useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import styled, { css } from "styled-components";
@@ -98,9 +96,8 @@ const TimeFrameHalf = styled.div`
 `;
 
 function StoreFormCreate() {
-  const { isCreating, createStore, error } = useCreateStore();
-  const brandId = storageService.getBrandId(); // Sử dụng getBrandId thay vì getLoginId
-
+  const { isCreating, createStore, error: apiError } = useCreateStore();
+  const brandId = storageService.getBrandId();
 
   const { areas, isLoading: isLoadingAreas } = useAreas({ state: true });
   const [areaOptions, setAreaOptions] = useState([]);
@@ -108,7 +105,6 @@ function StoreFormCreate() {
   const [fileCard, setFileCard] = useState(null);
   const moveBack = useMoveBack();
 
-  // Sử dụng useMemo để ổn định areaOptions dựa trên areas.result
   const computedAreaOptions = useMemo(() => {
     if (areas?.result && Array.isArray(areas.result)) {
       const filteredAreas = areas.result.filter((c) => c.state);
@@ -123,13 +119,17 @@ function StoreFormCreate() {
     setAreaOptions(computedAreaOptions);
   }, [computedAreaOptions]);
 
-  const { register, handleSubmit, reset, getValues, setValue, formState } = useForm({
-    // defaultValues: {
-    //   openingHours: "08:00", // Giá trị mặc định để tránh lỗi
-    //   closingHours: "17:00",
-    // },
-  });
+  const { register, handleSubmit, getValues, setValue, setError, formState } = useForm();
   const { errors } = formState;
+
+  // Xử lý lỗi từ API
+  useEffect(() => {
+    if (apiError) {
+      if (apiError === "Tên tài khoản đã tồn tại!") {
+        setError("userName", { type: "manual", message: apiError });
+      }
+    }
+  }, [apiError, setError]);
 
   const handleAreaOptions = (value) => {
     setValue("areaId", value, {
@@ -152,18 +152,15 @@ function StoreFormCreate() {
     const files = event.target.files;
     const selectedFile = files?.[0];
     setFileCard(selectedFile);
-    
-    
   };
 
-  // Hàm xác thực thời gian đóng cửa
   const validateClosingTime = (value) => {
     const openingTime = getValues("openingHours");
     if (!openingTime || !value) return "Vui lòng nhập thời gian hợp lệ";
     return value > openingTime || "Thời gian đóng cửa phải sau thời gian mở cửa";
   };
 
-  function onSubmit(data) {
+  async function onSubmit(data) {
     const avatar = typeof data.avatar === "string" ? data.avatar : data.avatar[0];
     if (!data.areaId) {
       setAreaError("Vui lòng chọn khu vực");
@@ -172,11 +169,10 @@ function StoreFormCreate() {
       setAreaError("");
     }
 
-    createStore({ ...data, brandId, avatar });
+    await createStore({ ...data, brandId, avatar });
   }
 
-  function onError(errors) {
-  }
+  function onError(errors) {}
 
   return (
     <>
@@ -376,8 +372,8 @@ function StoreFormCreate() {
             </StyledDataBox>
 
             <StyledDataBox>
-              <Header >
-                <div >Thời gian làm việc</div>
+              <Header>
+                <div>Thời gian làm việc</div>
               </Header>
               <TimeFrameContainer>
                 <TimeFrameHalf>
@@ -411,8 +407,7 @@ function StoreFormCreate() {
           </RightFormHalf>
         </StaffFormContainer>
 
-        <CreateUpdateButton onClick={handleSubmit(onSubmit, onError)} isLoading={isCreating} label="Tạo cửa hàng" />
-        {error && <div style={{ color: "red" }}>Lỗi: {error}</div>}
+        <CreateUpdateButton isLoading={isCreating} label="Tạo cửa hàng" />
       </Form>
     </>
   );

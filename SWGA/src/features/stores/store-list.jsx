@@ -69,7 +69,7 @@ function StoreList() {
   const navigate = useNavigate();
 
   // Kiểm tra dữ liệu stores trước khi sử dụng
-  const storeImages = stores?.result?.map((store) => store.avatar) || [];
+  const storeImages = stores?.result?.map((store) => store.file) || []; // Sửa từ store.avatar thành store.file
   const isValidImages = useImageValidity(stores?.result || [], storeImages);
 
   const handleSort = (pagination, filters, sorter) => {
@@ -112,7 +112,7 @@ function StoreList() {
   const data = stores.result.map((store, index) => {
     const dataIndex = (page - 1) * limit + index + 1;
     const isValid = isValidImages[index];
-    const avatarSrc = isValid ? store.avatar : imgDefaultStore;
+    const avatarSrc = isValid ? store.file : imgDefaultStore; // Sửa từ store.avatar thành store.file
 
     const openingHours = store.openingHours || "00:00:00";
     const closingHours = store.closingHours || "00:00:00";

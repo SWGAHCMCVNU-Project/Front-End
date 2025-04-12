@@ -3,7 +3,8 @@ import styled from "styled-components";
 import imgDefaultStore from "../../../../assets/images/store.png";
 import Empty from "../../../../ui/Empty";
 import { TableItem } from "../../../../ui/custom/Table/TableItem";
-import { useCampaignStore } from "../useCampaignStore"; // Import useCampaignStore
+import { useCampaignStore } from "../useCampaignStore";
+import { formatPhoneNumber } from "../../../../utils/helpers"; // Đảm bảo đã import formatPhoneNumber
 
 const Stacked = styled.div`
   display: flex;
@@ -124,8 +125,14 @@ function CampaignStore() {
         ),
         Contact: (
             <Stacked>
-                <span>{store.email}</span>
-                <span>{store.phone}</span>
+                {store.email === null && store.phone === null ? (
+                    <span style={{ fontSize: 14 }}>Chưa cập nhật</span>
+                ) : (
+                    <>
+                        <span>{store.email !== null ? store.email : "Chưa cập nhật Email"}</span>
+                        <span>{store.phone !== null ? formatPhoneNumber(store.phone) : "Chưa cập nhật số điện thoại"}</span>
+                    </>
+                )}
             </Stacked>
         ),
         Address: <StyledAddress>{store.address}</StyledAddress>,
