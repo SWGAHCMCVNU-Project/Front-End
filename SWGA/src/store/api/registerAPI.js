@@ -333,3 +333,57 @@ export const registerCampusAPI = async (formData, campusId) => {
     };
   }
 };
+export const registerLecturerAPI = async (formData, campusId) => {
+  try {
+    const lecturerData = {
+      userName: formData.userName || "",
+      password: formData.password || "",
+      phone: formData.phone || "",
+      email: formData.email || "",
+      fullName: formData.fullName || "",
+    };
+
+    const data = new FormData();
+    data.append("userName", lecturerData.userName);
+    data.append("password", lecturerData.password);
+    data.append("phone", lecturerData.phone);
+    data.append("email", lecturerData.email);
+    data.append("fullName", lecturerData.fullName);
+    // Add campusId to FormData instead of query parameters
+    data.append("campusId", campusId || "");
+
+    // Log the FormData contents
+   
+
+    const url = ACCOUNT_ENDPOINTS.RegisterLecturer; // No query parameters
+
+    const response = await apiClient.post(url, data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    if (response.data) {
+      return { status: response.status, success: true, data: response.data };
+    }
+    return {
+      status: response.status,
+      success: false,
+      message: "Không nhận được dữ liệu từ server!",
+    };
+  } catch (error) {
+    const errorMessage = error.response?.data?.Message || "Lỗi đăng ký tài khoản lecturer";
+
+    if (error.response?.data?.Message === "Account already exists") {
+      return {
+        status: error.response?.status || 409,
+        success: false,
+        message: "Tên tài khoản đã tồn tại!",
+      };
+    }
+
+    return {
+      status: error.response?.status || 500,
+      success: false,
+      message: errorMessage,
+    };
+  }
+};

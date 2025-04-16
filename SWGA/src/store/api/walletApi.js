@@ -25,7 +25,6 @@ const walletService = {
   getWalletByCampusId: async () => {
     try {
       const campusId = storageService.getCampusId();
-      console.log("campusId",campusId);
       
       if (!campusId) {
         throw new Error('Campus ID not found in storage');

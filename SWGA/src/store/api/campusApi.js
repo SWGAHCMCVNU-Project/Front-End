@@ -208,7 +208,14 @@ export const getCampusByAccountIdAPI = async (accountId) => {
       CAMPUS.GET_BY_ID_ACCOUNT.replace("{id}", accountId)
     );
 
-    if (response.data) {
+    if (response.status === 200) {
+      if (Array.isArray(response.data)) {
+        return {
+          status: response.status,
+          success: true,
+          data: response.data, // Return the array as-is
+        };
+      }
       return {
         status: response.status,
         success: true,
@@ -230,5 +237,28 @@ export const getCampusByAccountIdAPI = async (accountId) => {
       success: false,
       message: errorMessage,
     };
+  }
+};
+// Trong file campusApi.js
+export const distributePointsAPI = async (campusId, lecturerIds, points) => {
+  try {
+    const response = await apiClient.post(
+      `${CAMPUS.DISTRIBUTE_POINT}?${new URLSearchParams({
+        campusId,
+        lecturerIds: lecturerIds.join(","),
+        points
+      }).toString()}`,
+      null,
+      { headers: { "Content-Type": "application/json" } }
+    );
+
+    // Thêm log debug
+    console.log("API Response:", response.data);
+    
+    return response.data;
+
+  } catch (error) {
+    console.error("API Error:", error.response?.data);
+    throw new Error(error.response?.data?.Message || "Phân bổ điểm thất bại");
   }
 };

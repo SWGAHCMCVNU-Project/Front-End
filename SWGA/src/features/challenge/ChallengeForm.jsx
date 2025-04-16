@@ -53,7 +53,7 @@ const StyledButton = styled(Button)`
 `;
 
 const ChallengeForm = ({ challengeToEdit = {}, onCloseModal }) => {
-  const { id: editId, challengeName, amount, condition = 0, type, image, description, status } = challengeToEdit;
+  const { id: editId, challengeName, amount, condition = 0, type, image, description, status, category } = challengeToEdit;
   const isEditSession = Boolean(editId);
 
   const queryClient = useQueryClient();
@@ -62,8 +62,8 @@ const ChallengeForm = ({ challengeToEdit = {}, onCloseModal }) => {
 
   const { register, handleSubmit, reset, formState } = useForm({
     defaultValues: isEditSession
-      ? { type, challengeName, amount, condition, image: null, description, status }
-      : { type: 1, status: true },
+      ? { type, challengeName, amount, condition, image: null, description, status, category }
+      : { type: 1, status: true, category: "" },
   });
   const { errors } = formState;
 
@@ -78,9 +78,14 @@ const ChallengeForm = ({ challengeToEdit = {}, onCloseModal }) => {
     if (data.image && data.image[0]) formData.append("image", data.image[0]);
     formData.append("description", data.description?.trim() || "");
     formData.append("status", data.status ?? true);
+    formData.append("category", data.category?.trim() || "");
 
     if (!formData.get("challengeName")) {
       toast.error("Vui lòng nhập tên thử thách");
+      return;
+    }
+    if (!formData.get("category")) {
+      toast.error("Vui lòng nhập danh mục");
       return;
     }
 
@@ -114,6 +119,18 @@ const ChallengeForm = ({ challengeToEdit = {}, onCloseModal }) => {
           <option value={1}>Hằng ngày</option>
           <option value={2}>Thành tựu</option>
         </StyledSelect>
+      </FormRow>
+      <FormRow label="Danh mục" error={errors?.category?.message}>
+        <StyledInput
+          type="text"
+          id="category"
+          disabled={isWorking}
+          {...register("category", {
+            required: "Hãy nhập danh mục",
+            minLength: { value: 3, message: "Danh mục ít nhất 3 ký tự" },
+            maxLength: { value: 50, message: "Danh mục tối đa 50 ký tự" },
+          })}
+        />
       </FormRow>
       <FormRow label="Tên thử thách" error={errors?.challengeName?.message}>
         <StyledInput
@@ -157,7 +174,7 @@ const ChallengeForm = ({ challengeToEdit = {}, onCloseModal }) => {
           accept="image/*"
           disabled={isWorking}
           {...register("image", {
-            required: isEditSession ? false : "Hãy chọn hình ảnh", // Bắt buộc khi tạo mới, không bắt buộc khi chỉnh sửa
+            required: isEditSession ? false : "Hãy chọn hình ảnh",
           })}
         />
       </FormRow>
@@ -167,6 +184,7 @@ const ChallengeForm = ({ challengeToEdit = {}, onCloseModal }) => {
           disabled={isWorking}
           {...register("description", {
             required: "Hãy nhập mô tả",
+            minLength: { value: 3, message: "Mô tả ít nhất 3 ký tự" },
             maxLength: { value: 500, message: "Mô tả tối đa 500 ký tự" },
           })}
         />
@@ -198,6 +216,7 @@ ChallengeForm.propTypes = {
     image: PropTypes.any,
     description: PropTypes.string,
     status: PropTypes.bool,
+    category: PropTypes.string,
   }),
   onCloseModal: PropTypes.func,
 };

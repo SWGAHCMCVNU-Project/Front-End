@@ -19,7 +19,6 @@ export const getAllStudents = async ({ page = 1, size = 10, search = "" } = {}) 
 export const getStudentById = async (id) => {
   try {
     const response = await apiClient.get(STUDENT.GET_BY_ID.replace('{id}', id));
-    console.log("response",response);
     
     return response.data;
   } catch (error) {

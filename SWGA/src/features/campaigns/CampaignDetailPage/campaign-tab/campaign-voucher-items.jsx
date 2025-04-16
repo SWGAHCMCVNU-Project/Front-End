@@ -1,13 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
-import { FaRegEdit } from "react-icons/fa";
 import { Pagination } from "antd";
 import { useCampaignVoucherItem } from "../useCampaignVoucherItem";
 import Table from "../../../../ui/Table";
 import Spinner from "../../../../ui/Spinner";
 import Empty from "../../../../ui/Empty";
 import { formatCurrency } from "../../../../utils/helpers";
-import DataItem from "../../../../ui/DataItem";
 
 function CampaignVoucherItems() {
     const navigate = useNavigate();
@@ -32,8 +30,8 @@ function CampaignVoucherItems() {
     const currentVoucherGroup = voucherGroups[selectedVoucherId] || {};
     const currentVoucherInfo = currentVoucherGroup.voucher || {};
 
-    // Định nghĩa columns cho Table (đã bỏ cột Thao tác)
-    const columns = "5rem 15rem 20rem 15rem 15rem 15rem";
+    // Định nghĩa columns cho Table
+    const columns = "5rem 30rem 20rem 15rem 15rem 15rem";
 
     return (
         <div className="table-container">
@@ -46,7 +44,7 @@ function CampaignVoucherItems() {
                     <div>STT</div>
                     <div>Mã</div>
                     <div>Tên</div>
-                    <div>Giá trị</div>
+                    <div>Giá Trị</div>
                     <div>Ngày tạo</div>
                     <div>Trạng thái</div>
                 </Table.Header>
@@ -55,16 +53,10 @@ function CampaignVoucherItems() {
                     data={campaignVoucherItems}
                     render={(item, index) => {
                         const displayedIndex = (page - 1) * limit + index + 1;
-                        const voucherCode = `VI${index.toString().padStart(6, '0')}`;
                         return (
                             <Table.Row key={item.id}>
                                 <div>{displayedIndex}</div>
-                                <div>
-                                    <DataItem
-                                        image={currentVoucherInfo.image}
-                                        title={voucherCode}
-                                    />
-                                </div>
+                                <div>{item.id || "N/A"}</div>
                                 <div>{currentVoucherInfo.name || currentVoucherInfo.voucherName || 'Chưa có tên voucher'}</div>
                                 <div>{formatCurrency(currentVoucherInfo.price || 0)}</div>
                                 <div>{format(new Date(item.createdAt), "dd/MM/yyyy")}</div>

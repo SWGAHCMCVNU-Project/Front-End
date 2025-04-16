@@ -230,6 +230,15 @@ function Sidenav({ color }) {
       type: "group",
       menuSideNav: [
         {
+          key: "24",
+          linkURL: "/lecturers",
+          pageName: "lecturers",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faUserTie} />,
+          labelPageName: "Giảng viên",
+          allowedRoles: ["campus"],
+        },
+        {
           key: "15",
           linkURL: "/stores",
           pageName: "stores",
@@ -247,15 +256,6 @@ function Sidenav({ color }) {
           labelPageName: "Phiếu mẫu",
           allowedRoles: ["brand"],
         },
-        // {
-        //   key: "19",
-        //   linkURL: "/transactions",
-        //   pageName: "transactions",
-        //   color: color,
-        //   iconPage: <FontAwesomeIcon icon={faClockRotateLeft} />,
-        //   labelPageName: "Lịch sử giao dịch",
-        //   allowedRoles: ["brand", "campus"],
-        // },
         {
           key: "21",
           linkURL: "/buy-points",
@@ -273,6 +273,7 @@ function Sidenav({ color }) {
     {
       type: "group",
       menuSideNav: [
+      
         {
           key: "20",
           linkURL: "/profile",
@@ -280,7 +281,7 @@ function Sidenav({ color }) {
           color: color,
           iconPage: <ProfileOutlined />,
           labelPageName: "Thông tin chi tiết",
-          allowedRoles: [ "brand", "campus"],
+          allowedRoles: ["brand", "campus"],
         },
       ],
     },
@@ -300,7 +301,7 @@ function Sidenav({ color }) {
           src={logo}
           alt=""
         />
-        <span style={{ fontSize: "20px", marginLeft: "40px" }}>S_WALLET</span>
+        <span style={{ fontSize: "20px", marginLeft: "40px" }}>SWALLET</span>
       </div>
       <Divider />
       <Menu

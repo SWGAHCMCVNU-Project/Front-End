@@ -12,6 +12,7 @@ import {
   useImageValidity,
 } from "../../utils/helpers";
 import { useStore } from "./useStore";
+import { useState, useMemo } from "react";
 
 const Stacked = styled.div`
   display: flex;
@@ -64,28 +65,62 @@ function StoreList() {
     limit,
     handlePageChange,
     handleLimitChange,
-    setSort,
   } = useStore();
   const navigate = useNavigate();
 
+  // Local state for sorting
+  const [sort, setSort] = useState("Id,desc");
+
   // Kiểm tra dữ liệu stores trước khi sử dụng
-  const storeImages = stores?.result?.map((store) => store.file) || []; // Sửa từ store.avatar thành store.file
+  const storeImages = stores?.result?.map((store) => store.file) || [];
   const isValidImages = useImageValidity(stores?.result || [], storeImages);
 
+  // Handle sorting when a column header is clicked
   const handleSort = (pagination, filters, sorter) => {
-    if (!sorter.field || !sorter.order) return; // Ngăn lỗi khi sorter rỗng
-    const sortOrder = sorter.order === "ascend" ? "asc" : "desc";
-    switch (sorter.field) {
-      case "StoreName":
-        setSort(`${sorter.field},${sortOrder}`);
-        break;
-      case "Hours":
-        setSort(`${sorter.field},${sortOrder}`);
-        break;
-      default:
-        break;
+    if (!sorter.order) {
+      setSort("Id,desc");
+      return;
     }
+
+    const sortOrder = sorter.order === "ascend" ? "asc" : "desc";
+    const sortField = sorter.field; // e.g., "StoreName" or "Hours"
+    const newSort = `${sortField},${sortOrder}`;
+    setSort(newSort);
   };
+
+  // Client-side sorting logic
+  const sortedStores = useMemo(() => {
+    const [sortField, sortOrder] = sort.split(",");
+    const items = stores?.result ? [...stores.result] : [];
+
+    if (!items.length) return [];
+
+    items.sort((a, b) => {
+      let valueA, valueB;
+
+      switch (sortField) {
+        case "StoreName":
+          valueA = a.storeName?.toLowerCase() || "";
+          valueB = b.storeName?.toLowerCase() || "";
+          break;
+        case "Hours":
+          // Sort by opening hours (you could also sort by closing hours if preferred)
+          valueA = a.openingHours || "00:00:00";
+          valueB = b.openingHours || "00:00:00";
+          break;
+        default:
+          return 0; // No sorting for default case
+      }
+
+      if (sortOrder === "asc") {
+        return valueA < valueB ? -1 : valueA > valueB ? 1 : 0;
+      } else {
+        return valueA > valueB ? -1 : valueA < valueB ? 1 : 0;
+      }
+    });
+
+    return items;
+  }, [stores?.result, sort]);
 
   const columns = [
     { title: "STT", dataIndex: "number", key: "number", align: "center" },
@@ -109,10 +144,10 @@ function StoreList() {
     return <Empty resourceName="cửa hàng" />;
   }
 
-  const data = stores.result.map((store, index) => {
+  const data = sortedStores.map((store, index) => {
     const dataIndex = (page - 1) * limit + index + 1;
     const isValid = isValidImages[index];
-    const avatarSrc = isValid ? store.file : imgDefaultStore; // Sửa từ store.avatar thành store.file
+    const avatarSrc = isValid ? store.file : imgDefaultStore;
 
     const openingHours = store.openingHours || "00:00:00";
     const closingHours = store.closingHours || "00:00:00";

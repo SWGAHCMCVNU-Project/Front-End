@@ -12,7 +12,7 @@ const StyledButton = styled.button`
   border: none;
   padding: 0.6rem;
   font-size: 1.4rem;
-  transition: all 0.2s;
+  transitionやすall 0.2s;
   &:hover {
     background-color: var(--color-grey-50);
   }
@@ -74,13 +74,13 @@ const StatusTag = styled.div`
   border-radius: 100px;
   font-size: 1.2rem;
   font-weight: 500;
-  background-color: ${(props) => 
+  background-color: ${(props) =>
     props.$status ? "var(--color-cyan-100)" : "var(--color-red-100)"};
-  color: ${(props) => 
+  color: ${(props) =>
     props.$status ? "var(--color-cyan-700)" : "var(--color-red-700)"};
 `;
 
-function ChallengeRow({ id, challengeName, amount, condition, type, description, status, displayedIndex }) {
+function ChallengeRow({ id, challengeName, amount, condition, type, description, status, category, displayedIndex }) {
   const { update, isUpdating } = useUpdateChallenge();
 
   return (
@@ -90,6 +90,7 @@ function ChallengeRow({ id, challengeName, amount, condition, type, description,
       <ChallengeValue>{amount}</ChallengeValue>
       <ChallengeValue>{condition}</ChallengeValue>
       <ChallengeValue>{type === 1 ? "Hằng ngày" : "Thành tựu"}</ChallengeValue>
+      <ChallengeValue>{category}</ChallengeValue>
       <div>
         <Tag type={status ? "cyan" : "error"}>{status ? "Hoạt động" : "Không hoạt động"}</Tag>
       </div>
@@ -102,7 +103,7 @@ function ChallengeRow({ id, challengeName, amount, condition, type, description,
           </Modal.Open>
           <Modal.Window name={`edit-${id}`}>
             <ChallengeForm
-              challengeToEdit={{ id, challengeName, amount, condition, type, description, status }}
+              challengeToEdit={{ id, challengeName, amount, condition, type, description, status, category }}
               onCloseModal={() => {}}
             />
           </Modal.Window>
@@ -120,6 +121,7 @@ ChallengeRow.propTypes = {
   type: PropTypes.number.isRequired,
   description: PropTypes.string,
   status: PropTypes.bool.isRequired,
+  category: PropTypes.string.isRequired,
   displayedIndex: PropTypes.number.isRequired,
 };
 

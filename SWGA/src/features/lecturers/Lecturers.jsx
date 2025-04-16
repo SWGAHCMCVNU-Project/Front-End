@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Empty from "../../ui/Empty";
 import Menus from "../../ui/Menus";
@@ -11,20 +11,24 @@ import SetRowsPerPage from "./SetRowsPerPage";
 import LecturerRow from "./LecturerRow";
 import FilterOperations from "./FilterOperations";
 import LecturerTableOperations from "./LecturerTableOperations";
-import Heading from "../../ui/Heading";
 import Row from "../../ui/Row";
-import { mockLecturers, mockLecturersPoints } from "./mockLecturers";
 import Modal from "../../ui/Modal";
 import Form from "../../ui/Form";
 import FormRow from "../../ui/FormRow";
 import Input from "../../ui/Input";
 import Button from "../../ui/Button";
+import { useGetLecturers } from "../../hooks/lecturer/useGetLecturers";
+import useGetCampusByAccountId from "../../hooks/campus/useGetCampusByAccount";
+import StorageService from "../../services/storageService";
 
 const Container = styled.div`
-  margin: 0 auto 3rem;
+  margin: 0;
+  padding: 0 1rem;
   display: flex;
   flex-direction: column;
-  gap: 3.2rem;
+  gap: 3.3rem;
+  width: 100%;
+  box-sizing: border-box;
 `;
 
 const StyledHeader = styled.div`
@@ -39,7 +43,7 @@ const StyledButton = styled.div`
   background: none;
   border: none;
   cursor: pointer;
-
+  width: 100%;
   &:hover {
     background-color: var(--color-grey-50);
   }
@@ -53,18 +57,70 @@ function Lecturers() {
   const [searchParams] = useSearchParams();
   const [isOpenForm, setIsOpenForm] = useState(false);
   const [selectedLecturer, setSelectedLecturer] = useState(null);
+  const navigate = useNavigate();
 
-  const lecturers = mockLecturers.result;
+  const accountId = StorageService.getAccountId();
+
+  useEffect(() => {
+    if (!accountId) {
+      navigate("/login");
+    }
+  }, [accountId, navigate]);
+
+  const {
+    data: campusData,
+    isLoading: isCampusLoading,
+    error: campusError,
+  } = useGetCampusByAccountId(accountId);
+
+  const urlCampusId =
+    campusData?.id || searchParams.get("campusId") || undefined;
+
+  useEffect(() => {
+    if (campusData?.id) {
+      StorageService.setCampusId(campusData.id);
+    }
+  }, [campusData]);
+
+  useEffect(() => {
+    if (!urlCampusId && !isCampusLoading && !campusError) {
+      navigate("/dashboard");
+    }
+  }, [urlCampusId, isCampusLoading, campusError, navigate]);
+
+  const searchName = searchParams.get("search") || "";
+  const { lecturers, isLoading, error } = useGetLecturers({
+    campusId: urlCampusId,
+    searchName,
+    page: currentPage,
+    size: limit,
+  });
 
   const onLimitChange = (newLimit) => {
     setLimit(newLimit);
     setCurrentPage(1);
   };
 
-  if (!lecturers?.length) return <Empty resourceName="giảng viên" />;
+  if (isCampusLoading || isLoading) return <Spinner />;
+  if (campusError)
+    return (
+      <Empty resourceName="campus" message="Không thể tải thông tin campus" />
+    );
+  if (!urlCampusId)
+    return (
+      <Empty resourceName="campus" message="Không tìm thấy thông tin campus" />
+    );
+  if (error) return <Empty resourceName="giảng viên" message={error.message} />;
+
+  // Fallback filtering on the frontend
+  const filteredBySearch = searchName
+    ? lecturers.result.filter((lecturer) =>
+        lecturer.fullName?.toLowerCase().includes(searchName.toLowerCase())
+      )
+    : lecturers.result;
 
   const filteredLecturers = filterLecturersByState(
-    lecturers,
+    filteredBySearch,
     searchParams.get("state")
   );
 
@@ -75,139 +131,119 @@ function Lecturers() {
 
   const sortedLecturers = [...filteredLecturers].sort((a, b) => {
     if (sortField === "id") {
-      return sortOrder === "asc" ? a.id - b.id : b.id - a.id;
-    } else if (sortField === "FullName") {
       return sortOrder === "asc"
-        ? a.fullName.localeCompare(b.fullName)
-        : b.fullName.localeCompare(a.fullName);
+        ? a.id.localeCompare(b.id)
+        : b.id.localeCompare(a.id);
+    } else if (sortField === "fullName") {
+      return sortOrder === "asc"
+        ? (a.fullName || "").localeCompare(b.fullName || "")
+        : (b.fullName || "").localeCompare(a.fullName || "");
     }
     return 0;
   });
 
   const pageSize = limit || 10;
-  const totalCount = sortedLecturers.length;
+  const totalCount = filteredLecturers.length; // Use filtered count for pagination
   const pageCount = Math.ceil(totalCount / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
-  const paginatedLecturers = sortedLecturers.slice(startIndex, startIndex + pageSize);
+  const paginatedLecturers = sortedLecturers.slice(
+    startIndex,
+    startIndex + pageSize
+  );
 
-  // Hàm tính tổng điểm của từng giảng viên
-  const getLecturerPoints = (lecturerId) => {
-    const points = mockLecturersPoints.filter((point) => point.lecturerId === lecturerId);
-    if (!points.length) return { pointsAllocated: 0, pointsUsed: 0, pointsRemaining: 0 };
-
-    return points.reduce(
-      (acc, point) => ({
-        pointsAllocated: acc.pointsAllocated + point.pointsAllocated,
-        pointsUsed: acc.pointsUsed + point.pointsUsed,
-        pointsRemaining: acc.pointsRemaining + point.pointsRemaining,
-      }),
-      { pointsAllocated: 0, pointsUsed: 0, pointsRemaining: 0 }
-    );
-  };
-
-  // Hàm xử lý phân bổ điểm
   const handleAllocatePoints = (pointData) => {
-    const newPoint = {
-      id: Date.now() + Math.random(),
-      lecturerId: selectedLecturer.id,
-      campusId: 1,
-      pointsAllocated: parseInt(pointData.pointsAllocated),
-      pointsUsed: 0,
-      pointsRemaining: parseInt(pointData.pointsAllocated),
-      allocationDate: new Date().toISOString().split("T")[0],
-      state: "active",
-    };
-    // Cập nhật mockLecturersPoints (giả lập)
-    mockLecturersPoints.push(newPoint);
     setIsOpenForm(false);
-    setSelectedLecturer(null); // Reset sau khi phân bổ
+    setSelectedLecturer(null);
   };
 
   return (
     <Container>
-      {/* <Heading as="h1">Giảng viên</Heading> */}
-      <Row type="horizontal">
+      <Row type="horizontal" style={{ width: "100%", margin: 0 }}>
         <FilterOperations />
         <LecturerTableOperations />
       </Row>
-      <Row>
-        <Menus>
-          <Table columns="0.4fr 1.8fr 1.7fr 0.9fr 1.7fr 1.2fr 1.1fr 1fr 1fr 1fr 1fr 1fr">
-            <Table.Header>
-              <StyledHeader>STT</StyledHeader>
-              <StackedHeader
-                label="Giảng viên"
-                onClick={() => handleStackedClick("FullName")}
-                ascending={sortField === "FullName" && sortOrder === "asc"}
-                active={sortField === "FullName"}
-              />
-              <div>Liên hệ</div>
-              <div>Đại học</div>
-              <StyledHeader>Chuyên ngành</StyledHeader>
-              <StyledHeader>Trạng thái</StyledHeader>
-              <StyledHeader>Điểm hiện có</StyledHeader>
-              <StyledHeader>Điểm đã phân bổ</StyledHeader>
-              <StyledHeader>Điểm đã sử dụng</StyledHeader>
-              <StyledHeader>Điểm còn lại</StyledHeader>
-              <StyledHeader>Hành động</StyledHeader>
-            </Table.Header>
+      <Row style={{ width: "100%", margin: 0 }}>
+        {filteredLecturers.length === 0 ? (
+          <Empty resourceName="giảng viên" />
+        ) : (
+          <Menus>
+            <Table columns="0.5fr 2fr 0.5fr 1.9fr 1fr 1fr 1fr">
+              <Table.Header style={{ width: "100%" }}>
+                <StyledHeader>STT</StyledHeader>
+                <StackedHeader
+                  label="Giảng viên"
+                  onClick={() => handleStackedClick("fullName")}
+                  ascending={sortField === "fullName" && sortOrder === "asc"}
+                  active={sortField === "fullName"}
+                />
+                <StyledHeader>Liên hệ</StyledHeader>
+                <StyledHeader>Đại học</StyledHeader>
+                <StyledHeader>Trạng thái</StyledHeader>
+                <StyledHeader>Số dư</StyledHeader>
+                <StyledHeader>Hành động</StyledHeader>
+              </Table.Header>
 
-            <Table.Body
-              data={paginatedLecturers}
-              render={(lecturer, index) => {
-                const points = getLecturerPoints(lecturer.id);
-                return (
+              <Table.Body
+                data={paginatedLecturers}
+                render={(lecturer, index) => (
                   <StyledButton>
                     <LecturerRow
                       key={lecturer.id}
                       lecturer={lecturer}
                       index={startIndex + index + 1}
-                      pointsRemaining={points.pointsRemaining}
-                      pointsAllocated={points.pointsAllocated}
-                      pointsUsed={points.pointsUsed}
                       onAllocate={() => {
                         setSelectedLecturer(lecturer);
                         setIsOpenForm(true);
                       }}
                     />
                   </StyledButton>
-                );
-              }}
-            />
-            <Table.Footer>
-              <Pagination
-                count={totalCount}
-                currentPage={currentPage}
-                pageSize={pageSize}
-                pageCount={pageCount}
-                onPageChange={setCurrentPage}
+                )}
               />
-              <SetRowsPerPage pageSize={pageSize} onLimitChange={onLimitChange} />
-            </Table.Footer>
-          </Table>
+              <Table.Footer>
+                <Pagination
+                  count={totalCount}
+                  currentPage={currentPage}
+                  pageSize={pageSize}
+                  pageCount={pageCount}
+                  onPageChange={setCurrentPage}
+                />
+                <SetRowsPerPage
+                  pageSize={pageSize}
+                  onLimitChange={onLimitChange}
+                />
+              </Table.Footer>
+            </Table>
 
-          {isOpenForm && selectedLecturer && (
-            <Modal isOpen={isOpenForm} onClose={() => setIsOpenForm(false)}>
-              <Form onSubmit={(e) => {
-                e.preventDefault();
-                const formData = {
-                  pointsAllocated: e.target.pointsAllocated.value,
-                };
-                handleAllocatePoints(formData);
-              }}>
-                <FormRow label="Số điểm phân bổ">
-                  <Input
-                    type="number"
-                    name="pointsAllocated"
-                    defaultValue={0}
-                  />
-                </FormRow>
-                <Button type="submit">Phân bổ</Button>
-                <Button $variation="danger" onClick={() => setIsOpenForm(false)}>Hủy</Button>
-              </Form>
-            </Modal>
-          )}
-        </Menus>
+            {isOpenForm && selectedLecturer && (
+              <Modal isOpen={isOpenForm} onClose={() => setIsOpenForm(false)}>
+                <Form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const formData = {
+                      pointsAllocated: e.target.pointsAllocated.value,
+                    };
+                    handleAllocatePoints(formData);
+                  }}
+                >
+                  <FormRow label="Số điểm phân bổ">
+                    <Input
+                      type="number"
+                      name="pointsAllocated"
+                      defaultValue={0}
+                    />
+                  </FormRow>
+                  <Button type="submit">Phân bổ</Button>
+                  <Button
+                    $variation="danger"
+                    onClick={() => setIsOpenForm(false)}
+                  >
+                    Hủy
+                  </Button>
+                </Form>
+              </Modal>
+            )}
+          </Menus>
+        )}
       </Row>
     </Container>
   );
@@ -217,7 +253,9 @@ function filterLecturersByState(lecturers, filterValue) {
   if (!filterValue || filterValue === "all") {
     return lecturers;
   }
-  return lecturers.filter((lecturer) => lecturer.state === (filterValue === "true"));
+  return lecturers.filter(
+    (lecturer) => (lecturer.state ?? false) === (filterValue === "true")
+  );
 }
 
 export default Lecturers;
