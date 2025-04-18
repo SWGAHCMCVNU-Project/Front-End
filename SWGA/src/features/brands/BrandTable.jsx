@@ -80,7 +80,6 @@ function BrandTable() {
     return <div>Loading...</div>;
   }
 
-  console.log("Brand Data after fetch:", brandData);
 
   return (
     <div className="flex flex-col gap-8">

@@ -75,7 +75,7 @@ const StyledImg = styled.img`
   transition: border-color 0.3s ease;
 
   &:hover {
-    border-color: var(--color-green-400);
+    border-color: #1c5d78;
   }
 `;
 

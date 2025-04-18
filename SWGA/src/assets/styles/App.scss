@@ -20,24 +20,24 @@ body {
 }
 
 .ant-input-affix-wrapper:not(.ant-input-affix-wrapper-disabled):hover {
-  border-color: #2ecc71;
+  border-color: #104358;
 }
 
 .ant-input-affix-wrapper:focus,
 .ant-input-affix-wrapper-focused {
-  border-color: #2ecc71;
+  border-color: #104358;
   box-shadow: none;
 }
 
 .ant-select:not(.ant-select-disabled):hover .ant-select-selector {
-  border-color: #2ecc71;
+  border-color: #104358;
 }
 
 .ant-select-focused:not(.ant-select-disabled).ant-select:not(
     .ant-select-customize-input
   )
   .ant-select-selector {
-  border-color: #2ecc71;
+  border-color: #104358;
   box-shadow: none;
 }
 
@@ -156,10 +156,10 @@ body {
 .btn-logout {
   width: 100px;
   margin-top: 10px;
-  background-color: #2ecc71;
+  background-color: #104358;
 
   &:hover {
-    background-color: #21b658;
+    background-color:#104358;
   }
 }
 
@@ -186,7 +186,7 @@ body {
 /* ------------------- */
 
 .ant-menu-light .ant-menu-submenu-title:hover {
-  color: #2ecc71;
+  color: #104358;
 }
 
 .ant-select {
@@ -210,27 +210,27 @@ body {
 
 .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
   color: #fff;
-  background: #2ecc71;
+  background: #104358;
 }
 
 .ant-radio-button-wrapper-checked:not(
     .ant-radio-button-wrapper-disabled
   ):hover {
-  color: #2ecc71;
-  background: #2ecc71;
+  color:#104358;
+  background: #104358;
 }
 
 .ant-radio-button-wrapper:hover {
-  color: #2ecc71;
+  color: #104358;
 }
 
 .ant-pagination-item-active a {
   color: white;
-  background-color: #2ecc71;
+  background-color: #104358;
 }
 
 .ant-pagination-item-active {
-  border-color: #2ecc71;
+  border-color:#104358;
 }
 
 .ant-table-pagination {
@@ -397,9 +397,9 @@ body {
   .ant-menu-submenu.ant-menu-item-selected
   .active,
 .layout-dashboard .ant-layout-sider.sider-primary .ant-menu-submenu .active {
-  background-color: #caf5dc;
+  background-color: #1c5d78;
   font-weight: 600;
-  color: #2ecc71;
+  color:#fff;
 }
 
 .layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item a,
@@ -422,7 +422,7 @@ body {
   .ant-menu-item
   .active
   .icon {
-  background-color: #2ecc71;
+  background-color: #104358;
 }
 
 .layout-dashboard
@@ -491,7 +491,7 @@ body {
 
 .layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item a:hover,
 .layout-dashboard .ant-layout-sider.sider-primary .ant-menu-submenu a:hover {
-  color: #2ecc71;
+  color: #104358;
 }
 
 .layout-dashboard
@@ -1274,7 +1274,7 @@ button.ant-btn.bell strong {
 
 .bar-chart {
   background: transparent
-    linear-gradient(62deg, #15803d 0%, #21b658 53%, #2ecc71 100%) 0% 0%
+    linear-gradient(62deg, #15803d 0%, #21b658 53%,#104358 100%) 0% 0%
     no-repeat padding-box;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1215686275);
   border-radius: 8px;
@@ -3553,35 +3553,35 @@ section.ant-layout.ant-layout-has-sider.layout-dashboard.layout-profile
 }
 
 .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: #2ecc71;
+  color:#104358;
 }
 
 .ant-tabs-ink-bar {
-  color: #2ecc71;
+  color: #104358;
 }
 
 .ant-tabs-ink-bar {
   position: absolute;
-  background: #2ecc71;
+  background: #104358;
   pointer-events: none;
 }
 
 .ant-radio-checked .ant-radio-inner {
-  border-color: var(--color-green-600);
+  border-color: var(--color-blue-300);
 }
 
 .ant-radio-checked .ant-radio-inner::after {
-  background-color: var(--color-green-600);
+  background-color: var(--color-blue-300);
 }
 
 .ant-picker:hover,
 .ant-picker-focused {
-  border-color: #2ecc71;
+  border-color: #104358;
   border-right-width: 1px;
 }
 
 .ant-picker-focused {
-  border-color: #2ecc71;
+  border-color: #104358;
   box-shadow: none;
   border-right-width: 1px;
   outline: 0;
@@ -3598,28 +3598,28 @@ section.ant-layout.ant-layout-has-sider.layout-dashboard.layout-profile
   bottom: 0;
   left: 0;
   z-index: 1;
-  border: 1px solid #2ecc71;
+  border: 1px solid #104358;
   border-radius: 2px;
   content: "";
 }
 
 .ant-picker-today-btn {
-  color: #2ecc71;
+  color:#104358;
 }
 
 .ant-picker-today-btn:hover {
-  color: #2ecc71;
+  color: #104358;
 }
 
 .ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner,
 .ant-picker-cell-in-view.ant-picker-cell-range-start .ant-picker-cell-inner,
 .ant-picker-cell-in-view.ant-picker-cell-range-end .ant-picker-cell-inner {
   color: #fff;
-  background: #2ecc71;
+  background:#104358;
 }
 
 .ant-picker-header button:hover {
-  color: #2ecc71;
+  color: #104358;
 }
 
 .rdw-editor-main {

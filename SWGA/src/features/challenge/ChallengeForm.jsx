@@ -144,7 +144,7 @@ const ChallengeForm = ({ challengeToEdit = {}, onCloseModal }) => {
           })}
         />
       </FormRow>
-      <FormRow label="Số lượng (Amount)" error={errors?.amount?.message}>
+      <FormRow label="Thưởng" error={errors?.amount?.message}>
         <StyledInput
           type="number"
           id="amount"

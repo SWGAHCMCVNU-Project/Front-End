@@ -88,7 +88,7 @@ function ChallengeTable() {
             <Table.Header>
               <div>STT</div>
               <div>Tên thử thách</div>
-              <div>Số lượng</div>
+              <div>Thưởng</div>
               <div>Điều kiện</div>
               <div>Loại</div>
               <div>Danh mục</div>

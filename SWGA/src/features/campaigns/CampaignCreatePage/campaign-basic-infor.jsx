@@ -43,7 +43,7 @@ const Form = styled.form`
 `;
 
 const Header = styled.header`
-  color: var(--color-green-600);
+  color: #1c5d78;
   font-size: 1.7rem;
   font-weight: 500;
   display: flex;
@@ -311,7 +311,7 @@ function CampaignBasicInformation() {
             </span>
             <span>
               - Xem danh sách cửa hàng của bạn{" "}
-              <Link className="link-noti" to={"/stores"}>
+              <Link style={{color: "#1c5d78"}} className="link-noti" to={"/stores"}>
                 {" "}
                 tại đây
               </Link>
@@ -319,7 +319,7 @@ function CampaignBasicInformation() {
             </span>
             <span>
               - Xem phiếu ưu đãi của bạn{" "}
-              <Link className="link-noti" to={"/voucher-items"}>
+              <Link style={{color: "#1c5d78"}} className="link-noti" to={"/voucher-items"}>
                 {" "}
                 tại đây
               </Link>

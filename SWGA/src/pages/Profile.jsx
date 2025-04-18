@@ -22,15 +22,25 @@ const Profile = () => {
     return <Spinner />;
   }
 
+  // Fetch brandId or campusId based on role
+  const brandId = roleLogin === "brand" ? storageService.getBrandId() : null;
+  const campusId = roleLogin === "campus" ? storageService.getCampusId() : null;
+
   switch (roleLogin) {
     // case 'admin':
     //   return <AdminProfile />;
     // case 'staff':
     //   return <StaffProfile />;
     case "brand":
-      return <BrandProfile />;
+      if (!brandId) {
+        return <div>Error: Brand ID is missing for the logged-in user.</div>;
+      }
+      return <BrandProfile brandId={brandId} />;
     case "campus":
-      return <CampusProfile />;
+      if (!campusId) {
+        return <div>Error: Campus ID is missing for the logged-in user.</div>;
+      }
+      return <CampusProfile campusId={campusId} />;
     default:
       return <Navigate to="/sign-in" replace />;
   }

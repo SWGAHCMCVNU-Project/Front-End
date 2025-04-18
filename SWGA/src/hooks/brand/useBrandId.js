@@ -1,47 +1,29 @@
 // useBrand.js
-import { useState, useEffect } from 'react';
-import { getBrandByIdAPI } from '../../store/api/brandApi'; // Điều chỉnh đường dẫn theo cấu trúc project của bạn
+import { useQuery } from '@tanstack/react-query';
+import { getBrandByIdAPI } from '../../store/api/brandApi';
+import { toast } from "react-hot-toast";
 
 export const useBrand = (brandId) => {
-  const [brand, setBrand] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const fetchBrand = async (id) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const response = await getBrandByIdAPI(id);
-      setBrand(response.data);
-      return response;
-    } catch (err) {
-      setError(err.message || "Đã có lỗi xảy ra khi lấy thông tin thương hiệu!");
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Tự động fetch khi brandId thay đổi
-  useEffect(() => {
-    if (brandId) {
-      fetchBrand(brandId);
-    }
-  }, [brandId]);
-
-  // Hàm để refetch manually nếu cần
-  const refetch = () => {
-    if (brandId) {
-      fetchBrand(brandId);
-    }
-  };
+  const { data: brand, isLoading, error, refetch } = useQuery({
+    queryKey: ['brand', brandId], // Unique key for caching
+    queryFn: async () => {
+      if (!brandId) {
+        throw new Error('Brand ID is required');
+      }
+      const response = await getBrandByIdAPI(brandId);
+      return response.data; // Return the brand data
+    },
+    enabled: !!brandId, // Only run the query if brandId exists
+    onError: (err) => {
+      toast.error(err.message || 'Đã có lỗi xảy ra khi lấy thông tin thương hiệu!');
+    },
+  });
 
   return {
-    brand,      // Dữ liệu thương hiệu
-    loading,    // Trạng thái đang tải
-    error,      // Lỗi nếu có
-    refetch     // Hàm để gọi lại API manually
+    brand, // The fetched brand data
+    loading: isLoading, // Loading state
+    error: error?.message || null, // Error message if any
+    refetch, // Function to manually refetch
   };
 };
 

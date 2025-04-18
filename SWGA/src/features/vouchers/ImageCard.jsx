@@ -84,7 +84,7 @@ const InfoFile = styled.div`
 const ButtonRemove = styled.span`
   font-weight: 500;
   font-size: 16px;
-  color: var(--color-green-600);
+  color: #1c5d78;
   margin-top: 10px;
   cursor: pointer;
   transition: opacity 0.3s ease;
@@ -102,10 +102,10 @@ const CustomFileInput = styled.div`
 const FileInputLabel = styled.label`
   font-size: 1.4rem;
   color: var(--color-no-100);
-  background-color: var(--color-green-600);
+  background-color: #1c5d78;
   cursor: pointer;
   padding: 0.5rem 1rem;
-  border: 1px solid var(--color-green-600);
+  border: 1px solid #1c5d78;
   border-radius: 5px;
 `;
 

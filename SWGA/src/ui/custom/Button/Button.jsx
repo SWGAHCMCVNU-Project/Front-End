@@ -59,10 +59,10 @@ export const ButtonNextPrev = styled.button`
     padding: 1.2rem 2.4rem;
     font-weight: 500;
     color: var(--color-grey-0);
-    background-color: var(--color-green-400);
+    background-color: #1c5d78;
   
     &:hover {
-    background-color: var(--color-green-600);
+    background-color: #1c5d78;
     }
 `;
 
@@ -76,7 +76,7 @@ export const ButtonAction = styled.button`
 
   &:hover {
     background-color: var(--color-grey-50);
-    border: 1px solid var(--color-green-600);
+    border: 1px solid #1c5d78;
     border-radius: 5px;
   }
 
@@ -88,7 +88,7 @@ export const ButtonAction = styled.button`
   }
 
   & svg:hover {
-    color: var(--color-green-600);
+    color: var(--color-blue-300);
   }
 `;
 

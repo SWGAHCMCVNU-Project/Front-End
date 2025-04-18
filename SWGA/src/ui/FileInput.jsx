@@ -12,12 +12,12 @@ const FileInput = styled.input.attrs({ type: "file" })`
     border-radius: var(--border-radius-sm);
     border: none;
     color: var(--color-grey-0);
-    background-color: var(--color-green-400);
+    background-color:  #1c5d78;
     cursor: pointer;
     transition: color 0.2s, background-color 0.2s;
 
     &:hover {
-      background-color: var(--color-green-400);
+      background-color:  #1c5d78;
     }
   }
 `;

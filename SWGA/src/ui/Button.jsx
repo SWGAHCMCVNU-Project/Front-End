@@ -23,10 +23,10 @@ const sizes = {
 const variations = {
   primary: css`
     color: var(--color-grey-0);
-    background-color: var(--color-green-400);
+    background-color: #1c5d78;
 
     &:hover {
-      background-color: var(--color-green-600);
+      background-color: #1c5d78;
     }
   `,
   secondary: css`

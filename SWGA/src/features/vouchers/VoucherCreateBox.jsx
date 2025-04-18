@@ -51,7 +51,7 @@ Form.defaultProps = {
 };
 
 const Header = styled.header`
-  color: var(--color-green-600);
+  color: #1c5d78;
   font-size: 1.7rem;
   font-weight: 500;
   display: flex;

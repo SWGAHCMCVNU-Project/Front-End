@@ -7,13 +7,10 @@ export const useCreateChallenge = () => {
 
   const mutation = useMutation({
     mutationFn: async (challengeData) => {
-      console.log("Starting create challenge with data:", challengeData);
       const response = await createChallenge(challengeData);
-      console.log("Create challenge success, response:", response);
       return response;
     },
     onSuccess: () => {
-      console.log("Create challenge successful, invalidating challenges query");
       // Làm mới danh sách thử thách ngay lập tức
       queryClient.invalidateQueries(["challenges"]);
     },
@@ -21,7 +18,6 @@ export const useCreateChallenge = () => {
       console.error("Create challenge failed:", err);
     },
     onSettled: () => {
-      console.log("Finished create challenge, mutation settled");
     },
   });
 

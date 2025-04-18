@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 const ButtonText = styled.button`
-  color: var(--color-green-600);
+  color: #1c5d78;
   text-align: center;
   transition: all 0.3s;
   background: var(--color-grey-0);

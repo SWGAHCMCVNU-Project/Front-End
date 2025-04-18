@@ -46,7 +46,7 @@ const GlobalStyles = createGlobalStyle`
   --color-cyan-100: #e6fffb;
   --color-cyan-600: #87e8de;
   --color-cyan-700: #08979c;
-
+  --color-blue-300: #1c5d78;
   --color-error-100: #fff2f0;
   --color-error-600: #ffccc7;
   --color-error-700: #ff4d4f;

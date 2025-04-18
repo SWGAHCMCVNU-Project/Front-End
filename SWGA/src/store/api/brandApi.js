@@ -54,7 +54,7 @@ export const getBrandByIdAPI = async (brandId) => {
   }
 };
 
-export const getAllBrandsAPI = async ({ page = 1, size = 10, search = "", state = true, isAsc = true } = {}) => {
+export const getAllBrandsAPI = async ({ page = 1, size = "", search = "", state = true, isAsc = true } = {}) => {
   try {
     const params = new URLSearchParams();
     params.append("page", page);
