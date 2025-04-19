@@ -23,7 +23,7 @@ import { Divider, Menu } from "antd";
 import React, { useEffect } from "react";
 import { HiMiniTicket } from "react-icons/hi2";
 import { NavLink, useNavigate } from "react-router-dom";
-import logo from "../../assets/images/S_WalletLogo.png";
+import logo from "../../assets/images/swallet_logo.png";
 import storageService from "../../services/storageService";
 import { MenuItem } from "./MenuItem";
 

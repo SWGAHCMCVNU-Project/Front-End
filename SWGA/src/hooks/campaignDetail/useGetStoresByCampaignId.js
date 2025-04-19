@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getStoresByCampaignId } from '../../store/api/campaignDetailApi';
 
-const useGetStoresByCampaignId = (campaignId, searchName = "", page = 1, size = 10) => {
+const useGetStoresByCampaignId = (campaignId, searchName = "", page = 1, size = 100) => {
   const [stores, setStores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

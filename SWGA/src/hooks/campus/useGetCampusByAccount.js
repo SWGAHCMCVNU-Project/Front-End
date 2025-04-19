@@ -12,15 +12,11 @@ const useGetCampusByAccountId = (accountId) => {
       toast.error(error.message || 'Lấy thông tin campus theo account thất bại');
     },
     select: (response) => {
-      if (response && response.success) {
-        if (Array.isArray(response.data)) {
-          // If response.data is an array, return the first item's id or null
-          return response.data.length > 0 ? { id: response.data[0]?.id } : null;
-        }
-        // Handle object response
-        return response.data?.data || response.data || null;
+      if (response?.success) {
+        // Giả sử response.data là object chứa thông tin campus
+        return response.data?.id || null;
       }
-      return null; // Return null if no valid data
+      return null;
     },
     retry: 1, // Retry once on failure
   });

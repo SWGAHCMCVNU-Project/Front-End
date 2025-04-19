@@ -8,9 +8,9 @@ import { HiPencil } from "react-icons/hi2";
 import Modal from "../../../ui/Modal";
 import Spinner from "../../../ui/Spinner";
 import EditCampusForm from "./EditCampusForm";
-import useGetCampusByAccountId from "../../../hooks/campus/useGetCampusByAccount"; // Import hook mới
 import { useNavigate } from "react-router-dom";
 import StorageService from "../../../services/storageService";
+import useGetCampusById from "../../../hooks/campus/useGetCampusById";
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -51,18 +51,17 @@ function CampusProfile() {
   const navigate = useNavigate();
 
   // Lấy accountId từ StorageService
-  const accountId = StorageService.getAccountId();
-
+  const campusId = StorageService.getCampusId(); // Thay thế bằng hàm getCampusId()
   // Debug: Log accountId
 
   // Nếu không có accountId, chuyển hướng về trang đăng nhập hoặc trang lỗi
-  if (!accountId) {
+  if (!campusId) {
     console.warn("No accountId found, redirecting...");
     navigate("/login"); // Điều hướng về trang đăng nhập
     return null;
   }
 
-  const { data: campus, isLoading, error } = useGetCampusByAccountId(accountId);
+  const { data: campus, isLoading, error } = useGetCampusById(campusId);
 
   if (isLoading) return <Spinner />;
 
@@ -72,7 +71,7 @@ function CampusProfile() {
   }
 
   if (!campus?.success || !campus?.data) {
-    console.warn("Campus not found for accountId:", accountId);
+    console.warn("Campus not found for accountId:", campusId);
     return <div>Campus for this account not found.</div>;
   }
 

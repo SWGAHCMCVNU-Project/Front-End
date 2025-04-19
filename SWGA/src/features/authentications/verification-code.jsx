@@ -3,7 +3,7 @@ import { Button, Card, Col, Typography } from "antd";
 import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import ReactInputVerificationCode from "react-input-verification-code";
-import logo from "../../assets/images/S_WalletLogo.png";
+import logo from "../../assets/images/swallet_logo.png";
 import ButtonText from "../../ui/ButtonText";
 import { VerificationCodeButton } from "../../ui/custom/Button/Button";
 import "./scss/verification-code.scss";
