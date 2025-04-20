@@ -18,16 +18,16 @@ export const useGetLecturers = ({
   const { data, error, isLoading } = useQuery({
     queryKey: ["lecturers", campusId, searchName, page, size],
     queryFn: () => getLecturersByCampusAPI(params),
-    staleTime: 0, // Ensure immediate refetch on searchName change
+    staleTime: 0,
     onError: (error) => {
       toast.error("Không thể tải danh sách giảng viên");
     },
-    enabled: !!campusId, // Only fetch if campusId is defined
+    enabled: !!campusId,
   });
 
   const lecturers = data?.success && data.data
     ? {
-        result: data.data.items || [],
+        result: Array.isArray(data.data.items) ? data.data.items : [],
         totalCount: data.data.total || 0,
         page: data.data.page || page,
         size: data.data.size || size,

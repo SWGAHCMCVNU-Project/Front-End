@@ -1,6 +1,7 @@
 import apiClient from "./apiClient";
 import { CAMPUS } from "./endpoints";
 import toast from "react-hot-toast";
+import StorageService from "../../services/storageService";
 
 // 1. Lấy danh sách tất cả campus
 export const getAllCampusesAPI = async ({ searchName = "", page = 1, size = 10 } = {}) => {
@@ -19,6 +20,7 @@ export const getAllCampusesAPI = async ({ searchName = "", page = 1, size = 10 }
     return { status: error.response?.status || 500, success: false, message: errorMessage };
   }
 };
+
 // 2. Lấy thông tin campus theo ID
 export const getCampusByIdAPI = async (id) => {
   try {
@@ -54,10 +56,9 @@ export const getCampusByIdAPI = async (id) => {
 // 3. Tạo mới campus
 export const createCampusAPI = async (formData) => {
   try {
-    // Format the campus data to ensure consistency
     const formatCampusData = (formData) => {
       return {
-        areaId: formData.areaId?.trim() || "", // Sửa từ "areald" thành "areaId"
+        areaId: formData.areaId?.trim() || "",
         campusName: formData.campusName?.trim() || "",
         address: formData.address || "",
         phone: formData.phone || "",
@@ -69,8 +70,6 @@ export const createCampusAPI = async (formData) => {
     };
 
     const campusData = formatCampusData(formData);
-
-    // Prepare FormData for the request body
     const apiFormData = new FormData();
     apiFormData.append("areaId", campusData.areaId);
     apiFormData.append("campusName", campusData.campusName);
@@ -87,10 +86,6 @@ export const createCampusAPI = async (formData) => {
       console.warn("Image is a string, skipping file upload:", formData.image);
     }
 
-    // Log FormData contents for debugging
-    
-
-    // Gửi POST request chỉ với URL gốc (không có query parameters)
     const response = await apiClient.post(CAMPUS.CREATE, apiFormData, {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -126,11 +121,9 @@ export const createCampusAPI = async (formData) => {
   }
 };
 
-
 // 4. Cập nhật thông tin campus
 export const updateCampusAPI = async (id, formData) => {
   try {
-    // Format dữ liệu campus
     const formatCampusData = (formData) => {
       return {
         areaId: formData.areaId?.trim() || "",
@@ -145,8 +138,6 @@ export const updateCampusAPI = async (id, formData) => {
     };
 
     const campusData = formatCampusData(formData);
-
-    // Tạo FormData để gửi cả dữ liệu và image
     const apiFormData = new FormData();
     apiFormData.append("areaId", campusData.areaId);
     apiFormData.append("campusName", campusData.campusName);
@@ -157,18 +148,13 @@ export const updateCampusAPI = async (id, formData) => {
     apiFormData.append("description", campusData.description);
     apiFormData.append("state", campusData.state.toString());
 
-    // Thêm image nếu có
     if (formData.image instanceof File) {
       apiFormData.append("image", formData.image);
     } else if (formData.image && typeof formData.image === "string") {
       console.warn("Image is a string, skipping file upload:", formData.image);
     }
 
-    // Log dữ liệu để debug
-  
-
-    // Gửi yêu cầu PUT với body là FormData
-    const url = CAMPUS.UPDATE.replace("{id}", id); // Chỉ gửi id trong URL
+    const url = CAMPUS.UPDATE.replace("{id}", id);
     const response = await apiClient.put(url, apiFormData, {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -202,44 +188,53 @@ export const updateCampusAPI = async (id, formData) => {
     };
   }
 };
+
+// 5. Lấy campus theo accountId (sửa để nhận accountId làm tham số)
 export const getCampusByAccountIdAPI = async (accountId) => {
+  const role = StorageService.getRoleLogin();
+  if (role !== "campus") {
+    return { success: false, message: "Vai trò không phải campus" };
+  }
+
   try {
+    if (!accountId) {
+      return { success: false, message: "Không có accountId" };
+    }
+
     const response = await apiClient.get(
       CAMPUS.GET_BY_ID_ACCOUNT.replace("{id}", accountId)
     );
 
-    if (response.status === 200) {
+    if (response.status === 200 && response.data) {
+      let campusId;
       if (Array.isArray(response.data)) {
-        return {
-          status: response.status,
-          success: true,
-          data: response.data, // Return the array as-is
-        };
+        if (response.data.length === 0) {
+          console.warn('No campus data found for accountId:', accountId);
+          return { success: false, message: "Không tìm thấy campus" };
+        }
+        campusId = response.data[0]?.id;
+      } else if (response.data?.id) {
+        campusId = response.data.id;
+      } else if (response.data?.data?.id) {
+        campusId = response.data.data.id;
       }
-      return {
-        status: response.status,
-        success: true,
-        data: response.data,
-      };
-    } else {
-      return {
-        status: response.status,
-        success: false,
-        message: "Không nhận được dữ liệu từ server!",
-      };
+
+      if (campusId) {
+        return { success: true, data: response.data };
+      }
+
+      console.warn('No campusId found in response:', response.data);
+      return { success: false, message: "Không tìm thấy campusId trong dữ liệu trả về" };
     }
+
+    return { success: false, message: "Không nhận được dữ liệu từ server" };
   } catch (error) {
-    console.error("Get Campus By Account ID API Error:", error);
-    const errorMessage =
-      error.response?.data?.message || "Lấy thông tin campus theo account thất bại";
-    return {
-      status: error.response?.status || 500,
-      success: false,
-      message: errorMessage,
-    };
+    console.error('Error fetching campus by accountId:', error);
+    return { success: false, message: error.message || "Đã có lỗi xảy ra khi lấy thông tin campus" };
   }
 };
-// Trong file campusApi.js
+
+// 6. Phân bổ điểm
 export const distributePointsAPI = async (campusId, lecturerIds, points) => {
   try {
     const response = await apiClient.post(
@@ -252,11 +247,8 @@ export const distributePointsAPI = async (campusId, lecturerIds, points) => {
       { headers: { "Content-Type": "application/json" } }
     );
 
-    // Thêm log debug
     console.log("API Response:", response.data);
-    
     return response.data;
-
   } catch (error) {
     console.error("API Error:", error.response?.data);
     throw new Error(error.response?.data?.Message || "Phân bổ điểm thất bại");

@@ -28,17 +28,14 @@ const fetchCampusByAccountId = async (accountId) => {
       throw new Error('Account ID is missing or invalid');
     }
 
-
     const response = await apiClient.get(CAMPUS.GET_BY_ID_ACCOUNT.replace("{id}", accountId));
 
     if (response.status === 200) {
-      // First, try to get the id directly from response.data (object case)
       if (response.data && response.data.id) {
         const campusId = response.data.id;
         return campusId;
       }
 
-      // If response.data is an array, handle it
       if (Array.isArray(response.data)) {
         if (response.data.length === 0) {
           console.warn('No campus data found for accountId:', accountId);
@@ -53,13 +50,11 @@ const fetchCampusByAccountId = async (accountId) => {
         }
       }
 
-      // If response.data.data.id exists (nested object case)
       if (response.data?.data?.id) {
         const campusId = response.data.data.id;
         return campusId;
       }
 
-      // If none of the above, throw an error
       console.error('No campusId found in response:', response);
       throw new Error('Không thể lấy campusId từ API: No campusId in response');
     } else {
@@ -108,13 +103,19 @@ export const login = async (userName, password) => {
       userName,
       isVerify,
     };
-    if (brandId) userData.brandId = brandId;
+
+    // Chỉ lưu brandId nếu vai trò là brand
+    if (mappedRole === "brand" && brandId) {
+      userData.brandId = brandId;
+      StorageService.setBrandId(brandId);
+    } else {
+      StorageService.setBrandId(''); // Xóa brandId nếu không phải vai trò brand
+    }
 
     StorageService.setUser(userData);
     StorageService.setRoleLogin(mappedRole);
     StorageService.setNameLogin(userName);
     StorageService.setLoginId(accountId || '');
-    if (brandId) StorageService.setBrandId(brandId);
 
     if (mappedRole === 'campus') {
       try {
@@ -143,7 +144,7 @@ export const login = async (userName, password) => {
         userName,
         loginId: accountId,
         role: mappedRole,
-        brandId,
+        brandId: mappedRole === "brand" ? brandId : null,
         isVerify,
       },
     };

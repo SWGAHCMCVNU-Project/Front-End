@@ -49,10 +49,6 @@ const StyledButton = styled.div`
 function BrandProfile({ brandId }) {
   const { brand, loading: isLoading, error } = useBrand(brandId);
 
-  console.log("BrandProfile - brandId:", brandId);
-  console.log("BrandProfile - isLoading:", isLoading);
-  console.log("BrandProfile - error:", error);
-  console.log("BrandProfile - brand:", brand);
 
   if (!brandId) return <div>Error: Brand ID is missing.</div>;
 

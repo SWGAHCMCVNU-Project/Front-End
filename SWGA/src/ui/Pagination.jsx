@@ -27,8 +27,8 @@ const Buttons = styled.div`
 
 const PaginationButton = styled.button`
   background-color: ${(props) =>
-    props.$active ? " var(--color-green-400)" : "var(--color-grey-50)"};
-  color: ${(props) => (props.$active ? " var(--color-green-50)" : "inherit")};
+    props.$active ? " #1c5d78" : "var(--color-grey-50)"};
+  color: ${(props) => (props.$active ? " #1c5d78" : "inherit")};
   border: 1px solid var(--color-grey-200);
 
   border-radius: var(--border-radius-sm);
@@ -56,7 +56,7 @@ const PaginationButton = styled.button`
   }
 
   &:hover:not(:disabled) {
-    background-color: var(--color-green-400);
+    background-color: #1c5d78;
     color: var(--color-green-50);
     border: none;
   }
@@ -64,8 +64,8 @@ const PaginationButton = styled.button`
 
 const PaginationNumberPageButton = styled.button`
   background-color: ${(props) =>
-    props.$active ? " var(--color-green-400)" : "var(--color-grey-50)"};
-  color: ${(props) => (props.$active ? " var(--color-green-50)" : "inherit")};
+    props.$active ? " #1c5d78" : "var(--color-grey-50)"};
+  color: ${(props) => (props.$active ? " #fff" : "inherit")};
   border: none;
   border-radius: var(--border-radius-sm);
   font-weight: 500;
@@ -92,8 +92,8 @@ const PaginationNumberPageButton = styled.button`
   }
 
   &:hover:not(:disabled) {
-    background-color: var(--color-green-400);
-    color: var(--color-green-50);
+    background-color: #1c5d78;
+    color: #1c5d78;
     border: none;
   }
 `;

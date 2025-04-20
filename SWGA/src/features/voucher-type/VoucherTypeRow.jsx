@@ -59,7 +59,7 @@ const StationIndex = styled.div`
   justify-content: center;
   font-size: 1.6rem;
   font-weight: 500;
-  color: var(--color-green-400);
+  color: #1c5d78;
 `;
 
 const Description = styled.div`

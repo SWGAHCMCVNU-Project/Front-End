@@ -36,4 +36,4 @@ export function useGetVoucherItemsByCampaignId(campaignDetailId, searchName = ""
             hasPrevPage: actualPage > 1
         },
     };
-} 
+}

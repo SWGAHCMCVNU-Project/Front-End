@@ -37,7 +37,7 @@ const Form = styled.form`
 `;
 
 const Header = styled.header`
-  color: var(--color-green-600);
+  color: #1c5d78;
   font-size: 1.7rem;
   font-weight: 500;
   display: flex;
@@ -151,7 +151,7 @@ function CampaignReview() {
           </div>
           <div>
             <span>
-              - Chuyên ngành, cửa hàng, cơ sở và ưu đãi sau khi tạo chiến dịch sẽ
+              - Nơi tổ chức chiến dịch và ưu đãi sau khi tạo chiến dịch sẽ
               <strong className="note-strong"> không thể chỉnh sửa</strong>, vui lòng kiểm tra kĩ trước khi
               <strong className="note-strong"> tạo chiến dịch</strong>.
             </span>

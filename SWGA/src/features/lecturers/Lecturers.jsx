@@ -60,12 +60,16 @@ function Lecturers() {
   const navigate = useNavigate();
 
   const accountId = StorageService.getAccountId();
+  const role = StorageService.getRoleLogin();
 
   useEffect(() => {
     if (!accountId) {
       navigate("/login");
     }
-  }, [accountId, navigate]);
+    if (role !== "campus") {
+      navigate("/dashboard");
+    }
+  }, [accountId, role, navigate]);
 
   const {
     data: campusData,
@@ -73,20 +77,8 @@ function Lecturers() {
     error: campusError,
   } = useGetCampusByAccountId(accountId);
 
-  const urlCampusId =
-    campusData?.id || searchParams.get("campusId") || undefined;
-
-  useEffect(() => {
-    if (campusData?.id) {
-      StorageService.setCampusId(campusData.id);
-    }
-  }, [campusData]);
-
-  useEffect(() => {
-    if (!urlCampusId && !isCampusLoading && !campusError) {
-      navigate("/dashboard");
-    }
-  }, [urlCampusId, isCampusLoading, campusError, navigate]);
+  // Chỉ lấy campusId từ useGetCampusByAccountId hoặc searchParams
+  const urlCampusId = campusData?.id || searchParams.get("campusId") || undefined;
 
   const searchName = searchParams.get("search") || "";
   const { lecturers, isLoading, error } = useGetLecturers({
@@ -102,17 +94,16 @@ function Lecturers() {
   };
 
   if (isCampusLoading || isLoading) return <Spinner />;
-  if (campusError)
-    return (
-      <Empty resourceName="campus" message="Không thể tải thông tin campus" />
-    );
-  if (!urlCampusId)
-    return (
-      <Empty resourceName="campus" message="Không tìm thấy thông tin campus" />
-    );
-  if (error) return <Empty resourceName="giảng viên" message={error.message} />;
+  if (campusError) {
+    return <Empty resourceName="campus" message="Không thể tải thông tin campus" />;
+  }
+  if (!urlCampusId) {
+    return <Empty resourceName="campus" message="Không tìm thấy thông tin campus" />;
+  }
+  if (error) {
+    return <Empty resourceName="giảng viên" message={error.message} />;
+  }
 
-  // Fallback filtering on the frontend
   const filteredBySearch = searchName
     ? lecturers.result.filter((lecturer) =>
         lecturer.fullName?.toLowerCase().includes(searchName.toLowerCase())
@@ -143,7 +134,7 @@ function Lecturers() {
   });
 
   const pageSize = limit || 10;
-  const totalCount = filteredLecturers.length; // Use filtered count for pagination
+  const totalCount = filteredLecturers.length;
   const pageCount = Math.ceil(totalCount / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
   const paginatedLecturers = sortedLecturers.slice(

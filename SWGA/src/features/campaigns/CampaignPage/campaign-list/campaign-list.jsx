@@ -20,7 +20,7 @@ const StackedTime = styled.span`
 `;
 
 const StackedTimeFrameAbove = styled.span`
-  color: #2ecc71;
+  color: #1c5d78;
   margin-left: 0.4rem;
 `;
 
@@ -29,12 +29,12 @@ const StackedTimeFrameBelow = styled.span`
 `;
 
 const TotalIncome = styled.span`
-  color: #2ecc71;
+  color: #1c5d78;
   font-weight: 600;
 `;
 
 const TotalSpending = styled.span`
-  color: #2ecc71;
+  color: #1c5d78;
   font-weight: 600;
 `;
 

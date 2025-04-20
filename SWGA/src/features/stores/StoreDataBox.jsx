@@ -15,7 +15,7 @@ const StyledStationDataBox = styled.section`
 `;
 
 const Header = styled.header`
-  background-color: var(--color-green-600);
+  background-color: #1c5d78;
   padding: 2rem 4rem;
   color: #e0e7ff;
   font-size: 1.8rem;
@@ -83,8 +83,8 @@ const Price = styled.div`
   padding: 1.6rem 3.2rem;
   border-radius: var(--border-radius-sm);
   gap: 5rem;
-  background-color: ${(props) => (props.isActive ? "var(--color-green-100)" : "var(--color-yellow-100)")};
-  color: ${(props) => (props.isActive ? "var(--color-green-700)" : "var(--color-yellow-700)")};
+  background-color: ${(props) => (props.isActive ? "#1c5d78" : "#1c5d78")};
+  color: ${(props) => (props.isActive ? "#fff" : "#fff")};
 
   & p:last-child {
     text-transform: uppercase;

@@ -42,7 +42,7 @@ const TimeLabel = styled.span`
 `;
 
 const StackedTimeFrameAbove = styled.span`
-  color: #2ecc71;
+  color: #1c5d78;
   font-size: 1.4rem;
 `;
 

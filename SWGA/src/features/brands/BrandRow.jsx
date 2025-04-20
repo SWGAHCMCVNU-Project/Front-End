@@ -40,7 +40,7 @@ const StackedTime = styled.span`
 `;
 
 const StackedTimeFrameAbove = styled.span`
-  color: #2ecc71;
+  color: #1c5d78;
 `;
 
 const StackedTimeFrameBelow = styled.span`
@@ -69,7 +69,7 @@ const StyledButton = styled.button`
 
   &:hover {
     background-color: var(--color-grey-50);
-    border: 1px solid var(--color-green-600);
+    border: 1px solid #1c5d78;
     border-radius: 5px;
   }
 
@@ -80,7 +80,7 @@ const StyledButton = styled.button`
   }
 
   & svg:hover {
-    color: var(--color-green-600);
+    color: #1c5d78;
     transform: scale(1.1);
   }
 `;

@@ -20,7 +20,7 @@ const StyledAreaDataBox = styled.section`
 `;
 
 const Header = styled.header`
-  background-color: var(--color-green-600);
+  background-color: #1c5d78;
   padding: 2rem 4rem;
   color: #e0e7ff;
   font-size: 1.8rem;

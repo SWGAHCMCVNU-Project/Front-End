@@ -69,7 +69,7 @@ const WorkingHours = styled.div`
 
   span {
     &.open {
-      color: var(--color-green-700);
+      color: #1c5d78;
     }
     &.close {
       color: var(--color-red-700);
@@ -80,7 +80,7 @@ const WorkingHours = styled.div`
 const StationIndex = styled.div`
   font-size: 1.4rem;
   font-weight: 500;
-  color: var(--color-green-400);
+  color: #1c5d78;
   text-align: center;
 `;
 
@@ -93,26 +93,26 @@ function StoreRow({ store, displayedIndex }) {
     openingHours,
     closingHours,
     state,
-    avatar, // Thêm avatar vào destructuring
+    file, // Thêm avatar vào destructuring
   } = store;
 
   const [isValidImage, setIsValidImage] = useState(true);
 
   useEffect(() => {
-    if (avatar) {
-      handleValidImageURL(avatar)
+    if (file) {
+      handleValidImageURL(file)
         .then((isValid) => setIsValidImage(isValid))
         .catch(() => setIsValidImage(false));
     } else {
       setIsValidImage(false); // Nếu không có avatar, dùng logoDefault
     }
-  }, [avatar]);
+  }, [file]);
 
   return (
     <Table.Row>
       <StationIndex>{displayedIndex}</StationIndex>
       <Station>
-        <Img src={isValidImage && avatar ? avatar : logoDefault} />
+        <Img src={isValidImage && file ? file : logoDefault} />
         <div>
           <StationName>{storeName}</StationName>
           <StyledCode>Khu vực: {areaName}</StyledCode>

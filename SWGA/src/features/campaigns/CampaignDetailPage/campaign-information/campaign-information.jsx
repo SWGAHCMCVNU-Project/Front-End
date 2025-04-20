@@ -6,7 +6,7 @@ import getCampaignByIdAPI from "../../../../hooks/campaign/useGetCampaignById";
 import "./campaign-information.scss";
 
 const Total = styled.span`
-  color: #2ecc71;
+  color: #1c5d78;
   font-weight: 600;
   font-size: 17px;
   margin-left: 5px;

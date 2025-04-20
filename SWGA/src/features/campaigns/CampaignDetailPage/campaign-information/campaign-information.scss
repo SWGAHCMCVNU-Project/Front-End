@@ -25,13 +25,13 @@
 }
 
 @mixin brand-information {
-    @include font-size-brand-logo(#2ecc71);
+    @include font-size-brand-logo(#1c5d78);
     margin-left: 3px;
     text-transform: uppercase;
 }
 
 @mixin participant-information {
-    @include font-size-brand-logo(#2ecc71);
+    @include font-size-brand-logo(#1c5d78);
     margin-left: 3px;
 }
 
@@ -122,5 +122,5 @@
 }
 
 .website-span:hover {
-    color: #2ecc71;
+    color: #1c5d78;
 }

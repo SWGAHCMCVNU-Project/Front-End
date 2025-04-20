@@ -311,7 +311,11 @@ function CampaignBasicInformation() {
             </span>
             <span>
               - Xem danh sách cửa hàng của bạn{" "}
-              <Link style={{color: "#1c5d78"}} className="link-noti" to={"/stores"}>
+              <Link
+                style={{ color: "#1c5d78" }}
+                className="link-noti"
+                to={"/stores"}
+              >
                 {" "}
                 tại đây
               </Link>
@@ -319,7 +323,11 @@ function CampaignBasicInformation() {
             </span>
             <span>
               - Xem phiếu ưu đãi của bạn{" "}
-              <Link style={{color: "#1c5d78"}} className="link-noti" to={"/voucher-items"}>
+              <Link
+                style={{ color: "#1c5d78" }}
+                className="link-noti"
+                to={"/voucher-items"}
+              >
                 {" "}
                 tại đây
               </Link>
@@ -557,12 +565,6 @@ function CampaignBasicInformation() {
                   rules={{ required: "Vui lòng chọn ngày kết thúc" }}
                 />
               </CustomFormRow>
-              {errors.startOn && (
-                <p style={{ color: "red" }}>{errors.startOn.message}</p>
-              )}
-              {errors.endOn && (
-                <p style={{ color: "red" }}>{errors.endOn.message}</p>
-              )}
             </StyledDataBox>
           </RightFormHalf>
         </CampaignFormContainer>

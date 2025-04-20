@@ -48,7 +48,7 @@ $primaryColor: #f36522;
   font-weight: 700;
   color: #000000;
 
-  border-bottom: 0.5px solid var(--color-green-400);
+  border-bottom: 0.5px solid #1c5d78;
   padding: 5px 16px;
   // show 2 line
   overflow: hidden;
@@ -90,7 +90,7 @@ $primaryColor: #f36522;
   gap: 0.5rem; /* Thêm khoảng cách giữa các phần tử con */
 }
 .sale-price-green-bean {
-  color: #2ecc71;
+  color: #1c5d78;
   font-weight: bold;
   font-size: 16px;
   text-align: center;
@@ -106,7 +106,7 @@ $primaryColor: #f36522;
 }
 
 .styled-day-finish {
-  color: #2ecc71;
+  color: #1c5d78;
   font-size: 16px;
   font-weight: 600;
   text-align: center;
@@ -162,5 +162,5 @@ $primaryColor: #f36522;
 }
 
 .ant-tabs-nav .ant-tabs-tab:hover {
-  color: #2ecc71;
+  color: #1c5d78;
 }
