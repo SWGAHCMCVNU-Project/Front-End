@@ -16,7 +16,7 @@ const Category = styled.div`
   align-items: center;
   font-size: 1.6rem;
   font-weight: 600;
-  color: var(--color-grey-600);
+  color: #1c5d78;
   line-height: 1.6rem;
   gap: 0.5rem;
 `;
@@ -35,7 +35,7 @@ const CategoryIndex = styled.div`
   justify-content: center;
   font-size: 1.6rem;
   font-weight: 500;
-  color: var(--color-green-400);
+  color: #1c5d78;
   gap: 0.3rem;
 `;
 
@@ -95,7 +95,7 @@ const StyledButton = styled.button`
 
   &:hover {
     background-color: var(--color-grey-50);
-    border: 1px solid var(--color-green-600);
+    border: 1px solid #1c5d78;
     border-radius: 5px;
   }
 
@@ -107,7 +107,7 @@ const StyledButton = styled.button`
   }
 
   & svg:hover {
-    color: var(--color-green-600);
+    color: #1c5d78;
   }
 `;
 

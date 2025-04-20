@@ -37,14 +37,18 @@ function ItemFilter() {
     const [selectedOption, setSelectedOption] = useState("");
 
     const optionStates = [
-        { value: "", label: "Chưa mua" },
+        { value: "all", label: "Tất cả" }, // Added "Tất cả" option
+        { value: "", label: "Khả dụng" },
         { value: "bought", label: "Đã mua" },
         { value: "used", label: "Đã sử dụng" },
     ];
 
     const handleChangeState = (selectedOptionState) => {
         setSelectedOption(selectedOptionState);
-        if (selectedOptionState === "bought") {
+        if (selectedOptionState === "all") {
+            setIsBought(null); // Show all items
+            setIsUsed(null);
+        } else if (selectedOptionState === "bought") {
             setIsBought(true);
             setIsUsed(false);
         } else if (selectedOptionState === "used") {

@@ -20,7 +20,7 @@ export const FilterButtonRadio = styled.button`
   ${(props) =>
         props.$active &&
         css`
-      background-color: var(--color-green-400);
+      background-color: #1c5d78;
       color: var(--color-grey-0);
     `}
 
@@ -29,7 +29,7 @@ export const FilterButtonRadio = styled.button`
   transition: all 0.3s;
 
   &:hover:not(:disabled) {
-    background-color: var(--color-green-400);
+    background-color: #1c5d78;
     color: var(--color-grey-0);
   }
 `;

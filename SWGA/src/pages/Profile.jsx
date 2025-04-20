@@ -2,10 +2,8 @@
 import React, { useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import Spinner from "../ui/Spinner";
-// import AdminProfile from "../features/profile/admin/admin-profile";
 import BrandProfile from "../features/profile/brand/BrandProfile";
 import CampusProfile from "../features/profile/campus/CampusProfile";
-// import StaffProfile from "../features/profile/staff/staff-profile";
 import storageService from "../services/storageService";
 
 const Profile = () => {
@@ -22,15 +20,21 @@ const Profile = () => {
     return <Spinner />;
   }
 
+  // Fetch brandId or campusId based on role
+  const brandId = roleLogin === "brand" ? storageService.getBrandId() : null;
+
   switch (roleLogin) {
     // case 'admin':
     //   return <AdminProfile />;
     // case 'staff':
     //   return <StaffProfile />;
     case "brand":
-      return <BrandProfile />;
+      if (!brandId) {
+        return <div>Error: Brand ID is missing for the logged-in user.</div>;
+      }
+      return <BrandProfile brandId={brandId} />;
     case "campus":
-      return <CampusProfile />;
+       return <CampusProfile />;
     default:
       return <Navigate to="/sign-in" replace />;
   }

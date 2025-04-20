@@ -15,7 +15,6 @@ export function CampaignProvider({ children }) {
   const [searchParams] = useSearchParams();
   const { page: initialPage, limit: initialSize, handlePageChange: setInitialPage, handleLimitChange: setInitialSize } = useTablePagination(1, 10);
   const [currentPage, setCurrentPage] = useState(initialPage);
-  const [sort, setSort] = useState("Id,desc");
   const [statesFilterValue, setStatesFilterValue] = useState(undefined);
   const [errorMessage, setErrorMessage] = useState(null);
 
@@ -43,37 +42,35 @@ export function CampaignProvider({ children }) {
   const search = searchParams.get("search") || null;
   const campaignTypeIds = searchParams.get("campaignTypeIds")?.split(",") || null;
 
-  // Query cho brand (mặc định)
+  // Query for brand (default)
   const {
     isLoading: isLoadingBrand,
     data: campaignsBrand,
     error: errorBrand,
     refetch: refetchBrand,
   } = useGetAllCampaigns({
-    sort,
     search,
     page: currentPage,
     size: initialSize,
     campaignTypeIds,
     statesFilterValue,
-    enabled: !isAdmin, // Chỉ enable khi không phải admin
+    enabled: !isAdmin,
   });
 
-  // Query cho admin
+  // Query for admin
   const {
     isLoading: isLoadingAdmin,
     data: campaignsAdmin,
     error: errorAdmin,
     refetch: refetchAdmin,
   } = useGetAllCampaignsAdmin({
-    sort,
     search,
     page: currentPage,
     size: initialSize,
-    enabled: isAdmin, // Chỉ enable khi là admin
+    enabled: isAdmin,
   });
 
-  // Combine data dựa vào role
+  // Combine data based on role
   const isLoading = isAdmin ? isLoadingAdmin : isLoadingBrand;
   const campaigns = isAdmin ? campaignsAdmin : campaignsBrand;
   const error = isAdmin ? errorAdmin : errorBrand;
@@ -102,8 +99,6 @@ export function CampaignProvider({ children }) {
       size: initialSize,
       handlePageChange,
       handleLimitChange: handleSizeChangeWithReset,
-      sort,
-      setSort,
       statesFilterValue,
       setStatesFilterValue,
       refetch,
@@ -116,7 +111,6 @@ export function CampaignProvider({ children }) {
       errorMessage,
       currentPage,
       initialSize,
-      sort,
       statesFilterValue,
       refetch,
       isAdmin,

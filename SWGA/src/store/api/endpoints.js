@@ -8,6 +8,7 @@ export const AUTH_ENDPOINTS = {
     RegisterBrand: '/Account/brandRegister',
     RegisterStore: '/Account/storeRegister',
     RegisterCampus: '/Account/campusRegister',
+    RegisterLecturer: '/Account/lecturerRegister',
     AccountDetail: '/Account/{id}',
     UPDATEACCOUNT: '/Account/{id}',
     LOGOUT: '/logout',
@@ -31,7 +32,8 @@ export const AUTH_ENDPOINTS = {
     GET_BY_ID: "/Brand/{id}",
     CREATE: "/Brand",
     UPDATE: "/Brand/{id}",
-    CREATE_FOR_EXISTING_ACCOUNT: "/Brand/existingAccount"
+    CREATE_FOR_EXISTING_ACCOUNT: "/Brand/existingAccount",
+    GET_BY_ID_ACCOUNT: "/Brand/account/{id}"
   };
   export const AREA_ENDPOINTS = {
     CREATE: '/Area/areas',
@@ -87,6 +89,7 @@ export const AUTH_ENDPOINTS = {
 
   }
   export const CAMPUS = {
+    DISTRIBUTE_POINT: "/Campus/distribute-points",
     GET_ALL: "/Campus",
     GET_BY_ID: "/Campus/{id}",
     CREATE: "/Campus",
@@ -110,4 +113,7 @@ export const AUTH_ENDPOINTS = {
   export const WALLET = {
     GET_WALLET: "/Wallet/get-wallet-by-brand-id",
     GET_WALLET_CAMPUS: "/Wallet/get-wallet-by-campus-id"
+  }
+  export const LECTURER = {
+    GET_ALL: "/Lecturer/campus"
   }

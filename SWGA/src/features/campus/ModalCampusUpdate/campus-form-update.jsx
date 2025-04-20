@@ -1,4 +1,3 @@
-// components/CampusFormUpdate.js
 import { PlusOutlined } from "@ant-design/icons";
 import { Select, Upload } from "antd";
 import { useState } from "react";
@@ -36,7 +35,7 @@ function CampusFormUpdate({ campusToEdit = {}, onCloseModal }) {
       ? {
           ...editValues,
           campusName: editValues.campusName,
-          areaId: editValues.areaId?.toString(), // Chuyển sang string
+          areaId: editValues.areaId?.toString(),
         }
       : {},
   });
@@ -45,10 +44,10 @@ function CampusFormUpdate({ campusToEdit = {}, onCloseModal }) {
     event.target.value = event.target.value.replace(/\D/g, "");
   };
 
-  const handleChangeImage = (e) => {
-    const file = e && e.fileList[0];
+  const handleChangeImage = (info) => {
+    const file = info.file;
     if (file) {
-      setImage(e.file);
+      setImage(file);
     } else {
       setImage(null);
     }
@@ -63,8 +62,8 @@ function CampusFormUpdate({ campusToEdit = {}, onCloseModal }) {
   function onSubmit(data) {
     const formData = {
       ...data,
-      areaId: data.areaId, // Đúng tên trường
-      image: image,
+      areaId: data.areaId,
+      image: data.image,
     };
 
     if (isEditSession) {
@@ -89,13 +88,11 @@ function CampusFormUpdate({ campusToEdit = {}, onCloseModal }) {
     }
   }
 
-  function onError(errors) {
-  }
+  function onError(errors) {}
 
   const areaOptions =
     areas?.result?.map((area) => ({
-      value: area.id.toString(), // Đảm bảo value là string
-
+      value: area.id.toString(),
       label: area.areaName,
     })) || [];
 
@@ -201,14 +198,13 @@ function CampusFormUpdate({ campusToEdit = {}, onCloseModal }) {
           disabled={isWorking}
           placeholder="Nhập link website..."
           {...register("link", {
-            required: "Vui lòng nhập link website",
             pattern: {
               value: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/,
               message: "Link website không hợp lệ",
             },
           })}
         />
-</FormRow>
+      </FormRow>
 
       {isEditSession ? (
         <FormRow label="Ảnh campus">
@@ -221,44 +217,55 @@ function CampusFormUpdate({ campusToEdit = {}, onCloseModal }) {
             showUploadList={false}
             disabled={isWorking}
           >
-            {image && image.name ? (
+            {image ? (
               <img
-                src={URL.createObjectURL(new Blob([image]))}
+                src={URL.createObjectURL(image)}
                 alt="avatar"
                 style={{ width: "100%" }}
               />
             ) : (
-              <img src={campusToEdit?.image} alt="avatar" />
+              <img
+                src={campusToEdit?.image}
+                alt="avatar"
+                style={{ width: "100%" }}
+              />
             )}
           </Upload>
         </FormRow>
       ) : (
         <FormRow label="Ảnh campus" error={errors?.image?.message}>
-          <Upload
-            accept="image/*"
-            id="image"
-            listType="picture-card"
-            beforeUpload={() => false}
-            onChange={handleChangeImage}
-            showUploadList={false}
-            disabled={isWorking}
-            {...register("image", {
-              required: "Vui lòng tải ảnh lên",
-            })}
-          >
-            {image && image.name ? (
-              <img
-                src={URL.createObjectURL(new Blob([image]))}
-                alt="avatar"
-                style={{ width: "100%" }}
-              />
-            ) : (
-              <div>
-                <PlusOutlined />
-                <div style={{ marginTop: 8 }}>Tải ảnh lên</div>
-              </div>
+          <Controller
+            control={control}
+            name="image"
+            rules={{ required: "Vui lòng tải ảnh lên" }}
+            render={({ field }) => (
+              <Upload
+                accept="image/*"
+                id="image"
+                listType="picture-card"
+                beforeUpload={() => false}
+                onChange={(info) => {
+                  handleChangeImage(info);
+                  field.onChange(info.file);
+                }}
+                showUploadList={false}
+                disabled={isWorking}
+              >
+                {image ? (
+                  <img
+                    src={URL.createObjectURL(image)}
+                    alt="avatar"
+                    style={{ width: "100%" }}
+                  />
+                ) : (
+                  <div>
+                    <PlusOutlined />
+                    <div style={{ marginTop: 8 }}>Tải ảnh lên</div>
+                  </div>
+                )}
+              </Upload>
             )}
-          </Upload>
+          />
         </FormRow>
       )}
 

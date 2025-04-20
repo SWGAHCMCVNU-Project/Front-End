@@ -18,43 +18,43 @@ import "./scss/CampusDataBox.scss";
 // Styled component for DataItem with strict alignment
 const DataItemStyled = styled.div`
   display: flex;
-  align-items: baseline; /* Thay đổi từ center sang baseline */
+  align-items: center; /* Changed from baseline to center for better vertical alignment */
   gap: 0.8rem;
-  height: 100%;
+  min-width: 200px; /* Ensure consistent width for alignment */
 
   & > svg {
     height: 2.4rem;
     width: 2.4rem;
     flex-shrink: 0;
-    margin-top: 3px; /* Dịch icon xuống 3px */
+    /* Removed margin-top: 3px to align icon with text */
   }
 
   & > span {
     font-size: 1.6rem;
-    line-height: 2.4rem; /* Đặt line-height bằng chiều cao icon */
-    display: flex;
+    line-height: 2.4rem; /* Match the icon height for consistent alignment */
   }
 
   & > span:first-of-type {
     font-weight: 500;
     white-space: nowrap;
-    margin-right: 0.4rem; /* Thêm khoảng cách giữa label và nội dung */
+    margin-right: 0.4rem; /* Space between label and content */
   }
 
   & > span:last-of-type {
     color: var(--color-grey-700);
     word-break: break-all;
-    align-self: center; /* Căn giữa theo chiều dọc */
   }
 `;
+
 const PriceContent = styled.div`
   display: flex;
-  align-items: baseline; /* Căn theo baseline */
-  gap: 5rem;
+  align-items: center; /* Ensure vertical centering */
+  gap: 2rem; /* Reduced gap for better spacing */
   width: 100%;
-  justify-content: center;
-  padding: 4px 0; /* Thêm padding để cân bằng */
+  justify-content: center; /* Distribute items evenly */
+  padding: 4px 0;
 `;
+
 // Updated DataItem component
 function DataItem({ icon, label, children }) {
   return (
@@ -137,7 +137,7 @@ const Infor = styled.div`
 
 const Price = styled.div`
   display: flex;
-  align-items: center; /* Đảm bảo căn giữa theo chiều dọc */
+  align-items: center;
   justify-content: center;
   padding: 1.6rem 3.2rem;
   border-radius: var(--border-radius-sm);

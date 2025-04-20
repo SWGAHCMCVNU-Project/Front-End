@@ -1,9 +1,9 @@
 import { Flex, Heading, Text } from "@chakra-ui/react";
 import { Button, Col, Form, Input, Layout, Modal, Row } from "antd";
-import React, { useState } from "react";
+import  { useState } from "react";
 import toast from "react-hot-toast";
 import { NavLink, useNavigate } from "react-router-dom";
-import S_WalletLogo from "../assets/images/S_WalletLogo.png";
+import S_WalletLogo from "../assets/images/swallet_logo.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faLock, faWallet, faCoins } from "@fortawesome/free-solid-svg-icons";
 import { login } from "../store/api/authApi";
@@ -139,13 +139,13 @@ function SignIn() {
             border-radius: 8px;
             padding: 12px 40px;
             background: #4a5b5c !important;
-            border: 1px solid #2ecc71;
+            border: 1px solid #1c5d78;
             color: #fff;
             transition: all 0.3s ease;
           }
 
           .wallet-input:focus-within {
-            border-color: #27ae60;
+            border-color: #1c5d78;
             background: #4a5b5c !important;
             box-shadow: 0 0 8px rgba(46, 204, 113, 0.3);
           }
@@ -176,7 +176,7 @@ function SignIn() {
           }
 
           .wallet-button {
-            background: #2ecc71;
+            background: #1c5d78;
             border: none;
             border-radius: 8px;
             height: 50px;
@@ -186,23 +186,23 @@ function SignIn() {
           }
 
           .wallet-button:hover {
-            background: #27ae60;
+            background: #1c5d78;
             transform: scale(1.05);
           }
 
           .wallet-icon {
-            color: #2ecc71;
+            color: #1c5d78;
             margin-right: 10px;
           }
 
           .wallet-link {
-            color: #2ecc71;
+            color: #1c5d78;
             font-weight: 600;
             transition: color 0.3s ease;
           }
 
           .wallet-link:hover {
-            color: #27ae60;
+            color: #1c5d78;
           }
 
           .header-row {
@@ -278,15 +278,15 @@ function SignIn() {
                 <div className="logo-container">
                   <img src={S_WalletLogo} alt="S_Wallet Logo" style={{ width: "120px" }} />
                   <Text fontSize="20px" color="#fff" textAlign="center">
-                    <FontAwesomeIcon icon={faCoins} style={{ marginRight: "6px", color: "#2ecc71" }} />
-                    S_WALLET
+                    <FontAwesomeIcon icon={faCoins} style={{ marginRight: "6px", color: "#1c5d78" }} />
+                    SWALLET
                   </Text>
                 </div>
               </Col>
             </Row>
             <Row className="header-row">
               <Col>
-                <Heading fontSize="36px" color="#2ecc71">
+                <Heading fontSize="36px" color="#1c5d78">
                   Đăng nhập
                 </Heading>
               </Col>

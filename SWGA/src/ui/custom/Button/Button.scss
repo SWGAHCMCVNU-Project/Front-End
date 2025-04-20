@@ -6,11 +6,11 @@ $color-btn: #fff;
 }
 
 .btn-back {
-    @include btn-back-color(#2ECC71);
+    @include btn-back-color(#1c5d78);
     font-size: 1.4rem;
 
     &:hover {
-        @include btn-back-color(#21b658);
+        @include btn-back-color(#1c5d78);
     }
 }
 

@@ -23,7 +23,7 @@ import "./scss/campaign.scss";
 import { useVouchers } from "../../../hooks/voucher/useVouchers";
 
 const Header = styled.header`
-  color: var(--color-green-600);
+  color: #1c5d78;
   font-size: 1.7rem;
   font-weight: 500;
   display: flex;
@@ -48,13 +48,13 @@ const StackedTime = styled.span`
 `;
 
 const TotalIncome = styled.span`
-  color: #2ecc71;
+  color: #1c5d78;
   margin-left: 1.3rem;
   font-weight: 600;
 `;
 
 const TotalCost = styled.span`
-  color: #2ecc71;
+  color:#1c5d78;
   margin-left: 0.7rem;
   font-weight: 600;
   font-size: 1.6rem;

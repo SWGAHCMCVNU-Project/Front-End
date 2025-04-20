@@ -140,22 +140,19 @@ export const getStoresByCampaignId = async (
     // Format lại dữ liệu store từ response
     const items = response.data.items || response.data;
     const formattedItems = Array.isArray(items)
-      ? items.map((item) => ({
-          id: item.store?.id || "",
-          storeName: item.store?.storeName || "Cửa hàng không tên",
-          brandName: item.store?.brand?.brandName || "Thương hiệu không rõ",
-          avatar: item.store?.file || "",
-          email: item.store?.account?.email || "Chưa cập nhật",
-          phone: item.store?.account?.phoneNumber || "Chưa cập nhật",
-          address: item.store?.address || "Chưa cập nhật",
-          openingHours: item.store?.openingHours || "00:00",
-          closingHours: item.store?.closingHours || "00:00",
-          state: item.store?.state || false,
-          status: item.status || false,
-          campaignStoreId: item.id || "",
-        }))
-      : [];
-
+    ? items.map((item) => ({
+        id: item.id || "",
+        storeName: item.storeName || "Cửa hàng không tên",
+        brandName: item.brandName || "Thương hiệu không rõ", // Add this
+        email: item.email || "Chưa cập nhật",
+        phone: item.phone || "Chưa cập nhật",
+        address: item.address || "Chưa cập nhật",
+        openingHours: item.openingHours || "00:00",
+        closingHours: item.closingHours || "00:00",
+        state: item.state || false,
+        campaignStoreId: item.id || "",
+      }))
+    : [];
 
     const result = {
       items: formattedItems,

@@ -48,7 +48,7 @@ const StackedTime = styled.div`
 `;
 
 const StackedTimeFrameAbove = styled.span`
-  color: #2ecc71;
+  color: #1c5d78;
 `;
 
 const StackedTimeFrameBelow = styled.span`
@@ -81,7 +81,7 @@ const StationIndex = styled.div`
   justify-content: center;
   font-size: 1.6rem;
   font-weight: 500;
-  color: var(--color-green-400);
+  color: #1c5d78;
   gap: 0.3rem;
 `;
 

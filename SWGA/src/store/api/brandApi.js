@@ -1,25 +1,27 @@
-// store/api/brandApi.js
 import apiClient from './apiClient';
 import { BRAND_ENDPOINTS } from './endpoints';
 import StorageService from '../../services/storageService';
 import toast from 'react-hot-toast';
 
 export const getBrandByAccountIdAPI = async () => {
+  const role = StorageService.getRoleLogin();
+  if (role !== "brand") {
+    return null; // Không gọi API nếu vai trò không phải brand
+  }
+
   try {
     const accountId = StorageService.getAccountId();
     if (!accountId) {
       return null;
     }
 
-    const allBrandsResponse = await getAllBrandsAPI({});
-    if (allBrandsResponse.status === 200) {
-      const brands = Array.isArray(allBrandsResponse.data.items) ? allBrandsResponse.data.items : [];
-      const foundBrand = brands.find(brand => brand.accountId === accountId);
+    const response = await apiClient.get(
+      BRAND_ENDPOINTS.GET_BY_ID_ACCOUNT.replace("{id}", accountId)
+    );
 
-      if (foundBrand) {
-        StorageService.setBrandId(foundBrand.id);
-        return foundBrand;
-      }
+    if (response.status === 200 && response.data) {
+      StorageService.setBrandId(response.data.id);
+      return response.data;
     }
 
     const savedBrandId = StorageService.getBrandId();
@@ -30,7 +32,7 @@ export const getBrandByAccountIdAPI = async () => {
           return brandResponse.data;
         }
       } catch (error) {
-        // Không cần log lỗi ở đây, chỉ xử lý silently
+        // Xử lý silently nếu có lỗi
       }
     }
 
@@ -54,7 +56,7 @@ export const getBrandByIdAPI = async (brandId) => {
   }
 };
 
-export const getAllBrandsAPI = async ({ page = 1, size = 10, search = "", state = true, isAsc = true } = {}) => {
+export const getAllBrandsAPI = async ({ page = 1, size = "", search = "", state = true, isAsc = true } = {}) => {
   try {
     const params = new URLSearchParams();
     params.append("page", page);
@@ -100,7 +102,6 @@ export const updateBrandAPI = async (brandId, brandData) => {
       if (brandData[key] instanceof File) {
         formData.append(key, brandData[key]);
       } else if (brandData[key] !== undefined && brandData[key] !== null) {
-        // Nếu là object (như openingHours, closingHours), gửi dưới dạng JSON string
         if (typeof brandData[key] === "object") {
           formData.append(key, JSON.stringify(brandData[key]));
         } else {

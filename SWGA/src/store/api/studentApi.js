@@ -7,6 +7,8 @@ export const getAllStudents = async ({ page = 1, size = 10, search = "" } = {}) 
       const response = await apiClient.get(STUDENT.GET_ALL, {
         params: { page, size, search },
       });
+      
+      
       return response.data;
     } catch (error) {
       console.error('Error fetching all students:', error);
@@ -17,6 +19,7 @@ export const getAllStudents = async ({ page = 1, size = 10, search = "" } = {}) 
 export const getStudentById = async (id) => {
   try {
     const response = await apiClient.get(STUDENT.GET_BY_ID.replace('{id}', id));
+    
     return response.data;
   } catch (error) {
     console.error(`Error fetching student with ID ${id}:`, error);

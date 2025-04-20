@@ -6,14 +6,18 @@ const useGetCampusByAccountId = (accountId) => {
   return useQuery({
     queryKey: ['campusByAccount', accountId],
     queryFn: () => getCampusByAccountIdAPI(accountId),
-    enabled: !!accountId, // Chỉ chạy query nếu có accountId
+    enabled: !!accountId,
     onError: (error) => {
       console.error('Error fetching campus by accountId:', error.message);
       toast.error(error.message || 'Lấy thông tin campus theo account thất bại');
     },
     select: (response) => {
-      return response;
+      if (response?.success) {
+        return response.data; // Trả về toàn bộ dữ liệu campus
+      }
+      return null;
     },
+    retry: 1,
   });
 };
 

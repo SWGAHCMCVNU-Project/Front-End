@@ -82,7 +82,7 @@ const InfoFile = styled.div`
 const ButtonRemove = styled.button`
   font-weight: 500;
   font-size: 16px;
-  color: var(--color-green-600);
+  color: #1c5d78;
   background-color: #fff;
   margin-bottom: 20px;
   cursor: pointer;

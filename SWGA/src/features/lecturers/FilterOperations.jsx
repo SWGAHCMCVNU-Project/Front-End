@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState } from "react";
 import { HiOutlineFunnel } from "react-icons/hi2";
 import { useSearchParams } from "react-router-dom";
@@ -7,11 +8,8 @@ import useOutsideClick from "../../hooks/useOutsideClick";
 import Button from "../../ui/Button";
 import Filter from "../../ui/Filter";
 import TableOperations from "../../ui/TableOperations";
-import { mockMajors, mockUniversities, mockLecturers } from "./mockLecturers";
-import Modal from "../../ui/Modal";
-import Form from "../../ui/Form";
-import FormRow from "../../ui/FormRow";
-import Input from "../../ui/Input";
+import useGetAllCampuses from "../../hooks/campus/useGetAllCampuses";
+import StorageService from "../../services/storageService";
 
 const StyledContainerButton = styled.div`
   display: flex;
@@ -55,86 +53,29 @@ const StyledSelectWrapper = styled.div`
   margin-bottom: 10px;
 `;
 
-const AllocateButton = styled(Button)`
-  background-color: #4CAF50;
-  color: white;
-  padding: 0.8rem 1.5rem;
-  border-radius: 8px;
-  margin-left: 1rem;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: #45a049;
-  }
-`;
-
 function FilterOperations({ onTabChange = () => {} }) {
   const [showFilters, setShowFilters] = useState(false);
   const ref = useOutsideClick(() => setShowFilters(false));
-  const [selectedOption, setSelectedOption] = useState([]);
-  const [selectedOptionUniversity, setSelectedOptionUniversity] = useState([]);
+  const [selectedOptionCampus, setSelectedOptionCampus] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [isOpenBulkForm, setIsOpenBulkForm] = useState(false);
   const filterValue = searchParams.get("stateIds") || "";
 
-  const options = mockMajors.result.map((major) => ({
-    value: major.id,
-    label: major.majorName,
-  }));
+  const { data: campusesData, isLoading: isLoadingCampuses } = useGetAllCampuses({ size: 100 });
 
-  const optionsUniversities = mockUniversities.result.map((university) => ({
-    value: university.id,
-    label: university.universityName,
-  }));
+  const optionsCampuses = campusesData?.data?.result?.map((campus) => ({
+    value: campus.id,
+    label: campus.campusName,
+  })) || [];
 
-  const lecturerOptions = mockLecturers.result.map((lecturer) => ({
-    value: lecturer.id,
-    label: lecturer.fullName,
-  }));
-
-  const handleSelectChange = (selectedOptions) => {
-    const selectedValues = selectedOptions.map((option) => option.value);
-    if (selectedValues.length) {
-      searchParams.set("majors", selectedValues);
+  const handleSelectChangeCampus = (selectedOptionCampus) => {
+    const selectedValuesCampus = selectedOptionCampus.map((option) => option.value);
+    if (selectedValuesCampus.length) {
+      searchParams.set("campuses", selectedValuesCampus);
     } else {
-      searchParams.delete("majors");
+      searchParams.delete("campuses");
     }
     setSearchParams(searchParams);
-    setSelectedOption(selectedOptions);
-  };
-
-  const handleSelectChangeUniversity = (selectedOptionUniversity) => {
-    const selectedValuesUniversity = selectedOptionUniversity.map((option) => option.value);
-    if (selectedValuesUniversity.length) {
-      searchParams.set("universities", selectedValuesUniversity);
-    } else {
-      searchParams.delete("universities");
-    }
-    setSearchParams(searchParams);
-    setSelectedOptionUniversity(selectedOptionUniversity);
-  };
-
-  const handleAllocatePointsClick = () => {
-    setIsOpenBulkForm(true);
-  };
-
-  const [selectedLecturers, setSelectedLecturers] = useState([]);
-  const [pointsToAllocate, setPointsToAllocate] = useState(0);
-
-  const handleBulkSubmit = (e) => {
-    e.preventDefault();
-    const newPoints = selectedLecturers.map((lecturerId) => ({
-      id: Date.now() + Math.random(), // Tạo ID tạm thời
-      lecturerId,
-      campusId: 1,
-      pointsAllocated: parseInt(pointsToAllocate),
-      pointsUsed: 0,
-      pointsRemaining: parseInt(pointsToAllocate),
-      allocationDate: new Date().toISOString().split("T")[0],
-      state: "active",
-    }));
-    // Thêm logic để lưu vào mockLecturersPoints tại đây
-    setIsOpenBulkForm(false);
+    setSelectedOptionCampus(selectedOptionCampus);
   };
 
   return (
@@ -170,55 +111,18 @@ function FilterOperations({ onTabChange = () => {} }) {
             <StyledSelectWrapper>
               <Select
                 name="select"
-                placeholder="Đại học..."
-                options={optionsUniversities}
+                placeholder={isLoadingCampuses ? "Đang tải..." : "Campus..."}
+                options={optionsCampuses}
                 isMulti
-                value={selectedOptionUniversity}
-                onChange={handleSelectChangeUniversity}
+                value={selectedOptionCampus}
+                onChange={handleSelectChangeCampus}
+                isDisabled={isLoadingCampuses}
               />
             </StyledSelectWrapper>
-            <Select
-              name="select"
-              placeholder="Chuyên ngành..."
-              options={options}
-              isMulti
-              value={selectedOption}
-              onChange={handleSelectChange}
-            />
           </StyledFilterOptions>
         )}
       </StyledContainer>
 
-      <AllocateButton onClick={handleAllocatePointsClick}>
-        Phân bổ điểm
-      </AllocateButton>
-
-      {isOpenBulkForm && (
-        <Modal isOpen={isOpenBulkForm} onClose={() => setIsOpenBulkForm(false)}>
-          <Form onSubmit={handleBulkSubmit}>
-            <FormRow label="Chọn giảng viên">
-              <Select
-                isMulti
-                options={lecturerOptions}
-                value={lecturerOptions.filter((opt) => selectedLecturers.includes(opt.value))}
-                onChange={(selected) => setSelectedLecturers(selected.map((opt) => opt.value))}
-                placeholder="Chọn giảng viên..."
-              />
-            </FormRow>
-            <FormRow label="Số điểm phân bổ">
-              <Input
-                type="number"
-                value={pointsToAllocate}
-                onChange={(e) => setPointsToAllocate(e.target.value)}
-              />
-            </FormRow>
-            <Button type="submit">Phân bổ</Button>
-            <Button $variation="danger" onClick={() => setIsOpenBulkForm(false)}>
-              Hủy
-            </Button>
-          </Form>
-        </Modal>
-      )}
     </TableOperations>
   );
 }

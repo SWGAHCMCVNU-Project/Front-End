@@ -71,7 +71,7 @@ function CampusDetail() {
           <ButtonText onClick={() => navigate("/campus")}>← Quay lại</ButtonText>
         </div>
         <div className="btn-uni-camp">
-          <MyModal>
+          {/* <MyModal>
             <MyModal.Open opens="edit">
               <ButtonCustom>
                 <StyledContainerButton>
@@ -85,7 +85,7 @@ function CampusDetail() {
             <MyModal.Window name="edit">
               <CampusFormUpdate campusToEdit={campus.data} />
             </MyModal.Window>
-          </MyModal>
+          </MyModal> */}
 
           {/* Nếu bạn có route để tạo campus mới, sửa lại URL cho phù hợp */}
           {/* <NavigateCreateButton navigateCreateURL="campus/create" label="cơ sở" /> */}

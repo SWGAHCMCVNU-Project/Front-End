@@ -9,7 +9,7 @@ import ButtonCustom from "../../ui/custom/Button/ButtonCustom";
 import point from "../../assets/images/dauxanh.png";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import useGetCampusByAccountId from "../../hooks/campus/useGetCampusByAccount";
-import { useBrand } from "../../hooks/brand/useBrand"; // Import hook useBrand
+import { useBrand } from "../../hooks/brand/useBrand";
 
 const profileIcon = (
   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -30,9 +30,7 @@ function Header({ onPress, name, subName, handleSidenavColor, handleSidenavType,
   const queryClient = useQueryClient();
   const [campusId, setCampusId] = useState(storageService.getCampusId());
 
-  // Sử dụng hook useBrand để lấy brandId
   const { brand, isLoading: isLoadingBrand, error: brandError } = useBrand();
-
   const accountId = userData?.accountId;
   const { data: campusResponse, isLoading: isCampusLoading } = useGetCampusByAccountId(accountId, {
     enabled: !!accountId && userData?.role === 'campus' && !campusId,
@@ -46,20 +44,21 @@ function Header({ onPress, name, subName, handleSidenavColor, handleSidenavType,
     }
   }, [campusResponse]);
 
-  // Lấy brandId từ useBrand hoặc storageService
   const brandId = userData?.role === 'brand' && brand ? brand.id : storageService.getBrandId();
 
-  // Fetch wallet balance for campus and brand roles
-  const { data: walletBalance, isLoading: isLoadingWallet } = useQuery({
+  const { data: walletBalance, isLoading: isLoadingWallet, refetch } = useQuery({
     queryKey: ['walletBalance', userData?.role, campusId, brandId],
     queryFn: async () => {
       if (userData?.role === 'campus') {
-        if (!campusId) throw new Error('Campus ID not found in storage');
-        const walletData = await walletService.getWalletByCampusId();
+        if (!campusId) {
+          console.warn('Campus ID not found, returning 0 balance');
+          return 0; // Return 0 if campusId is not available
+        }
+        const walletData = await walletService.getWalletByCampusId(campusId);
         return walletData?.balance || 0;
       } else if (userData?.role === 'brand') {
         if (!brandId) throw new Error('Brand ID not found');
-        const walletData = await walletService.getWalletByBrandId();
+        const walletData = await walletService.getWalletByBrandId(brandId);
         return walletData?.balance || 0;
       }
       return null;
@@ -68,7 +67,6 @@ function Header({ onPress, name, subName, handleSidenavColor, handleSidenavType,
     retry: false,
   });
 
-  // Listen for storage and auth changes
   useEffect(() => {
     const handleStorageChange = () => {
       const newUser = storageService.getUser();
@@ -83,27 +81,31 @@ function Header({ onPress, name, subName, handleSidenavColor, handleSidenavType,
 
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('authChange', handleStorageChange);
-    window.addEventListener('campusIdUpdated', handleStorageChange);
+    window.addEventListener('campusIdUpdated', () => {
+      const updatedCampusId = storageService.getCampusId();
+      setCampusId(updatedCampusId);
+      refetch(); // Refetch wallet balance when campusId is updated
+    });
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('authChange', handleStorageChange);
       window.removeEventListener('campusIdUpdated', handleStorageChange);
     };
-  }, [queryClient]);
+  }, [queryClient, refetch]);
 
-  // Listen for wallet balance updates
   useEffect(() => {
     const handleWalletBalanceUpdate = () => {
+      // Force refetch wallet balance
       queryClient.invalidateQueries(['walletBalance']);
     };
-
+  
     window.addEventListener('walletBalanceUpdated', handleWalletBalanceUpdate);
+    
     return () => {
       window.removeEventListener('walletBalanceUpdated', handleWalletBalanceUpdate);
     };
   }, [queryClient]);
-
   const handleLogOut = () => {
     try {
       storageService.clearAll();
@@ -178,7 +180,7 @@ function Header({ onPress, name, subName, handleSidenavColor, handleSidenavType,
       }}
     >
       <Row gutter={[24, 0]} align="middle">
-        <Col span={24} md={24} className="header-control" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: "30px" }}>
+        <Col span={24} md={24} className="header-control" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: "-10px" }}>
           {userData ? (
             <>
               <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -189,7 +191,8 @@ function Header({ onPress, name, subName, handleSidenavColor, handleSidenavType,
                 {(userData.role === 'campus' || userData.role === 'brand') && (
                   <div style={{ display: 'flex', alignItems: 'center', marginLeft: '10px' }}>
                     <span style={{ fontSize: '16px', color: '#111827' }}>
-                      Ví: {isLoadingWallet || isCampusLoading || isLoadingBrand ? 'Loading...' : walletBalance ?? '0'}
+                      
+                      Ví: {isLoadingWallet || isCampusLoading || isLoadingBrand ? 'Loading...' : (walletBalance ?? '0')}
                     </span>
                     <img src={point} alt="point icon" style={{ width: '16px', height: '16px', marginLeft: '5px' }} />
                   </div>

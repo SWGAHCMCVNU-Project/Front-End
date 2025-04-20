@@ -69,7 +69,6 @@ function CreateAreaForm({ areaToEdit = {}, onCloseModal }) {
   }
 
   function onError(errors) {
-    console.log(errors);
   }
 
   return (

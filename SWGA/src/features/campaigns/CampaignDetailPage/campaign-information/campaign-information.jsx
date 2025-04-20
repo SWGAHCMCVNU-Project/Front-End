@@ -6,7 +6,7 @@ import getCampaignByIdAPI from "../../../../hooks/campaign/useGetCampaignById";
 import "./campaign-information.scss";
 
 const Total = styled.span`
-  color: #2ecc71;
+  color: #1c5d78;
   font-weight: 600;
   font-size: 17px;
   margin-left: 5px;
@@ -37,7 +37,7 @@ function CampaignInformation() {
                 <div>
                     <label>Hạn mức: </label>
                     <Total>
-                        {(campaign.totalCost || 0).toLocaleString("vi-VN")}
+                        {(campaign.totalIncome || 0).toLocaleString("vi-VN")}
                         <CoinImage src={greenBean} alt="bean" />
                     </Total>
                 </div>
@@ -45,15 +45,15 @@ function CampaignInformation() {
                 <div>
                     <label>Đã chi: </label>
                     <Total>
-                        {(campaign.usageCost || 0).toLocaleString("vi-VN")}
+                        {(campaign.totalSpending || 0).toLocaleString("vi-VN")}
                         <CoinImage src={greenBean} alt="bean" />
                     </Total>
                 </div>
             </div>
-            <div className="campaign-details-participant-information">
+            {/* <div className="campaign-details-participant-information">
                 <label>Lượng mã ưu đãi đã sử dụng: </label>
                 <span>{campaign.numberOfItemsUsed > 0 ? campaign.numberOfItemsUsed : 0}</span>
-            </div>
+            </div> */}
         </>
     );
 }

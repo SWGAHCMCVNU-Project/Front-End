@@ -47,7 +47,7 @@ function Main() {
 
   const [visible, setVisible] = useState(false);
   const [placement, setPlacement] = useState("right");
-  const [sidenavColor, setSidenavColor] = useState("#ff6b00");
+  const [sidenavColor, setSidenavColor] = useState("#083d52");
   const [sidenavType, setSidenavType] = useState("transparent");
   const [fixed, setFixed] = useState(false);
 
@@ -82,7 +82,7 @@ function Main() {
         width={270}
         theme="light"
         className={`sider-primary ant-layout-sider-primary ${
-          sidenavType === "#fff" ? "active-route" : ""
+          sidenavType === "#104358" ? "active-route" : ""
         }`}
         style={{ background: "#fff" }}
       >

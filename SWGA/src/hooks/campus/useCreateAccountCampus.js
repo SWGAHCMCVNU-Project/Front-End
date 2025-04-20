@@ -3,11 +3,11 @@ import { registerCampusAPI } from '../../store/api/registerAPI';
 import toast from 'react-hot-toast';
 
 export function useCreateCampusAccount() {
-  const { mutate: createCampusAccount, isLoading: isCreating } = useMutation({
+  const { mutate: createCampusAccount, isLoading: isCreating, error } = useMutation({
     mutationFn: ({ formData, campusId }) => registerCampusAPI(formData, campusId),
     onSuccess: (data) => {
       if (data.success) {
-        // Bỏ console.log
+        toast.success("Đăng ký tài khoản campus thành công!");
       }
     },
     onError: (error) => {
@@ -16,5 +16,5 @@ export function useCreateCampusAccount() {
     },
   });
 
-  return { createCampusAccount, isCreating };
+  return { createCampusAccount, isCreating, error };
 }

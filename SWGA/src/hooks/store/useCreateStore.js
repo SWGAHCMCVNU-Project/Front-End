@@ -1,6 +1,5 @@
-// store/hooks/useCreateStore.js
 import { useState } from 'react';
-import { registerStore } from '../../store/api/registerAPI'; // Import API registerStore
+import { registerStore } from '../../store/api/registerAPI';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 

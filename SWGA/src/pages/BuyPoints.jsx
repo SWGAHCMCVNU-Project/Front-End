@@ -40,7 +40,7 @@ const StyledCard = styled(Card)`
   
   &:hover {
     transform: translateY(-5px);
-    border-color: #1db954;
+    border-color: #1c5d78;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 
@@ -56,7 +56,7 @@ const PackageTitle = styled(Title)`
 const PriceTag = styled.div`
   font-size: 2rem;
   font-weight: bold;
-  color: #1db954;
+  color: #1c5d78;
   margin: 1.5rem 0;
 `;
 
@@ -80,14 +80,14 @@ const FeatureList = styled.ul`
 `;
 
 const BuyButton = styled(Button)`
-  background: #1db954;
+  background: #1c5d78;
   border: none;
   height: 48px;
   font-size: 1rem;
   font-weight: bold;
   
   &:hover {
-    background: #1ed760 !important;
+    background: #1c5d78 !important;
     transform: scale(1.02);
   }
 `;

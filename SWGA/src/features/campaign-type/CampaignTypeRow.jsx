@@ -22,7 +22,7 @@ const Station = styled.div`
   align-items: center;
   font-size: 1.6rem;
   font-weight: 600;
-  color: var(--color-grey-600);
+  color: #1c5d78;
   gap: 0.5rem;
 `;
 
@@ -66,7 +66,7 @@ const StationIndex = styled.div`
   justify-content: center;
   font-size: 1.6rem;
   font-weight: 500;
-  color: var(--color-green-400);
+  color: #1c5d78;
 `;
 
 const Description = styled.div`

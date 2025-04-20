@@ -1,22 +1,38 @@
-import { useEffect } from "react"; // Thêm import useEffect
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import Form from "../../../ui/Form";
-import FormRow from "../../../ui/FormRow";
-import Input from "../../../ui/Input";
-import ButtonCustom from "../../../ui/custom/Button/ButtonCustom";
-import { useCreateCampusAccount } from "../../../hooks/campus/useCreateAccountCampus";
+import toast, { Toaster } from "react-hot-toast";
+import Form from "../../ui/Form";
+import FormRow from "../../ui/FormRow";
+import Input from "../../ui/Input";
+import ButtonCustom from "../../ui/custom/Button/ButtonCustom";
+import { useRegisterLecturer } from "../../hooks/lecturer/useRegisterLecturer";
+import StorageService from "../../services/storageService";
 
-function CampusAccountForm({ campusId, campusName, onCloseModal }) {
-  const { createCampusAccount, isCreating, error: apiError } = useCreateCampusAccount(); // Thêm error từ hook
+function LecturerAccountForm({ campusId: propCampusId, onCloseModal }) {
+  const { registerLecturer, isCreating, error: apiError } = useRegisterLecturer();
+
+  // Log the raw propCampusId to understand its structure
+
+  // Ensure campusId is a string
+  let campusId;
+  if (propCampusId && typeof propCampusId === "string") {
+    campusId = propCampusId;
+  } else if (propCampusId && typeof propCampusId === "object" && propCampusId.id) {
+    campusId = propCampusId.id; // If propCampusId is an object with an id property
+  } else {
+    campusId = StorageService.getCampusId(); // Fallback to localStorage
+  }
+
 
   const {
     register,
     handleSubmit,
     reset,
-    setError, // Thêm setError
+    setError,
     formState: { errors },
   } = useForm({
     defaultValues: {
+      fullName: "",
       userName: "",
       password: "",
       email: "",
@@ -24,11 +40,11 @@ function CampusAccountForm({ campusId, campusName, onCloseModal }) {
     },
   });
 
-  // Xử lý lỗi từ API
+  // Handle API errors for form validation
   useEffect(() => {
     if (apiError) {
-      if (apiError.message === "Tên tài khoản đã tồn tại!") {
-        setError("userName", { type: "manual", message: apiError.message });
+      if (apiError === "Tên tài khoản đã tồn tại!") {
+        setError("userName", { type: "manual", message: apiError });
       }
     }
   }, [apiError, setError]);
@@ -44,21 +60,17 @@ function CampusAccountForm({ campusId, campusName, onCloseModal }) {
   };
 
   async function onSubmit(data) {
-    createCampusAccount(
-      { formData: data, campusId },
-      {
-        onSuccess: (response) => {
-          if (response.success) {
-            reset();
-            onCloseModal?.();
-          }
-        },
-        onError: (error) => {
-          console.error("Tạo tài khoản thất bại:", error.message);
-          // Lỗi sẽ được hiển thị qua toast từ hook và trong form qua useEffect
-        },
-      }
-    );
+    if (!campusId) {
+      toast.error("Không tìm thấy campusId. Vui lòng chọn một campus trước khi tạo giảng viên!");
+      return;
+    }
+
+    await registerLecturer({ formData: data, campusId }, {
+      onSuccess: () => {
+        reset();
+        onCloseModal?.();
+      },
+    });
   }
 
   function onError(errors) {}
@@ -69,8 +81,24 @@ function CampusAccountForm({ campusId, campusName, onCloseModal }) {
       onKeyDown={handleKeyDown}
       type={onCloseModal ? "modal" : "regular"}
     >
-      <FormRow label="Campus">
-        <Input type="text" id="campusName" value={campusName} disabled />
+      <FormRow label="Họ và tên" error={errors?.fullName?.message}>
+        <Input
+          type="text"
+          id="fullName"
+          placeholder="Nhập họ và tên giảng viên..."
+          disabled={isCreating}
+          {...register("fullName", {
+            required: "Vui lòng nhập họ và tên",
+            minLength: {
+              value: 2,
+              message: "Họ và tên phải chứa ít nhất 2 ký tự",
+            },
+            maxLength: {
+              value: 100,
+              message: "Họ và tên tối đa 100 ký tự",
+            },
+          })}
+        />
       </FormRow>
 
       <FormRow label="Tên đăng nhập" error={errors?.userName?.message}>
@@ -136,7 +164,7 @@ function CampusAccountForm({ campusId, campusName, onCloseModal }) {
           placeholder="Ví dụ: 0909339779"
           disabled={isCreating}
           {...register("phone", {
-            required: "Vui lòng nhập phone",
+            required: "Vui lòng nhập số điện thoại",
             pattern: {
               value: /^[0-9]{10,11}$/,
               message: "Số điện thoại hợp lệ phải từ 10 đến 11 số",
@@ -155,12 +183,21 @@ function CampusAccountForm({ campusId, campusName, onCloseModal }) {
         >
           Hủy bỏ
         </ButtonCustom>
-        <ButtonCustom type="submit" disabled={isCreating}>
-          Tạo tài khoản
+        <ButtonCustom type="submit" disabled={isCreating || !campusId}>
+          Tạo tài khoản giảng viên
         </ButtonCustom>
       </FormRow>
     </Form>
   );
 }
 
-export default CampusAccountForm;
+function CreateAccountLecturer({ campusId, onCloseModal }) {
+  return (
+    <>
+      <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
+      <LecturerAccountForm campusId={campusId} onCloseModal={onCloseModal} />
+    </>
+  );
+}
+
+export default CreateAccountLecturer;

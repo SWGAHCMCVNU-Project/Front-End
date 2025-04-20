@@ -5,16 +5,11 @@ import styled from "styled-components";
 
 import { useEffect, useState } from "react";
 import logoDefault from "../../../assets/images/brand.png";
-import greenBean from "../../../assets/images/dauxanh.png";
 import coverPhotoBrandDefault from "../../../assets/images/gallery.png";
 import DataItem from "../../../ui/DataItem";
 import Heading from "../../../ui/Heading";
 import Tag from "../../../ui/Tag";
-import {
-  formatCurrency,
-  formatPhoneNumber,
-  handleValidImageURL,
-} from "../../../utils/helpers";
+import { formatPhoneNumber, handleValidImageURL } from "../../../utils/helpers";
 import DataItemDes from "./DataItemDes";
 import useAccount from "../../../hooks/account/useAccount";
 
@@ -60,11 +55,11 @@ const Infor = styled.div`
 const Price = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center; /* Đảm bảo khoảng cách đều giữa các phần tử */
+  justify-content: center;
   padding: 1.6rem 3rem;
   border-radius: var(--border-radius-sm);
   margin-top: 2rem;
-  gap: 3rem; /* Giảm gap để tránh khoảng cách quá lớn */
+  gap: 3rem;
   background-color: var(--color-yellow-100);
   color: var(--color-yellow-700);
 
@@ -87,21 +82,6 @@ const HeadingGroup = styled.div`
   align-items: center;
 `;
 
-const StyledImageBean = styled.img`
-  width: 25px;
-  height: 25px;
-  vertical-align: middle; /* Căn giữa biểu tượng với văn bản */
-  margin-left: 0.5rem; /* Khoảng cách nhỏ giữa số và biểu tượng */
-`;
-
-const StyleGreenWallet = styled.div`
-  color: var(--color-green-400);
-  display: inline-flex; /* Sử dụng inline-flex để căn giữa số và biểu tượng */
-  align-items: center;
-  font-weight: bold;
-  font-size: 16px;
-`;
-
 const Footer = styled.footer`
   padding: 1.6rem 4rem;
   font-size: 1.2rem;
@@ -115,12 +95,6 @@ const Flag = styled.img`
   display: block;
   border: ${(props) => (props.src ? "1px solid var(--color-grey-100)" : null)};
   content: url(${(props) => (props.src ? props.src : coverPhotoBrandDefault)});
-`;
-
-const StyledTotalBean = styled.div`
-  display: flex;
-  gap: 2rem;
-  align-items: center;
 `;
 
 const LogoBrand = styled.img`
@@ -149,10 +123,6 @@ function BrandDataBox({ brand }) {
     description = "",
     address = "",
     numberOfFollowers = 0,
-    greenWalletName = "",
-    greenWalletBalance = 0,
-    totalIncome = 0,
-    totalSpending = 0,
     accountId = "",
     acronym = "",
     coverFileName = "",
@@ -179,6 +149,7 @@ function BrandDataBox({ brand }) {
     return timeStr.slice(0, 5);
   };
 
+  // Validate cover photo and logo URLs
   useEffect(() => {
     handleValidImageURL(coverPhoto)
       .then((isValid) => setIsValidCoverPhoto(isValid))
@@ -192,7 +163,7 @@ function BrandDataBox({ brand }) {
   }, [logo]);
 
   if (accountLoading) {
-    return <div>Loading account details...</div>;
+    return <div>Loading data...</div>;
   }
 
   if (accountError) {
@@ -237,29 +208,6 @@ function BrandDataBox({ brand }) {
               {numberOfFollowers ?? "Chưa cập nhật"}
             </DataItem>
 
-            <DataItem label={`${greenWalletName || "Ví"}:`}>
-              <StyleGreenWallet>
-                {formatCurrency(greenWalletBalance ?? 0)}
-                <StyledImageBean src={greenBean} alt="dau xanh" />
-              </StyleGreenWallet>
-            </DataItem>
-
-            <StyledTotalBean>
-              <DataItem label="Tổng nhận:">
-                <StyleGreenWallet>
-                  {formatCurrency(totalIncome ?? 0)}
-                  <StyledImageBean src={greenBean} alt="dau xanh" />
-                </StyleGreenWallet>
-              </DataItem>
-              |
-              <DataItem label="Tổng chi:">
-                <StyleGreenWallet>
-                  {formatCurrency(totalSpending ?? 0)}
-                  <StyledImageBean src={greenBean} alt="dau xanh" />
-                </StyleGreenWallet>
-              </DataItem>
-            </StyledTotalBean>
-
             {description ? (
               <DataItemDes label="Mô tả thương hiệu:">{description}</DataItemDes>
             ) : (
@@ -279,11 +227,7 @@ function BrandDataBox({ brand }) {
         </Guest>
 
         <Price>
-          <DataItem
-            icon={<HiOutlineEnvelope />}
-            label="Gmail"
-            value={email}
-          >
+          <DataItem icon={<HiOutlineEnvelope />} label="Gmail" value={email}>
             {email}
           </DataItem>
           <DataItem

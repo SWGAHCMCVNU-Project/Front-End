@@ -5,12 +5,12 @@ import styled from "styled-components";
 import imgDefaultCampaign from "../../../../assets/images/campaign.png";
 import greenBean from "../../../../assets/images/dauxanh.png";
 import Empty from "../../../../ui/Empty";
-import Modal from "../../../../ui/Modal";
 import { ButtonAction } from "../../../../ui/custom/Button/Button";
 import { TableItem } from "../../../../ui/custom/Table/TableItem";
 import { formatDate, useImageValidity } from "../../../../utils/helpers";
 import { useCampaign } from "../useCampaign";
 import "./campaign-list.scss";
+import { useState, useMemo } from "react";
 
 const StackedTime = styled.span`
   display: flex;
@@ -20,7 +20,7 @@ const StackedTime = styled.span`
 `;
 
 const StackedTimeFrameAbove = styled.span`
-  color: #2ecc71;
+  color: #1c5d78;
   margin-left: 0.4rem;
 `;
 
@@ -29,12 +29,12 @@ const StackedTimeFrameBelow = styled.span`
 `;
 
 const TotalIncome = styled.span`
-  color: #2ecc71;
+  color: #1c5d78;
   font-weight: 600;
 `;
 
 const TotalSpending = styled.span`
-  color: #2ecc71;
+  color: #1c5d78;
   font-weight: 600;
 `;
 
@@ -54,10 +54,12 @@ function CampaignList() {
     size,
     handlePageChange,
     handleLimitChange: handleSizeChange,
-    setSort,
   } = useCampaign();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+
+  // Local state for sorting
+  const [sort, setSort] = useState("Id,desc");
 
   const campaignImages = campaigns?.result?.map((campaign) => campaign.image) || [];
   const isValidImages = useImageValidity(campaigns?.result || [], campaignImages);
@@ -68,22 +70,59 @@ function CampaignList() {
   const day = String(currentDate.getDate()).padStart(2, "0");
   const formattedDate = `${year}-${month}-${day}`;
 
+  // Handle sorting when a column header is clicked
   const handleSort = (pagination, filters, sorter) => {
-    const sortOrder = sorter.order === "ascend" ? "asc" : "desc";
-    switch (sorter.field) {
-      case "CampaignName":
-        setSort(`${sorter.field},${sortOrder}`);
-        break;
-      case "StartOn":
-        setSort(`${sorter.field},${sortOrder}`);
-        break;
-      case "TotalIncome":
-        setSort(`${sorter.field},${sortOrder}`);
-        break;
-      default:
-        break;
+    if (!sorter.order) {
+      setSort("Id,desc");
+      return;
     }
+
+    const sortOrder = sorter.order === "ascend" ? "asc" : "desc";
+    const sortField = sorter.field; // e.g., "CampaignName"
+    const newSort = `${sortField},${sortOrder}`;
+    setSort(newSort);
   };
+
+  // Client-side sorting logic
+  const sortedCampaigns = useMemo(() => {
+    const [sortField, sortOrder] = sort.split(",");
+    const items = campaigns?.result ? [...campaigns.result] : [];
+
+    if (!items.length) return [];
+
+    items.sort((a, b) => {
+      let valueA, valueB;
+
+      switch (sortField) {
+        case "CampaignName":
+          valueA = a.campaignName?.toLowerCase() || "";
+          valueB = b.campaignName?.toLowerCase() || "";
+          break;
+        case "BrandName":
+          valueA = a.brandName?.toLowerCase() || "";
+          valueB = b.brandName?.toLowerCase() || "";
+          break;
+        case "StartOn":
+          valueA = new Date(a.startOn);
+          valueB = new Date(b.startOn);
+          break;
+        case "TotalIncome":
+          valueA = a.totalIncome || 0;
+          valueB = b.totalIncome || 0;
+          break;
+        default:
+          return 0; // No sorting for default case
+      }
+
+      if (sortOrder === "asc") {
+        return valueA < valueB ? -1 : valueA > valueB ? 1 : 0;
+      } else {
+        return valueA > valueB ? -1 : valueA < valueB ? 1 : 0;
+      }
+    });
+
+    return items;
+  }, [campaigns?.result, sort]);
 
   const determineCampaignStatus = (startOn, endOn) => {
     const startDate = new Date(startOn);
@@ -119,7 +158,7 @@ function CampaignList() {
   const columns = [
     { title: "STT", dataIndex: "number", key: "number", align: "center" },
     { title: "Chiến dịch", dataIndex: "CampaignName", key: "CampaignName", sorter: true },
-    { title: "Thương hiệu", dataIndex: "BrandName", key: "BrandName", align: "center" },
+    { title: "Thương hiệu", dataIndex: "BrandName", key: "BrandName", sorter: true, align: "center" },
     { title: "Thời gian diễn ra", dataIndex: "StartOn", key: "StartOn", sorter: true },
     { title: "Chi phí", key: "TotalIncome", dataIndex: "TotalIncome", sorter: true },
     { title: "Trạng thái", key: "State", dataIndex: "State", align: "center" },
@@ -140,7 +179,7 @@ function CampaignList() {
 
   if (!campaigns?.result?.length) return <Empty resourceName="chiến dịch" />;
 
-  const data = campaigns?.result?.map((campaign, index) => {
+  const data = sortedCampaigns.map((campaign, index) => {
     const dataIndex = !isNaN((page - 1) * size + index + 1)
       ? (page - 1) * size + index + 1
       : index + 1;
@@ -235,14 +274,14 @@ function CampaignList() {
       <TableItem
         columns={columns}
         dataSource={data}
-        handleSort={handleSort}
+        handleSort={handleSort} // Changed from onChange to handleSort to match TableItem prop
         limit={size}
         label=""
         page={page}
         elements={campaigns?.totalCount}
         setPage={handlePageChange}
         setLimit={handleSizeChange}
-        handleRowClick={handleRowClick}
+        handleRowClick={handleRowClick} // Changed to match TableItem prop
       />
     </Spin>
   );

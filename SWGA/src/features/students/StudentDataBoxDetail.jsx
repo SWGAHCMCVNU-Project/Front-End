@@ -171,7 +171,7 @@ function getGenderLabel(gender) {
 
 function StudentDataBoxDetail({ student }) {
   const navigate = useNavigate();
-
+  console.log("Student data:", student);
   const {
     id: studentId,
     dateCreated,
@@ -186,14 +186,15 @@ function StudentDataBoxDetail({ student }) {
     code,
     campusName,
     campusImage,
-    coinBalance: greenWalletBalance,
-    totalSpending: redWalletBalance,
+    totalIncome,
+    totalSpending,
+    coinBalance, // Thêm coinBalance
     studentCardBack,
     studentCardFront,
   } = student || {};
 
-  const greenWalletName = "Số dư xanh";
-  const redWalletName = "Tổng chi tiêu";
+  const greenWalletName = "Tổng nhận";
+  const redWalletName = "Tổng chi";
 
   const statusToTagName = {
     1: "green",
@@ -292,16 +293,17 @@ function StudentDataBoxDetail({ student }) {
                 <ComponentInfo>
                   <DataItem label={greenWalletName + ":"}>
                     <StyleGreenWallet>
-                      {formatCurrency(greenWalletBalance || 0)}
+                      {formatCurrency(totalIncome || 0)}
                       <StyledImageBean src={greenBean} alt="dau xanh" />
                     </StyleGreenWallet>
                   </DataItem>
                   <DataItem label={redWalletName + ":"}>
                     <StyleRedWallet>
-                      {formatCurrency(redWalletBalance || 0)}
+                      {formatCurrency(totalSpending || 0)}
                       <StyledImageBean src={greenBean} alt="dau do" />
                     </StyleRedWallet>
                   </DataItem>
+                 
                   {address ? (
                     <DataItem label="Địa chỉ:">{address}</DataItem>
                   ) : (
@@ -323,13 +325,6 @@ function StudentDataBoxDetail({ student }) {
                   alt={`Image student card front of ${fullName}`}
                 />
               </SectionInfo>
-              {/* <SectionInfo>
-                <LabelCard>Hình ảnh mặt sau thẻ sinh viên</LabelCard>
-                <ImageCard
-                  src={isValidStudentCardBack ? studentCardBack : logoDefaultCard}
-                  alt={`Image of student card back of ${fullName}`}
-                />
-              </SectionInfo> */}
             </ContainerImageCard>
           </Guest>
         </Section>

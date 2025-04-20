@@ -30,14 +30,14 @@ function ChallengeTable() {
   const [params, setParams] = useState({
     page: Number(searchParams.get('page')) || 1,
     size: Number(searchParams.get('size')) || 10,
-    search: searchParams.get('search') || '', // Thay searchName thành search
+    search: searchParams.get('search') || '',
     status: searchParams.get('status') || '',
   });
 
   const { challenges, totalCount, loading: isLoading, error } = useGetAllChallenges({
     page: params.page,
     size: params.size,
-    search: params.search, // Thay searchName thành search
+    search: params.search,
     status: params.status === '' ? null : params.status === 'active',
   });
 
@@ -45,7 +45,7 @@ function ChallengeTable() {
     const currentParams = {
       page: Number(searchParams.get('page')) || 1,
       size: Number(searchParams.get('size')) || 10,
-      search: searchParams.get('search') || '', // Thay searchName thành search
+      search: searchParams.get('search') || '',
       status: searchParams.get('status') || '',
     };
     setParams(currentParams);
@@ -55,7 +55,7 @@ function ChallengeTable() {
     setSearchParams({
       page: newPage.toString(),
       size: params.size.toString(),
-      ...(params.search && { search: params.search }), // Thay searchName thành search
+      ...(params.search && { search: params.search }),
       ...(params.status && { status: params.status }),
     });
   };
@@ -64,7 +64,7 @@ function ChallengeTable() {
     setSearchParams({
       size: newSize.toString(),
       page: '1',
-      ...(params.search && { search: params.search }), // Thay searchName thành search
+      ...(params.search && { search: params.search }),
       ...(params.status && { status: params.status }),
     });
   };
@@ -84,13 +84,14 @@ function ChallengeTable() {
         <Empty resource='thử thách' />
       ) : (
         <Menus>
-          <Table columns='0.5fr 2fr 1fr 1fr 1fr 1fr 1fr'>
+          <Table columns='0.5fr 2fr 1fr 1fr 1fr 1fr 1fr 1fr'>
             <Table.Header>
               <div>STT</div>
               <div>Tên thử thách</div>
-              <div>Số lượng</div>
+              <div>Thưởng</div>
               <div>Điều kiện</div>
               <div>Loại</div>
+              <div>Danh mục</div>
               <div>Trạng thái</div>
               <div>Hành động</div>
             </Table.Header>

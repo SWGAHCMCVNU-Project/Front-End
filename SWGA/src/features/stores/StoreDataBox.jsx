@@ -15,7 +15,7 @@ const StyledStationDataBox = styled.section`
 `;
 
 const Header = styled.header`
-  background-color: var(--color-green-600);
+  background-color: #1c5d78;
   padding: 2rem 4rem;
   color: #e0e7ff;
   font-size: 1.8rem;
@@ -83,8 +83,8 @@ const Price = styled.div`
   padding: 1.6rem 3.2rem;
   border-radius: var(--border-radius-sm);
   gap: 5rem;
-  background-color: ${(props) => (props.isActive ? "var(--color-green-100)" : "var(--color-yellow-100)")};
-  color: ${(props) => (props.isActive ? "var(--color-green-700)" : "var(--color-yellow-700)")};
+  background-color: ${(props) => (props.isActive ? "#1c5d78" : "#1c5d78")};
+  color: ${(props) => (props.isActive ? "#fff" : "#fff")};
 
   & p:last-child {
     text-transform: uppercase;
@@ -115,7 +115,7 @@ const Footer = styled.footer`
 function StoreDataBox({ store }) {
   const {
     id: storeId,
-    avatar,
+    file, // Thêm file vào destructuring
     areaName,
     storeName,
     openingHours,
@@ -132,8 +132,8 @@ function StoreDataBox({ store }) {
     amountOfBonuses,
   } = store;
 
-  const storeImage = avatar;
-  const isValidImages = useImageValidity(store, storeImage);
+  const storeImage = file; // Sửa từ avatar thành file
+  const isValidImages = useImageValidity([store], [storeImage]); // Sửa để truyền mảng
 
   // Hàm hỗ trợ kiểm tra và định dạng giờ
   const safeFormattedHours = (time) => {
@@ -164,7 +164,7 @@ function StoreDataBox({ store }) {
 
       <Section>
         <Guest>
-          <Flag src={isValidImages.find((image) => true) ? storeImage : imgDefaultStore} />
+          <Flag src={isValidImages[0] ? storeImage : imgDefaultStore} /> {/* Sửa để lấy giá trị đầu tiên từ isValidImages */}
 
           <Infor>
             <HeadingGroup>
@@ -191,17 +191,9 @@ function StoreDataBox({ store }) {
               <span>{numberOfVouchers || 0}</span>
             </div>
 
-            <div className="campus-details-information">
-              <label>Số lần đã tạo điểm thưởng cho khách hàng: </label>
-              <span>{numberOfBonuses || 0}</span>
-            </div>
+           
 
-            <div className="campus-details-information">
-              <label>Tổng điểm thưởng đã tạo: </label>
-              <span>{amountOfBonuses || 0}</span>
-            </div>
-
-            <div className="campus-details-description">{description || "Không có mô tả"}</div>
+            <div className="campus-details-description">Mô tả: {description || "Không có mô tả"}</div>
 
             {address && (
               <div className="campus-address">

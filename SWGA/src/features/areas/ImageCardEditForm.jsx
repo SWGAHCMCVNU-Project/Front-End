@@ -75,7 +75,7 @@ const StyledImg = styled.img`
   transition: border-color 0.3s ease;
 
   &:hover {
-    border-color: var(--color-green-400);
+    border-color: #1c5d78;
   }
 `;
 
@@ -104,7 +104,7 @@ const ButtonRemove = styled.span`
   box-shadow: var(--box-shadow);
   opacity: 0;
   transition: opacity 0.3s ease;
-  color: var(--color-green-600);
+  color: #1c5d78;
   z-index: 1;
   border: 1px solid;
 

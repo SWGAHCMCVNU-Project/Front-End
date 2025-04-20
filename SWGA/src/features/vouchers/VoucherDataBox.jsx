@@ -75,7 +75,7 @@ const StyledTotalBean = styled.div`
 `;
 
 const StyleGreenWallet = styled.div`
-  color: var(--color-green-400);
+  color: #1c5d78;
   font-weight: bold;
   font-size: 16px;
   display: flex;
