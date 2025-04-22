@@ -1,5 +1,7 @@
 import styled, { css } from "styled-components";
-import DataItem from "../DataItem";
+import DataItem from "./DataItem";
+import { useStudentRankingBrand } from "../../../hooks/ranking/useStudentRankingBrand";
+import { useBrand } from "../../../hooks/brand/useBrand";
 
 const StyledToday = styled.div`
   background-color: var(--color-grey-0);
@@ -54,29 +56,33 @@ const Heading = styled.h1`
 `;
 
 function RightRanking() {
-  // Fake student ranking data with proper structure for DataItem
-  const fakeStudentRanking = [
-    { id: 1, rank: 1, name: "Nguyễn Văn A", image: "", value: 95 },
-    { id: 2, rank: 2, name: "Trần Thị B", image: "", value: 88 },
-    { id: 3, rank: 3, name: "Lê Văn C", image: "", value: 85 },
-    { id: 4, rank: 4, name: "Phạm Thị D", image: "", value: 79 },
-    { id: 5, rank: 5, name: "Hoàng Văn E", image: "", value: 72 },
-  ];
+  const { brand, isLoading: isLoadingBrand } = useBrand();
+  const { data: studentRanking, isLoading: isLoadingStudentRanking, isError: isErrorStudent } = useStudentRankingBrand(brand?.id);
+
+  // Kiểm tra trạng thái loading
+  if (isLoadingBrand || isLoadingStudentRanking) {
+    return <NoActivity>Đang tải...</NoActivity>;
+  }
+
+  // Kiểm tra lỗi
+  if (isErrorStudent) {
+    return <NoActivity>Có lỗi xảy ra khi tải dữ liệu xếp hạng sinh viên</NoActivity>;
+  }
 
   return (
     <StyledToday>
       <StyledHeading>
         <Heading as="h2">Bảng xếp hạng sinh viên</Heading>
-        <Heading as="h3">Số lượng: {fakeStudentRanking.length}</Heading>
+        <Heading as="h3">Số lượng: {studentRanking?.length || 0}</Heading>
       </StyledHeading>
-      {fakeStudentRanking.length > 0 ? (
+      {studentRanking?.length > 0 ? (
         <TodayList>
-          {fakeStudentRanking.map((activity) => (
-            <DataItem key={activity.id} activity={activity} />
+          {studentRanking.map((activity) => (
+            <DataItem key={activity.rank} activity={activity} />
           ))}
         </TodayList>
       ) : (
-        <NoActivity>Không có dữ liệu...</NoActivity>
+        <NoActivity>Không có dữ liệu sinh viên...</NoActivity>
       )}
     </StyledToday>
   );

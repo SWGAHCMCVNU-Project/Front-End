@@ -13,10 +13,12 @@ import EditVoucherTypeForm from "./EditVoucherTypeForm";
 const Station = styled.div`
   display: flex;
   align-items: center;
+  justify-content: center; /* Center the content horizontally */
   font-size: 1.6rem;
   font-weight: 600;
   color: var(--color-grey-600);
   gap: 0.5rem;
+  text-align: center; /* Ensure text inside is centered */
 `;
 
 const Img = styled.img`
@@ -62,13 +64,20 @@ const StationIndex = styled.div`
   color: #1c5d78;
 `;
 
+const DescriptionContainer = styled.div`
+  display: flex;
+  justify-content: center; /* Center the content horizontally */
+  align-items: center; /* Center vertically if multi-line */
+  height: 100%; /* Ensure it takes full cell height */
+`;
+
 const Description = styled.div`
   font-size: 1.4rem;
   color: var(--color-grey-500);
   max-width: 250px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  text-align: center; /* Center the description text */
+  overflow-wrap: break-word; /* Allow text to wrap to the next line */
+  line-height: 1.5; /* Improve readability for wrapped text */
 `;
 
 const StyledAction = styled.div`
@@ -128,7 +137,9 @@ function VoucherTypeRow({ id, typeName, image, description, state, displayedInde
         </Station>
       </StyledButton>
 
-      <Description>{description}</Description>
+      <DescriptionContainer>
+        <Description>{description}</Description>
+      </DescriptionContainer>
 
       <StyledButton>
         <Tag type={state ? "cyan" : "error"}>{state ? "Hoạt động" : "Không hoạt động"}</Tag>
@@ -154,16 +165,6 @@ function VoucherTypeRow({ id, typeName, image, description, state, displayedInde
           </Modal.Window>
         </Modal>
 
-        <Modal>
-          <Modal.Open opens={`edit-${id}`}>
-            <StyledButton>
-              <HiTrash />
-            </StyledButton>
-          </Modal.Open>
-          <Modal.Window name={`delete-${id}`}>
-            <ConfirmDelete resourceName="loại ưu đãi" />
-          </Modal.Window>
-        </Modal>
       </StyledAction>
     </Table.Row>
   );

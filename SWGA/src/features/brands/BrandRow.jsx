@@ -9,11 +9,14 @@ import point from "../../assets/images/dauxanh.png";
 
 const Station = styled.div`
   display: flex;
-  align-items: center;
+  flex-direction: column; /* Xếp chồng hình ảnh và tên thương hiệu theo chiều dọc */
+  align-items: center; /* Căn giữa theo chiều ngang */
+  justify-content: center; /* Căn giữa theo chiều dọc */
   font-size: 1.6rem;
   font-weight: 600;
   color: var(--color-grey-600);
   gap: 0.5rem;
+  width: 100%; /* Đảm bảo chiếm toàn bộ chiều rộng của cột */
 `;
 
 const Img = styled.img`
@@ -21,68 +24,33 @@ const Img = styled.img`
   object-fit: cover;
   border-radius: 8px;
   padding: 0.5rem;
-  margin-left: 2rem;
   content: url(${(props) => (props.src ? props.src : logoDefault)});
 `;
 
 const StationName = styled.div`
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   max-width: 200px;
+  text-align: center; /* Căn giữa văn bản */
+  white-space: normal; /* Cho phép xuống dòng */
+  word-wrap: break-word; /* Đảm bảo từ dài được ngắt dòng */
 `;
 
 const StackedTime = styled.span`
   display: flex;
   flex-direction: column;
+  align-items: center; /* Căn giữa nội dung */
   font-weight: 500;
-  gap: 0.4rem; /* Khoảng cách giữa Tổng nhận và Tổng chi */
-`;
-
-const StackedTimeFrameAbove = styled.span`
-  color: #1c5d78;
-`;
-
-const StackedTimeFrameBelow = styled.span`
-  color: red;
+  gap: 0.4rem;
 `;
 
 const FinancialItem = styled.div`
   display: flex;
-  align-items: center; /* Đảm bảo số và hình ảnh thẳng hàng */
-  gap: 0.4rem; /* Khoảng cách giữa số và hình ảnh point */
-  white-space: nowrap; /* Ngăn văn bản xuống dòng */
-  margin-left: 75px;
+  align-items: center;
+  gap: 0.4rem;
 `;
 
 const PointIcon = styled.img`
   width: 16px;
   height: 16px;
-`;
-
-const StyledButton = styled.button`
-  background: none;
-  border: none;
-  padding: 0.4rem;
-  font-size: 1.4rem;
-  transition: all 0.2s;
-
-  &:hover {
-    background-color: var(--color-grey-50);
-    border: 1px solid #1c5d78;
-    border-radius: 5px;
-  }
-
-  & svg {
-    width: 2.4rem;
-    height: 2.4rem;
-    color: var(--color-grey-600);
-  }
-
-  & svg:hover {
-    color: #1c5d78;
-    transform: scale(1.1);
-  }
 `;
 
 const StyledAction = styled.div`
@@ -106,7 +74,7 @@ function BrandRow({ brand, displayedIndex }) {
   return (
     <Table.Row>
       <div>{displayedIndex}</div>
-      
+
       <div onClick={() => navigate(`/brands/${brandId}`)}>
         <Station>
           <Img src={isValidImage ? coverPhoto || "" : logoDefault} />
@@ -116,20 +84,20 @@ function BrandRow({ brand, displayedIndex }) {
 
       <StackedTime>
         <span>
-          Mở cửa: <StackedTimeFrameAbove>{openingHours ? formattedHours(openingHours) : "Chưa có dữ liệu"}</StackedTimeFrameAbove>
+          Mở cửa: <span style={{ color: "#1c5d78" }}>{openingHours ? formattedHours(openingHours) : "Chưa có dữ liệu"}</span>
         </span>
         <span>
-          Đóng cửa: <StackedTimeFrameBelow>{closingHours ? formattedHours(closingHours) : "Chưa có dữ liệu"}</StackedTimeFrameBelow>
+          Đóng cửa: <span style={{ color: "red" }}>{closingHours ? formattedHours(closingHours) : "Chưa có dữ liệu"}</span>
         </span>
       </StackedTime>
 
       <StackedTime>
         <FinancialItem>
-          Tổng nhận: <StackedTimeFrameAbove>{formatCurrency(totalIncome)}</StackedTimeFrameAbove>
+          Tổng nhận: <span style={{ color: "#1c5d78" }}>{formatCurrency(totalIncome)}</span>
           <PointIcon src={point} alt="point" />
         </FinancialItem>
         <FinancialItem>
-          Tổng chi: <StackedTimeFrameBelow>{formatCurrency(totalSpending)}</StackedTimeFrameBelow>
+          Tổng chi: <span style={{ color: "red" }}>{formatCurrency(totalSpending)}</span>
           <PointIcon src={point} alt="point" />
         </FinancialItem>
       </StackedTime>

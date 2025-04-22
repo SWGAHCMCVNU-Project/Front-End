@@ -20,9 +20,9 @@ import VoucherType from "./pages/VoucherType/VoucherType.jsx";
 import Vouchers from "./pages/VoucherManagement/Vouchers.jsx";
 import Voucher from "./pages/VoucherManagement/Voucher.jsx";
 import CustomerPage from "./pages/CustomerManagement/CustomerPage.jsx";
-import BrandTransactionPage from "./pages/BrandManagement/BrandTransaction.jsx";
+import Transaction from "./pages/TransactionManagement/Transaction.jsx";
 import FeedbackPage from "./pages/FeedbackManagement/Feedback.jsx";
-import TransactionDetailPage from "./pages/BrandManagement/TransactionDetailPage";
+import TransactionDetailPage from "./pages/TransactionManagement/TransactionDetailPage.jsx";
 import Lecturers from "./pages/LectureManagement/Lecturers.jsx";
 import PackagePoint from "./pages/PackagePointManagement/PackagePoint.jsx";
 import Main from "./components/layout/Main.jsx";
@@ -42,6 +42,8 @@ import BuyPoints from "./pages/BuyPoints";
 import CampusDetailsPage from "./pages/CampusManagement/CampusDetailsPage.jsx";
 import CampusPage from "./pages/CampusManagement/CampusPage.jsx";
 import LuckyPrize from "./pages/LuckyPrizeManagement/LuckyPrize.jsx";
+import Location from "./pages/LocationManagement/Location.jsx";
+import { useJsApiLoader } from "@react-google-maps/api";
 
 function PrivateRoute({ children, allowedRoles = [] }) {
   const location = useLocation();
@@ -68,6 +70,10 @@ function App() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const { isLoaded, loadError } = useJsApiLoader({
+    googleMapsApiKey: "AIzaSyAVZRTZCRZpuWMVv2DBQmfve18tOd1TF10",
+  });
+
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const vnpParams = Array.from(urlParams.entries()).filter(([key]) =>
@@ -83,6 +89,15 @@ function App() {
     storageService.setRoleLogin(newRoleLogin);
     setRoleLogin(newRoleLogin);
   };
+
+  if (loadError) {
+    console.error("Error loading Google Maps:", loadError);
+    // Vẫn render ứng dụng, nhưng các thành phần sử dụng Google Maps sẽ không hoạt động
+  }
+
+  if (!isLoaded) {
+    // Bạn có thể render một loading indicator ở đây nếu cần
+  }
 
   return (
     <>
@@ -304,15 +319,15 @@ function App() {
             path="/transactions"
             exact
             element={
-              <PrivateRoute allowedRoles={["brand"]}>
-                <BrandTransactionPage />
+              <PrivateRoute allowedRoles={["brand", "campus"]}>
+                <Transaction />
               </PrivateRoute>
             }
           />
           <Route
             path="/transactions/:id"
             element={
-              <PrivateRoute allowedRoles={["brand"]}>
+              <PrivateRoute allowedRoles={["brand", "campus"]}>
                 <TransactionDetailPage />
               </PrivateRoute>
             }
@@ -341,6 +356,15 @@ function App() {
             element={
               <PrivateRoute allowedRoles={["admin"]}>
                 <PackagePoint />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/locations"
+            exact
+            element={
+              <PrivateRoute allowedRoles={["admin"]}>
+                <Location />
               </PrivateRoute>
             }
           />

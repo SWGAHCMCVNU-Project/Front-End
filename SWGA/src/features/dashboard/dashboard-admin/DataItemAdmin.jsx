@@ -1,9 +1,10 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import greenBean from "../../assets/images/dauxanh.png";
-import logoDefault from "../../assets/images/reading.png";
-import star from "../../assets/images/star.png";
-import { formatCurrency, handleValidImageURL } from "../../utils/helpers";
+import logoDefault from "../../../assets/images/brand.png";
+import greenBean from "../../../assets/images/dauxanh.png";
+import star from "../../../assets/images/star.png";
+import { formatCurrency, handleValidImageURL } from "../../../utils/helpers";
 
 const StyledTodayItem = styled.li`
   display: grid;
@@ -25,8 +26,7 @@ const Guest = styled.div`
 
 export const Flag = styled.img`
   width: ${(props) => (props.src ? "5rem" : "5rem")};
-  height: ${(props) => (props.src ? "5rem" : "5rem")};
-  border-radius: 50%;
+  border-radius: var(--border-radius-lg);
   display: block;
   border: ${(props) => (props.src ? "1px solid var(--color-grey-100)" : null)};
   content: url(${(props) => (props.src ? props.src : logoDefault)});
@@ -69,7 +69,7 @@ const StyleGreenWallet = styled.div`
   justify-content: flex-end; /* Align to the right */
 `;
 
-function DataItem({ activity }) {
+function DataItemAdmin({ activity }) {
   const { id, rank, name, image, value } = activity;
   const [isValidImage, setIsValidImage] = useState(true);
 
@@ -95,4 +95,4 @@ function DataItem({ activity }) {
   );
 }
 
-export default DataItem;
+export default DataItemAdmin;

@@ -72,13 +72,17 @@ function Lecturers() {
   }, [accountId, role, navigate]);
 
   const {
-    data: campusData,
+    data: campusResponse,
     isLoading: isCampusLoading,
     error: campusError,
   } = useGetCampusByAccountId(accountId);
 
-  // Chỉ lấy campusId từ useGetCampusByAccountId hoặc searchParams
-  const urlCampusId = campusData?.id || searchParams.get("campusId") || undefined;
+  // Lấy campusId từ API hoặc localStorage
+  let urlCampusId = campusResponse?.campusId || searchParams.get("campusId");
+  if (!urlCampusId && role === "campus") {
+    urlCampusId = StorageService.getCampusId();
+    console.log("Fallback to localStorage campusId:", urlCampusId);
+  }
 
   const searchName = searchParams.get("search") || "";
   const { lecturers, isLoading, error } = useGetLecturers({

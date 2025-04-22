@@ -31,7 +31,7 @@ const customStyles = `
   .split-form {
     flex: none;
     width: 100%;
-    background: #2a3b3c; /* Fallback color */
+    // background:rgb(255, 255, 255); /* Fallback color */
     position: relative; /* For overlay positioning */
     display: flex;
     justify-content: center;
@@ -49,6 +49,7 @@ const customStyles = `
     left: 0;
     width: 100%;
     height: 100%;
+    // background: rgb(255, 255, 255); /* Dark overlay to make text readable */
     z-index: 1;
   }
 
@@ -63,16 +64,16 @@ const customStyles = `
   .wallet-input {
     border-radius: 8px;
     padding: 12px 40px;
-    background: #4a5b5c !important;
-    border: 1px solid rgb(43, 134, 173);
+    background: #1c5d78 !important; /* Match SignIn */
+    border: 1px solid #4A86A8; /* Match SignIn */
     color: #fff !important;
     transition: all 0.3s ease;
   }
 
   .wallet-input:focus-within {
-    border-color: rgb(43, 134, 173);
-    background: #4a5b5c !important;
-    box-shadow: 0 0 8px rgba(46, 204, 113, 0.3);
+    border-color: #4A86A8;
+    background: #1c5d78 !important;
+    box-shadow: 0 0 8px rgba(46, 138, 204, 0.5); /* Match SignIn */
   }
 
   .wallet-input .ant-input,
@@ -85,24 +86,26 @@ const customStyles = `
   .wallet-input .ant-input::placeholder,
   .wallet-input .ant-input-password::placeholder,
   .wallet-input textarea::placeholder {
-    color: #d1d5db !important;
+    color:rgb(219, 239, 255) !important; /* Match SignIn */
     opacity: 1;
   }
 
   /* Upload component styling */
   .ant-upload.ant-upload-select-picture-card {
-    background: #4a5b5c !important;
-    border: 1px solid rgb(43, 134, 173)!important;
+    background: rgba(46, 138, 204, 0.7) !important; /* Lighter background to stand out */
+    border: 1px solid #A8C8E0 !important; /* Brighter border */
     border-radius: 8px;
+    transition: all 0.3s ease;
   }
 
   .ant-upload.ant-upload-select-picture-card:hover {
-    border-color: rgb(43, 134, 173) !important;
+    border-color: #A8C8E0 !important;
+    box-shadow: 0 0 10px rgba(168, 200, 224, 0.5); /* Glow effect on hover */
   }
 
   .ant-upload-list-item {
-    background: #4a5b5c !important;
-    border: 1px solid rgb(43, 134, 173) !important;
+    background: rgba(46, 138, 204, 0.7) !important;
+    border: 1px solid #A8C8E0 !important;
     border-radius: 8px;
   }
 
@@ -140,7 +143,7 @@ const customStyles = `
   .btn-header-signup {
     position: absolute;
     top: 20px;
-    right: 300px; /* Fixed typo: '3S00px' to '300px' */
+    right: 300px;
   }
 
   .btn-header-signup button {
@@ -183,11 +186,12 @@ const customStyles = `
   }
 
   .section-header {
-    color: rgb(43, 134, 173);
+    color: #FFFFFF; /* White for contrast */
     font-size: 1.7rem;
     font-weight: 600;
     text-align: center;
     padding: 1.5rem 0;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5); /* Subtle shadow for readability */
   }
 
   .wallet-button {
@@ -206,7 +210,7 @@ const customStyles = `
   }
 
   .wallet-icon {
-    color:rgb(43, 134, 173);
+    color: rgb(43, 134, 173);
     margin-right: 10px;
   }
 
@@ -233,7 +237,7 @@ const customStyles = `
     }
 
     .btn-header-signup {
-      right: 20px; /* Adjust for smaller screens */
+      right: 20px;
     }
   }
 
@@ -247,7 +251,7 @@ const customStyles = `
     }
 
     .btn-header-signup {
-      right: 10px; /* Further adjust for very small screens */
+      right: 10px;
     }
   }
 `;
@@ -289,7 +293,7 @@ function SignUp() {
       const file = fileList[fileList.length - 1].originFileObj;
       if (file) {
         const base64 = await convertFileToBase64(file);
-        setLogo({ ...file, url: base64 }); // Add base64 URL for thumbnail
+        setLogo({ ...file, url: base64 });
         setLogoStorage(base64);
       }
     } else {
@@ -303,7 +307,7 @@ function SignUp() {
       const file = fileList[fileList.length - 1].originFileObj;
       if (file) {
         const base64 = await convertFileToBase64(file);
-        setCoverPhoto({ ...file, url: base64 }); // Add base64 URL for thumbnail
+        setCoverPhoto({ ...file, url: base64 });
         setCoverPhotoStorage(base64);
       }
     } else {
@@ -325,7 +329,7 @@ function SignUp() {
       toast.error("Vui lòng tải lên logo!");
       return;
     }
-  
+
     setIsLoading(true);
     try {
       const result = await registerBrandAPI(
@@ -346,14 +350,14 @@ function SignUp() {
         coverPhotoStorage,
         logoStorage
       );
-  
+
       if (result.success) {
         toast.success(
           "Đăng ký thành công! Vui lòng kiểm tra email để lấy mã xác minh."
         );
         navigate("/sign-in");
       } else {
-        const trimmedMessage = result.message?.trim(); // Trim để loại bỏ khoảng trắng
+        const trimmedMessage = result.message?.trim();
         if (trimmedMessage === "Tên tài khoản đã tồn tại!") {
           form.setFields([
             {
@@ -398,7 +402,7 @@ function SignUp() {
                 <div className="logo-container">
                   <img src={S_WalletLogo} alt="S_Wallet Logo" style={{ width: "120px" }} />
                   <Text fontSize="20px" color="#fff" textAlign="center">
-                    <FontAwesomeIcon icon={faCoins} style={{ marginRight: "6px", color: "rgb(43, 134, 173)" }} />
+                    <FontAwesomeIcon icon={faCoins} style={{ marginRight: "6px", color: "#fff" }} />
                     SWALLET
                   </Text>
                 </div>
@@ -406,7 +410,13 @@ function SignUp() {
             </Row>
             <Row className="header-row">
               <Col>
-                <Heading fontSize="28px" color="rgb(43, 134, 173)" textAlign="center" lineHeight="1.2">
+                <Heading
+                  fontSize="28px"
+                  color="#FFFFFF" /* White for contrast */
+                  textAlign="center"
+                  lineHeight="1.2"
+                  textShadow="0 0 5px rgba(0, 0, 0, 0.5)" /* Subtle shadow for readability */
+                >
                   Đăng Kí Tài Khoản Thương Hiệu
                 </Heading>
               </Col>
@@ -617,9 +627,9 @@ function SignUp() {
                     }}
                     disabled={isLoading}
                     showUploadList={{
-                      showPreviewIcon: false, // Disable preview icon
-                      showRemoveIcon: true,   // Keep remove icon
-                      showDownloadIcon: false, // Disable download icon
+                      showPreviewIcon: false,
+                      showRemoveIcon: true,
+                      showDownloadIcon: false,
                     }}
                   >
                     {!logo && (
@@ -647,9 +657,9 @@ function SignUp() {
                     }}
                     disabled={isLoading}
                     showUploadList={{
-                      showPreviewIcon: false, // Disable preview icon
-                      showRemoveIcon: true,   // Keep remove icon
-                      showDownloadIcon: false, // Disable download icon
+                      showPreviewIcon: false,
+                      showRemoveIcon: true,
+                      showDownloadIcon: false,
                     }}
                   >
                     {!coverPhoto && (
@@ -668,7 +678,7 @@ function SignUp() {
                 label={<span className="form-label">Mô tả</span>}
                 rules={[{ max: 500, message: "Mô tả tối đa 500 kí tự" }]}
               >
-                <Input.TextArea
+                <Input
                   placeholder="Nhập mô tả về thương hiệu..."
                   className="wallet-input"
                   rows={4}

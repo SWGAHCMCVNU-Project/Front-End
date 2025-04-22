@@ -86,7 +86,7 @@ export const AUTH_ENDPOINTS = {
     CREATE_PAYMENT_CAMPUS: "/VNPAY/campus-purchase-points",
     CREATE_PAYMENT_BRAND: "/VNPAY/brand-purchase-points",
     CALL_BACK_PAYMENT: "/VNPAY/Callback",
-
+    GET_HISTORY_PURCHASE: "/VNPAY/get-purchase-history",
   }
   export const CAMPUS = {
     DISTRIBUTE_POINT: "/Campus/distribute-points",
@@ -116,4 +116,16 @@ export const AUTH_ENDPOINTS = {
   }
   export const LECTURER = {
     GET_ALL: "/Lecturer/campus"
+  }
+  export const LOCATION = {
+    CREATE: "/Location/create-location",
+    GET_ALL: "/Location",
+    UPDATE: "/Location"
+  }
+  export const RANKING = {
+    RANKING_STUDENT_ADMIN: "/Ranking/{id}admin/student-ranking",
+    RANKING_BRAND_ADMIN: "/Ranking/{id}admin/brand-ranking",
+    RANKING_STUDENT_BRAND: "/Ranking/{id}brand/student-ranking",
+    RANKING_CAMPAIGN_BRAND: "/Ranking/{id}brand/campaign-ranking",
+
   }
