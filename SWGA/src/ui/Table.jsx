@@ -29,14 +29,8 @@ const StyledHeader = styled(CommonRow)`
 
   & > div {
     display: flex;
-    justify-content: center; /* Center-align header text */
+    justify-content: center; /* Center-align all header columns */
     align-items: center;
-  }
-
-  /* Left-align specific columns */
-  & > div:nth-child(2),
-  & > div:nth-child(3) {
-    justify-content: flex-start;
   }
 `;
 
@@ -50,14 +44,8 @@ const StyledRow = styled(CommonRow)`
 
   & > div {
     display: flex;
-    justify-content: center; /* Center-align all cells by default */
+    justify-content: center; /* Center-align all body columns */
     align-items: center;
-  }
-
-  /* Left-align specific columns */
-  & > div:nth-child(2),
-  & > div:nth-child(3) {
-    justify-content: flex-start;
   }
 `;
 

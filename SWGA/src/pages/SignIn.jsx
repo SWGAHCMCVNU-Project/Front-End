@@ -1,6 +1,6 @@
 import { Flex, Heading, Text } from "@chakra-ui/react";
 import { Button, Col, Form, Input, Layout, Modal, Row } from "antd";
-import  { useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { NavLink, useNavigate } from "react-router-dom";
 import S_WalletLogo from "../assets/images/swallet_logo.png";
@@ -68,7 +68,7 @@ function SignIn() {
       if (result.success) {
         storageService.setNameLogin(loginData.userName);
         setShowVerifyModal(false);
-        window.dispatchEvent(new Event('authChange'));
+        window.dispatchEvent(new Event("authChange"));
         navigate("/dashboard", { replace: true });
       } else {
         toast.error(result.message || "Xác minh thất bại!");
@@ -99,10 +99,12 @@ function SignIn() {
     setShowVerifyModal(false);
     form.resetFields();
   };
+
   return (
     <>
       <style>
         {`
+          /* Layout and Background */
           .split-background {
             flex: 1;
             background-image: url(${backgroundImage});
@@ -118,63 +120,51 @@ function SignIn() {
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(46, 204, 113, 0.3);
+            background: rgba(46, 138, 204, 0.3);
           }
 
           .split-form {
             flex: 1;
-            background: #2a3b3c;
+            background: rgba(46, 138, 204, 0.3);
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 40px;
           }
 
+          /* Form Container */
           .wallet-form-container {
             width: 100%;
             max-width: 400px;
           }
 
+          /* Input Fields */
           .wallet-input {
             border-radius: 8px;
             padding: 12px 40px;
-            background: #4a5b5c !important;
-            border: 1px solid #1c5d78;
+            background: #1c5d78 !important; /* Darker than the form background */
+            border: 1px solid #4A86A8;
             color: #fff;
             transition: all 0.3s ease;
           }
 
           .wallet-input:focus-within {
-            border-color: #1c5d78;
-            background: #4a5b5c !important;
-            box-shadow: 0 0 8px rgba(46, 204, 113, 0.3);
-          }
-
-          .wallet-input .ant-input,
-          .wallet-input .ant-input-password {
-            background: #4a5b5c !important;
-            color: #fff;
-          }
-
-          .wallet-input .ant-input-password input {
-            background: transparent !important;
-            color: #fff;
+            border-color: #4A86A8;
+            background: #1c5d78 !important;
+            box-shadow: 0 0 8px rgba(46, 138, 204, 0.5);
           }
 
           .wallet-input .ant-input::placeholder {
-            color: #a9b7b8;
+            color: #A8C8E0;
             opacity: 1;
           }
 
-          .wallet-input .ant-input-password input::placeholder {
-            color: #a9b7b8;
-            opacity: 1;
+          .wallet-icon {
+            color: #FFFFFF;
+            margin-right: 10px;
           }
 
-          .wallet-input .ant-input-suffix {
-            color: #d1e8d5;
-          }
-
+          /* Button */
           .wallet-button {
             background: #1c5d78;
             border: none;
@@ -190,11 +180,7 @@ function SignIn() {
             transform: scale(1.05);
           }
 
-          .wallet-icon {
-            color: #1c5d78;
-            margin-right: 10px;
-          }
-
+          /* Links */
           .wallet-link {
             color: #1c5d78;
             font-weight: 600;
@@ -205,6 +191,7 @@ function SignIn() {
             color: #1c5d78;
           }
 
+          /* Header and Logo */
           .header-row {
             display: flex;
             flex-direction: column;
@@ -221,8 +208,9 @@ function SignIn() {
             gap: 5px;
           }
 
+          /* Labels and Errors */
           .form-label {
-            color: #fff;
+            color: #1c5d78;
             font-size: 16px;
             font-weight: 500;
           }
@@ -233,6 +221,7 @@ function SignIn() {
             margin-top: 5px;
           }
 
+          /* Responsive Design */
           @media (max-width: 768px) {
             .split-background {
               display: none;
@@ -277,7 +266,7 @@ function SignIn() {
               <Col>
                 <div className="logo-container">
                   <img src={S_WalletLogo} alt="S_Wallet Logo" style={{ width: "120px" }} />
-                  <Text fontSize="20px" color="#fff" textAlign="center">
+                  <Text fontSize="20px" color="#1c5d78" textAlign="center">
                     <FontAwesomeIcon icon={faCoins} style={{ marginRight: "6px", color: "#1c5d78" }} />
                     SWALLET
                   </Text>
@@ -299,7 +288,11 @@ function SignIn() {
             >
               <Form.Item
                 name="username"
-                label={<span className="form-label">Tài khoản <span style={{ color: "#ff0000" }}>*</span></span>}
+                label={
+                  <span className="form-label">
+                    Tài khoản <span style={{ color: "#ff0000" }}>*</span>
+                  </span>
+                }
                 rules={[{ required: true, message: "Vui lòng nhập tài khoản!" }]}
               >
                 <Input
@@ -310,7 +303,11 @@ function SignIn() {
               </Form.Item>
               <Form.Item
                 name="password"
-                label={<span className="form-label">Mật khẩu <span style={{ color: "#ff0000" }}>*</span></span>}
+                label={
+                  <span className="form-label">
+                    Mật khẩu <span style={{ color: "#ff0000" }}>*</span>
+                  </span>
+                }
                 rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
               >
                 <Input.Password
@@ -320,7 +317,7 @@ function SignIn() {
                 />
               </Form.Item>
               <Flex justify="flex-end" style={{ marginBottom: "20px" }}>
-                <Text fontSize="14px" color="#fff">
+                <Text fontSize="14px" color="#1c5d78">
                   Bạn chưa có tài khoản?
                   <NavLink to="/sign-up">
                     <Text as="span" className="wallet-link" marginLeft="5px">

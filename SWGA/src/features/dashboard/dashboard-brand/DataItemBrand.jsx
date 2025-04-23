@@ -1,10 +1,10 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import logoDefault from "../../assets/images/brand.png";
-import greenBean from "../../assets/images/dauxanh.png";
-import star from "../../assets/images/star.png";
-import { formatCurrency, handleValidImageURL } from "../../utils/helpers";
+import logoDefault from "../../../assets/images/brand.png";
+import greenBean from "../../../assets/images/dauxanh.png";
+import star from "../../../assets/images/star.png";
+import { formatCurrency, handleValidImageURL } from "../../../utils/helpers";
 
 const StyledTodayItem = styled.li`
   display: grid;

@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/prop-types */
 import { ProfileOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import {
   faBars,
@@ -207,6 +205,15 @@ function Sidenav({ color }) {
           allowedRoles: ["admin"],
         },
         {
+          key: "25",
+          linkURL: "/locations",
+          pageName: "locations",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faLocationDot} />,
+          labelPageName: "Địa điểm",
+          allowedRoles: ["admin"],
+        },
+        {
           key: "22",
           linkURL: "/lucky-prizes",
           pageName: "lucky-prizes",
@@ -257,6 +264,15 @@ function Sidenav({ color }) {
           allowedRoles: ["brand"],
         },
         {
+          key: "26", // Thêm mục Transaction
+          linkURL: "/transactions",
+          pageName: "transactions",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faClockRotateLeft} />,
+          labelPageName: "Giao dịch",
+          allowedRoles: ["brand", "campus"],
+        },
+        {
           key: "21",
           linkURL: "/buy-points",
           pageName: "buy-points",
@@ -273,7 +289,6 @@ function Sidenav({ color }) {
     {
       type: "group",
       menuSideNav: [
-      
         {
           key: "20",
           linkURL: "/profile",

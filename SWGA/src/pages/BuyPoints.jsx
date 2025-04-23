@@ -109,7 +109,28 @@ function BuyPoints() {
   const accountId = StorageService.getAccountId();
   const { data: campusResponse, isLoading: isCampusLoading } = useGetCampusByAccountId(accountId);
   const role = StorageService.getRoleLogin();
-  const campusId = campusResponse?.data?.id;
+
+  // Sử dụng state để lưu campusId
+  const [persistentCampusId, setPersistentCampusId] = useState(null);
+
+  // Lấy campusId từ API
+  const campusData = campusResponse?.data;
+  let campusId = campusResponse?.campusId;
+
+  // Cập nhật persistentCampusId khi có campusId từ API
+  useEffect(() => {
+    if (campusId) {
+      setPersistentCampusId(campusId);
+    }
+  }, [campusId]);
+
+  // Fallback lấy campusId từ localStorage nếu API trả về null
+  if (!campusId && role === 'campus') {
+    const storedCampusId = StorageService.getCampusId();
+    console.log('Stored campusId from localStorage:', storedCampusId);
+    campusId = storedCampusId || persistentCampusId;
+  }
+
   const [brandId, setBrandId] = useState(StorageService.getBrandId());
 
   const { buyPoints: buyPointsCampus, isPurchasing: isPurchasingCampus } = usePurchasePointsCampus();
@@ -118,6 +139,15 @@ function BuyPoints() {
   const [selectedPackageId, setSelectedPackageId] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const hasProcessedRef = useRef(false);
+
+  // Debug localStorage
+  useEffect(() => {
+    console.log('localStorage state:', {
+      accountId: StorageService.getAccountId(),
+      role: StorageService.getRoleLogin(),
+      campusId: StorageService.getCampusId(),
+    });
+  }, [accountId, role]);
 
   // Store campusId in StorageService after fetching
   useEffect(() => {

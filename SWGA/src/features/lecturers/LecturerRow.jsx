@@ -5,10 +5,10 @@ import styled from "styled-components";
 import logoDefault from "../../assets/images/reading.png";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import Table from "../../ui/Table";
-import Tag from "../../ui/Tag";
 import MyModal from "../../ui/custom/Modal/MyModal";
 import { formatPhoneNumber, handleValidImageURL } from "../../utils/helpers";
-import AllocatePointsForm from "./AllocatePointsForm"; // Thêm import
+import AllocatePointsForm from "./AllocatePointsForm";
+import { Switch } from "antd"; // Import Switch từ Ant Design
 
 const StyledRow = styled.div`
   display: flex;
@@ -34,7 +34,6 @@ const LecturerContainer = styled.div`
   height: 100%;
   padding: 1rem 0.5rem;
   min-height: 50px;
-  margin-right: 140px
 `;
 
 const Img = styled.img`
@@ -82,7 +81,7 @@ const Stacked = styled.div`
   height: 100%;
   padding: 1rem 0.5rem;
   min-height: 60px;
-  margin-top: 60px
+  margin-top: 60px;
 `;
 
 const StyledButton = styled.button`
@@ -128,13 +127,6 @@ function LecturerRow({ lecturer, index, onAllocate }) {
     e.stopPropagation();
   };
 
-  const statusToTagName = {
-    "Chờ duyệt": "green",
-    "Hoạt động": "cyan",
-    "Không hoạt động": "error",
-    "Từ chối": "orange",
-  };
-
   const [isValidImage, setIsValidImage] = useState(true);
 
   useEffect(() => {
@@ -142,6 +134,12 @@ function LecturerRow({ lecturer, index, onAllocate }) {
       .then((isValid) => setIsValidImage(isValid))
       .catch(() => setIsValidImage(false));
   }, [lecturer.avatar]);
+
+  // Hàm xử lý khi toggle (tạm thời chỉ log, sẽ cập nhật API sau)
+  const handleToggle = (checked) => {
+    console.log(`Lecturer ${lecturer.fullName} state changed to: ${checked}`);
+    // Sau này sẽ gọi API để cập nhật trạng thái ở đây
+  };
 
   return (
     <Table.Row style={{ minHeight: "60px", display: "flex", alignItems: "center" }}>
@@ -161,12 +159,12 @@ function LecturerRow({ lecturer, index, onAllocate }) {
         {lecturer.campusName || "Không có dữ liệu"}
       </div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60px" }}>
-        <Tag
-          type={statusToTagName[lecturer.state ? "Hoạt động" : "Không hoạt động"]}
-          style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "36px" }}
-        >
-          {lecturer.state ? "Hoạt động" : "Không hoạt động"}
-        </Tag>
+        <Switch
+          checked={lecturer.state}
+          onChange={handleToggle}
+          checkedChildren="Hoạt động"
+          unCheckedChildren="Không hoạt động"
+        />
       </div>
       <StyledRow>{lecturer.balance || "N/A"}</StyledRow>
       <StyledAction>
@@ -186,13 +184,7 @@ function LecturerRow({ lecturer, index, onAllocate }) {
           </MyModal.Window>
         </MyModal>
 
-        <MyModal>
-          <MyModal.Open opens="disable">
-            <StyledButton>
-              <HiTrash />
-            </StyledButton>
-          </MyModal.Open>
-        </MyModal>
+        
       </StyledAction>
     </Table.Row>
   );

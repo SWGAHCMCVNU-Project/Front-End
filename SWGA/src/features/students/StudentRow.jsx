@@ -5,28 +5,24 @@ import logoDefault from "../../assets/images/reading.png";
 import Table from "../../ui/Table";
 import Tag from "../../ui/Tag";
 import { formatPhoneNumber, handleValidImageURL } from "../../utils/helpers";
-import { format } from "date-fns";
-import { vi } from "date-fns/locale";
 
 const StudentContainer = styled.div`
   display: flex;
-  align-items: center;
+  flex-direction: column; /* Đặt thông tin nằm dưới hình ảnh */
+  align-items: center; /* Căn giữa các phần tử */
   font-size: 1.6rem;
   font-weight: 600;
   color: var(--color-grey-600);
-  gap: 0.5rem;
+  gap: 1rem; /* Khoảng cách giữa hình ảnh và thông tin */
 `;
 
 const Img = styled.img`
   display: block;
-  align-items: center;
-  width: ${(props) => (props.src ? "50px" : "38px")};
+  width: 80px; /* Tăng kích thước hình ảnh */
   object-fit: cover;
   object-position: center;
-  transform: scale(1.5) translateX(-7px);
   border-radius: 8px;
-  padding: 0.5rem 0.5rem;
-  margin-left: ${(props) => (props.src ? "2rem" : "0.5rem")};
+  padding: 0.5rem;
   content: url(${(props) => (props.src ? props.src : logoDefault)});
 `;
 
@@ -36,12 +32,14 @@ const StudentName = styled.div`
   -webkit-line-clamp: 2;
   display: -webkit-box;
   -webkit-box-orient: vertical;
+  text-align: center; /* Căn giữa tên sinh viên */
 `;
 
 const StackedFrame = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
+  align-items: center; /* Căn giữa tên và mã sinh viên */
 `;
 
 const StyledCode = styled.div`
@@ -51,11 +49,10 @@ const StyledCode = styled.div`
 `;
 
 const Stacked = styled.div`
-  display: center;
+  display: flex;
   flex-direction: column;
   gap: 0.2rem;
   max-width: 100%;
-  margin-left: -120px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

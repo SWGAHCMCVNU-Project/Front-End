@@ -1,4 +1,4 @@
-import { HiPencil, HiTrash } from "react-icons/hi2";
+import { HiPencil } from "react-icons/hi2";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import Table from "../../ui/Table";
@@ -8,14 +8,6 @@ import Modal from "../../ui/Modal";
 import { handleValidImageURL } from "../../utils/helpers";
 import UpdateCampaignTypeForm from "./UpdateCampaignTypeForm";
 import { useCampaignTypeById } from "../../hooks/campaign-type/useCampaignTypeById";
-
-// Utility function to truncate text to 3 words
-const truncateToThreeWords = (text) => {
-  if (!text) return "";
-  const words = text.split(" ");
-  if (words.length <= 3) return text;
-  return words.slice(0, 3).join(" ") + "...";
-};
 
 const Station = styled.div`
   display: flex;
@@ -72,12 +64,13 @@ const StationIndex = styled.div`
 const Description = styled.div`
   font-size: 1.4rem;
   color: var(--color-grey-500);
-  max-width: 200px; /* Reduce width to prevent overflow */
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap; /* Prevent wrapping */
+  text-align: center; /* Giữ căn giữa */
+  overflow: visible; /* Hiển thị toàn bộ nội dung */
+  white-space: normal; /* Cho phép xuống dòng */
+  line-height: 1.5; /* Tăng khoảng cách dòng cho dễ đọc */
+  padding: 1rem; /* Thêm padding */
+  /* Bỏ max-width để nội dung tự điều chỉnh theo cột */
 `;
-
 const StyledAction = styled.div`
   display: flex;
   align-items: center;
@@ -95,10 +88,9 @@ const StyledTableRow = styled(Table.Row)`
 
   /* Left-align specific columns */
   & > div:nth-child(2) {
-    justify-content: flex-start; /* Left-align "Tên loại chiến dịch" */
   }
   & > div:nth-child(3) {
-    justify-content: flex-start; /* Left-align "Mô tả" */
+    justify-content: center; /* Center-align "Mô tả" */
   }
 `;
 
@@ -116,8 +108,8 @@ function CampaignTypeRow({ id, typeName, image, description, state, displayedInd
     return <Table.Row><td colSpan="5">Đang tải...</td></Table.Row>;
   }
 
-  // Truncate the description to 3 words
-  const truncatedDescription = truncateToThreeWords(description);
+  // Use the full description instead of truncated version
+  const fullDescription = description || ""; // Giữ nguyên logic lấy mô tả
 
   return (
     <StyledTableRow>
@@ -128,7 +120,7 @@ function CampaignTypeRow({ id, typeName, image, description, state, displayedInd
         <StationName>{typeName}</StationName>
       </Station>
 
-      <Description>{truncatedDescription}</Description>
+      <Description>{fullDescription}</Description>
 
       <div>
         <Tag type={state ? "cyan" : "error"}>{state ? "Hoạt động" : "Không hoạt động"}</Tag>
@@ -148,8 +140,6 @@ function CampaignTypeRow({ id, typeName, image, description, state, displayedInd
             />
           </Modal.Window>
         </Modal>
-
-       
       </StyledAction>
     </StyledTableRow>
   );

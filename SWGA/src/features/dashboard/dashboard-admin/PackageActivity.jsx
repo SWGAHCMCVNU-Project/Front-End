@@ -1,4 +1,3 @@
-// PackageActivity.jsx
 import styled, { css } from "styled-components";
 import Spinner from "../../../ui/Spinner";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
@@ -25,14 +24,12 @@ const NoActivity = styled.p`
 
 const StyledHeading = styled.div`
   margin-bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: block; /* Thay đổi từ flex sang block để xuống hàng */
   line-height: 1.4;
 `;
 
 const Heading = styled.h1`
-  margin-bottom: 0;
+  margin-bottom: 0.4rem; /* Thêm khoảng cách dưới tiêu đề chính */
   font-size: 1.9rem;
   font-weight: 550;
   ${(props) =>

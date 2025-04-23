@@ -1,7 +1,8 @@
-// RightRanking.jsx
 import styled, { css } from "styled-components";
 import Spinner from "../../../ui/Spinner";
 import DataItem from "./DataItem";
+import { useStudentRankingAdmin } from "../../../hooks/ranking/useStudentRankingAdmin";
+import StorageService from "../../../services/storageService";
 
 const StyledToday = styled.div`
   background-color: var(--color-grey-0);
@@ -18,7 +19,6 @@ const StyledToday = styled.div`
 const TodayList = styled.ul`
   overflow: scroll;
   overflow-x: hidden;
-
   &::-webkit-scrollbar {
     width: 0 !important;
   }
@@ -50,45 +50,42 @@ const Heading = styled.h1`
     css`
       text-transform: uppercase;
     `}
-
   ${(props) => props.as === "h3" && css``}
-    color: #f9ad14;
-
+  color: #f9ad14;
   text-align: left;
   line-height: 1.4;
 `;
 
 function RightRanking() {
-  // Fake data cho student ranking, cập nhật để phù hợp với DataItem
-  const fakeStudentRanking = [
-    { id: 1, rank: 1, name: "Nguyễn Văn A", image: "", value: 98 },
-    { id: 2, rank: 2, name: "Trần Thị B", image: "", value: 92 },
-    { id: 3, rank: 3, name: "Lê Văn C", image: "", value: 88 },
-    { id: 4, rank: 4, name: "Phạm Thị D", image: "", value: 85 },
-  ];
+  const accountId = StorageService.getAccountId();
+  const { data: studentRanking, isLoading, isError } = useStudentRankingAdmin(accountId);
 
-  const studentRankingAdmin = fakeStudentRanking;
-  const isLoading = false;
+  if (isLoading) {
+    return <Spinner />;
+  }
+
+  if (isError) {
+    return <NoActivity>Có lỗi xảy ra khi tải dữ liệu xếp hạng sinh viên</NoActivity>;
+  }
+
+  if (!accountId) {
+    return <NoActivity>Không tìm thấy accountId để lấy dữ liệu xếp hạng sinh viên</NoActivity>;
+  }
 
   return (
     <StyledToday>
       <StyledHeading>
         <Heading as="h2">Bảng xếp hạng sinh viên</Heading>
-        <Heading as="h3">Số lượng: {studentRankingAdmin?.length}</Heading>
+        <Heading as="h3">Số lượng: {studentRanking?.length || 0}</Heading>
       </StyledHeading>
-
-      {!isLoading ? (
-        studentRankingAdmin?.length > 0 ? (
-          <TodayList>
-            {studentRankingAdmin.map((activity) => (
-              <DataItem key={activity.id} activity={activity} />
-            ))}
-          </TodayList>
-        ) : (
-          <NoActivity>Không có dữ liệu...</NoActivity>
-        )
+      {studentRanking?.length > 0 ? (
+        <TodayList>
+          {studentRanking.map((activity) => (
+            <DataItem key={activity.rank} activity={activity} />
+          ))}
+        </TodayList>
       ) : (
-        <Spinner />
+        <NoActivity>Không có dữ liệu sinh viên...</NoActivity>
       )}
     </StyledToday>
   );

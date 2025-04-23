@@ -1,7 +1,7 @@
 import styled, { css } from "styled-components";
-import DataItemBrand from "./DataItemBrand";
-import { useCampaignRankingBrand } from "../../../hooks/ranking/useCampaignRankingBrand";
-import { useBrand } from "../../../hooks/brand/useBrand";
+import DataItemAdmin from "./DataItemAdmin";
+import { useBrandRankingAdmin } from "../../../hooks/ranking/useBrandRankingAdmin";
+import StorageService from "../../../services/storageService";
 
 const StyledToday = styled.div`
   background-color: var(--color-grey-0);
@@ -56,33 +56,38 @@ const Heading = styled.h1`
 `;
 
 function TodayActivity() {
-  const { brand, isLoading: isLoadingBrand } = useBrand();
-  const { data: campaignRanking, isLoading: isLoadingCampaignRanking, isError: isErrorCampaign } = useCampaignRankingBrand(brand?.id);
+  const accountId = StorageService.getAccountId();
+  const { data: brandRanking, isLoading: isLoadingBrandRanking, isError: isErrorBrand } = useBrandRankingAdmin(accountId);
 
   // Kiểm tra trạng thái loading
-  if (isLoadingBrand || isLoadingCampaignRanking) {
+  if (isLoadingBrandRanking) {
     return <NoActivity>Đang tải...</NoActivity>;
   }
 
   // Kiểm tra lỗi
-  if (isErrorCampaign) {
-    return <NoActivity>Có lỗi xảy ra khi tải dữ liệu xếp hạng chiến dịch</NoActivity>;
+  if (isErrorBrand) {
+    return <NoActivity>Có lỗi xảy ra khi tải dữ liệu xếp hạng thương hiệu</NoActivity>;
+  }
+
+  // Kiểm tra accountId
+  if (!accountId) {
+    return <NoActivity>Không tìm thấy accountId để lấy dữ liệu xếp hạng thương hiệu</NoActivity>;
   }
 
   return (
     <StyledToday>
       <StyledHeading>
-        <Heading as="h2">Bảng xếp hạng chiến dịch</Heading>
-        <Heading as="h3">Số lượng: {campaignRanking?.length || 0}</Heading>
+        <Heading as="h2">Bảng xếp hạng thương hiệu</Heading>
+        <Heading as="h3">Số lượng: {brandRanking?.length || 0}</Heading>
       </StyledHeading>
-      {campaignRanking?.length > 0 ? (
+      {brandRanking?.length > 0 ? (
         <DataList>
-          {campaignRanking.map((activity) => (
-            <DataItemBrand key={activity.rank} activity={activity} />
+          {brandRanking.map((activity) => (
+            <DataItemAdmin key={activity.rank} activity={activity} />
           ))}
         </DataList>
       ) : (
-        <NoActivity>Không có dữ liệu chiến dịch...</NoActivity>
+        <NoActivity>Không có dữ liệu thương hiệu...</NoActivity>
       )}
     </StyledToday>
   );

@@ -1,9 +1,9 @@
 import { Card, Col, Row } from "antd";
 import Title from "antd/lib/typography/Title";
 import styled from "styled-components";
-import SearchTransaction from "../../features/transactions/search-transaction";
-import TransactionList from "../../features/transactions/transaction-list";
-import { BrandTransactionProvider } from "../../features/transactions/useBrandTransaction";
+import SearchPurchaseHistory from "../../features/transactions/SearchPurchaseHistory"; // Cập nhật import
+import PurchaseHistoryList from "../../features/transactions/PurchaseHistoryList"; // Cập nhật import
+import { PurchaseHistoriesProvider } from "../../features/transactions/usePurchaseHistories"; // Cập nhật import
 
 const Container = styled.div`
   margin: 0 auto 3rem;
@@ -12,16 +12,16 @@ const Container = styled.div`
   gap: 2rem;
 `;
 
-function BrandTransactionPage() {
+function TransactionPage() {
     return (
-        <BrandTransactionProvider>
+        <PurchaseHistoriesProvider>
             <Container>
                 <div className="title-table-list">
                     <Title level={2}>
-                        Lịch sử giao dịch
+                        Lịch sử mua điểm
                     </Title>
                     <div>
-                        <SearchTransaction />
+                        <SearchPurchaseHistory />
                     </div>
                 </div>
 
@@ -32,14 +32,14 @@ function BrandTransactionPage() {
                                 bordered={false}
                                 className="criclebox tablespace mb-24"
                             >
-                                <TransactionList />
+                                <PurchaseHistoryList />
                             </Card>
                         </Col>
                     </Row>
                 </div>
             </Container>
-        </BrandTransactionProvider>
+        </PurchaseHistoriesProvider>
     );
-};
+}
 
-export default BrandTransactionPage;
+export default TransactionPage;

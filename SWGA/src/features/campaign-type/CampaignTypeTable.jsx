@@ -52,7 +52,7 @@ function CampaignTypeTable() {
   return (
     <TableContainer>
       <Menus>
-        <Table columns="0.5fr 2fr 2fr 1fr 1fr">
+        <Table columns="0.5fr 2fr 3fr 1fr 1fr"> {/* Tăng từ 2fr lên 3fr cho cột "Mô tả" */}
           <Table.Header>
             <div>STT</div>
             <div>Tên loại chiến dịch</div>
@@ -72,6 +72,7 @@ function CampaignTypeTable() {
             )}
           />
 
+          {/* Phần footer giữ nguyên */}
           <Table.Footer>
             <FooterContainer>
               <Pagination
