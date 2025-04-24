@@ -44,7 +44,6 @@ import CampusPage from "./pages/CampusManagement/CampusPage.jsx";
 import LuckyPrize from "./pages/LuckyPrizeManagement/LuckyPrize.jsx";
 import Location from "./pages/LocationManagement/Location.jsx";
 import { useJsApiLoader } from "@react-google-maps/api";
-
 function PrivateRoute({ children, allowedRoles = [] }) {
   const location = useLocation();
   const isAuthenticated = !!storageService.getAccessToken();
@@ -71,7 +70,8 @@ function App() {
   const navigate = useNavigate();
 
   const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: "AIzaSyAVZRTZCRZpuWMVv2DBQmfve18tOd1TF10",
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    
   });
 
   useEffect(() => {

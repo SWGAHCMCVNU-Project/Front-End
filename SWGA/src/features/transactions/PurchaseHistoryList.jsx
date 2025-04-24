@@ -65,7 +65,7 @@ function PurchaseHistoryList() {
             key: "points",
             sorter: true,
             align: "center",
-            render: (points) => <span>{points}</span>,
+            render: (points) => <span>{points ?? "-"}</span>,
         },
         {
             title: "Tổng tiền",
@@ -74,7 +74,9 @@ function PurchaseHistoryList() {
             sorter: true,
             align: "center",
             render: (amount) => (
-                <StyledAmount>{amount.toLocaleString()}đ</StyledAmount>
+                <StyledAmount>
+                    {typeof amount === "number" ? `${amount.toLocaleString()}đ` : "-"}
+                </StyledAmount>
             ),
         },
         {
@@ -83,8 +85,11 @@ function PurchaseHistoryList() {
             key: "paymentStatus",
             align: "center",
             render: (status) => (
-                <Tag color={status === "completed" ? "#389e0d" : "#1677ff"} style={{ fontWeight: 500 }}>
-                    {status === "completed" ? "Hoàn thành" : "Đang xử lý"}
+                <Tag
+                    color={status === "Success" ? "#389e0d" : "#1677ff"}
+                    style={{ fontWeight: 500 }}
+                >
+                    {status === "Success" ? "Hoàn thành" : "Đang xử lý"}
                 </Tag>
             ),
         },
@@ -113,10 +118,9 @@ function PurchaseHistoryList() {
                     pageSize: limit,
                     total: purchaseHistories?.totalCount,
                     showSizeChanger: true,
-                    pageSizeOptions: [5, 10, 20, 50], // Thêm tùy chọn 5 mục mỗi trang
+                    pageSizeOptions: [5, 10, 20, 50],
                     showSizeChangerLabel: false,
                     formatPageText: () => "",
-                    showSizeChanger: true, // Ẩn hoàn toàn phần chọn số lượng mục mỗi trang
                 }}
                 onChange={handleTableChange}
                 rowKey="id"
