@@ -4,7 +4,7 @@ import { jwtDecode } from 'jwt-decode';
 
 // Tạo API client
 const apiClient = axios.create({
-  baseURL: 'https://swallet-api-2025-capstoneproject.onrender.com/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },

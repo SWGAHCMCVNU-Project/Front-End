@@ -15,64 +15,61 @@ export function PurchaseHistoriesProvider({ children }) {
     const [searchParams] = useSearchParams();
     const { page, limit, handlePageChange, handleLimitChange } = useTablePagination(1, 10);
     const [sort, setSort] = useState("createdDate,desc");
-
+  
     // Get id from URL search params, or fall back to StorageService
     let id = searchParams.get("id") || null;
     if (!id) {
-        const role = StorageService.getRoleLogin();
-        if (role === "brand") {
-            id = StorageService.getBrandId(); // Use brandId as the entityId
-        } else if (role === "campus") {
-            id = StorageService.getAccountId(); // Use accountId as campusId if needed
-        }
+      const role = StorageService.getRoleLogin();
+      if (role === "brand") {
+        id = StorageService.getBrandId();
+      } else if (role === "campus") {
+        id = StorageService.getAccountId();
+      }
     }
-
-    // Fetch purchase history using the id
-    const { data: histories, error, isLoading } = useGetPurchaseHistory({ id });
-
-    // Structure purchaseHistories as an array
-    const purchaseHistories = histories ? [histories] : [];
-
+  
+    // Fetch purchase history using the id, page, and size (limit)
+    const { data: histories, error, isLoading } = useGetPurchaseHistory({ id, page, size: limit });
+  
+    // Dữ liệu đã được phân trang từ server, không cần slice thủ công nữa
+    const purchaseHistories = histories?.items || [];
+    const totalCount = histories?.total || 0;
+  
     // SEARCH: Filter by id or entityType if search term exists
     const search = searchParams.get("search") || null;
     const filteredHistories = search
-        ? purchaseHistories.filter(history =>
-              history.id.toLowerCase().includes(search.toLowerCase()) ||
-              history.entityType.toLowerCase().includes(search.toLowerCase())
-          )
-        : purchaseHistories;
-
+      ? purchaseHistories.filter(history =>
+          history.id.toLowerCase().includes(search.toLowerCase()) ||
+          history.entityType.toLowerCase().includes(search.toLowerCase())
+        )
+      : purchaseHistories;
+  
     // SORT: Sort data based on sort state
     const sortedHistories = [...filteredHistories].sort((a, b) => {
-        const [field, order] = sort.split(",");
-        const direction = order === "asc" ? 1 : -1;
-        if (field === "createdDate") {
-            return direction * (new Date(a.createdDate) - new Date(b.createdDate));
-        }
-        if (field === "amount") {
-            return direction * (a.amount - b.amount);
-        }
-        if (field === "id") {
-            return direction * a.id.localeCompare(b.id);
-        }
-        return 0;
+      const [field, order] = sort.split(",");
+      const direction = order === "asc" ? 1 : -1;
+      if (field === "createdDate") {
+        return direction * (new Date(a.createdDate) - new Date(b.createdDate));
+      }
+      if (field === "amount") {
+        return direction * (a.amount - b.amount);
+      }
+      if (field === "id") {
+        return direction * a.id.localeCompare(b.id);
+      }
+      return 0;
     });
-
-    // PAGINATION: Apply manual pagination
-    const totalCount = sortedHistories.length;
-    const paginatedHistories = sortedHistories.slice((page - 1) * limit, page * limit);
-
+  
     const value = {
-        isLoading,
-        purchaseHistories: { data: paginatedHistories, totalCount },
-        page,
-        limit,
-        handlePageChange,
-        handleLimitChange,
-        sort,
-        setSort,
-        error,
+      isLoading,
+      purchaseHistories: { data: sortedHistories, totalCount },
+      page,
+      limit,
+      handlePageChange,
+      handleLimitChange,
+      sort,
+      setSort,
+      error,
     };
-
+  
     return <PaginationContext.Provider value={value}>{children}</PaginationContext.Provider>;
-}
+  }

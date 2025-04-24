@@ -86,7 +86,7 @@ export const AUTH_ENDPOINTS = {
     CREATE_PAYMENT_CAMPUS: "/VNPAY/campus-purchase-points",
     CREATE_PAYMENT_BRAND: "/VNPAY/brand-purchase-points",
     CALL_BACK_PAYMENT: "/VNPAY/Callback",
-    GET_HISTORY_PURCHASE: "/VNPAY/get-purchase-history",
+    GET_HISTORY_PURCHASE: "/VNPAY/get-all-history-by-id",
   }
   export const CAMPUS = {
     DISTRIBUTE_POINT: "/Campus/distribute-points",
