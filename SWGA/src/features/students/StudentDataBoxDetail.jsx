@@ -171,7 +171,6 @@ function getGenderLabel(gender) {
 
 function StudentDataBoxDetail({ student }) {
   const navigate = useNavigate();
-  console.log("Student data:", student);
   const {
     id: studentId,
     dateCreated,

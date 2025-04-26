@@ -23,7 +23,7 @@ export function PurchaseHistoriesProvider({ children }) {
       if (role === "brand") {
         id = StorageService.getBrandId();
       } else if (role === "campus") {
-        id = StorageService.getAccountId();
+        id = StorageService.getCampusId();
       }
     }
   

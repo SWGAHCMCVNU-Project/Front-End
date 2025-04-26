@@ -127,7 +127,6 @@ function BuyPoints() {
   // Fallback lấy campusId từ localStorage nếu API trả về null
   if (!campusId && role === 'campus') {
     const storedCampusId = StorageService.getCampusId();
-    console.log('Stored campusId from localStorage:', storedCampusId);
     campusId = storedCampusId || persistentCampusId;
   }
 
@@ -141,13 +140,7 @@ function BuyPoints() {
   const hasProcessedRef = useRef(false);
 
   // Debug localStorage
-  useEffect(() => {
-    console.log('localStorage state:', {
-      accountId: StorageService.getAccountId(),
-      role: StorageService.getRoleLogin(),
-      campusId: StorageService.getCampusId(),
-    });
-  }, [accountId, role]);
+  
 
   // Store campusId in StorageService after fetching
   useEffect(() => {

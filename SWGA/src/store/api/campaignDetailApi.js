@@ -186,30 +186,19 @@ export const getVoucherItemsByCampaignId = async ({
   isUsed = null,
 }) => {
   try {
-   
-
-    // Đảm bảo campaignDetailId là array
     const campaignDetailIds = Array.isArray(campaignDetailId)
       ? campaignDetailId
       : [campaignDetailId];
 
-    // Tạo object params
-    const params = {};
+    const params = {
+      campaignDetailId: campaignDetailIds,
+      pageNumber: page,  // Đảm bảo tên param đúng với API
+      pageSize: limit,   // Đảm bảo tên param đúng với API
+    };
 
-    // Thêm các campaignDetailId riêng lẻ
-    campaignDetailIds.forEach((id) => {
-      if (!params.campaignDetailId) {
-        params.campaignDetailId = [];
-      }
-      params.campaignDetailId.push(id);
-    });
-
-    // Thêm các params khác
     if (state !== null) params.state = state;
     if (sort) params.sort = sort;
     if (search) params.searchName = search;
-    if (page) params.pageNumber = page;
-    if (limit) params.pageSize = limit;
     if (isLocked !== null) params.isLocked = isLocked;
     if (isBought !== null) params.isBought = isBought;
     if (isUsed !== null) params.isUsed = isUsed;
@@ -219,11 +208,10 @@ export const getVoucherItemsByCampaignId = async ({
       {
         params: params,
         paramsSerializer: {
-          indexes: null, // Điều này sẽ giúp axios serialize array params đúng cách
+          indexes: null,
         },
       }
     );
-
 
     if (!response.data) {
       console.warn(
@@ -267,13 +255,13 @@ export const getVoucherItemsByCampaignId = async ({
     const result = {
       items: formattedItems,
       total: Array.isArray(response.data)
-        ? formattedItems.length
-        : response.data.total || formattedItems.length,
+          ? formattedItems.length
+          : response.data.total || formattedItems.length,
       page: Array.isArray(response.data) ? page : response.data.page || page,
       totalPages: Array.isArray(response.data)
-        ? Math.ceil(formattedItems.length / limit)
-        : response.data.totalPages || Math.ceil(formattedItems.length / limit),
-    };
+          ? Math.ceil(formattedItems.length / limit)
+          : response.data.totalPages || Math.ceil(formattedItems.length / limit),
+  };
 
     return result;
   } catch (error) {

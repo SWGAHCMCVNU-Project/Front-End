@@ -7,7 +7,6 @@ export const useRegisterLecturer = () => {
 
   const { mutate: registerLecturer, isLoading: isCreating, error } = useMutation({
     mutationFn: ({ formData, campusId }) => {
-      console.log("campusId in useRegisterLecturer mutationFn:", campusId);
       return registerLecturerAPI(formData, campusId);
     },
     onSuccess: (data) => {
