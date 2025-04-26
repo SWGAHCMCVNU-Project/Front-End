@@ -193,7 +193,7 @@ export const updateCampusAPI = async (id, formData) => {
 export const getCampusByAccountIdAPI = async (accountId) => {
   const role = StorageService.getRoleLogin();
   if (role !== "campus") {
-    return { success: false, message: "Vai trò không phải campus" };
+    // return { success: false, message: "Vai trò không phải campus" };
   }
 
   try {
@@ -247,7 +247,6 @@ export const distributePointsAPI = async (campusId, lecturerIds, points) => {
       { headers: { "Content-Type": "application/json" } }
     );
 
-    console.log("API Response:", response.data);
     return response.data;
   } catch (error) {
     console.error("API Error:", error.response?.data);

@@ -137,7 +137,6 @@ function LecturerRow({ lecturer, index, onAllocate }) {
 
   // Hàm xử lý khi toggle (tạm thời chỉ log, sẽ cập nhật API sau)
   const handleToggle = (checked) => {
-    console.log(`Lecturer ${lecturer.fullName} state changed to: ${checked}`);
     // Sau này sẽ gọi API để cập nhật trạng thái ở đây
   };
 

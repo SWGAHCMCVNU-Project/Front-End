@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Select } from "antd";
 import { FilterButtonRadio, StyledFilterRadio } from "../../../../ui/custom/Filter/Radio/RadioOptions";
 import { useCampaignVoucherItem } from "../useCampaignVoucherItem";
@@ -31,13 +31,31 @@ function ItemFilter() {
         voucherGroups,
         selectedVoucherId,
         setSelectedVoucherId,
+        isBought,
+        isUsed,
         setIsBought,
         setIsUsed,
+        handlePageChange,
     } = useCampaignVoucherItem();
-    const [selectedOption, setSelectedOption] = useState("");
+
+    // Hàm ánh xạ isBought/isUsed sang selectedOption
+    const getSelectedOption = (isBought, isUsed) => {
+        if (isBought === null && isUsed === null) return "all";
+        if (isBought === true && isUsed === false) return "bought";
+        if (isBought === true && isUsed === true) return "used";
+        if (isBought === false && isUsed === false) return "";
+        return "all"; // Mặc định nếu không khớp
+    };
+
+    const [selectedOption, setSelectedOption] = useState(getSelectedOption(isBought, isUsed));
+
+    // Đồng bộ selectedOption khi isBought hoặc isUsed thay đổi
+    useEffect(() => {
+        setSelectedOption(getSelectedOption(isBought, isUsed));
+    }, [isBought, isUsed]);
 
     const optionStates = [
-        { value: "all", label: "Tất cả" }, // Added "Tất cả" option
+        { value: "all", label: "Tất cả" },
         { value: "", label: "Khả dụng" },
         { value: "bought", label: "Đã mua" },
         { value: "used", label: "Đã sử dụng" },
@@ -46,7 +64,7 @@ function ItemFilter() {
     const handleChangeState = (selectedOptionState) => {
         setSelectedOption(selectedOptionState);
         if (selectedOptionState === "all") {
-            setIsBought(null); // Show all items
+            setIsBought(null);
             setIsUsed(null);
         } else if (selectedOptionState === "bought") {
             setIsBought(true);
@@ -58,12 +76,13 @@ function ItemFilter() {
             setIsBought(false);
             setIsUsed(false);
         }
+        // Reset page to 1 when filter changes
+        handlePageChange(1);
     };
 
-    // Chuyển đổi voucherGroups thành format cho Select
     const voucherOptions = Object.entries(voucherGroups).map(([voucherId, groupData]) => ({
         value: voucherId,
-        label: `${groupData.voucher?.name || groupData.voucher?.voucherName || 'Chưa có tên voucher'} (${groupData.items.length} items)`
+        label: `${groupData.voucher?.name || groupData.voucher?.voucherName || 'Chưa có tên voucher'} (${groupData.items.length} items)`,
     }));
 
     return (
@@ -86,7 +105,6 @@ function ItemFilter() {
                 <div className="custom-select-container-product">
                     {filters}
                     <div>
-                        {/* <div className="filter-label">Chọn Voucher</div> */}
                         <Select
                             style={{ width: 550 }}
                             placeholder="Chọn voucher để xem danh sách..."
@@ -99,7 +117,7 @@ function ItemFilter() {
                         />
                     </div>
                 </div>
-            </div>
+        </div>
             <div>
                 <CampaignVoucherItems />
             </div>

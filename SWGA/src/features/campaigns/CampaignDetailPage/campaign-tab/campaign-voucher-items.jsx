@@ -17,20 +17,41 @@ function CampaignVoucherItems() {
         voucherGroups,
         selectedVoucherId,
         pagination,
-        page,
-        handlePageChange
+        handlePageChange,
+        handlePageSizeChange,
+        pageSize,
+        isBought,
+        isUsed
     } = useCampaignVoucherItem();
 
-    if (isLoading) return <Spinner />;
+    if (isLoading && !campaignVoucherItems?.length) return <Spinner />;
     if (error) return <div>Error: {error.message}</div>;
-    if (!campaignVoucherItems?.length) return <Empty resource="voucher items" />;
 
+    // Lấy danh sách items thuộc voucher được chọn
     const currentVoucherGroup = voucherGroups[selectedVoucherId] || {};
     const currentVoucherInfo = currentVoucherGroup.voucher || {};
+    let filteredItems = currentVoucherGroup.items || [];
+
+    // Nếu không có items nào cho voucher được chọn
+    if (!filteredItems.length && selectedVoucherId) return <Empty resource="voucher items for this voucher" />;
+    if (!selectedVoucherId) return <Empty resource="voucher (please select a voucher)" />;
+
+    // Áp dụng bộ lọc trạng thái phía client
+    filteredItems = filteredItems.filter(item => {
+        if (isBought === null && isUsed === null) return true; // "Tất cả"
+        if (isBought === false && isUsed === false) return item.status === "Khả dụng"; // "Khả dụng"
+        if (isBought === true && isUsed === false) return item.status === "Đã mua"; // "Đã mua"
+        if (isBought === true && isUsed === true) return item.status === "Đã sử dụng"; // "Đã sử dụng"
+        return false;
+    });
+
+    // Giới hạn số lượng items hiển thị dựa trên pageSize và trang hiện tại
+    const startIndex = (pagination.currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedItems = filteredItems.slice(startIndex, endIndex);
 
     const columns = "5rem 30rem 20rem 15rem 15rem 15rem";
 
-    // Calculate counts using the full list of items for the selected voucher
     const allItemsForVoucher = currentVoucherGroup.items || [];
     const availableCount = allItemsForVoucher.filter(item => item.status === "Khả dụng").length;
     const boughtCount = allItemsForVoucher.filter(item => item.status === "Đã mua").length;
@@ -55,7 +76,7 @@ function CampaignVoucherItems() {
             const value = payload[0].payload.displayValue;
             const percentage = total === 0 ? 0 : ((value / total) * 100).toFixed(2);
             return (
-                <div style={{ backgroundColor: "#fff", padding: "5px", border: "1px solid #ccc", fontFamily: "Arial, sans-serif" }}>
+                <div style={{ backgroundColor: "#fff", padding: "5px", border: "1px solid #ccc" }}>
                     <p>{`${payload[0].name}: ${value} (${percentage}%)`}</p>
                 </div>
             );
@@ -65,7 +86,7 @@ function CampaignVoucherItems() {
 
     const renderLegend = () => {
         return (
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: "10px", fontFamily: "Arial, sans-serif" }}>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: "10px" }}>
                 {rawChartData.map((entry, index) => (
                     <div key={`legend-${index}`} style={{ display: "flex", alignItems: "center", marginRight: "20px" }}>
                         <div
@@ -83,11 +104,15 @@ function CampaignVoucherItems() {
         );
     };
 
+    // Xác định xem có cần disable nút chuyển trang không
+    const totalPages = Math.ceil(filteredItems.length / pageSize);
+    const disablePaginationButtons = filteredItems.length <= pageSize;
+
     return (
         <div className="table-container">
             <div className="voucher-info">
                 <h3>{currentVoucherInfo.name || currentVoucherInfo.voucherName || 'Chưa có tên voucher'}</h3>
-                <p>Tổng số: {pagination.total} voucher items</p>
+                <p>Tổng số: {filteredItems.length} voucher items</p>
             </div>
             <Table columns={columns}>
                 <Table.Header>
@@ -98,11 +123,10 @@ function CampaignVoucherItems() {
                     <div>Ngày tạo</div>
                     <div>Trạng thái</div>
                 </Table.Header>
-
                 <Table.Body
-                    data={campaignVoucherItems}
+                    data={paginatedItems} // Sử dụng paginatedItems thay vì filteredItems
                     render={(item, index) => {
-                        const displayedIndex = (page - 1) * 10 + index + 1;
+                        const displayedIndex = startIndex + index + 1;
                         return (
                             <Table.Row key={item.id}>
                                 <div>{displayedIndex}</div>
@@ -118,14 +142,17 @@ function CampaignVoucherItems() {
             </Table>
             <Pagination
                 current={pagination.currentPage}
-                total={pagination.total}
-                pageSize={10}
+                total={filteredItems.length}
+                pageSize={pageSize}
                 onChange={handlePageChange}
-                disabled={pagination.total <= 10}
-                showSizeChanger={false}
+                onShowSizeChange={handlePageSizeChange}
+                showSizeChanger
+                pageSizeOptions={['10', '20', '50']}
+                disabled={disablePaginationButtons} // Disable nút chuyển trang nếu không cần phân trang
+                showSizeChangerDisabled={false} // Đảm bảo showSizeChanger không bị disable
                 style={{ marginTop: '1rem', textAlign: 'right' }}
             />
-            <div style={{ marginTop: '2rem', textAlign: 'center', maxWidth: '400px', margin: '2rem auto', fontFamily: "Arial, sans-serif" }}>
+            <div style={{ marginTop: '2rem', textAlign: 'center', maxWidth: '400px', margin: '2rem auto' }}>
                 <h4>Tỉ lệ trạng thái</h4>
                 {renderLegend()}
                 <PieChart width={430} height={400}>

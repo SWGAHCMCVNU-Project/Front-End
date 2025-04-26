@@ -81,7 +81,6 @@ function Lecturers() {
   let urlCampusId = campusResponse?.campusId || searchParams.get("campusId");
   if (!urlCampusId && role === "campus") {
     urlCampusId = StorageService.getCampusId();
-    console.log("Fallback to localStorage campusId:", urlCampusId);
   }
 
   const searchName = searchParams.get("search") || "";

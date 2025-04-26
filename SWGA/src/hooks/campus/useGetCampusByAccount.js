@@ -12,7 +12,6 @@ const useGetCampusByAccountId = (accountId) => {
       toast.error(error.message || 'Lấy thông tin campus theo account thất bại');
     },
     select: (response) => {
-      console.log('Response in useGetCampusByAccountId:', response); // Debug response
       if (response?.success) {
         let campusId = null;
         if (Array.isArray(response.data)) {
