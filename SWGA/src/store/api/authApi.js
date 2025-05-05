@@ -1,7 +1,8 @@
 import apiClient from './apiClient';
 import toast from 'react-hot-toast';
 import StorageService from '../../services/storageService';
-import { AUTH_ENDPOINTS, EMAIL_ENDPOINTS, CAMPUS } from './endpoints';
+import { AUTH_ENDPOINTS, EMAIL_ENDPOINTS } from './endpoints';
+import { getCampusByAccountIdAPI } from './campusApi';
 
 const ROLE_MAPPING = {
   'Quản trị viên': 'admin',
@@ -19,52 +20,6 @@ const ERROR_MESSAGES = {
   LOGOUT_ERROR: 'Đã xảy ra lỗi khi đăng xuất!',
   VERIFY_ACCOUNT_ERROR: 'Xác minh tài khoản thất bại!',
   INVALID_VERIFY_DATA: 'Dữ liệu xác minh không hợp lệ!',
-};
-
-// Function to fetch campusId by accountId
-const fetchCampusByAccountId = async (accountId) => {
-  try {
-    if (!accountId) {
-      throw new Error('Account ID is missing or invalid');
-    }
-
-    const response = await apiClient.get(CAMPUS.GET_BY_ID_ACCOUNT.replace("{id}", accountId));
-
-    if (response.status === 200) {
-      if (response.data && response.data.id) {
-        const campusId = response.data.id;
-        return campusId;
-      }
-
-      if (Array.isArray(response.data)) {
-        if (response.data.length === 0) {
-          console.warn('No campus data found for accountId:', accountId);
-          return '';
-        }
-        const campusId = response.data[0]?.id;
-        if (campusId) {
-          return campusId;
-        } else {
-          console.error('No campusId found in array response:', response.data);
-          throw new Error('Không thể lấy campusId từ API: No campusId in array response');
-        }
-      }
-
-      if (response.data?.data?.id) {
-        const campusId = response.data.data.id;
-        return campusId;
-      }
-
-      console.error('No campusId found in response:', response);
-      throw new Error('Không thể lấy campusId từ API: No campusId in response');
-    } else {
-      console.error('Unexpected response status:', response.status, response);
-      throw new Error('Không thể lấy campusId từ API: Invalid response status');
-    }
-  } catch (error) {
-    console.error('Error fetching campusId:', error.message, error.response?.data);
-    throw new Error(error.message || 'Không thể lấy campusId từ API');
-  }
 };
 
 export const login = async (userName, password) => {
@@ -119,9 +74,14 @@ export const login = async (userName, password) => {
 
     if (mappedRole === 'campus') {
       try {
-        const campusId = await fetchCampusByAccountId(accountId);
-        StorageService.setCampusId(campusId || '');
-        userData.campusId = campusId || '';
+        const campusData = await getCampusByAccountIdAPI();
+        if (campusData?.id) {
+          StorageService.setCampusId(campusData.id);
+          userData.campusId = campusData.id;
+        } else {
+          StorageService.setCampusId('');
+          userData.campusId = '';
+        }
       } catch (error) {
         console.error('Failed to fetch campusId during login:', error.message);
         StorageService.setCampusId('');

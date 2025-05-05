@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import PaginationContext from "../../../context/PaginationContext";
-import useGetAllCampaigns from "../../../hooks/campaign/useGetAllCampaigns";
+import useCampaignsByBrandId from "../../../hooks/campaign/useCampaignsByBrandId";
 import useGetAllCampaignsAdmin from "../../../hooks/campaign/useGetAllCampaignsAdmin";
 import { useTablePagination } from "../../../hooks/useTablePagination";
 import StorageService from "../../../services/storageService";
@@ -21,6 +21,8 @@ export function CampaignProvider({ children }) {
   const roleLogin = StorageService.getRoleLogin().toLowerCase();
   const isAdmin = roleLogin === "admin";
 
+  const brandId = StorageService.getBrandId?.() || null;
+
   useEffect(() => {
     setCurrentPage(initialPage);
   }, [initialPage]);
@@ -39,42 +41,101 @@ export function CampaignProvider({ children }) {
     setCurrentPage(1);
   };
 
-  const search = searchParams.get("search") || null;
+  const search = searchParams.get("search") || "";
   const campaignTypeIds = searchParams.get("campaignTypeIds")?.split(",") || null;
 
-  // Query for brand (default)
+  const normalizedStates = statesFilterValue === undefined ? null : statesFilterValue;
+
   const {
-    isLoading: isLoadingBrand,
-    data: campaignsBrand,
+    campaigns: campaignsBrand,
+    loading: isLoadingBrand,
     error: errorBrand,
+    pagination: brandPagination,
     refetch: refetchBrand,
-  } = useGetAllCampaigns({
-    search,
+  } = useCampaignsByBrandId(brandId, {
     page: currentPage,
     size: initialSize,
+    searchName: search,
     campaignTypeIds,
-    statesFilterValue,
-    enabled: !isAdmin,
+    statesFilterValue: normalizedStates,
   });
 
-  // Query for admin
+  // Filter campaigns for brand role
+  const today = new Date();
+  const filteredBrandCampaigns = normalizedStates === null
+    ? campaignsBrand || [] // Ensure campaignsBrand is an array
+    : campaignsBrand?.filter(campaign => {
+        const statusFilter = parseInt(normalizedStates, 10);
+        const campaignStatus = campaign.status;
+        const startDate = new Date(campaign.startOn);
+        const endDate = new Date(campaign.endOn);
+
+        if (statusFilter === 1) {
+          return campaignStatus === 1 && today >= startDate && today <= endDate;
+        } else if (statusFilter === 0) {
+          return campaignStatus === 0 || today < startDate || today > endDate;
+        } else {
+          return campaignStatus === statusFilter;
+        }
+      }) || [];
+
   const {
     isLoading: isLoadingAdmin,
-    data: campaignsAdmin,
+    data: campaignsAdminData,
     error: errorAdmin,
     refetch: refetchAdmin,
   } = useGetAllCampaignsAdmin({
     search,
     page: currentPage,
     size: initialSize,
+    statesFilterValue: normalizedStates,
     enabled: isAdmin,
   });
 
-  // Combine data based on role
+  // Normalize admin data structure to match brand data structure
+  const campaignsAdmin = campaignsAdminData
+    ? {
+        items: campaignsAdminData.items || campaignsAdminData,
+        page: campaignsAdminData.page || currentPage,
+        totalPages: campaignsAdminData.totalPages || 1,
+        total: campaignsAdminData.total || campaignsAdminData.length,
+      }
+    : null;
+
+  // Filter campaigns for admin role
+  const filteredAdminCampaigns = normalizedStates === null || !campaignsAdmin
+    ? campaignsAdmin?.items || [] // Ensure campaignsAdmin.items is an array
+    : campaignsAdmin.items?.filter(campaign => {
+        const statusFilter = parseInt(normalizedStates, 10);
+        const campaignStatus = campaign.status;
+        const startDate = new Date(campaign.startOn);
+        const endDate = new Date(campaign.endOn);
+
+        if (statusFilter === 1) {
+          return campaignStatus === 1 && today >= startDate && today <= endDate;
+        } else if (statusFilter === 0) {
+          return campaignStatus === 0 || today < startDate || today > endDate;
+        } else {
+          return campaignStatus === statusFilter;
+        }
+      }) || [];
+
   const isLoading = isAdmin ? isLoadingAdmin : isLoadingBrand;
-  const campaigns = isAdmin ? campaignsAdmin : campaignsBrand;
+  const campaigns = isAdmin
+    ? {
+        items: filteredAdminCampaigns,
+        page: campaignsAdmin?.page || currentPage,
+        totalPages: campaignsAdmin?.totalPages || 1,
+        total: campaignsAdmin?.total || filteredAdminCampaigns.length,
+      }
+    : {
+        items: filteredBrandCampaigns,
+        page: brandPagination?.currentPage || currentPage,
+        totalPages: brandPagination?.totalPages || 1,
+        total: brandPagination?.totalItems || filteredBrandCampaigns.length,
+      };
   const error = isAdmin ? errorAdmin : errorBrand;
-  const refetch = isAdmin ? refetchAdmin : refetchBrand;
+  const refetch = isAdmin ? refetchAdmin : (newParams) => refetchBrand({ page: newParams?.page, size: newParams?.size, searchName: newParams?.search });
 
   useEffect(() => {
     setErrorMessage(error ? "Không thể tải danh sách chiến dịch. Vui lòng thử lại sau." : null);

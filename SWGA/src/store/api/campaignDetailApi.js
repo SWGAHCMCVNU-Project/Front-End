@@ -151,6 +151,7 @@ export const getStoresByCampaignId = async (
         closingHours: item.closingHours || "00:00",
         state: item.state || false,
         campaignStoreId: item.id || "",
+        file: item.file || "", 
       }))
     : [];
 

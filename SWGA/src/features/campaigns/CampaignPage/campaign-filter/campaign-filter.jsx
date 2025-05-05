@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Added useEffect
 import { useLocation, useNavigate } from "react-router-dom";
 import TableOperations from "../../../../ui/TableOperations";
 import { FilterButtonRadio, StyledFilterRadio } from "../../../../ui/custom/Filter/Radio/RadioOptions";
@@ -13,8 +13,9 @@ function CampaignFilter() {
     isLoading,
     statesFilterValue,
     setStatesFilterValue,
-    size, // Đổi từ limit thành size
-    handleLimitChange // Đổi tên để đồng bộ
+    size,
+    handleLimitChange,
+    refetch, // Added refetch
   } = useCampaign();
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -27,11 +28,10 @@ function CampaignFilter() {
 
   const optionStates = [
     { id: undefined, key: "All", value: "Tất cả", label: "Tất cả" },
-    { id: "1", key: "1", value: "Chờ duyệt", label: "Chờ duyệt" },
-    { id: "2", key: "2", value: "Từ chối", label: "Từ chối" },
-    { id: "3,4", key: "onactive", value: "Đang diễn ra", label: "Đang diễn ra" },
-    { id: "6", key: "closed", value: "Đã đóng", label: "Đã đóng" },
-    { id: "7", key: "canceled", value: "Đã hủy", label: "Đã hủy" }
+    { id: "2", key: "pending", value: "Chờ duyệt", label: "Chờ duyệt" },
+    { id: "3", key: "rejected", value: "Từ chối", label: "Từ chối" },
+    { id: "1", key: "active", value: "Hoạt động", label: "Hoạt động" },
+    { id: "0", key: "inactive", value: "Không hoạt động", label: "Không hoạt động" },
   ];
 
   const handleChangeState = (e) => {
@@ -42,12 +42,12 @@ function CampaignFilter() {
   const optionBrands = brands?.map((brand) => ({
     value: brand.id,
     label: brand.brandName,
-  }));
+  })) || [];
 
   const optionsCampaignTypes = campaignTypes?.map((type) => ({
     value: type.id,
     label: type.typeName,
-  }));
+  })) || [];
 
   const handleBrandChange = (selected) => {
     const ids = selected.map(item => item.value).join(",");
@@ -59,6 +59,7 @@ function CampaignFilter() {
     }
     navigate(`${pathname}?${currentSearch.toString()}`, { replace: true });
     setSelectedOptionBrand(selected);
+    refetch({ brandIds: ids || null }); // Trigger refetch
   };
 
   const handleTypeChange = (selected) => {
@@ -71,6 +72,7 @@ function CampaignFilter() {
     }
     navigate(`${pathname}?${currentSearch.toString()}`, { replace: true });
     setSelectedOptionType(selected);
+    refetch({ campaignTypeIds: ids || null }); // Trigger refetch
   };
 
   return (

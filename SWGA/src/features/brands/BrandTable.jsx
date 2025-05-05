@@ -25,6 +25,9 @@ Table.Row = styled(Table.Row)`
 
 function BrandTable() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [sortField, setSortField] = useState("brandName"); // Default sort by brandName
+  const [sortOrder, setSortOrder] = useState("asc"); // Default sort order
+
   const currentPage = Number(searchParams.get("page")) || 1;
   const pageSize = Number(searchParams.get("size")) || 10;
   const searchTerm = searchParams.get("searchName") || "";
@@ -69,6 +72,15 @@ function BrandTable() {
     refetch();
   };
 
+  const handleSortClick = (field) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortOrder("asc");
+    }
+  };
+
   const isDataEmpty = !brandData.items.length || brandData.total === 0;
 
   if (error) {
@@ -80,6 +92,34 @@ function BrandTable() {
     return <div>Loading...</div>;
   }
 
+  // Sort the brand items
+  const sortedBrands = [...brandData.items].sort((a, b) => {
+    let valueA, valueB;
+
+    switch (sortField) {
+      case "brandName":
+        valueA = a.brandName?.toLowerCase() || "";
+        valueB = b.brandName?.toLowerCase() || "";
+        break;
+      case "openingHours":
+        valueA = a.openingHours || "";
+        valueB = b.openingHours || "";
+        break;
+      case "totalSpending":
+        valueA = Number(a.totalSpending) || 0;
+        valueB = Number(b.totalSpending) || 0;
+        break;
+      default:
+        return 0;
+    }
+
+    if (sortOrder === "asc") {
+      return valueA > valueB ? 1 : -1;
+    } else {
+      return valueA < valueB ? 1 : -1;
+    }
+  });
+
   return (
     <div className="flex flex-col gap-8">
       {!brandData.items.length ? (
@@ -89,15 +129,30 @@ function BrandTable() {
           <Table columns="0.5fr 2.5fr 1.5fr 1.5fr 1fr 0.5fr">
             <Table.Header>
               <div>STT</div>
-              <StackedHeader label="Tên thương hiệu" />
-              <div>Thời gian làm việc</div>
-              <div>Tổng chi phí</div>
+              <StackedHeader
+                label="Tên thương hiệu"
+                onClick={() => handleSortClick("brandName")}
+                ascending={sortField === "brandName" && sortOrder === "asc"}
+                active={sortField === "brandName"}
+              />
+              <StackedHeader
+                label="Thời gian làm việc"
+                onClick={() => handleSortClick("openingHours")}
+                ascending={sortField === "openingHours" && sortOrder === "asc"}
+                active={sortField === "openingHours"}
+              />
+              <StackedHeader
+                label="Tổng chi phí"
+                onClick={() => handleSortClick("totalSpending")}
+                ascending={sortField === "totalSpending" && sortOrder === "asc"}
+                active={sortField === "totalSpending"}
+              />
               <div>Trạng thái</div>
               <div></div> {/* Cột trống cho StyledAction */}
             </Table.Header>
 
             <Table.Body
-              data={brandData.items}
+              data={sortedBrands}
               render={(brand, index) => (
                 <BrandRow
                   key={brand.id}

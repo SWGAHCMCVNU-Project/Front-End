@@ -22,18 +22,17 @@ function SignIn() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const { verifyUserAccount, resendVerificationCode, isLoading: isVerifying, error: verifyError } = useVerifyAccount();
-
   const handleLogin = async (values) => {
     try {
       setIsLoading(true);
       const response = await login(values.username.trim(), values.password);
       if (response.success) {
         const { role, isVerify, loginId } = response.data;
-
+  
         if (!isVerify) {
           const accountResponse = await getAccountByIdAPI(loginId);
           if (!accountResponse.success) {
-            toast.error("Không thể lấy thông tin tài khoản!");
+            toast.error(accountResponse.message || "Không thể lấy thông tin tài khoản!");
             return;
           }
           setLoginData({

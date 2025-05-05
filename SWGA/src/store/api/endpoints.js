@@ -56,13 +56,13 @@ export const AUTH_ENDPOINTS = {
   };
   export const CAMPAIGN_ENDPOINTS = {
     GET_ALL: "/Campaign",
-    GET_BY_ID: "/Campaign/{id}",
+    GET_BY_ID: "/Campaign/{id}/allStatus",
     CREATE: "/Campaign",
     UPDATE: "/Campaign/{id}",
-    GET_ALL_CAMPAIGN: "Campaign/getAll",
-    GET_STORE_BY_ID: "Campaign/getStoreByCampaignId/{id}",
-    GET_CAMPAIGN_BY_ID: "/Campaign/brand/{id}"
-
+    GET_ALL_CAMPAIGN: "/Campaign/getCampaignsAllStatus",
+    GET_STORE_BY_ID: "/Campaign/getStoreByCampaignId/{id}",
+    GET_CAMPAIGN_BY_ID: "/Campaign/brandAllStatus/{id}",
+    CHANGE_STATUS_OF_CAMPAIGN: "/Campaign/approve-camp"
   };
   export const CAMPAIGN_DETAIL_ENDPOINTS = {
     GET_VOUCHER: "/CampaignDetail",

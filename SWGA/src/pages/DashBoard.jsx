@@ -9,14 +9,7 @@ import DashboardCampus from './Dashboard/DashBoardCampus';
 import storageService from '../services/storageService';
 
 const DashBoard = () => {
-  const navigate = useNavigate();
-  const roleLogin = storageService.getRoleLogin(); // Sử dụng getRoleLogin thay vì getUserRole
-
-  useEffect(() => {
-    if (!storageService.getAccessToken() || !roleLogin) {
-      navigate('/sign-in', { replace: true });
-    }
-  }, [roleLogin, navigate]);
+  const roleLogin = storageService.getRoleLogin();
 
   if (!roleLogin) {
     return <Spinner />;
