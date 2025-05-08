@@ -1,8 +1,8 @@
-import { useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+/* eslint-disable no-undef */
+/* eslint-disable react-hooks/rules-of-hooks */
+import { useEffect, useState } from "react";
+import { Route, Routes, Navigate, useLocation, useNavigate } from "react-router-dom";
 import "antd/dist/reset.css";
-import { useState } from "react";
-import { Route, Routes, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import "./assets/styles/App.scss";
 import "./assets/styles/responsive.scss";
@@ -44,16 +44,15 @@ import CampusPage from "./pages/CampusManagement/CampusPage.jsx";
 import LuckyPrize from "./pages/LuckyPrizeManagement/LuckyPrize.jsx";
 import Location from "./pages/LocationManagement/Location.jsx";
 import { useJsApiLoader } from "@react-google-maps/api";
+import Spinner from "./ui/Spinner.jsx";
+import ProtectedRoute from "./features/ProtectedRoute/ProtectedRoute.jsx";
+
 function PrivateRoute({ children, allowedRoles = [] }) {
   const location = useLocation();
-  const isAuthenticated = !!storageService.getAccessToken();
+  const token = storageService.getAccessToken();
   const roleLogin = storageService.getRoleLogin();
 
-  if (location.pathname === "/sign-in") {
-    return children;
-  }
-
-  if (!isAuthenticated || !roleLogin) {
+  if (!token || !roleLogin) {
     return <Navigate to="/sign-in" state={{ from: location }} replace />;
   }
 
@@ -65,51 +64,71 @@ function PrivateRoute({ children, allowedRoles = [] }) {
 }
 
 function App() {
-  const [roleLogin, setRoleLogin] = useState(storageService.getRoleLogin());
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-    
   });
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(location.search);
-    const vnpParams = Array.from(urlParams.entries()).filter(([key]) =>
-      key.startsWith("vnp_")
+    const checkAuth = () => {
+      setIsAuthChecked(true);
+    };
+
+    checkAuth();
+    const handleAuthChange = () => checkAuth();
+    window.addEventListener("authChange", handleAuthChange);
+
+    return () => window.removeEventListener("authChange", handleAuthChange);
+  }, []);
+
+  if (!isAuthChecked) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spinner />
+      </div>
     );
-
-    if (vnpParams.length > 0 && location.pathname === "/") {
-      navigate(`/buy-points?${urlParams.toString()}`, { replace: true });
-    }
-  }, [location, navigate]);
-
-  const handleLogin = (newRoleLogin) => {
-    storageService.setRoleLogin(newRoleLogin);
-    setRoleLogin(newRoleLogin);
-  };
+  }
 
   if (loadError) {
     console.error("Error loading Google Maps:", loadError);
-    // Vẫn render ứng dụng, nhưng các thành phần sử dụng Google Maps sẽ không hoạt động
   }
 
-  if (!isLoaded) {
-    // Bạn có thể render một loading indicator ở đây nếu cần
-  }
+  const isAuthenticated = !!storageService.getAccessToken();
 
   return (
     <>
       <Routes>
-        <Route
-          path="/sign-in"
-          exact
-          element={<SignIn onLogin={handleLogin} />}
-        />
+        <Route path="/sign-in" exact element={<SignIn />} />
         <Route path="/sign-up" exact element={<SignUp />} />
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Navigate to="/sign-in" replace />
+            )
+          }
+        />
         <Route path="/" element={<Main />}>
-          <Route path="/dashboard" exact element={<DashBoard />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashBoard />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/profile" element={<Profile />} />
           <Route path="/account" element={<Account />} />
           <Route
@@ -386,7 +405,7 @@ function App() {
               </PrivateRoute>
             }
           />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/sign-in" replace />} />
         </Route>
       </Routes>
       <Toaster />

@@ -9,11 +9,13 @@ import DashboardCampus from './Dashboard/DashBoardCampus';
 import storageService from '../services/storageService';
 
 const DashBoard = () => {
+  const navigate = useNavigate();
   const roleLogin = storageService.getRoleLogin();
 
-  if (!roleLogin) {
-    return <Spinner />;
-  }
+  
+
+ 
+  if (!roleLogin) return null;
 
   switch (roleLogin) {
     case 'admin':

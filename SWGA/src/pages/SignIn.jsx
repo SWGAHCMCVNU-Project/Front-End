@@ -141,7 +141,7 @@ function SignIn() {
           .wallet-input {
             border-radius: 8px;
             padding: 12px 40px;
-            background: #1c5d78 !important; /* Darker than the form background */
+            background: #1c5d78 !important;
             border: 1px solid #4A86A8;
             color: #fff;
             transition: all 0.3s ease;

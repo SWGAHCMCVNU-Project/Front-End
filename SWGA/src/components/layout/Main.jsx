@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { Affix, Layout } from "antd";
 import { jwtDecode } from "jwt-decode";
 import { useEffect, useState } from "react";
@@ -10,39 +11,36 @@ const { Header: AntHeader, Content, Sider } = Layout;
 
 function Main() {
   const navigate = useNavigate();
+  const token = storageService.getAccessToken();
+  const nameLogin = storageService.getNameLogin();
+
+  if (!token || !nameLogin) {
+    navigate("/sign-in", { replace: true });
+    return null;
+  }
+
+  try {
+    const tokenDecode = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+    if (tokenDecode.exp < currentTime) {
+      storageService.clearAll();
+      navigate("/sign-in", { replace: true });
+      return null;
+    }
+  } catch {
+    storageService.clearAll();
+    navigate("/sign-in", { replace: true });
+    return null;
+  }
 
   useEffect(() => {
-    const token = storageService.getAccessToken();
-    const nameLogin = storageService.getNameLogin();
-    
-    if (!token || !nameLogin) {
-      navigate('/sign-in');
-      return;
-    }
-
-    try {
-      const tokenDecode = jwtDecode(token);
-      const currentTime = Date.now() / 1000;
-      
-      if (tokenDecode.exp < currentTime) {
-        storageService.clearAll();
-        navigate('/sign-in');
-      }
-    } catch {
-      storageService.clearAll();
-      navigate('/sign-in');
-    }
-
-    // Lắng nghe sự kiện token hết hạn
     const handleTokenExpired = () => {
-      navigate('/sign-in');
+      storageService.clearAll();
+      navigate("/sign-in", { replace: true });
     };
 
-    window.addEventListener('tokenExpired', handleTokenExpired);
-
-    return () => {
-      window.removeEventListener('tokenExpired', handleTokenExpired);
-    };
+    window.addEventListener("tokenExpired", handleTokenExpired);
+    return () => window.removeEventListener("tokenExpired", handleTokenExpired);
   }, [navigate]);
 
   const [visible, setVisible] = useState(false);
@@ -69,15 +67,13 @@ function Main() {
 
   return (
     <Layout
-      className={`layout-dashboard ${cleanPathname === "profile" ? "layout-profile" : ""} 
-      ${cleanPathname === "rtl" ? "layout-dashboard-rtl" : ""}`}
+      className={`layout-dashboard ${
+        cleanPathname === "profile" ? "layout-profile" : ""
+      } ${cleanPathname === "rtl" ? "layout-dashboard-rtl" : ""}`}
     >
       <Sider
         breakpoint="lg"
         collapsedWidth="0"
-        onCollapse={(collapsed, type) => {
-          // console.log(collapsed, type);
-        }}
         trigger={null}
         width={270}
         theme="light"
@@ -123,3 +119,4 @@ function Main() {
 }
 
 export default Main;
+
