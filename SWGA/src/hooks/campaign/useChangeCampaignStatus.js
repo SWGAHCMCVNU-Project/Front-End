@@ -40,7 +40,7 @@ export const useChangeCampaignStatus = () => {
       // Cập nhật cache
       queryClient.invalidateQueries(['campaigns']);
       queryClient.invalidateQueries(['campaign', variables.campaignId]);
-      queryClient.invalidateQueries(['walletBalance']); // Cập nhật số dư ví
+      queryClient.invalidateQueries(['walletBalance']); 
     },
     onError: (error) => {
       console.error('Error changing campaign status:', error);

@@ -29,7 +29,7 @@ const MapContainer = styled.div`
 `;
 
 const LocationForm = ({ locationToEdit = {}, onCloseModal }) => {
-  const { id: editId, name, latitue, longtitude, qrcode, status } = locationToEdit;
+  const { id: editId, name, latitue, longtitude, qrcode, status, address } = locationToEdit;
   const isEditSession = Boolean(editId);
 
   const { mutate: create, isLoading: isCreating } = useCreateLocation();
@@ -45,6 +45,7 @@ const LocationForm = ({ locationToEdit = {}, onCloseModal }) => {
     defaultValues: isEditSession
       ? {
           name: name || "",
+          address: address || "",
           latitue: latitue ? latitue.toString().replace(',', '.') : "0",
           longtitude: longtitude ? longtitude.toString().replace(',', '.') : "0",
           qrcode: qrcode || "",
@@ -54,6 +55,7 @@ const LocationForm = ({ locationToEdit = {}, onCloseModal }) => {
           status: true,
           latitue: "0",
           longtitude: "0",
+          address: "",
         },
   });
   const { errors } = formState;
@@ -61,6 +63,7 @@ const LocationForm = ({ locationToEdit = {}, onCloseModal }) => {
   const onSubmit = (data) => {
     const formData = {
       name: data.name?.trim() || "",
+      address: data.address?.trim() || "",
       latitue: Number(data.latitue.replace(',', '.')),
       longtitude: Number(data.longtitude.replace(',', '.')),
       qrcode: data.qrcode?.trim() || "",
@@ -69,6 +72,11 @@ const LocationForm = ({ locationToEdit = {}, onCloseModal }) => {
 
     if (!formData.name) {
       toast.error("Vui lòng nhập tên địa điểm");
+      return;
+    }
+
+    if (!formData.address) {
+      toast.error("Vui lòng nhập địa chỉ");
       return;
     }
 
@@ -113,7 +121,7 @@ const LocationForm = ({ locationToEdit = {}, onCloseModal }) => {
   };
 
   const handleInputChange = (field, value) => {
-    const formattedValue = value.replace(',', '.'); // Thay dấu phẩy thành dấu chấm khi người dùng nhập
+    const formattedValue = value.replace(',', '.');
     setValue(field, formattedValue, { shouldValidate: true });
     setMarkerPosition({
       lat: field === "latitue" ? Number(formattedValue) : markerPosition.lat,
@@ -127,8 +135,8 @@ const LocationForm = ({ locationToEdit = {}, onCloseModal }) => {
   };
 
   const defaultCenter = {
-    lat: latitue || 10.7769, // Default to Hanoi, Vietnam if no latitude
-    lng: longtitude || 106.7009, // Default to Hanoi, Vietnam if no longitude
+    lat: latitue || 10.7769,
+    lng: longtitude || 106.7009,
   };
 
   return (
@@ -150,6 +158,24 @@ const LocationForm = ({ locationToEdit = {}, onCloseModal }) => {
             maxLength: {
               value: 100,
               message: "Tên địa điểm tối đa 100 ký tự",
+            },
+          })}
+        />
+      </FormRow>
+      <FormRow label="Địa chỉ" error={errors?.address?.message}>
+        <StyledInput
+          type="text"
+          id="address"
+          disabled={isWorking}
+          {...register("address", {
+            required: "Hãy nhập địa chỉ",
+            minLength: {
+              value: 5,
+              message: "Địa chỉ ít nhất 5 ký tự",
+            },
+            maxLength: {
+              value: 200,
+              message: "Địa chỉ tối đa 200 ký tự",
             },
           })}
         />
@@ -249,6 +275,7 @@ LocationForm.propTypes = {
   locationToEdit: PropTypes.shape({
     id: PropTypes.string,
     name: PropTypes.string,
+    address: PropTypes.string,
     latitue: PropTypes.number,
     longtitude: PropTypes.number,
     qrcode: PropTypes.string,
