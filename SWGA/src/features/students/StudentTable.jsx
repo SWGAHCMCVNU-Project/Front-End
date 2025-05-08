@@ -65,6 +65,30 @@ function StudentTable() {
 
   const filteredStudents = filterStudentsByState(students, searchParams.get("state"));
 
+  // Sort the filtered students based on sortField and sortOrder
+  const sortedStudents = [...filteredStudents].sort((a, b) => {
+    let valueA = a[sortField?.toLowerCase()] || "";
+    let valueB = b[sortField?.toLowerCase()] || "";
+    
+    // Handle case sensitivity and special cases
+    if (sortField === "FullName") {
+      valueA = a.fullName?.toLowerCase() || "";
+      valueB = b.fullName?.toLowerCase() || "";
+    } else if (sortField === "Phone") {
+      valueA = a.phone || "";
+      valueB = b.phone || "";
+    } else if (sortField === "CampusName") {
+      valueA = a.campusName?.toLowerCase() || "";
+      valueB = b.campusName?.toLowerCase() || "";
+    }
+
+    if (sortOrder === "asc") {
+      return valueA > valueB ? 1 : -1;
+    } else {
+      return valueA < valueB ? 1 : -1;
+    }
+  });
+
   return (
     <Menus>
       <Table columns="0.4fr 2fr 1.5fr 1fr 1fr">
@@ -76,13 +100,23 @@ function StudentTable() {
             ascending={sortField === "FullName" && sortOrder === "asc"}
             active={sortField === "FullName"}
           />
-          <div>Liên hệ</div>
-          <div>Campus</div>
+          <StackedHeader
+            label="Liên hệ"
+            onClick={() => handleStackedClick("Phone")}
+            ascending={sortField === "Phone" && sortOrder === "asc"}
+            active={sortField === "Phone"}
+          />
+          <StackedHeader
+            label="Campus"
+            onClick={() => handleStackedClick("CampusName")}
+            ascending={sortField === "CampusName" && sortOrder === "asc"}
+            active={sortField === "CampusName"}
+          />
           <StyledHeader>Trạng thái</StyledHeader>
         </Table.Header>
 
         <Table.Body
-          data={filteredStudents}
+          data={sortedStudents}
           render={(student, index) => (
             <StyledButton>
               <StudentRow
@@ -96,7 +130,7 @@ function StudentTable() {
         />
         <Table.Footer>
           <Pagination
-            count={filteredStudents.length}
+            count={sortedStudents.length}
             currentPage={currentPage}
             pageSize={limit}
             pageCount={Math.ceil(totalCount / limit)}

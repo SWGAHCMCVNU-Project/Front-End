@@ -4,7 +4,7 @@ import imgDefaultStore from "../../../../assets/images/store.png";
 import Empty from "../../../../ui/Empty";
 import { TableItem } from "../../../../ui/custom/Table/TableItem";
 import { useCampaignStore } from "../useCampaignStore";
-import { formatPhoneNumber } from "../../../../utils/helpers"; // Đảm bảo đã import formatPhoneNumber
+import { formatPhoneNumber } from "../../../../utils/helpers";
 
 const Stacked = styled.div`
   display: flex;
@@ -94,50 +94,58 @@ function CampaignStore() {
     } = useCampaignStore();
 
     // Chuyển đổi dữ liệu từ campaignStores thành định dạng phù hợp với Table
-    const dataSource = campaignStores?.result?.map((store, index) => ({
-        key: store.id || index + 1,
-        number: <div className="number-header"><span>{(page - 1) * limit + index + 1}</span></div>,
-        StoreName: (
-            <StoreNameWrapper>
-                <Avatar 
-                    className="shape-avatar-product" 
-                    shape="square" 
-                    src={store.avatar || imgDefaultStore} 
-                    size={45}
-                />
-                <div className="avatar-info">
-                    <Title className="title-product-name" level={5}>{store.name}</Title>
-                    <p className="p-column-table">{store.brand}</p>
-                </div>
-            </StoreNameWrapper>
-        ),
-        Hours: (
-            <StackedTime>
-                <span>
-                    <TimeLabel>Mở cửa:</TimeLabel>
-                    <StackedTimeFrameAbove>{store.openTime}</StackedTimeFrameAbove>
-                </span>
-                <span>
-                    <TimeLabel>Đóng cửa:</TimeLabel>
-                    <StackedTimeFrameBelow>{store.closeTime}</StackedTimeFrameBelow>
-                </span>
-            </StackedTime>
-        ),
-        Contact: (
-            <Stacked>
-                {store.email === null && store.phone === null ? (
-                    <span style={{ fontSize: 14 }}>Chưa cập nhật</span>
-                ) : (
-                    <>
-                        <span>{store.email !== null ? store.email : "Chưa cập nhật Email"}</span>
-                        <span>{store.phone !== null ? formatPhoneNumber(store.phone) : "Chưa cập nhật số điện thoại"}</span>
-                    </>
-                )}
-            </Stacked>
-        ),
-        Address: <StyledAddress>{store.address}</StyledAddress>,
-        State: <Tag className="status-tag" color={store.state === "active" ? "cyan" : "red"}>{store.state}</Tag>,
-    })) || [];
+    const dataSource = campaignStores?.result?.map((store, index) => {
+        // Debug the file URL to ensure it's being passed correctly
+
+        return {
+            key: store.id || index + 1,
+            number: <div className="number-header"><span>{(page - 1) * limit + index + 1}</span></div>,
+            StoreName: (
+                <StoreNameWrapper>
+                    <Avatar 
+                        className="shape-avatar-product" 
+                        shape="square" 
+                        src={store.file ? store.file : imgDefaultStore} // Ensure the file is used, fallback to default
+                        size={45}
+                        onError={() => {
+                            console.error("Failed to load image for store:", store.name, store.file);
+                            return true; // Trigger fallback to default image
+                        }}
+                    />
+                    <div className="avatar-info">
+                        <Title className="title-product-name" level={5}>{store.name}</Title>
+                        <p className="p-column-table">{store.brand}</p>
+                    </div>
+                </StoreNameWrapper>
+            ),
+            Hours: (
+                <StackedTime>
+                    <span>
+                        <TimeLabel>Mở cửa:</TimeLabel>
+                        <StackedTimeFrameAbove>{store.openTime}</StackedTimeFrameAbove>
+                    </span>
+                    <span>
+                        <TimeLabel>Đóng cửa:</TimeLabel>
+                        <StackedTimeFrameBelow>{store.closeTime}</StackedTimeFrameBelow>
+                    </span>
+                </StackedTime>
+            ),
+            Contact: (
+                <Stacked>
+                    {store.email === null && store.phone === null ? (
+                        <span style={{ fontSize: 14 }}>Chưa cập nhật</span>
+                    ) : (
+                        <>
+                            <span>{store.email !== null ? store.email : "Chưa cập nhật Email"}</span>
+                            <span>{store.phone !== null ? formatPhoneNumber(store.phone) : "Chưa cập nhật số điện thoại"}</span>
+                        </>
+                    )}
+                </Stacked>
+            ),
+            Address: <StyledAddress>{store.address}</StyledAddress>,
+            State: <Tag className="status-tag" color={store.state === "active" ? "cyan" : "red"}>{store.state}</Tag>,
+        };
+    }) || [];
 
     const handleSort = (pagination, filters, sorter) => {
         if (sorter.order) {
@@ -151,7 +159,7 @@ function CampaignStore() {
                 <TableItem
                     columns={[
                         { 
-                            title: "STT", 
+                            title: "ST ", 
                             dataIndex: "number", 
                             key: "number", 
                             align: "center",

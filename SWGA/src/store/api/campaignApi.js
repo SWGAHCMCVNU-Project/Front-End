@@ -204,7 +204,10 @@ export const updateCampaignAPI = async (id, params) => {
     throw error;
   }
 };
-export const getCampaignsByBrandIdAPI = async (brandId, { page = 1, size = 10, searchName = "" } = {}) => {
+export const getCampaignsByBrandIdAPI = async (
+  brandId,
+  { page = 1, size = 10, searchName = "", campaignTypeIds, statesFilterValue } = {}
+) => {
   try {
     if (!brandId) {
       throw new Error("Brand ID is required");
@@ -216,6 +219,8 @@ export const getCampaignsByBrandIdAPI = async (brandId, { page = 1, size = 10, s
         page,
         size,
         searchName,
+        campaignTypeIds: campaignTypeIds?.join(","),
+        statesFilterValue,
       },
     });
 
@@ -228,6 +233,37 @@ export const getCampaignsByBrandIdAPI = async (brandId, { page = 1, size = 10, s
     console.error(`Error fetching campaigns for brand ${brandId}:`, error);
     const errorMessage =
       error.response?.data?.message || "Lấy danh sách chiến dịch theo thương hiệu thất bại";
+    return {
+      status: error.response?.status || 500,
+      success: false,
+      message: errorMessage,
+    };
+  }
+};
+export const changeCampaignStatusAPI = async ({ campaignId, isApproved, rejectionReason }) => {
+  try {
+    if (!campaignId) {
+      throw new Error("Campaign ID is required");
+    }
+
+    const queryParams = new URLSearchParams();
+    queryParams.append("campaignId", campaignId);
+    queryParams.append("isApproved", isApproved);
+    if (rejectionReason) queryParams.append("rejectionReason", rejectionReason);
+
+    const response = await apiClient.put(
+      `${CAMPAIGN_ENDPOINTS.CHANGE_STATUS_OF_CAMPAIGN}?${queryParams.toString()}`
+    );
+
+    return {
+      status: response.status,
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    console.error(`Error changing status for campaign ${campaignId}:`, error);
+    const errorMessage =
+      error.response?.data?.message || "Thay đổi trạng thái chiến dịch thất bại";
     return {
       status: error.response?.status || 500,
       success: false,

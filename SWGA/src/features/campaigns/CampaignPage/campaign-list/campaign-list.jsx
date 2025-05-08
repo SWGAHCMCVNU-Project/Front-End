@@ -1,3 +1,4 @@
+// campaign-list.jsx
 import { Avatar, Spin, Tag, Typography, Alert } from "antd";
 import { HiEye, HiPencil } from "react-icons/hi2";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -58,8 +59,8 @@ function CampaignList() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  // Local state for sorting
   const [sort, setSort] = useState("Id,desc");
+
 
   const campaignImages = campaigns?.result?.map((campaign) => campaign.image) || [];
   const isValidImages = useImageValidity(campaigns?.result || [], campaignImages);
@@ -70,7 +71,6 @@ function CampaignList() {
   const day = String(currentDate.getDate()).padStart(2, "0");
   const formattedDate = `${year}-${month}-${day}`;
 
-  // Handle sorting when a column header is clicked
   const handleSort = (pagination, filters, sorter) => {
     if (!sorter.order) {
       setSort("Id,desc");
@@ -78,12 +78,11 @@ function CampaignList() {
     }
 
     const sortOrder = sorter.order === "ascend" ? "asc" : "desc";
-    const sortField = sorter.field; // e.g., "CampaignName"
+    const sortField = sorter.field;
     const newSort = `${sortField},${sortOrder}`;
     setSort(newSort);
   };
 
-  // Client-side sorting logic
   const sortedCampaigns = useMemo(() => {
     const [sortField, sortOrder] = sort.split(",");
     const items = campaigns?.result ? [...campaigns.result] : [];
@@ -111,7 +110,7 @@ function CampaignList() {
           valueB = b.totalIncome || 0;
           break;
         default:
-          return 0; // No sorting for default case
+          return 0;
       }
 
       if (sortOrder === "asc") {
@@ -124,14 +123,25 @@ function CampaignList() {
     return items;
   }, [campaigns?.result, sort]);
 
-  const determineCampaignStatus = (startOn, endOn) => {
+  const determineCampaignStatus = (status, startOn, endOn) => {
+    const today = new Date();
     const startDate = new Date(startOn);
     const endDate = new Date(endOn);
-    const today = new Date(formattedDate);
-    if (today < startDate) return "Chờ duyệt";
-    if (today >= startDate && today <= endDate) return "Hoạt động";
-    if (today > endDate) return "Kết thúc";
-    return "Không xác định";
+
+    if (status === 1 && today >= startDate && today <= endDate) {
+      return "Hoạt động";
+    }
+    if (status === 0 || today < startDate || today > endDate) {
+      return "Không hoạt động";
+    }
+    switch (status) {
+      case 2:
+        return "Chờ duyệt";
+      case 3:
+        return "Từ chối";
+      default:
+        return "Không xác định";
+    }
   };
 
   const getStatusTagColor = (stateCurrent) => {
@@ -144,14 +154,8 @@ function CampaignList() {
         return "cyan";
       case "Không hoạt động":
         return "default";
-      case "Kết thúc":
-        return "volcano";
-      case "Đóng":
-        return "red";
-      case "Hủy":
-        return "error";
       default:
-        return "default-color";
+        return "default";
     }
   };
 
@@ -185,7 +189,8 @@ function CampaignList() {
       : index + 1;
     const isValid = isValidImages[index];
     const avatarSrc = isValid ? campaign.image : imgDefaultCampaign;
-    const campaignStatus = determineCampaignStatus(campaign.startOn, campaign.endOn);
+    const campaignStatus = determineCampaignStatus(campaign.status, campaign.startOn, campaign.endOn);
+
 
     return {
       key: campaign.id,
@@ -274,14 +279,14 @@ function CampaignList() {
       <TableItem
         columns={columns}
         dataSource={data}
-        handleSort={handleSort} // Changed from onChange to handleSort to match TableItem prop
+        handleSort={handleSort}
         limit={size}
         label=""
         page={page}
         elements={campaigns?.totalCount}
         setPage={handlePageChange}
         setLimit={handleSizeChange}
-        handleRowClick={handleRowClick} // Changed to match TableItem prop
+        handleRowClick={handleRowClick}
       />
     </Spin>
   );

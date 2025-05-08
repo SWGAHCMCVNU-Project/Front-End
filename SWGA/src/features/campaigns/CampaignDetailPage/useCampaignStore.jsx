@@ -37,7 +37,7 @@ export function CampaignStoreProvider({ children }) {
             id: store.id,
             name: store.storeName,
             brand: store.brandName,
-            avatar: store.avatar,
+            file: store.file,
             email: store.email,
             phone: store.phone,
             address: store.address,

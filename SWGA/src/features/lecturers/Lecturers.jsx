@@ -98,10 +98,14 @@ function Lecturers() {
 
   if (isCampusLoading || isLoading) return <Spinner />;
   if (campusError) {
-    return <Empty resourceName="campus" message="Không thể tải thông tin campus" />;
+    return (
+      <Empty resourceName="campus" message="Không thể tải thông tin campus" />
+    );
   }
   if (!urlCampusId) {
-    return <Empty resourceName="campus" message="Không tìm thấy thông tin campus" />;
+    return (
+      <Empty resourceName="campus" message="Không tìm thấy thông tin campus" />
+    );
   }
   if (error) {
     return <Empty resourceName="giảng viên" message={error.message} />;
@@ -161,7 +165,7 @@ function Lecturers() {
           <Empty resourceName="giảng viên" />
         ) : (
           <Menus>
-            <Table columns="0.5fr 2fr 0.5fr 1.9fr 1fr 1fr 1fr">
+            <Table columns="0.5fr 2fr 2fr 1fr 1fr 1fr">
               <Table.Header style={{ width: "100%" }}>
                 <StyledHeader>STT</StyledHeader>
                 <StackedHeader
@@ -170,8 +174,8 @@ function Lecturers() {
                   ascending={sortField === "fullName" && sortOrder === "asc"}
                   active={sortField === "fullName"}
                 />
+                {/* Gộp 2 cột thành 1 */}
                 <StyledHeader>Liên hệ</StyledHeader>
-                <StyledHeader>Đại học</StyledHeader>
                 <StyledHeader>Trạng thái</StyledHeader>
                 <StyledHeader>Số dư</StyledHeader>
                 <StyledHeader>Hành động</StyledHeader>

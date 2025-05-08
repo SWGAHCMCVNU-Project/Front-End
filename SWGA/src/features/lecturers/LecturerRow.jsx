@@ -81,7 +81,8 @@ const Stacked = styled.div`
   height: 100%;
   padding: 1rem 0.5rem;
   min-height: 60px;
-  margin-top: 60px;
+  text-align: center; // Thêm dòng này
+  width: 100%; // Thêm dòng này
 `;
 
 const StyledButton = styled.button`
@@ -141,23 +142,56 @@ function LecturerRow({ lecturer, index, onAllocate }) {
   };
 
   return (
-    <Table.Row style={{ minHeight: "60px", display: "flex", alignItems: "center" }}>
+    <Table.Row
+      style={{ minHeight: "60px", display: "flex", alignItems: "center" }}
+    >
       <StyledRow>{index}</StyledRow>
       <LecturerContainer>
-        {isValidImage ? <Img src={lecturer.avatar || ""} /> : <Img src={logoDefault} />}
+        {isValidImage ? (
+          <Img src={lecturer.avatar || ""} />
+        ) : (
+          <Img src={logoDefault} />
+        )}
         <StackedFrame>
-          <LecturerName onClick={handleNameClick}>{lecturer.fullName || "Không có tên"}</LecturerName>
+          <LecturerName onClick={handleNameClick}>
+            {lecturer.fullName || "Không có tên"}
+          </LecturerName>
         </StackedFrame>
       </LecturerContainer>
       <Stacked>
-        <span style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-          {lecturer.phone ? formatPhoneNumber(lecturer.phone) : "N/A"}
-        </span>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "4px",
+            alignItems: "center", // Thêm dòng này
+            width: "100%", // Thêm dòng này
+          }}
+        >
+          <span>
+            {lecturer.phone ? formatPhoneNumber(lecturer.phone) : "N/A"}
+          </span>
+          <span
+            style={{
+              fontSize: "1.4rem",
+              color: "var(--color-grey-500)",
+              wordBreak: "break-word", // Thêm dòng này
+              width: "100%", // Thêm dòng này
+            }}
+          >
+            {lecturer.email || "N/A"}
+          </span>
+        </div>
       </Stacked>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60px" }}>
-        {lecturer.campusName || "Không có dữ liệu"}
-      </div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60px" }}>
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "60px",
+        }}
+      >
         <Switch
           checked={lecturer.state}
           onChange={handleToggle}
@@ -175,15 +209,13 @@ function LecturerRow({ lecturer, index, onAllocate }) {
           </MyModal.Open>
 
           <MyModal.Window name={`allocate-${lecturer.id}`}>
-            <AllocatePointsForm 
+            <AllocatePointsForm
               campusId={lecturer.campusId}
-              lecturerIds={[lecturer.id]} 
+              lecturerIds={[lecturer.id]}
               onCloseModal={() => {}}
             />
           </MyModal.Window>
         </MyModal>
-
-        
       </StyledAction>
     </Table.Row>
   );
