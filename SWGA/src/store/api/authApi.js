@@ -168,6 +168,8 @@ export const verifyAccount = async (id, email, code) => {
 export const logout = () => {
   try {
     StorageService.clearAll();
+    // Thêm logic clear cache
+    window.dispatchEvent(new Event('authChange'));
     toast.success('Đã đăng xuất thành công!');
   } catch (error) {
     console.error('Lỗi khi đăng xuất:', error);
