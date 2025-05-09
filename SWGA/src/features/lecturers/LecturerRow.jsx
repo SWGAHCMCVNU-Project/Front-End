@@ -1,14 +1,14 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { HiPlus, HiTrash } from "react-icons/hi2";
+import { HiPlus } from "react-icons/hi2";
 import styled from "styled-components";
 import logoDefault from "../../assets/images/reading.png";
-import ConfirmDelete from "../../ui/ConfirmDelete";
 import Table from "../../ui/Table";
 import MyModal from "../../ui/custom/Modal/MyModal";
 import { formatPhoneNumber, handleValidImageURL } from "../../utils/helpers";
 import AllocatePointsForm from "./AllocatePointsForm";
-import { Switch } from "antd"; // Import Switch từ Ant Design
+import { Switch } from "antd";
+import { useUpdateLecturer } from "../../hooks/lecturer/useUpdateLecturer";
 
 const StyledRow = styled.div`
   display: flex;
@@ -66,12 +66,6 @@ const StackedFrame = styled.div`
   gap: 0.2rem;
 `;
 
-const StyledCode = styled.div`
-  color: var(--color-grey-500);
-  font-size: 1.2rem;
-  font-weight: 500;
-`;
-
 const Stacked = styled.div`
   display: flex;
   flex-direction: column;
@@ -81,8 +75,8 @@ const Stacked = styled.div`
   height: 100%;
   padding: 1rem 0.5rem;
   min-height: 60px;
-  text-align: center; // Thêm dòng này
-  width: 100%; // Thêm dòng này
+  text-align: center;
+  width: 100%;
 `;
 
 const StyledButton = styled.button`
@@ -129,6 +123,7 @@ function LecturerRow({ lecturer, index, onAllocate }) {
   };
 
   const [isValidImage, setIsValidImage] = useState(true);
+  const [localState, setLocalState] = useState(lecturer.state);
 
   useEffect(() => {
     handleValidImageURL(lecturer.avatar)
@@ -136,87 +131,101 @@ function LecturerRow({ lecturer, index, onAllocate }) {
       .catch(() => setIsValidImage(false));
   }, [lecturer.avatar]);
 
-  // Hàm xử lý khi toggle (tạm thời chỉ log, sẽ cập nhật API sau)
+  const { mutate: updateLecturer, isLoading: isUpdating, isError, error } = useUpdateLecturer();
+
   const handleToggle = (checked) => {
-    // Sau này sẽ gọi API để cập nhật trạng thái ở đây
+    setLocalState(checked);
+    updateLecturer({ id: lecturer.id, state: checked }, {
+      onSuccess: () => {
+        // State update successful
+      },
+      onError: (err) => {
+        setLocalState(!checked);
+        console.error("Error updating lecturer state:", err);
+      },
+    });
   };
 
   return (
-    <Table.Row
-      style={{ minHeight: "60px", display: "flex", alignItems: "center" }}
-    >
-      <StyledRow>{index}</StyledRow>
-      <LecturerContainer>
-        {isValidImage ? (
-          <Img src={lecturer.avatar || ""} />
-        ) : (
-          <Img src={logoDefault} />
-        )}
-        <StackedFrame>
-          <LecturerName onClick={handleNameClick}>
-            {lecturer.fullName || "Không có tên"}
-          </LecturerName>
-        </StackedFrame>
-      </LecturerContainer>
-      <Stacked>
+    <Table.Row style={{ minHeight: "60px", display: "flex", alignItems: "center" }}>
+      <>
+        <StyledRow>{index}</StyledRow>
+        <LecturerContainer>
+          {isValidImage ? (
+            <Img src={lecturer.avatar || ""} />
+          ) : (
+            <Img src={logoDefault} />
+          )}
+          <StackedFrame>
+            <LecturerName onClick={handleNameClick}>
+              {lecturer.fullName || "Không có tên"}
+            </LecturerName>
+          </StackedFrame>
+        </LecturerContainer>
+        <Stacked>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "4px",
+              alignItems: "center",
+              width: "100%",
+            }}
+          >
+            <span>
+              {lecturer.phone ? formatPhoneNumber(lecturer.phone) : "N/A"}
+            </span>
+            <span
+              style={{
+                fontSize: "1.4rem",
+                color: "var(--color-grey-500)",
+                wordBreak: "break-word",
+                width: "100%",
+              }}
+            >
+              {lecturer.email || "N/A"}
+            </span>
+          </div>
+        </Stacked>
+
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
-            gap: "4px",
-            alignItems: "center", // Thêm dòng này
-            width: "100%", // Thêm dòng này
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: "60px",
           }}
         >
-          <span>
-            {lecturer.phone ? formatPhoneNumber(lecturer.phone) : "N/A"}
-          </span>
-          <span
-            style={{
-              fontSize: "1.4rem",
-              color: "var(--color-grey-500)",
-              wordBreak: "break-word", // Thêm dòng này
-              width: "100%", // Thêm dòng này
-            }}
-          >
-            {lecturer.email || "N/A"}
-          </span>
+          <Switch
+            checked={localState}
+            onChange={handleToggle}
+            checkedChildren="Hoạt động"
+            unCheckedChildren="Không hoạt động"
+            disabled={isUpdating}
+          />
+          {isError && <span style={{ color: "red" }}>Lỗi: {error?.message || "Cập nhật thất bại"}</span>}
         </div>
-      </Stacked>
+        <StyledRow>{lecturer.balance || "N/A"}</StyledRow>
+        <StyledAction>
+          {localState && (
+            <MyModal>
+              <MyModal.Open opens={`allocate-${lecturer.id}`}>
+                <StyledButton onClick={(e) => e.stopPropagation()}>
+                  <HiPlus />
+                </StyledButton>
+              </MyModal.Open>
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "60px",
-        }}
-      >
-        <Switch
-          checked={lecturer.state}
-          onChange={handleToggle}
-          checkedChildren="Hoạt động"
-          unCheckedChildren="Không hoạt động"
-        />
-      </div>
-      <StyledRow>{lecturer.balance || "N/A"}</StyledRow>
-      <StyledAction>
-        <MyModal>
-          <MyModal.Open opens={`allocate-${lecturer.id}`}>
-            <StyledButton onClick={(e) => e.stopPropagation()}>
-              <HiPlus />
-            </StyledButton>
-          </MyModal.Open>
-
-          <MyModal.Window name={`allocate-${lecturer.id}`}>
-            <AllocatePointsForm
-              campusId={lecturer.campusId}
-              lecturerIds={[lecturer.id]}
-              onCloseModal={() => {}}
-            />
-          </MyModal.Window>
-        </MyModal>
-      </StyledAction>
+              <MyModal.Window name={`allocate-${lecturer.id}`}>
+                <AllocatePointsForm
+                  campusId={lecturer.campusId}
+                  lecturerIds={[lecturer.id]}
+                  onCloseModal={() => {}}
+                />
+              </MyModal.Window>
+            </MyModal>
+          )}
+        </StyledAction>
+      </>
     </Table.Row>
   );
 }

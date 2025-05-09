@@ -27,3 +27,14 @@ export const getLecturersByCampusAPI = async ({
     return { status: error.response?.status || 500, success: false, message: errorMessage };
   }
 };
+export const updateLecturerStateAPI = async ({ id, state }) => {
+  try {
+    const response = await apiClient.put(LECTURER.UPDATE_STATUS.replace('{id}', id), {
+      state
+    });
+    return { status: response.status, success: true, data: response.data };
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || "Cập nhật trạng thái giảng viên thất bại";
+    return { status: error.response?.status || 500, success: false, message: errorMessage };
+  }
+};

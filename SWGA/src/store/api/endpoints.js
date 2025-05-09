@@ -115,7 +115,8 @@ export const AUTH_ENDPOINTS = {
     GET_WALLET_CAMPUS: "/Wallet/get-wallet-by-campus-id"
   }
   export const LECTURER = {
-    GET_ALL: "/Lecturer/campus"
+    GET_ALL: "/Lecturer/campus",
+    UPDATE_STATUS: "/Lecturer/{id}",
   }
   export const LOCATION = {
     CREATE: "/Location/create-location",
