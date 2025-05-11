@@ -6,6 +6,7 @@ import { useMoveBack } from "../../../hooks/useMoveBack";
 import ButtonText from "../../../ui/ButtonText";
 import CampaignBasicInformation from "./campaign-basic-infor";
 import CampaignMSC from "./campaign-msc";
+import CampaignTimeOfEvent from "./CampaignTimeOfEvent";
 import CampaignVoucherCost from "./campaign-voucher-cost";
 import CampaignReview from "./campaign-review";
 import "./scss/campaign.scss";
@@ -18,7 +19,7 @@ function CampaignStep() {
   useEffect(() => {
     const handleBeforeUnload = (event) => {
       event.preventDefault();
-      event.returnValue = ""; // Hiển thị thông báo xác nhận gửi lại biểu mẫu
+      event.returnValue = "";
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
@@ -38,6 +39,10 @@ function CampaignStep() {
       content: <CampaignMSC />,
     },
     {
+      title: "Loại và thời gian diễn ra",
+      content: <CampaignTimeOfEvent />,
+    },
+    {
       title: "Khuyến mãi",
       content: <CampaignVoucherCost />,
     },
@@ -51,10 +56,10 @@ function CampaignStep() {
     key: item.title,
     title: item.title,
     status: completedSteps.includes(index)
-      ? "finish" // Bước đã hoàn thành
+      ? "finish"
       : index === current
-      ? "process" // Bước hiện tại
-      : "wait", // Bước chưa hoàn thành
+      ? "process"
+      : "wait",
   }));
 
   return (

@@ -147,6 +147,8 @@ export const getAllCampaignTypes = async ({
               state: type.state ?? true,
               status: type.status ?? true,
               numberOfCampaign: type.numberOfCampaign || 0,
+              coin: type.coin || 0, // Thêm nếu chưa có
+              duration: type.duration || 0, // Thêm nếu chưa có
             }))
           : [],
       },

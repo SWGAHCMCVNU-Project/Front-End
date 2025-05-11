@@ -5,20 +5,19 @@ import { NextPrevContext } from "../../../context/NextPrevContext";
 import { ButtonNextPrev } from "../../../ui/custom/Button/Button";
 import ButtonCustom from "../../../ui/custom/Button/ButtonCustom";
 import CampaignVoucher from "./CampaignVoucher";
-import walletService from "../../../store/api/walletApi"; // Import wallet service
+import walletService from "../../../store/api/walletApi";
 import "./scss/campaign.scss";
 import toast from "react-hot-toast";
 
 function CampaignVoucherCost() {
   const { current, setCurrent, newCampaign, setNewCampaign, completedSteps, setCompletedSteps } = useContext(NextPrevContext);
   const [isLoading, setIsLoading] = useState(false);
-  const [walletBalance, setWalletBalance] = useState(null); // State for wallet balance
+  const [walletBalance, setWalletBalance] = useState(null);
 
   const { handleSubmit } = useForm({
     defaultValues: newCampaign || {}
   });
 
-  // Fetch wallet balance on component mount
   useEffect(() => {
     const fetchWalletBalance = async () => {
       try {
@@ -56,13 +55,13 @@ function CampaignVoucherCost() {
         return;
       }
 
-      // Validate wallet balance before proceeding
-      if (walletBalance !== null && newCampaign.cost > walletBalance) {
-        toast.error(`Số dư ví không đủ! Cần ${newCampaign.cost} điểm, nhưng ví chỉ có ${walletBalance} điểm.`);
+      const totalCost = (newCampaign.cost || 0) + (newCampaign.campaignTypeCoin || 0);
+      if (walletBalance !== null && totalCost > walletBalance) {
+        toast.error(`Số dư ví không đủ! Cần ${totalCost} điểm, nhưng ví chỉ có ${walletBalance} điểm.`);
         return;
       }
 
-      setCompletedSteps((prev) => [...new Set([...prev, 2])]); // Đánh dấu bước 2 hoàn thành
+      setCompletedSteps((prev) => [...new Set([...prev, 3])]);
       setCurrent(current + 1);
     } catch {
       toast.error("Có lỗi xảy ra, vui lòng thử lại");
