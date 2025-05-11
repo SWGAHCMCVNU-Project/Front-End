@@ -70,10 +70,15 @@ export function CampaignProvider({ children }) {
         const startDate = new Date(campaign.startOn);
         const endDate = new Date(campaign.endOn);
 
+        // Nếu chiến dịch đã bị từ chối (status = 3), giữ nguyên trạng thái
+        if (campaignStatus === 3) {
+          return statusFilter === 3;
+        }
+
         if (statusFilter === 1) {
           return campaignStatus === 1 && today >= startDate && today <= endDate;
         } else if (statusFilter === 0) {
-          return campaignStatus === 0 || today < startDate || today > endDate;
+          return campaignStatus === 0 || (campaignStatus === 1 && (today < startDate || today > endDate));
         } else {
           return campaignStatus === statusFilter;
         }
@@ -111,10 +116,15 @@ export function CampaignProvider({ children }) {
         const startDate = new Date(campaign.startOn);
         const endDate = new Date(campaign.endOn);
 
+        // Nếu chiến dịch đã bị từ chối (status = 3), giữ nguyên trạng thái
+        if (campaignStatus === 3) {
+          return statusFilter === 3;
+        }
+
         if (statusFilter === 1) {
           return campaignStatus === 1 && today >= startDate && today <= endDate;
         } else if (statusFilter === 0) {
-          return campaignStatus === 0 || today < startDate || today > endDate;
+          return campaignStatus === 0 || (campaignStatus === 1 && (today < startDate || today > endDate));
         } else {
           return campaignStatus === statusFilter;
         }

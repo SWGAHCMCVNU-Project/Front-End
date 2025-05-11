@@ -1,21 +1,28 @@
 import { Avatar, Card, DatePicker, Spin, message } from "antd";
 import moment from "moment-timezone";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import styled, { css } from "styled-components";
 import { NextPrevContext } from "../../../context/NextPrevContext";
 import Input from "../../../ui/Input";
 import { ButtonNextPrev } from "../../../ui/custom/Button/Button";
 import ButtonCustom from "../../../ui/custom/Button/ButtonCustom";
-import { CustomFormEditorRow, CustomFormRow } from "../../../ui/custom/Form/InputItem/CustomFormItem";
+import {
+  CustomFormEditorRow,
+  CustomFormRow,
+} from "../../../ui/custom/Form/InputItem/CustomFormItem";
 import MyEditor from "../../../ui/custom/Form/TextEditor/MyEditor";
 import { FormSelect } from "../../../ui/custom/Select/SelectBox/SelectForm";
 import { useCampaignTypes } from "../../../hooks/campaign-type/useCampaignTypes";
 import CampaignStore from "./CampaignStore";
 import CampaignVoucher from "./CampaignVoucher";
+import walletService from "../../../store/api/walletApi";
 import "./scss/campaign.scss";
 import useCreateCampaign from "../../../hooks/campaign/useCreateCampaign";
 import StorageService from "../../../services/storageService";
+import greenBean from "../../../assets/images/dauxanh.png";
+import toast from "react-hot-toast";
+import { formatCurrency } from "../../../utils/helpers";
 
 const StyledDataBox = styled.section`
   background-color: var(--color-grey-0);
@@ -73,15 +80,52 @@ const LeftFormHalf = styled.div`
   flex: 1;
 `;
 
+const TotalCostContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #1c5d78;
+`;
+
+const TotalCostBreakdown = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+`;
+
+const CostRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const CostLabel = styled.span`
+  font-weight: 500;
+`;
+
+const CostWithIcon = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+`;
+
+const TotalCostValue = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+`;
+
 const { RangePicker } = DatePicker;
 
-// Hàm chuyển đổi ngày thành định dạng YYYY/MM/DD
 const formatDateToObject = (date) => {
   const momentDate = moment(date);
   return momentDate.format("YYYY/MM/DD");
 };
 
-// Hàm chuyển array campaignDetails thành string theo định dạng backend mong muốn
 const convertCampaignDetailsToString = (details) => {
   if (!Array.isArray(details) || details.length === 0) return "";
   return JSON.stringify(details);
@@ -94,6 +138,7 @@ function CampaignReview() {
   const { handleSubmit, setValue } = useForm({
     defaultValues: newCampaign ? newCampaign : {},
   });
+  const [walletBalance, setWalletBalance] = useState(null);
 
   useEffect(() => {
     if (newCampaign?.typeId !== undefined) {
@@ -105,6 +150,21 @@ function CampaignReview() {
     window.scrollTo(0, 0);
   }, []);
 
+  useEffect(() => {
+    const fetchWalletBalance = async () => {
+      try {
+        const walletData = await walletService.getWalletByBrandId();
+        setWalletBalance(walletData.balance);
+      } catch (error) {
+        console.error("Failed to fetch wallet balance:", error);
+        setWalletBalance(0);
+        toast.error("Không thể tải số dư ví");
+      }
+    };
+
+    fetchWalletBalance();
+  }, []);
+
   function onSubmit() {
     const startOn = newCampaign?.startOn
       ? formatDateToObject(newCampaign.startOn)
@@ -113,7 +173,18 @@ function CampaignReview() {
       ? formatDateToObject(newCampaign.endOn)
       : formatDateToObject(new Date());
 
-    const campaignDetailsString = convertCampaignDetailsToString(newCampaign?.campaignDetails);
+    const campaignDetailsString = convertCampaignDetailsToString(
+      newCampaign?.campaignDetails
+    );
+
+    const totalCost =
+      (newCampaign?.cost || 0) + (newCampaign?.campaignTypeCoin || 0);
+    if (walletBalance !== null && totalCost > walletBalance) {
+      toast.error(
+        `Số dư ví không đủ! Cần ${totalCost} điểm, nhưng ví chỉ có ${walletBalance} điểm.`
+      );
+      return;
+    }
 
     const completeCampaignData = {
       ...newCampaign,
@@ -124,7 +195,7 @@ function CampaignReview() {
       description: newCampaign?.description,
       startOn: startOn,
       endOn: endOn,
-      totalIncome: newCampaign?.cost ?? 0,
+      totalIncome: totalCost,
       storeIds: newCampaign?.storeIds || [],
       link: newCampaign?.link || "",
       image: newCampaign?.image || null,
@@ -142,6 +213,10 @@ function CampaignReview() {
     setCurrent(current - 1);
   };
 
+  const voucherCost = newCampaign?.cost || 0;
+  const campaignTypeCost = newCampaign?.campaignTypeCoin || 0;
+  const totalCampaignCost = voucherCost + campaignTypeCost;
+
   return (
     <>
       <div>
@@ -152,7 +227,8 @@ function CampaignReview() {
           <div>
             <span>
               - Nơi tổ chức chiến dịch và ưu đãi sau khi tạo chiến dịch sẽ
-              <strong className="note-strong"> không thể chỉnh sửa</strong>, vui lòng kiểm tra kĩ trước khi
+              <strong className="note-strong"> không thể chỉnh sửa</strong>, vui
+              lòng kiểm tra kĩ trước khi
               <strong className="note-strong"> tạo chiến dịch</strong>.
             </span>
           </div>
@@ -171,7 +247,10 @@ function CampaignReview() {
                     <Avatar
                       className="shape-review-avatar-campaign"
                       shape="square"
-                      src={newCampaign?.image && URL.createObjectURL(newCampaign.image)}
+                      src={
+                        newCampaign?.image &&
+                        URL.createObjectURL(newCampaign.image)
+                      }
                     />
                   </Avatar.Group>
                   <CustomFormRow label="Tên chiến dịch">
@@ -192,7 +271,10 @@ function CampaignReview() {
                         id="startOn"
                         value={
                           newCampaign?.startOn && newCampaign?.endOn
-                            ? [moment(newCampaign.startOn), moment(newCampaign.endOn)]
+                            ? [
+                                moment(newCampaign.startOn),
+                                moment(newCampaign.endOn),
+                              ]
                             : undefined
                         }
                         disabled
@@ -203,10 +285,12 @@ function CampaignReview() {
                       <FormSelect
                         id="typeId"
                         value={newCampaign?.typeId ? newCampaign.typeId : null}
-                        options={campaignTypes?.filter(c => c.state).map(c => ({
-                          value: c.id,
-                          label: c.typeName
-                        }))}
+                        options={campaignTypes
+                          ?.filter((c) => c.state)
+                          .map((c) => ({
+                            value: c.id,
+                            label: c.typeName,
+                          }))}
                         disabled={true}
                       />
                     </div>
@@ -225,7 +309,9 @@ function CampaignReview() {
                   <CustomFormEditorRow label="Mô tả">
                     <MyEditor
                       id="description"
-                      initialContent={newCampaign?.description ? newCampaign.description : ""}
+                      initialContent={
+                        newCampaign?.description ? newCampaign.description : ""
+                      }
                       disabled={true}
                     />
                   </CustomFormEditorRow>
@@ -233,7 +319,9 @@ function CampaignReview() {
                   <CustomFormEditorRow label="Thể lệ chiến dịch">
                     <MyEditor
                       id="condition"
-                      initialContent={newCampaign?.condition ? newCampaign.condition : ""}
+                      initialContent={
+                        newCampaign?.condition ? newCampaign.condition : ""
+                      }
                       disabled={true}
                     />
                   </CustomFormEditorRow>
@@ -248,6 +336,43 @@ function CampaignReview() {
                     <div className="review-section voucher-section">
                       <CampaignVoucher mode="review" />
                     </div>
+                    <TotalCostContainer>
+                      <TotalCostBreakdown>
+                        <CostRow>
+                          <CostLabel>Chi phí voucher:</CostLabel>
+                          <CostWithIcon>
+                            {formatCurrency(voucherCost)}
+                            <img
+                              className="shape-avatar-campaign-bean"
+                              src={greenBean}
+                              alt="bean"
+                            />
+                          </CostWithIcon>
+                        </CostRow>
+                        <CostRow>
+                          <CostLabel>Chi phí loại chiến dịch:</CostLabel>
+                          <CostWithIcon>
+                            {formatCurrency(campaignTypeCost)}
+                            <img
+                              className="shape-avatar-campaign-bean"
+                              src={greenBean}
+                              alt="bean"
+                            />
+                          </CostWithIcon>
+                        </CostRow>
+                        <CostRow>
+                          <CostLabel>Tổng:</CostLabel>
+                          <TotalCostValue>
+                            {formatCurrency(totalCampaignCost)}
+                            <img
+                              className="shape-avatar-campaign-bean"
+                              src={greenBean}
+                              alt="bean"
+                            />
+                          </TotalCostValue>
+                        </CostRow>
+                      </TotalCostBreakdown>
+                    </TotalCostContainer>
                   </StyledDataBox>
                 </div>
               </LeftFormHalf>
@@ -255,6 +380,7 @@ function CampaignReview() {
           </Form>
         </div>
       </div>
+
       <div className="btn-next-prev">
         <ButtonNextPrev onClick={() => prev()} disabled={isCreating}>
           Quay lại

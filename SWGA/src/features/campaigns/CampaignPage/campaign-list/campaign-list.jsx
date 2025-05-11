@@ -1,4 +1,3 @@
-// campaign-list.jsx
 import { Avatar, Spin, Tag, Typography, Alert } from "antd";
 import { HiEye, HiPencil } from "react-icons/hi2";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -60,7 +59,6 @@ function CampaignList() {
   const { pathname } = useLocation();
 
   const [sort, setSort] = useState("Id,desc");
-
 
   const campaignImages = campaigns?.result?.map((campaign) => campaign.image) || [];
   const isValidImages = useImageValidity(campaigns?.result || [], campaignImages);
@@ -124,6 +122,11 @@ function CampaignList() {
   }, [campaigns?.result, sort]);
 
   const determineCampaignStatus = (status, startOn, endOn) => {
+    // Nếu trạng thái là 3 (Từ chối), giữ nguyên
+    if (status === 3) {
+      return "Từ chối";
+    }
+
     const today = new Date();
     const startDate = new Date(startOn);
     const endDate = new Date(endOn);
@@ -131,14 +134,12 @@ function CampaignList() {
     if (status === 1 && today >= startDate && today <= endDate) {
       return "Hoạt động";
     }
-    if (status === 0 || today < startDate || today > endDate) {
+    if (status === 0 || (status === 1 && (today < startDate || today > endDate))) {
       return "Không hoạt động";
     }
     switch (status) {
       case 2:
         return "Chờ duyệt";
-      case 3:
-        return "Từ chối";
       default:
         return "Không xác định";
     }
@@ -190,7 +191,6 @@ function CampaignList() {
     const isValid = isValidImages[index];
     const avatarSrc = isValid ? campaign.image : imgDefaultCampaign;
     const campaignStatus = determineCampaignStatus(campaign.status, campaign.startOn, campaign.endOn);
-
 
     return {
       key: campaign.id,
