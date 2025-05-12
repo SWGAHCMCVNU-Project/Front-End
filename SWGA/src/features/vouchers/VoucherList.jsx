@@ -68,7 +68,7 @@ function VoucherList() {
                   </div>
                 </div>
               </div>
-              <div className="container-amount-item">
+              {/* <div className="container-amount-item">
                 <div className="container-item">
                   <div>Còn lại: </div>
                   <div className="styled-number-item">
@@ -76,7 +76,7 @@ function VoucherList() {
                   </div>
                   <div> mã</div>
                 </div>
-              </div>
+              </div> */}
             </StyledButton>
           </div>
         ))}

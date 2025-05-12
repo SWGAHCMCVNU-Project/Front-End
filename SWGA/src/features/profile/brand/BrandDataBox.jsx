@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { addHours, format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { HiOutlineEnvelope, HiOutlinePhone } from "react-icons/hi2";
@@ -122,7 +123,7 @@ function BrandDataBox({ brand }) {
     state = false,
     description = "",
     address = "",
-    numberOfFollowers = 0,
+    favorCount = 0,
     accountId = "",
     acronym = "",
     coverFileName = "",
@@ -205,7 +206,7 @@ function BrandDataBox({ brand }) {
             )}
 
             <DataItem label="Số người theo dõi:">
-              {numberOfFollowers ?? "Chưa cập nhật"}
+              {favorCount ?? "Chưa cập nhật"}
             </DataItem>
 
             {description ? (

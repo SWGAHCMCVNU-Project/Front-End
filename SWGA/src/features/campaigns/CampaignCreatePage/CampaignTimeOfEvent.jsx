@@ -1,4 +1,4 @@
-import { Card, Spin } from "antd";
+import { Card, Spin, Popover } from "antd";
 import moment from "moment-timezone";
 import { useContext, useEffect, useState, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
@@ -24,25 +24,44 @@ const TimeEventContainer = styled.div`
   overflow-y: auto;
 
   .react-calendar {
-    width: 100%;
-    border: 1px solid #d9d9d9;
-    border-radius: 4px;
+    width: 280px;
+    border: none;
     font-size: 14px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
+    border-radius: 4px;
   }
 
   .react-calendar__tile--active {
     background: #1890ff;
     color: #fff;
-    border-radius: 50%;
+    border-radius: 4px;
   }
 
   .react-calendar__tile--now {
     background: #e6f7ff;
   }
 
-  .react-calendar--disabled {
+  .react-calendar__tile--disabled {
     opacity: 0.6;
     cursor: not-allowed;
+  }
+
+  .calendar-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    background: #fff;
+    &:hover {
+      border-color: #1890ff;
+    }
+    &:focus {
+      border-color: #1890ff;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    }
   }
 `;
 
@@ -90,6 +109,8 @@ function CampaignTimeOfEvent() {
   const isMounted = useRef(false);
   const [walletBalance, setWalletBalance] = useState(null);
   const [selectedCampaignType, setSelectedCampaignType] = useState(null);
+  const [startOpen, setStartOpen] = useState(false);
+  const [endOpen, setEndOpen] = useState(false);
 
   const { register, handleSubmit, setValue, control, formState, watch } =
     useForm({
@@ -152,22 +173,8 @@ function CampaignTimeOfEvent() {
     if (typeId && campaignTypes) {
       const selectedType = campaignTypes.find((c) => c.id === typeId);
       setSelectedCampaignType(selectedType);
-      if (startOn && selectedType?.duration) {
-        const monthsToAdd = Math.floor(selectedType.duration / 30); // Use selectedType instead
-        let newEndDate = moment(startOn).add(monthsToAdd, "months").subtract(1, "day");
-
-        const startDay = startOn.date();
-        const targetMonthEnd = moment(newEndDate).endOf("month").date();
-        if (startDay > targetMonthEnd) {
-          newEndDate = moment(newEndDate).endOf("month").subtract(1, "day");
-        } else if (startDay === moment(startOn).endOf("month").date()) {
-          newEndDate = moment(newEndDate).endOf("month").subtract(1, "day");
-        }
-
-        setValue("endOn", newEndDate);
-      }
     }
-  }, [typeId, campaignTypes, startOn, setValue]);
+  }, [typeId, campaignTypes]);
 
   useEffect(() => {
     if (newCampaign?.typeId && isMounted.current) {
@@ -194,17 +201,20 @@ function CampaignTimeOfEvent() {
       setTypeError("");
     }
     if (!timeRange.startOn || !timeRange.endOn) {
-      errors.push("Vui lòng chọn ngày bắt đầu");
+      errors.push("Vui lòng chọn ngày bắt đầu và ngày kết thúc");
     } else {
       const start = moment(timeRange.startOn);
       const end = moment(timeRange.endOn);
       const today = moment().startOf("day");
+      const maxEndDate = moment(start).add(campaignType?.duration || 30, "days");
       if (!start.isValid() || !end.isValid()) {
         errors.push("Ngày không hợp lệ");
       } else if (end.isBefore(start)) {
         errors.push("Ngày kết thúc phải sau ngày bắt đầu");
       } else if (start.isBefore(today)) {
         errors.push("Ngày bắt đầu phải là ngày hiện tại hoặc sau đó");
+      } else if (end.isAfter(maxEndDate)) {
+        errors.push(`Ngày kết thúc không được vượt quá ${campaignType?.duration} ngày kể từ ngày bắt đầu`);
       }
     }
     if (
@@ -223,7 +233,7 @@ function CampaignTimeOfEvent() {
     const formattedStartOn = data.startOn?.format("YYYY-MM-DD");
     const formattedEndOn = data.endOn?.format("YYYY-MM-DD");
     if (!formattedStartOn || !formattedEndOn) {
-      toast.error("Vui lòng chọn ngày bắt đầu");
+      toast.error("Vui lòng chọn ngày bắt đầu và ngày kết thúc");
       return;
     }
     const timeRange = { startOn: formattedStartOn, endOn: formattedEndOn };
@@ -282,22 +292,31 @@ function CampaignTimeOfEvent() {
     return false;
   };
 
+  const tileDisabledEnd = ({ date, view }) => {
+    if (view !== "month") return false;
+    const momentDate = moment(date);
+    const minEndDate = startOn ? moment(startOn).add(1, "day") : moment().startOf("day");
+    const maxEndDate = startOn && selectedCampaignType?.duration
+      ? moment(startOn).add(selectedCampaignType.duration, "days")
+      : moment().add(1, "year");
+
+    if (momentDate.isBefore(minEndDate)) return true;
+    if (momentDate.isAfter(maxEndDate)) return true;
+
+    return false;
+  };
+
   const handleDateChange = (date, fieldName) => {
     const momentDate = moment(date);
     setValue(fieldName, momentDate);
-    if (fieldName === "startOn" && momentDate.isValid() && selectedCampaignType?.duration) {
-      const monthsToAdd = Math.floor(selectedCampaignType.duration / 30);
-      let newEndDate = moment(momentDate).add(monthsToAdd, "months").subtract(1, "day");
-
-      const startDay = momentDate.date();
-      const targetMonthEnd = moment(newEndDate).endOf("month").date();
-      if (startDay > targetMonthEnd) {
-        newEndDate = moment(newEndDate).endOf("month").subtract(1, "day");
-      } else if (startDay === moment(momentDate).endOf("month").date()) {
-        newEndDate = moment(newEndDate).endOf("month").subtract(1, "day");
+    if (fieldName === "startOn") {
+      const currentEndDate = watch("endOn");
+      if (currentEndDate) {
+        const maxEndDate = moment(momentDate).add(selectedCampaignType?.duration || 30, "days");
+        if (moment(currentEndDate).isAfter(maxEndDate)) {
+          setValue("endOn", null);
+        }
       }
-
-      setValue("endOn", newEndDate);
     }
   };
 
@@ -342,14 +361,28 @@ function CampaignTimeOfEvent() {
                 name="startOn"
                 control={control}
                 render={({ field }) => (
-                  <Calendar
-                    onChange={(date) => handleDateChange(date, "startOn")}
-                    value={field.value ? field.value.toDate() : null}
-                    tileDisabled={tileDisabled}
-                    minDate={new Date()}
-                    maxDate={moment().add(1, "year").toDate()}
+                  <Popover
+                    content={
+                      <Calendar
+                        onChange={(date) => {
+                          handleDateChange(date, "startOn");
+                          setStartOpen(false);
+                        }}
+                        value={field.value ? field.value.toDate() : null}
+                        tileDisabled={tileDisabled}
+                        minDate={new Date()}
+                        maxDate={moment().add(1, "year").toDate()}
+                      />
+                    }
+                    trigger="click"
+                    open={startOpen}
+                    onOpenChange={setStartOpen}
                     disabled={typesLoading}
-                  />
+                  >
+                    <div className="calendar-input">
+                      {field.value ? field.value.format("DD/MM/YYYY") : "Chọn ngày"}
+                    </div>
+                  </Popover>
                 )}
                 rules={{ required: "Vui lòng chọn ngày bắt đầu" }}
               />
@@ -359,20 +392,36 @@ function CampaignTimeOfEvent() {
                 name="endOn"
                 control={control}
                 render={({ field }) => (
-                  <Calendar
-                    value={field.value ? field.value.toDate() : null}
-                    minDate={startOn ? startOn.toDate() : new Date()}
-                    maxDate={
-                      startOn && selectedCampaignType?.duration
-                        ? moment(startOn)
-                            .add(Math.floor(selectedCampaignType.duration / 30), "months")
-                            .toDate()
-                        : moment().add(1, "year").toDate()
+                  <Popover
+                    content={
+                      <Calendar
+                        onChange={(date) => {
+                          handleDateChange(date, "endOn");
+                          setEndOpen(false);
+                        }}
+                        value={field.value ? field.value.toDate() : null}
+                        tileDisabled={tileDisabledEnd}
+                        minDate={startOn ? startOn.toDate() : new Date()}
+                        maxDate={
+                          startOn && selectedCampaignType?.duration
+                            ? moment(startOn)
+                                .add(selectedCampaignType.duration, "days")
+                                .toDate()
+                            : moment().add(1, "year").toDate()
+                        }
+                      />
                     }
-                    disabled={true}
-                  />
+                    trigger="click"
+                    open={endOpen}
+                    onOpenChange={setEndOpen}
+                    disabled={typesLoading || !startOn}
+                  >
+                    <div className="calendar-input">
+                      {field.value ? field.value.format("DD/MM/YYYY") : "Chọn ngày"}
+                    </div>
+                  </Popover>
                 )}
-                rules={{ required: "Ngày kết thúc không hợp lệ" }}
+                rules={{ required: "Vui lòng chọn ngày kết thúc" }}
               />
             </CustomFormRow>
             <footer>{footer()}</footer>
