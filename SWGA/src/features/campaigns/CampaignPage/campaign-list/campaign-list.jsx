@@ -251,13 +251,13 @@ function CampaignList() {
               <HiEye />
             </ButtonAction>
           </Link>
-          {new Date(campaign.startOn) > new Date(formattedDate) && (
+          {/* {new Date(campaign.startOn) > new Date(formattedDate) && (
             <Link to={`/campaigns/edit/${campaign.id}`} state={{ campaign }}>
               <ButtonAction>
                 <HiPencil />
               </ButtonAction>
             </Link>
-          )}
+          )} */}
         </div>
       ),
     };
