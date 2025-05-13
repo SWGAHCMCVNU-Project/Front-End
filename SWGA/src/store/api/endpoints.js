@@ -130,3 +130,6 @@ export const AUTH_ENDPOINTS = {
     RANKING_CAMPAIGN_BRAND: "/Ranking/{id}brand/campaign-ranking",
 
   }
+  export const CAMP_TRANSATION = {
+    HISTORY_OF_CAMP_TRANSATION: "/CampTransation/GetByBrand"
+  }

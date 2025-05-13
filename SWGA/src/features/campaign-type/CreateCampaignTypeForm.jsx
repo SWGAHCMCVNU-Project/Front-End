@@ -6,7 +6,7 @@ import Button from "../../ui/Button";
 import Form from "../../ui/Form";
 import FormRow from "../../ui/FormRow";
 import Textarea from "../../ui/Textarea";
-import { useCreateCampaignType } from "../../hooks/campaign-type/useCreateCampaignType"; // Updated import
+import { useCreateCampaignType } from "../../hooks/campaign-type/useCreateCampaignType";
 import FileInput from "../../ui/FileInput";
 import { toast } from "react-hot-toast";
 import PropTypes from "prop-types";
@@ -21,12 +21,12 @@ const StyledInput = styled.input`
 `;
 
 const CreateCampaignTypeForm = ({ onCloseModal }) => {
-  const { isCreating, createCampaignType } = useCreateCampaignType(); // Updated hook
+  const { isCreating, createCampaignType } = useCreateCampaignType();
   const queryClient = useQueryClient();
   const [typeImage, setTypeImage] = useState(null);
 
   const { register, handleSubmit, reset, formState } = useForm({
-    defaultValues: { state: true },
+    defaultValues: { state: true, duration: 0, coin: 0 },
   });
   const { errors } = formState;
 
@@ -37,25 +37,36 @@ const CreateCampaignTypeForm = ({ onCloseModal }) => {
       typeName: data.typeName?.trim() || "",
       description: data.description?.trim() || "",
       state: true,
+      duration: Number(data.duration) || 0,
+      coin: Number(data.coin) || 0,
     };
 
     if (!formData.typeName) {
-      toast.error("Vui lòng nhập tên loại chiến dịch"); // Updated message
+      toast.error("Vui lòng nhập tên loại chiến dịch");
+      return;
+    }
+
+    if (formData.duration < 0) {
+      toast.error("Thời gian không được là số âm");
+      return;
+    }
+
+    if (formData.coin < 0) {
+      toast.error("Số xu không được là số âm");
       return;
     }
 
     if (typeImage) {
       formData.image = typeImage;
-      // console.log("Image to be uploaded:", typeImage);
     }
 
     createCampaignType(formData, {
       onSuccess: (response) => {
         if (response.status >= 200 && response.status < 300) {
-          toast.success("Tạo loại chiến dịch thành công!"); // Updated message (already handled in API, but kept for consistency)
+          toast.success("Tạo loại chiến dịch thành công!");
           reset();
           onCloseModal?.();
-          queryClient.invalidateQueries(["campaignTypes"]); // Updated query key
+          queryClient.invalidateQueries(["campaignTypes"]);
         } else {
           toast.error(response.data?.message || "Có lỗi xảy ra khi tạo loại chiến dịch");
         }
@@ -69,12 +80,12 @@ const CreateCampaignTypeForm = ({ onCloseModal }) => {
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)} type={onCloseModal ? "modal" : "regular"}>
-      <FormRow label="Tên loại chiến dịch" error={errors?.typeName?.message}> {/* Updated label */}
+      <FormRow label="Tên loại chiến dịch" error={errors?.typeName?.message}>
         <StyledInput
           type="text"
           id="typeName"
           disabled={isCreating}
-          {...register("typeName", { required: "Hãy nhập tên loại chiến dịch" })} 
+          {...register("typeName", { required: "Hãy nhập tên loại chiến dịch" })}
         />
       </FormRow>
       <FormRow label="Mô tả" error={errors?.description?.message}>
@@ -82,6 +93,24 @@ const CreateCampaignTypeForm = ({ onCloseModal }) => {
           id="description"
           disabled={isCreating}
           {...register("description")}
+        />
+      </FormRow>
+      <FormRow label="Thời gian (ngày)" error={errors?.duration?.message}>
+        <StyledInput
+          type="number"
+          id="duration"
+          disabled={isCreating}
+          min="0"
+          {...register("duration", { required: "Hãy nhập thời gian" })}
+        />
+      </FormRow>
+      <FormRow label="Số xu" error={errors?.coin?.message}>
+        <StyledInput
+          type="number"
+          id="coin"
+          disabled={isCreating}
+          min="0"
+          {...register("coin", { required: "Hãy nhập số xu" })}
         />
       </FormRow>
       <FormRow label="Hình ảnh" error={errors?.image?.message}>
@@ -110,7 +139,7 @@ const CreateCampaignTypeForm = ({ onCloseModal }) => {
         >
           Hủy bỏ
         </Button>
-        <Button disabled={isCreating}>Tạo loại chiến dịch mới</Button> {/* Updated button text */}
+        <Button disabled={isCreating}>Tạo loại chiến dịch mới</Button>
       </FormRow>
     </Form>
   );

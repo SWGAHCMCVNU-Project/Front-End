@@ -1,6 +1,13 @@
 import { Card, Spin, Popover } from "antd";
 import moment from "moment-timezone";
-import { useContext, useEffect, useState, useRef } from "react";
+import {
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import { useForm, Controller } from "react-hook-form";
 import styled from "styled-components";
 import { NextPrevContext } from "../../../context/NextPrevContext";
@@ -15,7 +22,6 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "./scss/campaign.scss";
 
-// Set default timezone
 moment.tz.setDefault("Asia/Ho_Chi_Minh");
 
 const TimeEventContainer = styled.div`
@@ -72,7 +78,6 @@ const Header = styled.header`
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   & div:first-child {
     display: flex;
     align-items: center;
@@ -114,150 +119,224 @@ function CampaignTimeOfEvent() {
 
   const { register, handleSubmit, setValue, control, formState, watch } =
     useForm({
-      defaultValues: newCampaign
-        ? {
-            typeId: newCampaign.typeId,
-            startOn: newCampaign.startOn
-              ? moment(newCampaign.startOn, "YYYY-MM-DD")
-              : null,
-            endOn: newCampaign.endOn
-              ? moment(newCampaign.endOn, "YYYY-MM-DD")
-              : null,
-          }
-        : { typeId: null, startOn: null, endOn: null },
+      defaultValues: {
+        typeId: newCampaign?.typeId || null,
+        startOn: newCampaign?.startOn ? moment(newCampaign.startOn) : null,
+        endOn: newCampaign?.endOn ? moment(newCampaign.endOn) : null,
+      },
     });
   const { errors } = formState;
   const typeId = watch("typeId");
   const startOn = watch("startOn");
 
+  // Initialize component
   useEffect(() => {
     isMounted.current = true;
     window.scrollTo(0, 0);
+
+    return () => {
+      isMounted.current = false;
+    };
   }, []);
 
+  // Fetch wallet balance
   useEffect(() => {
     const fetchWalletBalance = async () => {
       try {
         const walletData = await walletService.getWalletByBrandId();
-        setWalletBalance(walletData.balance);
+        if (isMounted.current) {
+          setWalletBalance(walletData.balance);
+        }
       } catch (error) {
         console.error("Failed to fetch wallet balance:", error);
-        setWalletBalance(0);
-        toast.error("Không thể tải số dư ví");
+        if (isMounted.current) {
+          setWalletBalance(0);
+          toast.error("Không thể tải số dư ví");
+        }
       }
     };
     fetchWalletBalance();
   }, []);
 
+  // Update campaign types options
   useEffect(() => {
     if (campaignTypes && Array.isArray(campaignTypes)) {
-      const filteredCampaignTypes = campaignTypes.filter((c) => c.state);
-      setCampaignTypesOptions(
-        filteredCampaignTypes.map((c) => ({
-          value: c.id,
-          label: c.typeName,
-          coin: c.coin,
-          duration: c.duration,
-        }))
-      );
-      if (newCampaign?.typeId) {
-        const selectedType = filteredCampaignTypes.find(
-          (c) => c.id === newCampaign.typeId
-        );
-        setSelectedCampaignType(selectedType);
+      const options = campaignTypes.map((c) => ({
+        value: c.id,
+        label: c.typeName,
+        coin: c.coin,
+        duration: c.duration,
+      }));
+      if (isMounted.current) {
+        setCampaignTypesOptions(options);
       }
     }
-  }, [campaignTypes, newCampaign]);
+  }, [campaignTypes]);
 
+  // Set initial typeId if none exists
+  useEffect(() => {
+    if (
+      campaignTypesOptions.length > 0 &&
+      !newCampaign?.typeId &&
+      isMounted.current
+    ) {
+      const firstOption = campaignTypesOptions[0].value;
+      const selectedType = campaignTypes.find((c) => c.id === firstOption);
+      setValue("typeId", firstOption);
+      setSelectedCampaignType(selectedType);
+      setNewCampaign((prev) => ({
+        ...prev,
+        typeId: firstOption,
+        campaignTypeCoin: selectedType?.coin || 0,
+      }));
+    }
+  }, [campaignTypesOptions, campaignTypes, setValue, setNewCampaign]);
+
+  // Update selectedCampaignType when typeId changes
   useEffect(() => {
     if (typeId && campaignTypes) {
       const selectedType = campaignTypes.find((c) => c.id === typeId);
-      setSelectedCampaignType(selectedType);
+      if (isMounted.current) {
+        setSelectedCampaignType(selectedType);
+      }
     }
   }, [typeId, campaignTypes]);
 
-  useEffect(() => {
-    if (newCampaign?.typeId && isMounted.current) {
-      setValue("typeId", newCampaign.typeId);
-    }
-  }, [newCampaign, setValue]);
-
-  const handleCampaignTypesOption = (value) => {
-    if (isMounted.current) {
-      setValue("typeId", value, { shouldDirty: true, shouldValidate: true });
-    }
-  };
-
-  const validateCampaign = (typeId, timeRange, campaignType) => {
-    const errors = [];
-    if (!campaignType) {
-      errors.push("Vui lòng chọn loại chiến dịch");
-      setTypeError("Vui lòng chọn loại chiến dịch");
-    }
-    if (!typeId) {
-      errors.push("Type ID is required");
-      setTypeError("Vui lòng chọn loại chiến dịch");
-    } else {
-      setTypeError("");
-    }
-    if (!timeRange.startOn || !timeRange.endOn) {
-      errors.push("Vui lòng chọn ngày bắt đầu và ngày kết thúc");
-    } else {
-      const start = moment(timeRange.startOn);
-      const end = moment(timeRange.endOn);
-      const today = moment().startOf("day");
-      const maxEndDate = moment(start).add(campaignType?.duration || 30, "days");
-      if (!start.isValid() || !end.isValid()) {
-        errors.push("Ngày không hợp lệ");
-      } else if (end.isBefore(start)) {
-        errors.push("Ngày kết thúc phải sau ngày bắt đầu");
-      } else if (start.isBefore(today)) {
-        errors.push("Ngày bắt đầu phải là ngày hiện tại hoặc sau đó");
-      } else if (end.isAfter(maxEndDate)) {
-        errors.push(`Ngày kết thúc không được vượt quá ${campaignType?.duration} ngày kể từ ngày bắt đầu`);
+  const handleCampaignTypesOption = useCallback(
+    (value) => {
+      if (isMounted.current) {
+        const selectedType = campaignTypes?.find((c) => c.id === value);
+        setValue("typeId", value);
+        setSelectedCampaignType(selectedType);
+        setNewCampaign((prev) => ({
+          ...prev,
+          typeId: value,
+          campaignTypeCoin: selectedType?.coin || 0,
+        }));
       }
-    }
-    if (
-      campaignType?.coin &&
-      walletBalance !== null &&
-      campaignType.coin > walletBalance
-    ) {
-      errors.push(
-        `Số dư ví không đủ! Cần ${campaignType.coin} điểm, nhưng ví chỉ có ${walletBalance} điểm.`
-      );
-    }
-    return errors.length === 0 ? null : errors;
-  };
+    },
+    [campaignTypes, setNewCampaign, setValue]
+  );
 
-  const onSubmit = (data) => {
-    const formattedStartOn = data.startOn?.format("YYYY-MM-DD");
-    const formattedEndOn = data.endOn?.format("YYYY-MM-DD");
-    if (!formattedStartOn || !formattedEndOn) {
-      toast.error("Vui lòng chọn ngày bắt đầu và ngày kết thúc");
-      return;
-    }
-    const timeRange = { startOn: formattedStartOn, endOn: formattedEndOn };
-    const validationErrors = validateCampaign(
-      data.typeId,
-      timeRange,
-      selectedCampaignType
-    );
-    if (validationErrors) {
-      validationErrors.forEach((error) => toast.error(error));
-      return;
-    }
-    if (isMounted.current) {
-      setNewCampaign({
-        ...newCampaign,
-        typeId: data.typeId,
-        startOn: formattedStartOn,
-        endOn: formattedEndOn,
-        campaignTypeCoin: selectedCampaignType?.coin || 0,
-      });
-      setCompletedSteps((prev) => [...new Set([...prev, 2])]);
-      setCurrent(current + 1);
-    }
-  };
+  const validateCampaign = useCallback(
+    (typeId, timeRange, campaignType) => {
+      const errors = [];
+      if (!campaignType) {
+        errors.push("Vui lòng chọn loại chiến dịch");
+        setTypeError("Vui lòng chọn loại chiến dịch");
+      }
+      if (!typeId) {
+        errors.push("Type ID is required");
+        setTypeError("Vui lòng chọn loại chiến dịch");
+      } else {
+        setTypeError("");
+      }
+      if (!timeRange.startOn || !timeRange.endOn) {
+        errors.push("Vui lòng chọn ngày bắt đầu và ngày kết thúc");
+      } else {
+        const start = moment(timeRange.startOn);
+        const end = moment(timeRange.endOn);
+        const today = moment().startOf("day");
+        const maxEndDate = moment(start).add(
+          campaignType?.duration || 30,
+          "days"
+        );
+        if (!start.isValid() || !end.isValid()) {
+          errors.push("Ngày không hợp lệ");
+        } else if (end.isBefore(start)) {
+          errors.push("Ngày kết thúc phải sau ngày bắt đầu");
+        } else if (start.isBefore(today)) {
+          errors.push("Ngày bắt đầu phải là ngày hiện tại hoặc sau đó");
+        } else if (end.isAfter(maxEndDate)) {
+          errors.push(
+            `Ngày kết thúc không được vượt quá ${campaignType?.duration} ngày kể từ ngày bắt đầu`
+          );
+        }
+      }
+      if (
+        campaignType?.coin &&
+        walletBalance !== null &&
+        campaignType.coin > walletBalance
+      ) {
+        errors.push(
+          `Số dư ví không đủ! Cần ${campaignType.coin} điểm, nhưng ví chỉ có ${walletBalance} điểm.`
+        );
+      }
+      return errors.length === 0 ? null : errors;
+    },
+    [walletBalance]
+  );
+
+  const handleDateChange = useCallback(
+    (date, fieldName) => {
+      const momentDate = moment(date);
+      setValue(fieldName, momentDate);
+      setNewCampaign((prev) => ({
+        ...prev,
+        [fieldName]: momentDate.format("YYYY-MM-DD"),
+      }));
+      if (fieldName === "startOn") {
+        const currentEndDate = watch("endOn");
+        if (currentEndDate) {
+          const maxEndDate = moment(momentDate).add(
+            selectedCampaignType?.duration || 30,
+            "days"
+          );
+          if (moment(currentEndDate).isAfter(maxEndDate)) {
+            setValue("endOn", null);
+            setNewCampaign((prev) => ({
+              ...prev,
+              endOn: null,
+            }));
+          }
+        }
+        setStartOpen(false);
+      } else if (fieldName === "endOn") {
+        setEndOpen(false);
+      }
+    },
+    [setValue, setNewCampaign, selectedCampaignType?.duration, watch]
+  );
+
+  const onSubmit = useCallback(
+    (data) => {
+      const formattedStartOn = data.startOn?.format("YYYY-MM-DD");
+      const formattedEndOn = data.endOn?.format("YYYY-MM-DD");
+      if (!formattedStartOn || !formattedEndOn) {
+        toast.error("Vui lòng chọn ngày bắt đầu và ngày kết thúc");
+        return;
+      }
+      const timeRange = { startOn: formattedStartOn, endOn: formattedEndOn };
+      const validationErrors = validateCampaign(
+        data.typeId,
+        timeRange,
+        selectedCampaignType
+      );
+      if (validationErrors) {
+        validationErrors.forEach((error) => toast.error(error));
+        return;
+      }
+      if (isMounted.current) {
+        setNewCampaign((prev) => ({
+          ...prev,
+          typeId: data.typeId,
+          startOn: formattedStartOn,
+          endOn: formattedEndOn,
+          campaignTypeCoin: selectedCampaignType?.coin || 0,
+        }));
+        setCompletedSteps((prev) => [...new Set([...prev, 2])]);
+        setCurrent(current + 1);
+      }
+    },
+    [
+      validateCampaign,
+      selectedCampaignType,
+      setNewCampaign,
+      setCompletedSteps,
+      current,
+      setCurrent,
+    ]
+  );
 
   const onSubmitPrev = () => setCurrent(current - 1);
   const onError = () =>
@@ -273,7 +352,11 @@ function CampaignTimeOfEvent() {
           <label className="cost-label">Chi phí loại chiến dịch: </label>
           <TotalCost>
             {coinValue.toLocaleString("vi-VN")}
-            <img className="shape-avatar-campaign-bean" src={greenBean} alt="bean" />
+            <img
+              className="shape-avatar-campaign-bean"
+              src={greenBean}
+              alt="bean"
+            />
           </TotalCost>
         </div>
       </div>
@@ -292,33 +375,24 @@ function CampaignTimeOfEvent() {
     return false;
   };
 
-  const tileDisabledEnd = ({ date, view }) => {
-    if (view !== "month") return false;
-    const momentDate = moment(date);
-    const minEndDate = startOn ? moment(startOn).add(1, "day") : moment().startOf("day");
-    const maxEndDate = startOn && selectedCampaignType?.duration
-      ? moment(startOn).add(selectedCampaignType.duration, "days")
-      : moment().add(1, "year");
+  const tileDisabledEnd = useMemo(() => {
+    return ({ date, view }) => {
+      if (view !== "month") return false;
+      const momentDate = moment(date);
+      const minEndDate = startOn
+        ? moment(startOn).add(1, "day")
+        : moment().startOf("day");
+      const maxEndDate =
+        startOn && selectedCampaignType?.duration
+          ? moment(startOn).add(selectedCampaignType.duration, "days")
+          : moment().add(1, "year");
 
-    if (momentDate.isBefore(minEndDate)) return true;
-    if (momentDate.isAfter(maxEndDate)) return true;
+      if (momentDate.isBefore(minEndDate)) return true;
+      if (momentDate.isAfter(maxEndDate)) return true;
 
-    return false;
-  };
-
-  const handleDateChange = (date, fieldName) => {
-    const momentDate = moment(date);
-    setValue(fieldName, momentDate);
-    if (fieldName === "startOn") {
-      const currentEndDate = watch("endOn");
-      if (currentEndDate) {
-        const maxEndDate = moment(momentDate).add(selectedCampaignType?.duration || 30, "days");
-        if (moment(currentEndDate).isAfter(maxEndDate)) {
-          setValue("endOn", null);
-        }
-      }
-    }
-  };
+      return false;
+    };
+  }, [startOn, selectedCampaignType?.duration]);
 
   return (
     <>
@@ -342,15 +416,23 @@ function CampaignTimeOfEvent() {
               <div>Loại chiến dịch và thời gian diễn ra</div>
             </Header>
             <CustomFormRow label="Loại chiến dịch" error={typeError}>
-              <FormSelect
-                id="typeId"
-                placeholder="Chọn thể loại"
-                {...register("typeId", {
-                  required: "Vui lòng chọn loại chiến dịch",
-                })}
-                disabled={typesLoading || !campaignTypesOptions.length}
-                onChange={handleCampaignTypesOption}
-                options={campaignTypesOptions}
+              <Controller
+                name="typeId"
+                control={control}
+                rules={{ required: "Vui lòng chọn loại chiến dịch" }}
+                render={({ field }) => (
+                  <FormSelect
+                    {...field}
+                    id="typeId"
+                    placeholder="Chọn thể loại"
+                    disabled={typesLoading || !campaignTypesOptions.length}
+                    options={campaignTypesOptions}
+                    onChange={(value) => {
+                      field.onChange(value);
+                      handleCampaignTypesOption(value);
+                    }}
+                  />
+                )}
               />
             </CustomFormRow>
             <CustomFormRow
@@ -364,10 +446,7 @@ function CampaignTimeOfEvent() {
                   <Popover
                     content={
                       <Calendar
-                        onChange={(date) => {
-                          handleDateChange(date, "startOn");
-                          setStartOpen(false);
-                        }}
+                        onChange={(date) => handleDateChange(date, "startOn")}
                         value={field.value ? field.value.toDate() : null}
                         tileDisabled={tileDisabled}
                         minDate={new Date()}
@@ -380,7 +459,9 @@ function CampaignTimeOfEvent() {
                     disabled={typesLoading}
                   >
                     <div className="calendar-input">
-                      {field.value ? field.value.format("DD/MM/YYYY") : "Chọn ngày"}
+                      {field.value
+                        ? field.value.format("DD/MM/YYYY")
+                        : "Chọn ngày"}
                     </div>
                   </Popover>
                 )}
@@ -395,10 +476,7 @@ function CampaignTimeOfEvent() {
                   <Popover
                     content={
                       <Calendar
-                        onChange={(date) => {
-                          handleDateChange(date, "endOn");
-                          setEndOpen(false);
-                        }}
+                        onChange={(date) => handleDateChange(date, "endOn")}
                         value={field.value ? field.value.toDate() : null}
                         tileDisabled={tileDisabledEnd}
                         minDate={startOn ? startOn.toDate() : new Date()}
@@ -417,7 +495,9 @@ function CampaignTimeOfEvent() {
                     disabled={typesLoading || !startOn}
                   >
                     <div className="calendar-input">
-                      {field.value ? field.value.format("DD/MM/YYYY") : "Chọn ngày"}
+                      {field.value
+                        ? field.value.format("DD/MM/YYYY")
+                        : "Chọn ngày"}
                     </div>
                   </Popover>
                 )}

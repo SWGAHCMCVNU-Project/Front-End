@@ -10,7 +10,7 @@ import FileInput from "../../ui/FileInput";
 import { toast } from "react-hot-toast";
 import PropTypes from "prop-types";
 import { useUpdateCampaignType } from "../../hooks/campaign-type/useUpdateCampaignType";
-import logoDefault from "../../assets/images/brand.png"; // Default image if needed
+import logoDefault from "../../assets/images/brand.png";
 
 const StyledInput = styled.input`
   width: 100%;
@@ -30,7 +30,7 @@ const PreviewImage = styled.img`
 `;
 
 const UpdateCampaignTypeForm = ({ campaignTypeToEdit, onCloseModal }) => {
-  const { id, typeName, description, image, state } = campaignTypeToEdit || {};
+  const { id, typeName, description, image, state, duration, coin } = campaignTypeToEdit || {};
   const { isUpdating, updateCampaignType } = useUpdateCampaignType();
   const queryClient = useQueryClient();
   const [typeImage, setTypeImage] = useState(null);
@@ -41,6 +41,8 @@ const UpdateCampaignTypeForm = ({ campaignTypeToEdit, onCloseModal }) => {
       typeName: typeName || "",
       description: description || "",
       state: state ?? true,
+      duration: duration || 0,
+      coin: coin || 0,
     },
   });
   const { errors } = formState;
@@ -65,11 +67,23 @@ const UpdateCampaignTypeForm = ({ campaignTypeToEdit, onCloseModal }) => {
       typeName: data.typeName?.trim() || "",
       description: data.description?.trim() || "",
       state: data.state ?? true,
-      image: typeImage || undefined, // Only include image if a new one is uploaded
+      image: typeImage || undefined,
+      duration: Number(data.duration) || 0,
+      coin: Number(data.coin) || 0,
     };
 
     if (!formData.typeName) {
       toast.error("Vui lòng nhập tên loại chiến dịch");
+      return;
+    }
+
+    if (formData.duration < 0) {
+      toast.error("Thời gian không được là số âm");
+      return;
+    }
+
+    if (formData.coin < 0) {
+      toast.error("Số xu không được là số âm");
       return;
     }
 
@@ -78,8 +92,8 @@ const UpdateCampaignTypeForm = ({ campaignTypeToEdit, onCloseModal }) => {
         if (response.status >= 200 && response.status < 300) {
           toast.success("Cập nhật loại chiến dịch thành công!");
           reset();
-          onCloseModal?.();
           queryClient.invalidateQueries(["campaignTypes"]);
+          onCloseModal?.();
         } else {
           toast.error(response.data?.message || "Có lỗi xảy ra khi cập nhật loại chiến dịch");
         }
@@ -106,6 +120,24 @@ const UpdateCampaignTypeForm = ({ campaignTypeToEdit, onCloseModal }) => {
           id="description"
           disabled={isUpdating}
           {...register("description")}
+        />
+      </FormRow>
+      <FormRow label="Thời gian (ngày)" error={errors?.duration?.message}>
+        <StyledInput
+          type="number"
+          id="duration"
+          disabled={isUpdating}
+          min="0"
+          {...register("duration", { required: "Hãy nhập thời gian" })}
+        />
+      </FormRow>
+      <FormRow label="Số xu" error={errors?.coin?.message}>
+        <StyledInput
+          type="number"
+          id="coin"
+          disabled={isUpdating}
+          min="0"
+          {...register("coin", { required: "Hãy nhập số xu" })}
         />
       </FormRow>
       <FormRow label="Hình ảnh" error={errors?.image?.message}>

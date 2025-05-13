@@ -43,6 +43,7 @@ import CampusDetailsPage from "./pages/CampusManagement/CampusDetailsPage.jsx";
 import CampusPage from "./pages/CampusManagement/CampusPage.jsx";
 import LuckyPrize from "./pages/LuckyPrizeManagement/LuckyPrize.jsx";
 import Location from "./pages/LocationManagement/Location.jsx";
+import TransactionCamp from "./pages/TransactionCampManagement/TransactionCamp.jsx"; // New import
 import { useJsApiLoader } from "@react-google-maps/api";
 import Spinner from "./ui/Spinner.jsx";
 import ProtectedRoute from "./features/ProtectedRoute/ProtectedRoute.jsx";
@@ -340,6 +341,15 @@ function App() {
             element={
               <PrivateRoute allowedRoles={["brand", "campus"]}>
                 <Transaction />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/camp-transactions" // New route
+            exact
+            element={
+              <PrivateRoute allowedRoles={["brand"]}>
+                <TransactionCamp />
               </PrivateRoute>
             }
           />

@@ -207,12 +207,12 @@ function CampaignBasicInformation() {
     }
 
     if (isMounted.current) {
-      setNewCampaign({
-        ...newCampaign,
+      setNewCampaign(prev => ({
+        ...prev,
         ...data,
         brandId: brandId,
         image: fileCard || data.image,
-      });
+      }));
       setCompletedSteps((prev) => [...new Set([...prev, 0])]);
       setCurrent(current + 1);
     }

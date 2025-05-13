@@ -64,37 +64,37 @@ const StationIndex = styled.div`
 const Description = styled.div`
   font-size: 1.4rem;
   color: var(--color-grey-500);
-  text-align: center; /* Giữ căn giữa */
-  overflow: visible; /* Hiển thị toàn bộ nội dung */
-  white-space: normal; /* Cho phép xuống dòng */
-  line-height: 1.5; /* Tăng khoảng cách dòng cho dễ đọc */
-  padding: 1rem; /* Thêm padding */
-  /* Bỏ max-width để nội dung tự điều chỉnh theo cột */
+  text-align: center;
+  overflow: visible;
+  white-space: normal;
+  line-height: 1.5;
+  padding: 1rem;
 `;
+
+const Number = styled.div`
+  font-size: 1.4rem;
+  color: var(--color-grey-500);
+  text-align: center;
+  padding: 1rem;
+`;
+
 const StyledAction = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem; /* Add spacing between buttons */
+  gap: 0.5rem;
 `;
 
 const StyledTableRow = styled(Table.Row)`
   & > div {
     display: flex;
     align-items: center;
-    justify-content: center; /* Center content in all cells */
+    justify-content: center;
     padding: 1rem;
-  }
-
-  /* Left-align specific columns */
-  & > div:nth-child(2) {
-  }
-  & > div:nth-child(3) {
-    justify-content: center; /* Center-align "Mô tả" */
   }
 `;
 
-function CampaignTypeRow({ id, typeName, image, description, state, displayedIndex }) {
+function CampaignTypeRow({ id, typeName, image, description, state, duration, coin, displayedIndex }) {
   const [isValidImage, setIsValidImage] = useState(true);
   const { campaignType, isLoading } = useCampaignTypeById(id);
 
@@ -105,27 +105,24 @@ function CampaignTypeRow({ id, typeName, image, description, state, displayedInd
   }, [image]);
 
   if (isLoading) {
-    return <Table.Row><td colSpan="5">Đang tải...</td></Table.Row>;
+    return <Table.Row><td colSpan="7">Đang tải...</td></Table.Row>;
   }
 
-  // Use the full description instead of truncated version
-  const fullDescription = description || ""; // Giữ nguyên logic lấy mô tả
+  const fullDescription = description || "";
 
   return (
     <StyledTableRow>
       <StationIndex>{displayedIndex}</StationIndex>
-
       <Station>
         <Img src={isValidImage ? image || logoDefault : logoDefault} />
         <StationName>{typeName}</StationName>
       </Station>
-
       <Description>{fullDescription}</Description>
-
+      <Number>{duration}</Number>
+      <Number>{coin}</Number>
       <div>
         <Tag type={state ? "cyan" : "error"}>{state ? "Hoạt động" : "Không hoạt động"}</Tag>
       </div>
-
       <StyledAction>
         <Modal>
           <Modal.Open opens={`edit-${id}`}>
@@ -135,7 +132,7 @@ function CampaignTypeRow({ id, typeName, image, description, state, displayedInd
           </Modal.Open>
           <Modal.Window name={`edit-${id}`}>
             <UpdateCampaignTypeForm
-              campaignTypeToEdit={campaignType?.data || { id, typeName, image, description, state }}
+              campaignTypeToEdit={campaignType?.data || { id, typeName, image, description, state, duration, coin }}
               onCloseModal={() => Modal.Close(`edit-${id}`)}
             />
           </Modal.Window>

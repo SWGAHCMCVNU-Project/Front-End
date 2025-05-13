@@ -40,19 +40,19 @@ function CampaignMSC() {
           return;
         }
       
-        setNewCampaign({
-          ...newCampaign,
+        setNewCampaign(prev => ({
+          ...prev,
           campaignStores: selectedItemStores,
-        });
+        }));
         setCompletedSteps((prev) => [...new Set([...prev, 1])]); // Đánh dấu bước 1 hoàn thành
         setCurrent(current + 1);
       }
 
     function onSubmitPrev(data) {
-        setNewCampaign({
-            ...newCampaign,
+        setNewCampaign(prev => ({
+            ...prev,
             campaignStores: selectedItemStores
-        });
+        }));
         setCurrent(current - 1);
     }
 
