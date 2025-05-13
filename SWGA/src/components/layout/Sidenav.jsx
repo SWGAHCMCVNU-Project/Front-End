@@ -264,13 +264,22 @@ function Sidenav({ color }) {
           allowedRoles: ["brand"],
         },
         {
-          key: "26", // Thêm mục Transaction
+          key: "26",
           linkURL: "/transactions",
           pageName: "transactions",
           color: color,
           iconPage: <FontAwesomeIcon icon={faClockRotateLeft} />,
           labelPageName: "Giao dịch",
           allowedRoles: ["brand", "campus"],
+        },
+        {
+          key: "27", // New menu item
+          linkURL: "/camp-transactions",
+          pageName: "camp-transactions",
+          color: color,
+          iconPage: <FontAwesomeIcon icon={faClockRotateLeft} />,
+          labelPageName: "Lịch sử giao dịch ",
+          allowedRoles: ["brand"],
         },
         {
           key: "21",

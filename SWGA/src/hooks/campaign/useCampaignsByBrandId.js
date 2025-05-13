@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getCampaignsByBrandIdAPI } from "../../store/api/campaignApi";
 
-const useCampaignsByBrandId = (brandId, initialParams = { page: 1, size: 10, searchName: "" }) => {
+const useCampaignsByBrandId = (brandId, initialParams = { page: 1, size: 100, searchName: "" }) => {
   // Define the query key for caching and refetching
   const queryKey = ["campaigns", brandId, initialParams.page, initialParams.size, initialParams.searchName];
 

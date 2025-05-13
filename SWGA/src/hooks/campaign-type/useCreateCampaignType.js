@@ -4,8 +4,8 @@ import { createCampaignType } from "../../store/api/campaignTypeAPI";
 
 export const useCreateCampaignType = () => {
   const { mutate: createCampaignTypeFn, isLoading: isCreating } = useMutation({
-    mutationFn: ({ typeName, description, image, state }) =>
-      createCampaignType({ typeName, description, image, state }),
+    mutationFn: ({ typeName, description, image, state, duration, coin }) =>
+      createCampaignType({ typeName, description, image, state, duration, coin }),
   });
 
   return { createCampaignType: createCampaignTypeFn, isCreating };

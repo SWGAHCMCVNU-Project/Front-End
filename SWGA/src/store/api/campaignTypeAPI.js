@@ -8,12 +8,16 @@ export const createCampaignType = async ({
   description,
   image,
   state = true,
+  duration = 0,
+  coin = 0,
 }) => {
   try {
     const formData = new FormData();
     formData.append("typeName", typeName || "");
     formData.append("description", description || "");
     formData.append("state", state);
+    formData.append("duration", duration);
+    formData.append("coin", coin);
 
     if (image) {
       formData.append("image", image, image.name);
@@ -49,13 +53,15 @@ export const createCampaignType = async ({
 
 export const updateCampaignType = async (
   id,
-  { typeName, description, image, state, status }
+  { typeName, description, image, state, status, duration, coin }
 ) => {
   try {
     const formData = new FormData();
     formData.append("typeName", typeName || "");
     formData.append("description", description || "");
     formData.append("state", state);
+    formData.append("duration", duration || 0);
+    formData.append("coin", coin || 0);
 
     if (image) {
       formData.append("image", image, image.name);
@@ -77,7 +83,6 @@ export const updateCampaignType = async (
       throw new Error("Invalid server response");
     }
 
-    // toast.success("Cập nhật loại chiến dịch thành công!");
     return { status: response.status, data: response.data };
   } catch (error) {
     console.error("Update campaign type API error:", error);
@@ -147,8 +152,8 @@ export const getAllCampaignTypes = async ({
               state: type.state ?? true,
               status: type.status ?? true,
               numberOfCampaign: type.numberOfCampaign || 0,
-              coin: type.coin || 0, // Thêm nếu chưa có
-              duration: type.duration || 0, // Thêm nếu chưa có
+              coin: type.coin || 0,
+              duration: type.duration || 0,
             }))
           : [],
       },
@@ -194,6 +199,8 @@ export const getCampaignTypeById = async (id) => {
         state: response.data.state ?? true,
         status: response.data.status ?? true,
         numberOfCampaign: response.data.numberOfCampaign || 0,
+        coin: response.data.coin || 0,
+        duration: response.data.duration || 0,
       },
     };
 
