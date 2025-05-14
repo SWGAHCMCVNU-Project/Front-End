@@ -278,7 +278,7 @@ function Sidenav({ color }) {
           pageName: "camp-transactions",
           color: color,
           iconPage: <FontAwesomeIcon icon={faClockRotateLeft} />,
-          labelPageName: "Lịch sử giao dịch ",
+          labelPageName: "Lịch sử hoạt động  ",
           allowedRoles: ["brand"],
         },
         {
