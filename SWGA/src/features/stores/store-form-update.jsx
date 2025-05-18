@@ -51,7 +51,7 @@ Form.defaultProps = {
 };
 
 const Header = styled.header`
-  color: var(--color-green-600);
+  color: #104358;
   font-size: 1.7rem;
   font-weight: 500;
   display: flex;
@@ -399,21 +399,21 @@ function StoreFormUpdate() {
               </Header>
               <ReviewImageUpload
                 label="Ảnh cửa hàng"
-                error={errors?.avatar?.message}
+                error={errors?.file?.message}
                 file={fileCard}
                 fileRemove={handleAvatarRemove}
                 disabled={isEditing}
-                image={editValues?.avatar}
+                image={editValues?.file}
                 edit={true}
               >
                 <FileInput
-                  id="avatar"
+                  id="file"
                   accept="image/*"
                   label="Chọn ảnh"
                   disabled={isEditing}
-                  {...register("avatar", {
+                  {...register("file", {
                     required:
-                      !getValues("avatar") || getValues("avatar").length === 0
+                      !getValues("file") || getValues("file").length === 0
                         ? "Vui lòng thêm hình ảnh cho cửa hàng"
                         : false,
                   })}

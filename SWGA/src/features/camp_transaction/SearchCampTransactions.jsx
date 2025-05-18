@@ -21,7 +21,7 @@ function SearchCampTransactions() {
   return (
     <SearchBar
       onChange={setSearchTerm}
-      placeholder="Tìm kiếm lịch sử giao dịch chiến dịch"
+      placeholder="Tìm kiếm lịch sử giao dịch hoạt động"
     />
   );
 }

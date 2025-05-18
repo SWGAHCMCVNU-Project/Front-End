@@ -29,7 +29,7 @@ const MapContainer = styled.div`
 `;
 
 const LocationForm = ({ locationToEdit = {}, onCloseModal }) => {
-  const { id: editId, name, latitue, longtitude, qrcode, status, address } = locationToEdit;
+  const { id: editId, name, latitue, longtitude, status } = locationToEdit;
   const isEditSession = Boolean(editId);
 
   const { mutate: create, isLoading: isCreating } = useCreateLocation();
@@ -45,38 +45,29 @@ const LocationForm = ({ locationToEdit = {}, onCloseModal }) => {
     defaultValues: isEditSession
       ? {
           name: name || "",
-          address: address || "",
-          latitue: latitue ? latitue.toString().replace(',', '.') : "0",
-          longtitude: longtitude ? longtitude.toString().replace(',', '.') : "0",
-          qrcode: qrcode || "",
+          latitue: latitue ? latitue.toString().replace(",", ".") : "0",
+          longtitude: longtitude ? longtitude.toString().replace(",", ".") : "0",
           status: status ?? true,
         }
       : {
           status: true,
           latitue: "0",
           longtitude: "0",
-          address: "",
         },
   });
+
   const { errors } = formState;
 
   const onSubmit = (data) => {
     const formData = {
       name: data.name?.trim() || "",
-      address: data.address?.trim() || "",
-      latitue: Number(data.latitue.replace(',', '.')),
-      longtitude: Number(data.longtitude.replace(',', '.')),
-      qrcode: data.qrcode?.trim() || "",
+      latitue: Number(data.latitue.replace(",", ".")),
+      longtitude: Number(data.longtitude.replace(",", ".")),
       status: data.status ?? true,
     };
 
     if (!formData.name) {
       toast.error("Vui lòng nhập tên địa điểm");
-      return;
-    }
-
-    if (!formData.address) {
-      toast.error("Vui lòng nhập địa chỉ");
       return;
     }
 
@@ -116,12 +107,12 @@ const LocationForm = ({ locationToEdit = {}, onCloseModal }) => {
     const lat = event.latLng.lat();
     const lng = event.latLng.lng();
     setMarkerPosition({ lat, lng });
-    setValue("latitue", lat.toString().replace(',', '.'), { shouldValidate: true });
-    setValue("longtitude", lng.toString().replace(',', '.'), { shouldValidate: true });
+    setValue("latitue", lat.toString().replace(",", "."), { shouldValidate: true });
+    setValue("longtitude", lng.toString().replace(",", "."), { shouldValidate: true });
   };
 
   const handleInputChange = (field, value) => {
-    const formattedValue = value.replace(',', '.');
+    const formattedValue = value.replace(",", ".");
     setValue(field, formattedValue, { shouldValidate: true });
     setMarkerPosition({
       lat: field === "latitue" ? Number(formattedValue) : markerPosition.lat,
@@ -162,24 +153,7 @@ const LocationForm = ({ locationToEdit = {}, onCloseModal }) => {
           })}
         />
       </FormRow>
-      <FormRow label="Địa chỉ" error={errors?.address?.message}>
-        <StyledInput
-          type="text"
-          id="address"
-          disabled={isWorking}
-          {...register("address", {
-            required: "Hãy nhập địa chỉ",
-            minLength: {
-              value: 5,
-              message: "Địa chỉ ít nhất 5 ký tự",
-            },
-            maxLength: {
-              value: 200,
-              message: "Địa chỉ tối đa 200 ký tự",
-            },
-          })}
-        />
-      </FormRow>
+
       <FormRow label="Chọn vị trí trên bản đồ">
         <MapContainer>
           <GoogleMap
@@ -192,6 +166,7 @@ const LocationForm = ({ locationToEdit = {}, onCloseModal }) => {
           </GoogleMap>
         </MapContainer>
       </FormRow>
+
       <FormRow label="Vĩ độ" error={errors?.latitue?.message}>
         <StyledInput
           type="text"
@@ -211,6 +186,7 @@ const LocationForm = ({ locationToEdit = {}, onCloseModal }) => {
           onChange={(e) => handleInputChange("latitue", e.target.value)}
         />
       </FormRow>
+
       <FormRow label="Kinh độ" error={errors?.longtitude?.message}>
         <StyledInput
           type="text"
@@ -230,20 +206,7 @@ const LocationForm = ({ locationToEdit = {}, onCloseModal }) => {
           onChange={(e) => handleInputChange("longtitude", e.target.value)}
         />
       </FormRow>
-      <FormRow label="QR Code" error={errors?.qrcode?.message}>
-        <StyledInput
-          type="text"
-          id="qrcode"
-          disabled={isWorking}
-          {...register("qrcode", {
-            required: "Hãy nhập mã QR",
-            maxLength: {
-              value: 200,
-              message: "Mã QR tối đa 200 ký tự",
-            },
-          })}
-        />
-      </FormRow>
+
       {isEditSession && (
         <FormRow label="Trạng thái">
           <StyledInput
@@ -254,6 +217,7 @@ const LocationForm = ({ locationToEdit = {}, onCloseModal }) => {
           />
         </FormRow>
       )}
+
       <FormRow>
         <Button
           $variations="secondary"
@@ -275,10 +239,8 @@ LocationForm.propTypes = {
   locationToEdit: PropTypes.shape({
     id: PropTypes.string,
     name: PropTypes.string,
-    address: PropTypes.string,
     latitue: PropTypes.number,
     longtitude: PropTypes.number,
-    qrcode: PropTypes.string,
     status: PropTypes.bool,
   }),
   onCloseModal: PropTypes.func,

@@ -61,8 +61,7 @@ function LocationTable() {
   let filteredLocations = locations;
   if (searchTerm) {
     filteredLocations = filteredLocations.filter((loc) =>
-      loc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      loc.address.toLowerCase().includes(searchTerm.toLowerCase())
+      loc.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }
 
@@ -79,11 +78,10 @@ function LocationTable() {
         <Empty resource="địa điểm" />
       ) : (
         <Menus>
-          <Table columns="0.5fr 2fr 2fr 1fr 1fr 1fr">
+          <Table columns="0.5fr 2fr 1fr 1fr 1fr">
             <Table.Header>
               <div>STT</div>
               <div>Tên địa điểm</div>
-              <div>Địa chỉ</div>
               <div>Vĩ độ</div>
               <div>Kinh độ</div>
               <div>Hành động</div>

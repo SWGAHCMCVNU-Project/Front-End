@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import Table from "../../ui/Table";
@@ -15,16 +15,6 @@ const StyledHeader = styled.div`
   justify-content: center;
 `;
 
-const StyledButton = styled.div`
-  background: none;
-  border: none;
-  cursor: pointer;
-
-  &:hover {
-    background-color: var(--color-grey-50);
-  }
-`;
-
 export default function AreaTable() {
   const [searchParams, setSearchParams] = useSearchParams();
   
@@ -39,7 +29,7 @@ export default function AreaTable() {
   const { isLoading, areas, error } = useAreas({
     page: currentPage,
     size: limit,
-    searchName: searchParams.get("search") || "",  // Đổi từ `search` thành `searchName`
+    searchName: searchParams.get("search") || "",
     state: searchParams.get("state") === "true",
     isAsc: sortOrder === "asc",
   });
@@ -88,13 +78,11 @@ export default function AreaTable() {
       <Table.Body
         data={areas.result}
         render={(area, index) => (
-          <StyledButton key={area.id}>
-            <AreaRow
-              area={area}
-              index={index + 1}
-              displayedIndex={(currentPage - 1) * limit + index + 1}
-            />
-          </StyledButton>
+          <AreaRow
+            key={area.id}
+            area={area}
+            displayedIndex={(currentPage - 1) * limit + index + 1}
+          />
         )}
       />
       <Table.Footer>

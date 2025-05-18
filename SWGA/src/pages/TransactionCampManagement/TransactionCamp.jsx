@@ -17,7 +17,7 @@ function TransactionCamp() {
     <CampTransactionsProvider>
       <Container>
         <div className="title-table-list">
-          <Title level={2}>Lịch sử giao dịch chiến dịch</Title>
+          <Title level={2}>Lịch sử giao dịch hoạt động</Title>
           <div>
             <SearchCampTransactions />
           </div>

@@ -63,15 +63,14 @@ const CostContainer = styled.div`
   font-size: 1.4rem;
 `;
 
-// Thêm style cho span để căn chỉnh nhãn và giá trị
 const LabelValue = styled.span`
   display: flex;
   align-items: center;
-  gap: 0.5rem; /* Khoảng cách giữa nhãn và giá trị */
+  gap: 0.5rem;
 `;
 
 const Label = styled.span`
-  min-width: 70px; /* Đảm bảo nhãn có độ dài cố định để thẳng hàng */
+  min-width: 70px;
   display: inline-block;
 `;
 
@@ -93,7 +92,7 @@ function CampaignRow({ campaign, displayedIndex }) {
     openingHours,
     closingHours,
     phone,
-    status,
+    status = 0, // Giá trị mặc định nếu status không tồn tại
     campaignName,
     email,
     state,
@@ -101,20 +100,22 @@ function CampaignRow({ campaign, displayedIndex }) {
     totalSpending,
     greenWalletImage,
     coverPhoto,
-    currentStateName,
-    currentState,
     startOn,
     endOn,
   } = campaign;
 
   const statusToTagName = {
-    Pending: "tag-orange",
-    Active: "cyan",
-    Inactive: "no",
-    Rejected: "orange",
-    Closed: "red",
-    Cancelled: "error",
-    Finished: "red",
+    0: "no", // Không hoạt động
+    1: "cyan", // Hoạt động
+    2: "tag-orange", // Chờ duyệt
+    3: "orange", // Từ chối
+  };
+
+  const statusToDisplayName = {
+    0: "Không hoạt động",
+    1: "Hoạt động",
+    2: "Chờ duyệt",
+    3: "Từ chối",
   };
 
   const [isValidImage, setIsValidImage] = useState(true);
@@ -124,6 +125,9 @@ function CampaignRow({ campaign, displayedIndex }) {
       .then((isValid) => setIsValidImage(isValid))
       .catch(() => setIsValidImage(false));
   }, [image]);
+
+  // Log để kiểm tra giá trị của status
+  console.log("Campaign ID:", campaignId, "Status:", status);
 
   return (
     <Table.Row>
@@ -159,7 +163,7 @@ function CampaignRow({ campaign, displayedIndex }) {
         </LabelValue>
       </CostContainer>
 
-      <Tag type={statusToTagName[currentState]}>{currentStateName}</Tag>
+      <Tag type={statusToTagName[status] || "no"}>{statusToDisplayName[status] || "Không xác định"}</Tag>
     </Table.Row>
   );
 }
