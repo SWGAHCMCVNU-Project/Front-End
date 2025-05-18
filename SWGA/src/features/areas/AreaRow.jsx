@@ -1,8 +1,7 @@
 import { addHours, format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { useEffect, useState } from "react";
-import { HiPencil } from "react-icons/hi2"; // Bỏ HiTrash
-import { useNavigate } from "react-router-dom";
+import { HiPencil } from "react-icons/hi2";
 import styled from "styled-components";
 import logoDefault from "../../assets/images/plot.png";
 import Modal from "../../ui/Modal";
@@ -111,27 +110,8 @@ const StyledButton = styled.button`
   }
 `;
 
-const StyledNavigateButton = styled.div`
-  background: none;
-  border: none;
-  cursor: pointer;
-
-  &:hover {
-    background-color: var(--color-grey-50);
-  }
-`;
-
 export default function AreaRow({ area, displayedIndex }) {
   const { id: areaId, areaName, image, description, dateCreated, state } = area;
-
-  const NavigateButton = ({ children }) => {
-    const navigate = useNavigate();
-    return (
-      <StyledNavigateButton onClick={() => navigate(`/areas/${areaId}`)}>
-        {children}
-      </StyledNavigateButton>
-    );
-  };
 
   const statusToTagName = {
     true: "cyan",
@@ -148,32 +128,22 @@ export default function AreaRow({ area, displayedIndex }) {
 
   return (
     <Table.Row>
-      <NavigateButton>
-        <CategoryIndex>{displayedIndex}</CategoryIndex>
-      </NavigateButton>
-      <NavigateButton>
-        <Category>
-          <Img src={isValidImage ? image || "" : logoDefault} />
-          <CategoryName>{areaName}</CategoryName>
-        </Category>
-      </NavigateButton>
-      <NavigateButton>
-        <Description>
-          {description ? description : "Chưa cập nhật mô tả "}
-        </Description>
-      </NavigateButton>
-      <NavigateButton>
-        <Stacked>
-          {format(addHours(new Date(dateCreated), 7), "dd MMM yyyy", {
-            locale: vi,
-          })}
-        </Stacked>
-      </NavigateButton>
-      <NavigateButton>
-        <Tag type={statusToTagName[state]}>
-          {state ? "Hoạt động" : "Không hoạt động"}
-        </Tag>
-      </NavigateButton>
+      <CategoryIndex>{displayedIndex}</CategoryIndex>
+      <Category>
+        <Img src={isValidImage ? image || "" : logoDefault} />
+        <CategoryName>{areaName}</CategoryName>
+      </Category>
+      <Description>
+        {description ? description : "Chưa cập nhật mô tả "}
+      </Description>
+      <Stacked>
+        {format(addHours(new Date(dateCreated), 7), "dd MMM yyyy", {
+          locale: vi,
+        })}
+      </Stacked>
+      <Tag type={statusToTagName[state]}>
+        {state ? "Hoạt động" : "Không hoạt động"}
+      </Tag>
       <StyledAction>
         <Modal>
           <Modal.Open opens="edit">

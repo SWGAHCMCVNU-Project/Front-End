@@ -97,12 +97,12 @@ function CampTransactionList() {
   if (error)
     return (
       <Empty
-        resourceName="lịch sử giao dịch chiến dịch"
+        resourceName="Lịch sử giao dịch hoạt động"
         message={error.message}
       />
     );
   if (!campTransactions?.data?.length)
-    return <Empty resourceName="lịch sử giao dịch chiến dịch" />;
+    return <Empty resourceName="Lịch sử giao dịch hoạt động" />;
 
   return (
     <TableContainer>
