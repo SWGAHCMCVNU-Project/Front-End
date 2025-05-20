@@ -18,9 +18,9 @@ function CampaignActivity() {
         switch (stateCurrent) {
             case "Chờ duyệt":
                 return 'orange';
-            case "Từ chối":
+            case "Đã từ chối":
                 return 'purple';
-            case "Hoạt động":
+            case "Đang hoạt động":
                 return 'cyan';
             case "Không hoạt động":
                 return 'default';

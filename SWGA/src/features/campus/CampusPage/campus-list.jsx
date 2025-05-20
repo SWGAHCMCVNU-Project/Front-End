@@ -1,5 +1,5 @@
-import { Avatar, Spin, Tag, Typography, Tooltip } from "antd";
-import { HiPencil, HiUserPlus } from "react-icons/hi2";
+import { Avatar, Switch, Typography, Tooltip } from "antd";
+import { HiUserPlus } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import imgDefaultCampus from "../../../assets/images/campus.png";
@@ -9,8 +9,9 @@ import { ButtonAction } from "../../../ui/custom/Button/Button";
 import { TableItem } from "../../../ui/custom/Table/TableItem";
 import { formatDate, formatPhoneNumber, useImageValidity } from "../../../utils/helpers";
 import { useCampuses } from "./useCampuses";
-import CampusFormUpdate from "../ModalCampusUpdate/campus-form-update";
+import  useUpdateCampus  from "../../../hooks/campus/useUpdateCampus";
 import CampusAccountForm from "../ModalCampusUpdate/campus-account-form";
+import toast from "react-hot-toast";
 
 const Stacked = styled.div`
   display: flex;
@@ -54,6 +55,7 @@ function CampusList() {
     handleLimitChange,
     setSort,
   } = useCampuses();
+  const { editCampus, isEditing } = useUpdateCampus();
   const navigate = useNavigate();
 
   const campusImages = campuses?.items?.map((campus) => campus.image);
@@ -70,12 +72,45 @@ function CampusList() {
     }
   };
 
+  const handleToggleState = async (campusId, currentState) => {
+  // Lấy thông tin campus hiện tại từ danh sách đã có
+  const currentCampus = campuses.items.find(c => c.id === campusId);
+  if (!currentCampus) {
+    toast.error("Không tìm thấy thông tin campus");
+    return;
+  }
+
+  // Tạo formData với tất cả thông tin hiện tại và cập nhật state
+  const formData = {
+    areaId: currentCampus.areaId,
+    campusName: currentCampus.campusName,
+    address: currentCampus.address,
+    phone: currentCampus.phone,
+    email: currentCampus.email,
+    link: currentCampus.link,
+    description: currentCampus.description,
+    image: currentCampus.image, // Giữ nguyên ảnh hiện tại
+    state: !currentState, // Cập nhật trạng thái mới
+  };
+
+  editCampus({
+    id: campusId,
+    formData: formData,
+  });
+};
+
   const columns = [
     { title: "STT", dataIndex: "number", key: "number", align: "center" },
     { title: "Campus", dataIndex: "CampusName", key: "CampusName", width: "18%", sorter: true },
     { title: "Liên hệ", dataIndex: "Contact", key: "Contact" },
     { title: "Ngày tạo", dataIndex: "DateCreated", key: "DateCreated", align: "center" },
-    { title: "Trạng thái", key: "State", dataIndex: "State", align: "center" },
+    { 
+      title: "Trạng thái", 
+      key: "State", 
+      dataIndex: "State", 
+      align: "center",
+      width: "15%"
+    },
     { 
       title: <div className="header-login">Hành động</div>, 
       key: "action", 
@@ -86,9 +121,7 @@ function CampusList() {
 
   if (isLoading) {
     return (
-      <Spin>
-        <TableItem columns={columns} dataSource={[]} pagination={false} />
-      </Spin>
+      <TableItem columns={columns} dataSource={[]} pagination={false} />
     );
   }
 
@@ -137,14 +170,17 @@ function CampusList() {
       DateCreated: <>{formatDate(campus.dateCreated)}</>,
       State: (
         <StatusContainer>
-          <Tag className="status-tag" color={campus.state ? "cyan" : "error"}>
-            {campus.state ? "Hoạt động" : "Không hoạt động"}
-          </Tag>
+          <Switch
+            checked={campus.state}
+            onChange={() => handleToggleState(campus.id, campus.state)}
+            disabled={isEditing}
+            checkedChildren="Hoạt động"
+            unCheckedChildren="Không hoạt động"
+          />
         </StatusContainer>
       ),
       action: (
         <ActionContainer className="ant-employed-actions">
-          
           {campus.hasAccount ? (
             <Tooltip title="Tài khoản đã được tạo cho campus này">
               <StyledButtonAction disabled>
@@ -186,20 +222,18 @@ function CampusList() {
   };
 
   return (
-    <Spin spinning={isLoading}>
-      <TableItem
-        columns={columns}
-        dataSource={data}
-        handleSort={handleSort}
-        limit={limit}
-        label=""
-        page={page}
-        elements={campuses?.total}
-        setPage={handlePageChange}
-        setLimit={handleLimitChange}
-        handleRowClick={handleRowClick}
-      />
-    </Spin>
+    <TableItem
+      columns={columns}
+      dataSource={data}
+      handleSort={handleSort}
+      limit={limit}
+      label=""
+      page={page}
+      elements={campuses?.total}
+      setPage={handlePageChange}
+      setLimit={handleLimitChange}
+      handleRowClick={handleRowClick}
+    />
   );
 }
 
