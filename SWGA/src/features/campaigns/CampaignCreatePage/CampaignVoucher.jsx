@@ -326,12 +326,7 @@ function CampaignVoucher({
     if (mode === "create") {
       return [
         ...baseColumns,
-        {
-          title: "Tồn kho",
-          dataIndex: "Available",
-          key: "Available",
-          align: "center",
-        },
+       
         {
           title: "Số lượng",
           dataIndex: "Quantity",
