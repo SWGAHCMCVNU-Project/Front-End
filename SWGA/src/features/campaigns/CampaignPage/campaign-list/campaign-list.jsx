@@ -60,8 +60,12 @@ function CampaignList() {
 
   const [sort, setSort] = useState("Id,desc");
 
-  const campaignImages = campaigns?.result?.map((campaign) => campaign.image) || [];
-  const isValidImages = useImageValidity(campaigns?.result || [], campaignImages);
+  const campaignImages =
+    campaigns?.result?.map((campaign) => campaign.image) || [];
+  const isValidImages = useImageValidity(
+    campaigns?.result || [],
+    campaignImages
+  );
 
   const currentDate = new Date();
   const year = currentDate.getFullYear();
@@ -131,29 +135,36 @@ function CampaignList() {
     const startDate = new Date(startOn);
     const endDate = new Date(endOn);
 
-    if (status === 1 && today >= startDate && today <= endDate) {
-      return "Đang Hoạt Động";
+    if (status === 1) {
+      if (today < startDate) {
+        return "Chưa Diễn Ra";
+      }
+      if (today >= startDate && today <= endDate) {
+        return "Đang Hoạt Động";
+      }
     }
-    if (status === 0 || (status === 1 && (today < startDate || today > endDate))) {
-      return "Không hoạt động";
+    if (status === 0 || (status === 1 && today > endDate)) {
+      return "Không Hoạt Động";
     }
     switch (status) {
       case 2:
-        return "Chờ duyệt";
+        return "Chờ Duyệt";
       default:
-        return "Không xác định";
+        return "Không Xác Định";
     }
   };
 
   const getStatusTagColor = (stateCurrent) => {
     switch (stateCurrent) {
-      case "Chờ duyệt":
+      case "Chờ Duyệt":
         return "orange";
       case "Đã Từ Chối":
         return "purple";
       case "Đang Hoạt Động":
         return "cyan";
-      case "Không hoạt động":
+      case "Chưa Diễn Ra":
+        return "blue"; // New color for "Chưa Diễn Ra"
+      case "Không Hoạt Động":
         return "default";
       default:
         return "default";
@@ -162,10 +173,31 @@ function CampaignList() {
 
   const columns = [
     { title: "STT", dataIndex: "number", key: "number", align: "center" },
-    { title: "Chiến dịch", dataIndex: "CampaignName", key: "CampaignName", sorter: true },
-    { title: "Thương hiệu", dataIndex: "BrandName", key: "BrandName", sorter: true, align: "center" },
-    { title: "Thời gian diễn ra", dataIndex: "StartOn", key: "StartOn", sorter: true },
-    { title: "Chi phí", key: "TotalIncome", dataIndex: "TotalIncome", sorter: true },
+    {
+      title: "Chiến dịch",
+      dataIndex: "CampaignName",
+      key: "CampaignName",
+      sorter: true,
+    },
+    {
+      title: "Thương hiệu",
+      dataIndex: "BrandName",
+      key: "BrandName",
+      sorter: true,
+      align: "center",
+    },
+    {
+      title: "Thời gian diễn ra",
+      dataIndex: "StartOn",
+      key: "StartOn",
+      sorter: true,
+    },
+    {
+      title: "Chi phí",
+      key: "TotalIncome",
+      dataIndex: "TotalIncome",
+      sorter: true,
+    },
     { title: "Trạng thái", key: "State", dataIndex: "State", align: "center" },
     { title: "Hành động", key: "action", dataIndex: "action", align: "center" },
   ];
@@ -190,7 +222,11 @@ function CampaignList() {
       : index + 1;
     const isValid = isValidImages[index];
     const avatarSrc = isValid ? campaign.image : imgDefaultCampaign;
-    const campaignStatus = determineCampaignStatus(campaign.status, campaign.startOn, campaign.endOn);
+    const campaignStatus = determineCampaignStatus(
+      campaign.status,
+      campaign.startOn,
+      campaign.endOn
+    );
 
     return {
       key: campaign.id,
@@ -201,7 +237,11 @@ function CampaignList() {
       ),
       CampaignName: (
         <Avatar.Group>
-          <Avatar className="shape-avatar-product" shape="square" src={avatarSrc} />
+          <Avatar
+            className="shape-avatar-product"
+            shape="square"
+            src={avatarSrc}
+          />
           <div className="avatar-info">
             <Title className="title-product-name" level={5}>
               {campaign.campaignName}
@@ -214,10 +254,16 @@ function CampaignList() {
       StartOn: (
         <StackedTime>
           <span>
-            Bắt đầu: <StackedTimeFrameAbove>{formatDate(campaign.startOn)}</StackedTimeFrameAbove>
+            Bắt đầu:{" "}
+            <StackedTimeFrameAbove>
+              {formatDate(campaign.startOn)}
+            </StackedTimeFrameAbove>
           </span>
           <span>
-            Kết thúc: <StackedTimeFrameBelow>{formatDate(campaign.endOn)}</StackedTimeFrameBelow>
+            Kết thúc:{" "}
+            <StackedTimeFrameBelow>
+              {formatDate(campaign.endOn)}
+            </StackedTimeFrameBelow>
           </span>
         </StackedTime>
       ),
@@ -226,21 +272,28 @@ function CampaignList() {
           <span>
             Hạn mức:{" "}
             <MoneyWrapper>
-              <TotalIncome>{campaign.totalIncome.toLocaleString("vi-VN")}</TotalIncome>
+              <TotalIncome>
+                {campaign.totalIncome.toLocaleString("vi-VN")}
+              </TotalIncome>
               <img className="shape-avatar-campaign-bean" src={greenBean} />
             </MoneyWrapper>
           </span>
           <span>
             Đã chi:{" "}
             <MoneyWrapper>
-              <TotalSpending>{campaign.totalSpending.toLocaleString("vi-VN")}</TotalSpending>
+              <TotalSpending>
+                {campaign.totalSpending.toLocaleString("vi-VN")}
+              </TotalSpending>
               <img className="shape-avatar-campaign-bean" src={greenBean} />
             </MoneyWrapper>
           </span>
         </StackedTime>
       ),
       State: (
-        <Tag className="campaign-status-tag" color={getStatusTagColor(campaignStatus)}>
+        <Tag
+          className="campaign-status-tag"
+          color={getStatusTagColor(campaignStatus)}
+        >
           {campaignStatus}
         </Tag>
       ),
