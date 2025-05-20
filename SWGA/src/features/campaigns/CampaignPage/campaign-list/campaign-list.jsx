@@ -124,7 +124,7 @@ function CampaignList() {
   const determineCampaignStatus = (status, startOn, endOn) => {
     // Nếu trạng thái là 3 (Từ chối), giữ nguyên
     if (status === 3) {
-      return "Từ chối";
+      return "Đã Từ Chối";
     }
 
     const today = new Date();
@@ -132,7 +132,7 @@ function CampaignList() {
     const endDate = new Date(endOn);
 
     if (status === 1 && today >= startDate && today <= endDate) {
-      return "Hoạt động";
+      return "Đang Hoạt Động";
     }
     if (status === 0 || (status === 1 && (today < startDate || today > endDate))) {
       return "Không hoạt động";
@@ -149,9 +149,9 @@ function CampaignList() {
     switch (stateCurrent) {
       case "Chờ duyệt":
         return "orange";
-      case "Từ chối":
+      case "Đã Từ Chối":
         return "purple";
-      case "Hoạt động":
+      case "Đang Hoạt Động":
         return "cyan";
       case "Không hoạt động":
         return "default";

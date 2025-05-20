@@ -125,7 +125,7 @@ export const createCampusAPI = async (formData) => {
 export const updateCampusAPI = async (id, formData) => {
   try {
     const formatCampusData = (formData) => {
-      return {
+      const campusData = {
         areaId: formData.areaId?.trim() || "",
         campusName: formData.campusName?.trim() || "",
         address: formData.address || "",
@@ -133,25 +133,23 @@ export const updateCampusAPI = async (id, formData) => {
         email: formData.email || "",
         link: formData.link || "",
         description: formData.description || "",
-        state: formData.state !== undefined ? formData.state : true,
+        state: formData.state // Luôn bao gồm state
       };
+      return campusData;
     };
 
     const campusData = formatCampusData(formData);
     const apiFormData = new FormData();
-    apiFormData.append("areaId", campusData.areaId);
-    apiFormData.append("campusName", campusData.campusName);
-    apiFormData.append("address", campusData.address);
-    apiFormData.append("phone", campusData.phone);
-    apiFormData.append("email", campusData.email);
-    apiFormData.append("link", campusData.link);
-    apiFormData.append("description", campusData.description);
-    apiFormData.append("state", campusData.state.toString());
+    // Append tất cả các trường bắt buộc
+    Object.keys(campusData).forEach(key => {
+      apiFormData.append(key, campusData[key]);
+    });
 
+    // Xử lý ảnh
     if (formData.image instanceof File) {
       apiFormData.append("image", formData.image);
     } else if (formData.image && typeof formData.image === "string") {
-      console.warn("Image is a string, skipping file upload:", formData.image);
+      console.warn("Image is a string, skipping file upload");
     }
 
     const url = CAMPUS.UPDATE.replace("{id}", id);
@@ -253,3 +251,5 @@ export const distributePointsAPI = async (campusId, lecturerIds, points) => {
     throw new Error(error.response?.data?.Message || "Phân bổ điểm thất bại");
   }
 };
+
+

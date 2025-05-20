@@ -5,20 +5,22 @@ import logoDefault from "../../assets/images/reading.png";
 import Table from "../../ui/Table";
 import Tag from "../../ui/Tag";
 import { formatPhoneNumber, handleValidImageURL } from "../../utils/helpers";
+import { useUpdateStudent } from "../../hooks/student/useUpdateStudents";
+import { Switch } from "antd";
 
 const StudentContainer = styled.div`
   display: flex;
-  flex-direction: column; /* Đặt thông tin nằm dưới hình ảnh */
-  align-items: center; /* Căn giữa các phần tử */
+  flex-direction: column;
+  align-items: center;
   font-size: 1.6rem;
   font-weight: 600;
   color: var(--color-grey-600);
-  gap: 1rem; /* Khoảng cách giữa hình ảnh và thông tin */
+  gap: 1rem;
 `;
 
 const Img = styled.img`
   display: block;
-  width: 80px; /* Tăng kích thước hình ảnh */
+  width: 80px;
   object-fit: cover;
   object-position: center;
   border-radius: 8px;
@@ -32,14 +34,14 @@ const StudentName = styled.div`
   -webkit-line-clamp: 2;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  text-align: center; /* Căn giữa tên sinh viên */
+  text-align: center;
 `;
 
 const StackedFrame = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  align-items: center; /* Căn giữa tên và mã sinh viên */
+  align-items: center;
 `;
 
 const StyledCode = styled.div`
@@ -74,12 +76,25 @@ const StyledRow = styled.div`
   font-family: "Sono";
 `;
 
+const SwitchContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const SwitchLabel = styled.span`
+  font-size: 1.4rem;
+  color: var(--color-grey-600);
+`;
+
 function StudentRow({ student, index, displayedIndex }) {
   const navigate = useNavigate();
+  const { mutate: updateStudent, isLoading } = useUpdateStudent();
+  const [localState, setLocalState] = useState(student.state); // Local state for immediate UI feedback
 
   const handleNameClick = (e) => {
     e.stopPropagation();
-    navigate(`/students/${student.id}`);
+    navigate(`/students/${student.accountId}`);
   };
 
   const statusToTagName = {
@@ -90,7 +105,8 @@ function StudentRow({ student, index, displayedIndex }) {
   };
 
   const stateToName = {
-    1: "Chờ duyệt",
+    0: "Không xác định",
+    1: "Chờ xác thực",
     2: "Hoạt động",
     3: "Không hoạt động",
     4: "Từ chối",
@@ -104,10 +120,31 @@ function StudentRow({ student, index, displayedIndex }) {
       .catch(() => setIsValidImage(false));
   }, [student.avatar]);
 
-  const stateName = stateToName[student.state] || "Không xác định";
+  // Use localState for rendering, which updates immediately
+  const stateName = stateToName[localState] || "Không xác định";
+
+  // Trong StudentRow.jsx
+const handleStateChange = (checked) => {
+  const newState = checked ? 2 : 3;
+  updateStudent(
+    { accountId: student.accountId, state: newState },
+    {
+      onSuccess: (data) => {
+        console.log("Server response:", data); // Kiểm tra data trả về
+        setLocalState(newState); // Cập nhật UI ngay lập tức
+      },
+      onError: (error) => {
+        console.error("Error details:", error.response?.data);
+        setLocalState(student.state); // Rollback UI nếu có lỗi
+      },
+    }
+  );
+};
+  // Chỉ hiển thị Switch cho trạng thái 2 hoặc 3
+  const showSwitch = [2, 3].includes(localState);
 
   return (
-    <Table.Row onClick={() => navigate(`/students/${student.id}`)}>
+    <Table.Row onClick={() => navigate(`/students/${student.accountId}`)}>
       <StyledRow>{displayedIndex}</StyledRow>
       <StudentContainer>
         {isValidImage ? (
@@ -127,7 +164,18 @@ function StudentRow({ student, index, displayedIndex }) {
         <span>{student.studentEmail || "Chưa cập nhật"}</span>
       </Stacked>
       <div>{student.campusName || "Chưa cập nhật"}</div>
-      <Tag type={statusToTagName[student.state]}>{stateName}</Tag>
+      {showSwitch ? (
+        <SwitchContainer>
+          <Switch
+            checked={localState === 2}
+            onChange={handleStateChange}
+            disabled={isLoading}
+          />
+          <SwitchLabel>{stateName}</SwitchLabel>
+        </SwitchContainer>
+      ) : (
+        <Tag type={statusToTagName[localState] || "default"}>{stateName}</Tag>
+      )}
     </Table.Row>
   );
 }

@@ -26,3 +26,18 @@ export const getStudentById = async (id) => {
     throw error;
   }
 };
+export const updateStudent = async (accountId, state) => {
+  try {
+    const response = await apiClient.put(
+      STUDENT.UPDATE.replace("{id}", accountId),
+      {}, // Body trống (nếu server không yêu cầu)
+      {
+        params: { state }, // Gửi state qua query parameter
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating student:", error.response?.data || error);
+    throw error;
+  }
+};

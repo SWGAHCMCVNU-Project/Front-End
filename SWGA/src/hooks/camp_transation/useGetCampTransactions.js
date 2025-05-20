@@ -12,6 +12,7 @@ export function useGetCampTransactions({ brandId, page, size }) {
     },
     enabled: !!brandId, // Only run query if brandId exists
     retry: 1,
+    
     staleTime: 0,
     cacheTime: 0,
     onError: (error) => {
