@@ -351,6 +351,7 @@ function CampaignTimeOfEvent() {
         <div style={{ display: "flex", alignItems: "baseline" }}>
           <label className="cost-label">Chi phí loại chiến dịch: </label>
           <TotalCost>
+            <span style={{ marginRight: "1px",marginTop: "11px" }} /> {/* Thêm khoảng cách */}
             {coinValue.toLocaleString("vi-VN")}
             <img
               className="shape-avatar-campaign-bean"

@@ -79,6 +79,9 @@ function DataItemBrand({ activity }) {
       .catch(() => setIsValidImage(false));
   }, [image]);
 
+  // Check if value should be displayed as a percentage (assuming value is a number between 0 and 100 from TodayActivity)
+  const displayValue = Number.isFinite(value) ? `${value.toFixed(2)}%` : "N/A";
+
   return (
     <StyledTodayItem>
       <StarImage>
@@ -88,8 +91,8 @@ function DataItemBrand({ activity }) {
       <Flag src={isValidImage ? image : logoDefault} alt={`Image of ${name}`} />
       <Guest>{name}</Guest>
       <StyleGreenWallet>
-        {formatCurrency(value)}
-        <StyledImageBean src={greenBean} alt="dau xanh" />
+        {displayValue}
+       
       </StyleGreenWallet>
     </StyledTodayItem>
   );

@@ -124,6 +124,7 @@ export const createCampaignAPI = async (params) => {
     throw error;
   }
 };
+
 // Hàm cập nhật chiến dịch theo ID (sửa đổi)
 export const updateCampaignAPI = async (id, params) => {
   try {
@@ -204,6 +205,7 @@ export const updateCampaignAPI = async (id, params) => {
     throw error;
   }
 };
+
 export const getCampaignsByBrandIdAPI = async (
   brandId,
   { page = 1, size = 10, searchName = "", campaignTypeIds, statesFilterValue } = {}
@@ -240,6 +242,7 @@ export const getCampaignsByBrandIdAPI = async (
     };
   }
 };
+
 export const changeCampaignStatusAPI = async ({ campaignId, isApproved, rejectionReason }) => {
   try {
     if (!campaignId) {
@@ -269,5 +272,23 @@ export const changeCampaignStatusAPI = async ({ campaignId, isApproved, rejectio
       success: false,
       message: errorMessage,
     };
+  }
+};
+
+export const getCampaignRankingByBrandAPI = async (brandId, { limit = 10 } = {}) => {
+  try {
+    if (!brandId) {
+      throw new Error("Brand ID is required");
+    }
+    const url = CAMPAIGN_ENDPOINTS.RANKING_CAMPAIGN.replace("{id}", brandId);
+    const response = await apiClient.get(url, {
+      params: {
+        limit,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching campaign ranking for brand with ID ${brandId}:`, error);
+    throw error;
   }
 };
