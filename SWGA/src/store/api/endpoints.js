@@ -61,6 +61,7 @@ export const CAMPAIGN_ENDPOINTS = {
   GET_STORE_BY_ID: "/Campaign/getStoreByCampaignId/{id}",
   GET_CAMPAIGN_BY_ID: "/Campaign/brandAllStatus/{id}",
   CHANGE_STATUS_OF_CAMPAIGN: "/Campaign/approve-camp",
+  RANKING_CAMPAIGN: "/Campaign/ranking/{id}",
 };
 export const CAMPAIGN_DETAIL_ENDPOINTS = {
   GET_VOUCHER: "/CampaignDetail",
