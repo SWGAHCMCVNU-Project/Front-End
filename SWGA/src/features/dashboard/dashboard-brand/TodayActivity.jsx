@@ -2,7 +2,6 @@ import styled, { css } from "styled-components";
 import DataItemBrand from "./DataItemBrand";
 import { useCampaignRankingByBrand } from "../../../hooks/campaign/useCampaignRankingByBrand";
 import { useBrand } from "../../../hooks/brand/useBrand";
-import { useState } from "react";
 
 const StyledToday = styled.div`
   background-color: var(--color-grey-0);
@@ -12,7 +11,7 @@ const StyledToday = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2.4rem;
-  grid-column: 1 / span 2;
+  grid-column: 1 / -1;
   padding-top: 2.4rem;
 `;
 
@@ -24,6 +23,7 @@ const DataList = styled.ul`
   }
   scrollbar-width: none;
   -ms-overflow-style: none;
+  max-height: 300px;
 `;
 
 const NoActivity = styled.p`
@@ -50,96 +50,101 @@ const Heading = styled.h1`
     css`
       text-transform: uppercase;
     `}
-  ${(props) => props.as === "h3" && css``}
+  ${(props) =>
+    props.as === "h3" &&
+    css`
+      padding-left: 4rem; /* Thêm padding để thẳng hàng với ngôi sao */
+    `}
   color: #f9ad14;
   text-align: left;
   line-height: 1.4;
 `;
 
-const TabContainer = styled.div`
+const RankingContainer = styled.div`
   display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  flex-wrap: nowrap;
+  width: 100%;
+  gap: 2rem;
 `;
 
-const TabButton = styled.button`
-  padding: 0.8rem 1.6rem;
-  font-size: 1.4rem;
-  font-weight: 500;
-  border: none;
-  border-radius: var(--border-radius-sm);
-  background-color: ${(props) => (props.active ? "#f9ad14" : "var(--color-grey-100)")};
-  color: ${(props) => (props.active ? "white" : "var(--color-grey-700)")};
-  cursor: pointer;
-  transition: all 0.3s;
-
-  &:hover {
-    background-color: ${(props) => (props.active ? "#e89c00" : "var(--color-grey-200)")};
-  }
+const RankingSection = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
 `;
 
 function TodayActivity() {
   const { brand, isLoading: isLoadingBrand } = useBrand();
   const { data: campaignRanking, isLoading: isLoadingCampaignRanking, isError: isErrorCampaign } = useCampaignRankingByBrand(brand?.id);
-  
-  const [rankingType, setRankingType] = useState("voucherUsageRatio"); // Default to voucher usage ratio
 
-  // Kiểm tra trạng thái loading
   if (isLoadingBrand || isLoadingCampaignRanking) {
     return <NoActivity>Đang tải...</NoActivity>;
   }
 
-  // Kiểm tra lỗi
   if (isErrorCampaign) {
     return <NoActivity>Có lỗi xảy ra khi tải dữ liệu xếp hạng chiến dịch</NoActivity>;
   }
 
-  // Sort campaigns based on the selected ranking type
-  const sortedCampaigns = campaignRanking
-    ? [...campaignRanking].sort((a, b) => {
-        if (rankingType === "voucherUsageRatio") {
-          return b.voucherUsageRatio - a.voucherUsageRatio; // Sort by voucher usage ratio (descending)
-        } else {
-          return b.voucherBoughtRatio - a.voucherBoughtRatio; // Sort by voucher bought ratio (descending)
-        }
-      }).map((campaign, index) => ({
-        ...campaign,
-        rank: index + 1, // Assign rank based on sorted order
-        name: campaign.campaignName,
-        image: campaign.image,
-        value: rankingType === "voucherUsageRatio" ? campaign.voucherUsageRatio * 100 : campaign.voucherBoughtRatio * 100, // Convert to percentage
-      }))
+  const sortedByVoucherUsage = campaignRanking
+    ? [...campaignRanking]
+        .sort((a, b) => b.voucherUsageRatio - a.voucherUsageRatio)
+        .map((campaign, index) => ({
+          ...campaign,
+          rank: index + 1,
+          name: campaign.campaignName,
+          image: campaign.image,
+          value: campaign.voucherUsageRatio * 100,
+        }))
+    : [];
+
+  const sortedByVoucherBought = campaignRanking
+    ? [...campaignRanking]
+        .sort((a, b) => b.voucherBoughtRatio - a.voucherBoughtRatio)
+        .map((campaign, index) => ({
+          ...campaign,
+          rank: index + 1,
+          name: campaign.campaignName,
+          image: campaign.image,
+          value: campaign.voucherBoughtRatio * 100,
+        }))
     : [];
 
   return (
     <StyledToday>
       <StyledHeading>
         <Heading as="h2">Bảng xếp hạng chiến dịch</Heading>
-        <Heading as="h3">Số lượng: {sortedCampaigns?.length || 0}</Heading>
+        <Heading as="h3">Số lượng: {campaignRanking?.length || 0}</Heading>
       </StyledHeading>
-      <TabContainer>
-        <TabButton
-          active={rankingType === "voucherUsageRatio"}
-          onClick={() => setRankingType("voucherUsageRatio")}
-        >
-          Tỉ lệ sử dụng voucher
-        </TabButton>
-        <TabButton
-          active={rankingType === "voucherBoughtRatio"}
-          onClick={() => setRankingType("voucherBoughtRatio")}
-        >
-          Tỉ lệ mua voucher
-        </TabButton>
-      </TabContainer>
-      {sortedCampaigns?.length > 0 ? (
-        <DataList>
-          {sortedCampaigns.map((activity) => (
-            <DataItemBrand key={activity.id} activity={activity} />
-          ))}
-        </DataList>
-      ) : (
-        <NoActivity>Không có dữ liệu chiến dịch...</NoActivity>
-      )}
+
+      <RankingContainer>
+        <RankingSection>
+          <Heading as="h3">Tỉ lệ sử dụng voucher</Heading>
+          {sortedByVoucherUsage.length > 0 ? (
+            <DataList>
+              {sortedByVoucherUsage.map((activity) => (
+                <DataItemBrand key={activity.id} activity={activity} />
+              ))}
+            </DataList>
+          ) : (
+            <NoActivity>Không có dữ liệu...</NoActivity>
+          )}
+        </RankingSection>
+
+        <RankingSection>
+          <Heading as="h3">Tỉ lệ mua voucher</Heading>
+          {sortedByVoucherBought.length > 0 ? (
+            <DataList>
+              {sortedByVoucherBought.map((activity) => (
+                <DataItemBrand key={activity.id} activity={activity} />
+              ))}
+            </DataList>
+          ) : (
+            <NoActivity>Không có dữ liệu...</NoActivity>
+          )}
+        </RankingSection>
+      </RankingContainer>
     </StyledToday>
   );
 }

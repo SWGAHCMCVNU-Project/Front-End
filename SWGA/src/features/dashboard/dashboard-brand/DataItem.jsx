@@ -7,11 +7,11 @@ import { formatCurrency, handleValidImageURL } from "../../../utils/helpers";
 
 const StyledTodayItem = styled.li`
   display: grid;
-  grid-template-columns: 7rem 5rem 1fr 9rem;
-  gap: 1.2rem;
+  grid-template-columns: 8rem 7rem 3fr 30rem; /* Tăng kích thước cột: ngôi sao, ảnh, tên, giá trị */
+  gap: 1.6rem; /* Tăng khoảng cách giữa các cột */
   align-items: center;
   font-size: 1.4rem;
-  padding: 0.8rem 0;
+  padding: 1.2rem 1.6rem; /* Tăng padding để ô rộng hơn */
   border-bottom: 1px solid var(--color-grey-100);
 
   &:first-child {
@@ -24,8 +24,8 @@ const Guest = styled.div`
 `;
 
 export const Flag = styled.img`
-  width: ${(props) => (props.src ? "5rem" : "5rem")};
-  height: ${(props) => (props.src ? "5rem" : "5rem")};
+  width: ${(props) => (props.src ? "6rem" : "6rem")}; /* Tăng kích thước ảnh */
+  height: ${(props) => (props.src ? "6rem" : "6rem")};
   border-radius: 50%;
   display: block;
   border: ${(props) => (props.src ? "1px solid var(--color-grey-100)" : null)};
@@ -35,12 +35,12 @@ export const Flag = styled.img`
 const StyledImageBean = styled.img`
   width: 25px;
   height: 25px;
-  margin-left: 5px; /* Add some spacing between the value and the image */
+  margin-left: 8px; /* Tăng khoảng cách giữa giá trị và icon */
 `;
 
 const StarImage = styled.div`
-  width: 4rem;
-  height: 4rem;
+  width: 5rem; /* Tăng kích thước ngôi sao */
+  height: 5rem;
   position: relative;
 `;
 
@@ -54,7 +54,7 @@ const RankLabel = styled.span`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 1.4rem;
+  font-size: 1.6rem; /* Tăng cỡ chữ số thứ hạng */
   font-weight: bold;
   color: white;
 `;
@@ -64,9 +64,9 @@ const StyleGreenWallet = styled.div`
   font-weight: bold;
   font-size: 16px;
   text-align: end;
-  display: flex; /* Use flexbox to align items */
-  align-items: center; /* Center items vertically */
-  justify-content: flex-end; /* Align to the right */
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 `;
 
 function DataItem({ activity }) {

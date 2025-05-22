@@ -11,7 +11,8 @@ const StyledToday = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2.4rem;
-  grid-column: 3 / span 2;
+  /* Loại bỏ grid-column để tự động mở rộng */
+  min-width: 400px; /* Đặt chiều rộng tối thiểu để ô không quá hẹp */
   padding-top: 2.4rem;
 `;
 

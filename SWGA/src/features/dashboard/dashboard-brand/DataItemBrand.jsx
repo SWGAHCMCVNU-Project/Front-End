@@ -1,18 +1,16 @@
-/* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import logoDefault from "../../../assets/images/brand.png";
-import greenBean from "../../../assets/images/dauxanh.png";
 import star from "../../../assets/images/star.png";
-import { formatCurrency, handleValidImageURL } from "../../../utils/helpers";
+import { handleValidImageURL } from "../../../utils/helpers";
 
 const StyledTodayItem = styled.li`
   display: grid;
-  grid-template-columns: 7rem 5rem 1fr 9rem;
+  grid-template-columns: 4rem 6rem 1fr 7rem; /* Điều chỉnh cột: giảm cột ngôi sao, tăng cột ảnh và phần trăm */
   gap: 1.2rem;
   align-items: center;
   font-size: 1.4rem;
-  padding: 0.8rem 0;
+  padding: 0.8rem 1.2rem; /* Thêm padding để tạo khoảng cách */
   border-bottom: 1px solid var(--color-grey-100);
 
   &:first-child {
@@ -30,12 +28,6 @@ export const Flag = styled.img`
   display: block;
   border: ${(props) => (props.src ? "1px solid var(--color-grey-100)" : null)};
   content: url(${(props) => (props.src ? props.src : logoDefault)});
-`;
-
-const StyledImageBean = styled.img`
-  width: 25px;
-  height: 25px;
-  margin-left: 5px; /* Add some spacing between the value and the image */
 `;
 
 const StarImage = styled.div`
@@ -64,9 +56,9 @@ const StyleGreenWallet = styled.div`
   font-weight: bold;
   font-size: 16px;
   text-align: end;
-  display: flex; /* Use flexbox to align items */
-  align-items: center; /* Center items vertically */
-  justify-content: flex-end; /* Align to the right */
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 `;
 
 function DataItemBrand({ activity }) {
@@ -79,7 +71,6 @@ function DataItemBrand({ activity }) {
       .catch(() => setIsValidImage(false));
   }, [image]);
 
-  // Check if value should be displayed as a percentage (assuming value is a number between 0 and 100 from TodayActivity)
   const displayValue = Number.isFinite(value) ? `${value.toFixed(2)}%` : "N/A";
 
   return (
@@ -90,10 +81,7 @@ function DataItemBrand({ activity }) {
       </StarImage>
       <Flag src={isValidImage ? image : logoDefault} alt={`Image of ${name}`} />
       <Guest>{name}</Guest>
-      <StyleGreenWallet>
-        {displayValue}
-       
-      </StyleGreenWallet>
+      <StyleGreenWallet>{displayValue}</StyleGreenWallet>
     </StyledTodayItem>
   );
 }
