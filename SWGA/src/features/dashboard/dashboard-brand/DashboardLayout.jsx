@@ -1,4 +1,3 @@
-// DashboardLayout.jsx
 import styled from "styled-components";
 import Spinner from "../../../ui/Spinner";
 import RightRanking from "./RightRanking";
@@ -15,8 +14,14 @@ import { useBrand } from '../../../hooks/brand/useBrand';
 const StyledDashboardLayout = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-template-rows: auto 34rem auto;
+  grid-template-rows: auto auto auto;
   gap: 2.4rem;
+`;
+
+const CenteredRanking = styled.div`
+  grid-column: 2 / span 2; /* Căn giữa bằng cách chiếm 2 cột ở giữa */
+  display: flex;
+  justify-content: center;
 `;
 
 export default function DashboardLayout() {
@@ -25,7 +30,6 @@ export default function DashboardLayout() {
   const { totalCampaigns, isLoading: isLoadingCampaigns } = useGetAllCampaigns();
   const { brand, isLoading: isLoadingBrand } = useBrand();
 
-  // Fetch wallet balance using TanStack Query
   const { data: walletBalance, isLoading: isLoadingWallet } = useQuery({
     queryKey: ['walletBalance', brand?.id],
     queryFn: async () => {
@@ -33,11 +37,10 @@ export default function DashboardLayout() {
       const walletData = await walletService.getWalletByBrandId(brand.id);
       return walletData?.balance || 0;
     },
-    enabled: !!brand?.id, // Chỉ fetch khi có brandId
-    staleTime: 5 * 60 * 1000, // Cache dữ liệu trong 5 phút
+    enabled: !!brand?.id,
+    staleTime: 5 * 60 * 1000,
   });
 
-  // Kiểm tra tất cả các trạng thái loading
   if (isLoadingStores || isLoadingVouchers || isLoadingCampaigns || isLoadingWallet || isLoadingBrand) 
     return <Spinner />;
 
@@ -45,14 +48,16 @@ export default function DashboardLayout() {
     numberOfCampaigns: totalCampaigns || 0,
     numberOfStores: stores?.totalCount || 0,
     numberOfVoucherItems: totalVouchers || 0,
-    balance: walletBalance || 0, // Sử dụng walletBalance từ useQuery
+    balance: walletBalance || 0,
   };
 
   return (
     <StyledDashboardLayout>
       <Stats titles={titles} />
       <TodayActivity />
-      <RightRanking />
+      <CenteredRanking>
+        <RightRanking />
+      </CenteredRanking>
       <SalesChart />
     </StyledDashboardLayout>
   );
