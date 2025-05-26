@@ -1,4 +1,4 @@
-import { Card, Typography, Button, Row, Col, Spin } from 'antd';
+import { Card, Typography, Button, Row, Col, Spin, Modal } from 'antd';
 import styled from 'styled-components';
 import { ShoppingCartOutlined, CheckOutlined } from '@ant-design/icons';
 import { usePointPackages } from '../hooks/point-package/usePointPackages';
@@ -110,21 +110,25 @@ function BuyPoints() {
   const { data: campusResponse, isLoading: isCampusLoading } = useGetCampusByAccountId(accountId);
   const role = StorageService.getRoleLogin();
 
-  // Sử dụng state để lưu campusId
+  // State for campusId
   const [persistentCampusId, setPersistentCampusId] = useState(null);
 
-  // Lấy campusId từ API
+  // State for modal visibility and selected package
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState(null);
+
+  // Get campusId from API
   const campusData = campusResponse?.data;
   let campusId = campusResponse?.campusId;
 
-  // Cập nhật persistentCampusId khi có campusId từ API
+  // Update persistentCampusId when campusId is available
   useEffect(() => {
     if (campusId) {
       setPersistentCampusId(campusId);
     }
   }, [campusId]);
 
-  // Fallback lấy campusId từ localStorage nếu API trả về null
+  // Fallback to localStorage if campusId is not available
   if (!campusId && role === 'campus') {
     const storedCampusId = StorageService.getCampusId();
     campusId = storedCampusId || persistentCampusId;
@@ -138,9 +142,6 @@ function BuyPoints() {
   const [selectedPackageId, setSelectedPackageId] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const hasProcessedRef = useRef(false);
-
-  // Debug localStorage
-  
 
   // Store campusId in StorageService after fetching
   useEffect(() => {
@@ -210,6 +211,26 @@ function BuyPoints() {
     }
   };
 
+  // Show confirmation modal when clicking "Mua Ngay"
+  const showConfirmModal = (pkg) => {
+    setSelectedPackage(pkg);
+    setIsModalVisible(true);
+  };
+
+  // Handle modal confirmation
+  const handleConfirm = async () => {
+    setIsModalVisible(false);
+    if (selectedPackage) {
+      await handleBuyPackage(selectedPackage);
+    }
+  };
+
+  // Handle modal cancellation
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    setSelectedPackage(null);
+  };
+
   if (isLoading || isBrandLoading || isCampusLoading) {
     return (
       <LoadingContainer>
@@ -263,7 +284,7 @@ function BuyPoints() {
                 style={{ fontSize: "20px" }}
                 type="primary"
                 icon={<ShoppingCartOutlined />}
-                onClick={() => handleBuyPackage(pkg)}
+                onClick={() => showConfirmModal(pkg)}
                 block
                 loading={isPurchasing && selectedPackageId === pkg.id}
                 disabled={isPurchasing}
@@ -274,6 +295,28 @@ function BuyPoints() {
           </Col>
         ))}
       </Row>
+
+      <Modal
+        title="Xác nhận mua gói điểm"
+        open={isModalVisible}
+        onOk={handleConfirm}
+        onCancel={handleCancel}
+        okText="Đồng ý"
+        cancelText="Hủy"
+        okButtonProps={{ style: { background: '#1c5d78', borderColor: '#1c5d78' } }}
+      >
+        <Text>
+          Bạn đang mua gói <strong>{selectedPackage?.packageName}</strong> với giá{' '}
+          <strong>{selectedPackage?.price?.toLocaleString('vi-VN')} VNĐ</strong> để nhận{' '}
+          <strong>{selectedPackage?.point} điểm</strong>.
+        </Text>
+        <br />
+        <br />
+        <Text>
+          <strong>Lưu ý:</strong> Số tiền mua gói điểm không được hoàn lại sau khi giao dịch hoàn tất. 
+          Bạn có đồng ý với chính sách này và tiếp tục mua không?
+        </Text>
+      </Modal>
     </PageContainer>
   );
 }
