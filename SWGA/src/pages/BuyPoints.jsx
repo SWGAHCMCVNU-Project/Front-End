@@ -1,4 +1,5 @@
-import { Card, Typography, Button, Row, Col, Spin, Modal } from 'antd';
+import { Card, Typography, Button, Row, Col, Spin, Modal, Checkbox, Space } from 'antd';
+import { Link as RouterLink } from 'react-router-dom';
 import styled from 'styled-components';
 import { ShoppingCartOutlined, CheckOutlined } from '@ant-design/icons';
 import { usePointPackages } from '../hooks/point-package/usePointPackages';
@@ -10,6 +11,7 @@ import StorageService from '../services/storageService';
 import { useBrand } from '../hooks/brand/useBrand';
 import useGetCampusByAccountId from '../hooks/campus/useGetCampusByAccount';
 import { toast } from 'react-hot-toast';
+import Policy from './Policy';
 
 const { Title, Text } = Typography;
 
@@ -29,6 +31,14 @@ const HeaderSection = styled.div`
   .ant-typography {
     color: #666;
   }
+`;
+
+const NotificationSection = styled.div`
+  background: #e6f7ff;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  text-align: center;
 `;
 
 const StyledCard = styled(Card)`
@@ -99,6 +109,16 @@ const LoadingContainer = styled.div`
   min-height: 400px;
 `;
 
+const PolicyContent = styled.div`
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 1rem;
+  border: 1px solid #e8e8e8;
+  border-radius: 5px;
+  background: #fafafa;
+  margin-bottom: 1rem;
+`;
+
 function BuyPoints() {
   const { pointPackages, isLoading } = usePointPackages({
     status: true,
@@ -110,25 +130,23 @@ function BuyPoints() {
   const { data: campusResponse, isLoading: isCampusLoading } = useGetCampusByAccountId(accountId);
   const role = StorageService.getRoleLogin();
 
-  // State for campusId
   const [persistentCampusId, setPersistentCampusId] = useState(null);
-
-  // State for modal visibility and selected package
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(null);
+  const [isPolicyModalVisible, setIsPolicyModalVisible] = useState(false);
+  const [hasReadPolicy, setHasReadPolicy] = useState(false);
+  const [isConfirmPolicyAgreed, setIsConfirmPolicyAgreed] = useState(false);
+  const policyContentRef = useRef(null);
 
-  // Get campusId from API
   const campusData = campusResponse?.data;
   let campusId = campusResponse?.campusId;
 
-  // Update persistentCampusId when campusId is available
   useEffect(() => {
     if (campusId) {
       setPersistentCampusId(campusId);
     }
   }, [campusId]);
 
-  // Fallback to localStorage if campusId is not available
   if (!campusId && role === 'campus') {
     const storedCampusId = StorageService.getCampusId();
     campusId = storedCampusId || persistentCampusId;
@@ -143,7 +161,6 @@ function BuyPoints() {
   const [searchParams, setSearchParams] = useSearchParams();
   const hasProcessedRef = useRef(false);
 
-  // Store campusId in StorageService after fetching
   useEffect(() => {
     if (campusId && role === 'campus') {
       StorageService.setCampusId(campusId);
@@ -185,6 +202,16 @@ function BuyPoints() {
     }
   }, [searchParams, setSearchParams]);
 
+  // Scroll tracking to ensure the user has read the policy
+  const handleScroll = () => {
+    if (policyContentRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = policyContentRef.current;
+      if (scrollTop + clientHeight >= scrollHeight - 10) {
+        setHasReadPolicy(true);
+      }
+    }
+  };
+
   const handleBuyPackage = async (packageInfo) => {
     try {
       setSelectedPackageId(packageInfo.id);
@@ -211,13 +238,24 @@ function BuyPoints() {
     }
   };
 
-  // Show confirmation modal when clicking "Mua Ngay"
   const showConfirmModal = (pkg) => {
     setSelectedPackage(pkg);
     setIsModalVisible(true);
+    setIsConfirmPolicyAgreed(false); // Reset agreement for confirmation modal
   };
 
-  // Handle modal confirmation
+  const handlePolicyAgree = () => {
+    if (hasReadPolicy && isConfirmPolicyAgreed) {
+      setIsPolicyModalVisible(false);
+      setIsModalVisible(true); // Reopen confirmation modal after agreeing
+    }
+  };
+
+  const handlePolicyCancel = () => {
+    setIsPolicyModalVisible(false);
+    setIsModalVisible(true); // Reopen confirmation modal if policy modal is closed without agreeing
+  };
+
   const handleConfirm = async () => {
     setIsModalVisible(false);
     if (selectedPackage) {
@@ -225,7 +263,6 @@ function BuyPoints() {
     }
   };
 
-  // Handle modal cancellation
   const handleCancel = () => {
     setIsModalVisible(false);
     setSelectedPackage(null);
@@ -297,13 +334,44 @@ function BuyPoints() {
       </Row>
 
       <Modal
+        title="Chính sách của SWallet"
+        open={isPolicyModalVisible}
+        onOk={handlePolicyAgree}
+        onCancel={handlePolicyCancel}
+        okText="Đồng ý"
+        cancelText="Đóng"
+        okButtonProps={{ 
+          style: { background: '#1c5d78', borderColor: '#1c5d78' },
+          disabled: !hasReadPolicy || !isConfirmPolicyAgreed // Require both scrolling and checkbox
+        }}
+        width={800}
+      >
+        <PolicyContent ref={policyContentRef} onScroll={handleScroll}>
+          <Policy />
+        </PolicyContent>
+        <Space direction="vertical" style={{ width: '100%' }}>
+          <Checkbox
+            checked={isConfirmPolicyAgreed}
+            onChange={(e) => setIsConfirmPolicyAgreed(e.target.checked)}
+            disabled={!hasReadPolicy}
+          >
+            Tôi đã đọc và đồng ý với chính sách của SWallet
+          </Checkbox>
+        </Space>
+      </Modal>
+
+      <Modal
         title="Xác nhận mua gói điểm"
         open={isModalVisible}
         onOk={handleConfirm}
         onCancel={handleCancel}
         okText="Đồng ý"
         cancelText="Hủy"
-        okButtonProps={{ style: { background: '#1c5d78', borderColor: '#1c5d78' } }}
+        okButtonProps={{ 
+          style: { background: '#1c5d78', borderColor: '#1c5d78' },
+          disabled: !isConfirmPolicyAgreed
+        }}
+        width={400}
       >
         <Text>
           Bạn đang mua gói <strong>{selectedPackage?.packageName}</strong> với giá{' '}
@@ -313,9 +381,22 @@ function BuyPoints() {
         <br />
         <br />
         <Text>
-          <strong>Lưu ý:</strong> Số tiền mua gói điểm không được hoàn lại sau khi giao dịch hoàn tất. 
-          Bạn có đồng ý với chính sách này và tiếp tục mua không?
+          <strong>Lưu ý:</strong> Số tiền mua gói điểm không được hoàn lại sau khi giao dịch hoàn tất.
         </Text>
+        <br />
+        <NotificationSection>
+          <Text>
+            Vui lòng đọc và đồng ý với{' '}
+            <RouterLink to="#" onClick={(e) => {
+              e.preventDefault();
+              setIsModalVisible(false);
+              setIsPolicyModalVisible(true);
+            }}>
+              Chính sách của SWallet
+            </RouterLink>{' '}
+            trước khi mua gói điểm.
+          </Text>
+        </NotificationSection>
       </Modal>
     </PageContainer>
   );
