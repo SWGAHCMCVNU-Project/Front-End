@@ -24,6 +24,12 @@ const CenteredRanking = styled.div`
   justify-content: center;
 `;
 
+const CenteredActivity = styled.div`
+  grid-column: 2 / span 2; /* Căn giữa bằng cách chiếm 2 cột ở giữa */
+  display: flex;
+  justify-content: center;
+`;
+
 export default function DashboardLayout() {
   const { stores, isLoading: isLoadingStores } = useStores();
   const { totalVouchers, isLoading: isLoadingVouchers } = useVouchers();
@@ -54,7 +60,9 @@ export default function DashboardLayout() {
   return (
     <StyledDashboardLayout>
       <Stats titles={titles} />
-      <TodayActivity />
+      <CenteredActivity>
+        <TodayActivity />
+      </CenteredActivity>
       <CenteredRanking>
         <RightRanking />
       </CenteredRanking>
