@@ -63,7 +63,7 @@ const ChallengeForm = ({ challengeToEdit = {}, onCloseModal }) => {
   const { register, handleSubmit, reset, formState } = useForm({
     defaultValues: isEditSession
       ? { type, challengeName, amount, condition, image: null, description, status, category }
-      : { type: 1, status: true, category: "" },
+      : { type: 1, status: true, category: "Check-in" },
   });
   const { errors } = formState;
 
@@ -85,7 +85,7 @@ const ChallengeForm = ({ challengeToEdit = {}, onCloseModal }) => {
       return;
     }
     if (!formData.get("category")) {
-      toast.error("Vui lòng nhập danh mục");
+      toast.error("Vui lòng chọn danh mục");
       return;
     }
 
@@ -121,16 +121,15 @@ const ChallengeForm = ({ challengeToEdit = {}, onCloseModal }) => {
         </StyledSelect>
       </FormRow>
       <FormRow label="Danh mục" error={errors?.category?.message}>
-        <StyledInput
-          type="text"
+        <StyledSelect
           id="category"
           disabled={isWorking}
-          {...register("category", {
-            required: "Hãy nhập danh mục",
-            minLength: { value: 3, message: "Danh mục ít nhất 3 ký tự" },
-            maxLength: { value: 50, message: "Danh mục tối đa 50 ký tự" },
-          })}
-        />
+          {...register("category", { required: "Hãy chọn danh mục" })}
+        >
+          <option value="Check-in">Check-in</option>
+          <option value="Mời bạn">Mời bạn</option>
+          <option value="Tiêu sài">Tiêu sài</option>
+        </StyledSelect>
       </FormRow>
       <FormRow label="Tên thử thách" error={errors?.challengeName?.message}>
         <StyledInput
