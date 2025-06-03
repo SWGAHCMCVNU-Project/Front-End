@@ -18,16 +18,24 @@ const StyledDashboardLayout = styled.div`
   gap: 2.4rem;
 `;
 
-const CenteredRanking = styled.div`
-  grid-column: 2 / span 2; /* Căn giữa bằng cách chiếm 2 cột ở giữa */
+const ActivityAndRankingContainer = styled.div`
+  grid-column: 1 / -1; /* Span the full width of the grid (from first to last column) */
   display: flex;
-  justify-content: center;
+  justify-content: space-between; /* Push children to the edges */
+  gap: 4.8rem; /* Increase the gap between TodayActivity and RightRanking */
+  width: 100%; /* Ensure the container takes the full width */
 `;
 
-const CenteredActivity = styled.div`
-  grid-column: 2 / span 2; /* Căn giữa bằng cách chiếm 2 cột ở giữa */
+const ActivityWrapper = styled.div`
+  flex: 1; /* Allow the wrapper to grow and take available space */
   display: flex;
-  justify-content: center;
+  justify-content: flex-start; /* Align to the left */
+`;
+
+const RankingWrapper = styled.div`
+  flex: 1; /* Allow the wrapper to grow and take available space */
+  display: flex;
+  justify-content: flex-end; /* Align to the right */
 `;
 
 export default function DashboardLayout() {
@@ -60,12 +68,14 @@ export default function DashboardLayout() {
   return (
     <StyledDashboardLayout>
       <Stats titles={titles} />
-      <CenteredActivity>
-        <TodayActivity />
-      </CenteredActivity>
-      <CenteredRanking>
-        <RightRanking />
-      </CenteredRanking>
+      <ActivityAndRankingContainer>
+        <ActivityWrapper>
+          <TodayActivity />
+        </ActivityWrapper>
+        <RankingWrapper>
+          <RightRanking />
+        </RankingWrapper>
+      </ActivityAndRankingContainer>
       <SalesChart />
     </StyledDashboardLayout>
   );
