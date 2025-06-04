@@ -13,6 +13,7 @@ import "./assets/styles/responsive.scss";
 import GlobalStyles from "./styles/GlobalStyles.js"; // Import GlobalStyles
 import App from "./App.jsx";
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
+import '@fortawesome/fontawesome-free/css/all.min.css';
 const queryClient = new QueryClient();
 
 

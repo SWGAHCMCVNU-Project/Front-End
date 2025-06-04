@@ -2,8 +2,15 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import greenBean from "../../../assets/images/dauxanh.png";
 import logoDefault from "../../../assets/images/reading.png";
-import star from "../../../assets/images/star.png";
 import { formatCurrency, handleValidImageURL } from "../../../utils/helpers";
+
+// Hàm chuyển đổi số thứ hạng thành số thứ tự (1st, 2nd, 3rd, 4th, ...)
+const getOrdinal = (number) => {
+  const suffixes = ["th", "st", "nd", "rd"];
+  const value = number % 100;
+  const suffix = suffixes[(value - 20) % 10] || suffixes[value] || suffixes[0];
+  return `${number}${suffix}`;
+};
 
 const StyledTodayItem = styled.li`
   display: grid;
@@ -35,38 +42,47 @@ export const Flag = styled.img`
 const StyledImageBean = styled.img`
   width: 25px;
   height: 25px;
-  margin-left: 5px; /* Add spacing between the value and the image */
+  margin-left: 5px;
 `;
 
-const StarImage = styled.div`
+const RankContainer = styled.div`
   width: 4rem;
   height: 4rem;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
-const StarIcon = styled.img`
-  width: 100%;
-  height: 100%;
+const RankIcon = styled.i`
+  font-size: 4rem;
+  color: ${props =>
+    props.rank === 1 ? "#FFD700" : // Vàng cho hạng 1
+    props.rank === 2 ? "#C0C0C0" : // Bạc cho hạng 2
+    props.rank === 3 ? "#CD7F32" : // Đồng cho hạng 3
+    "#4A4A4A"}; // Xám cho hạng 4 trở lên
+  position: absolute;
 `;
 
 const RankLabel = styled.span`
   position: absolute;
-  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 1.4rem;
+  font-size: 1.1rem; /* Điều chỉnh kích thước chữ để nằm gọn */
   font-weight: bold;
   color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); /* Bóng chữ để nổi bật */
+  z-index: 1; /* Đảm bảo số nằm trên cúp */
 `;
 
 const StyleGreenWallet = styled.div`
   color: var(--color-green-400);
   font-weight: bold;
   font-size: 16px;
-  display: flex; /* Use flexbox for alignment */
-  align-items: center; /* Vertically center the items */
-  justify-content: flex-end; /* Align to the right */
-  gap: 5px; /* Ensure consistent spacing */
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
 `;
 
 function DataItem({ activity }) {
@@ -81,10 +97,10 @@ function DataItem({ activity }) {
 
   return (
     <StyledTodayItem>
-      <StarImage>
-        <StarIcon src={star} alt="Star" />
-        <RankLabel>{rank}</RankLabel>
-      </StarImage>
+      <RankContainer>
+        <RankIcon className="fas fa-trophy" rank={rank} />
+        <RankLabel>{getOrdinal(rank)}</RankLabel>
+      </RankContainer>
       <Flag src={isValidImage ? image : logoDefault} alt={`Image of ${name}`} />
       <Guest>{name}</Guest>
       <StyleGreenWallet>
