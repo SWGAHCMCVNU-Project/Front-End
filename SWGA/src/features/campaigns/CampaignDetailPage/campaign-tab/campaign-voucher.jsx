@@ -39,10 +39,10 @@ function CampaignVoucher() {
                       <img className="shape-avatar-product-bean" src={greenBean} alt="bean" />
                     </span>
                   </div>
-                  <div className="voucher-price-infor">
+                  {/* <div className="voucher-price-infor">
                     <label>Tỉ lệ chuyển đổi</label>
                     <span className="voucher-price-item">x{voucher.rate || 0}</span>
-                  </div>
+                  </div> */}
                 </div>
                 <div className="container-quantity">
                   <label>Còn lại: </label>

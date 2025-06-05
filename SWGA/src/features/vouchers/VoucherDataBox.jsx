@@ -169,9 +169,9 @@ function VoucherDataBox({ voucher }) {
                 </StyleGreenWallet>
               </DataItem>
               |
-              <DataItem label="Tỉ lệ chuyển đổi:">
+              {/* <DataItem label="Tỉ lệ chuyển đổi:">
                 <StyleGreenWallet>x{rate}</StyleGreenWallet>
-              </DataItem>
+              </DataItem> */}
             </StyledTotalBean>
 
             <DataItem label="Thể loại:">

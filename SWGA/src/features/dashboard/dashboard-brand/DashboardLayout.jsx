@@ -16,26 +16,47 @@ const StyledDashboardLayout = styled.div`
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: auto auto auto;
   gap: 2.4rem;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const ActivityAndRankingContainer = styled.div`
-  grid-column: 1 / -1; /* Span the full width of the grid (from first to last column) */
+  grid-column: 1 / -1;
   display: flex;
-  justify-content: space-between; /* Push children to the edges */
-  gap: 4.8rem; /* Increase the gap between TodayActivity and RightRanking */
-  width: 100%; /* Ensure the container takes the full width */
+  justify-content: space-between;
+  gap: 4.8rem;
+  width: 100%;
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+    gap: 2.4rem;
+  }
 `;
 
 const ActivityWrapper = styled.div`
-  flex: 1; /* Allow the wrapper to grow and take available space */
+  flex: 1;
   display: flex;
-  justify-content: flex-start; /* Align to the left */
+  justify-content: flex-start;
+
+  @media (max-width: 1024px) {
+    width: 100%;
+  }
 `;
 
 const RankingWrapper = styled.div`
-  flex: 1; /* Allow the wrapper to grow and take available space */
+  flex: 1;
   display: flex;
-  justify-content: flex-end; /* Align to the right */
+  justify-content: flex-end;
+
+  @media (max-width: 1024px) {
+    width: 100%;
+  }
 `;
 
 export default function DashboardLayout() {

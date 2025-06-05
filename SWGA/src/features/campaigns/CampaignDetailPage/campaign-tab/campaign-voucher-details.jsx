@@ -65,12 +65,12 @@ function CampaignVoucherDetails({ voucherId }) {
                                 ></img>
                             </span>
                         </div>
-                        <div className="voucher-price-infor">
+                        {/* <div className="voucher-price-infor">
                             <label>Tỉ lệ chuyển đổi</label>
                             <span className="voucher-price-item">
                                 x{campaignVoucher.rate}
                             </span>
-                        </div>
+                        </div> */}
                     </div>
 
                     <div className="container-quantity">

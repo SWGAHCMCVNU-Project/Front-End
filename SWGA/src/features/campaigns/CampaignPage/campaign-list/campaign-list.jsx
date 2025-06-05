@@ -270,15 +270,6 @@ function CampaignList() {
       TotalIncome: (
         <StackedTime>
           <span>
-            Hạn mức:{" "}
-            <MoneyWrapper>
-              <TotalIncome>
-                {campaign.totalIncome.toLocaleString("vi-VN")}
-              </TotalIncome>
-              <img className="shape-avatar-campaign-bean" src={greenBean} />
-            </MoneyWrapper>
-          </span>
-          <span>
             Đã chi:{" "}
             <MoneyWrapper>
               <TotalSpending>
@@ -287,6 +278,7 @@ function CampaignList() {
               <img className="shape-avatar-campaign-bean" src={greenBean} />
             </MoneyWrapper>
           </span>
+         
         </StackedTime>
       ),
       State: (

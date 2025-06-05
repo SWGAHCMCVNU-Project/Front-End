@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams } from "react-router-dom"; // Thêm useSearchParams
+import { useNavigate, useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import logoDefault from "../../assets/images/coupon.png";
 import greenBean from "../../assets/images/dauxanh.png";
@@ -28,10 +28,9 @@ const StyledButton = styled.div``;
 
 function VoucherList() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams(); // Lấy search params từ URL
-  const search = searchParams.get("search") || ""; // Lấy giá trị của tham số 'search', mặc định là chuỗi rỗng
+  const [searchParams] = useSearchParams();
+  const search = searchParams.get("search") || "";
 
-  // Truyền tham số search vào useVouchers
   const { vouchers, isLoading } = useVouchers({ search });
 
   if (isLoading) return <Spinner />;
@@ -52,7 +51,7 @@ function VoucherList() {
                 <button style={{ background: "none", border: "none", width: "100%" }}>
                   <div className="name-item-voucher">{n.voucherName}</div>
                 </button>
-                <div className="price-item-discount">
+                <div className="price-item-discount" style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                   <div className="container-price-brand">
                     <div className="price-voucher">
                       <div>Giá voucher</div>
@@ -61,22 +60,9 @@ function VoucherList() {
                         <img className="shape-avatar-product-bean" src={greenBean} alt="bean" />
                       </div>
                     </div>
-                    <div className="finish-day">
-                      <div>Tỉ lệ chuyển đổi</div>
-                      <div className="styled-day-finish">x{n.rate}</div>
-                    </div>
                   </div>
                 </div>
               </div>
-              {/* <div className="container-amount-item">
-                <div className="container-item">
-                  <div>Còn lại: </div>
-                  <div className="styled-number-item">
-                     {n.numberOfItems}
-                  </div>
-                  <div> mã</div>
-                </div>
-              </div> */}
             </StyledButton>
           </div>
         ))}

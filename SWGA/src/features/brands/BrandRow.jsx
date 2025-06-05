@@ -92,10 +92,10 @@ function BrandRow({ brand, displayedIndex }) {
       </StackedTime>
 
       <StackedTime>
-        <FinancialItem>
+        {/* <FinancialItem>
           Tổng nhận: <span style={{ color: "#1c5d78" }}>{formatCurrency(totalIncome)}</span>
           <PointIcon src={point} alt="point" />
-        </FinancialItem>
+        </FinancialItem> */}
         <FinancialItem>
           Tổng chi: <span style={{ color: "red" }}>{formatCurrency(totalSpending)}</span>
           <PointIcon src={point} alt="point" />
