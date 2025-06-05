@@ -184,10 +184,10 @@ function BrandDataBox({ brand }) {
             )}
 
             <StyledTotalBean>
-              <DataItem label="Tổng nhận:">
+              {/* <DataItem label="Tổng nhận:">
                 {totalIncome !== null ? formatCurrency(totalIncome) : "Chưa cập nhật"}
-              </DataItem>
-              |
+              </DataItem> */}
+              
               <DataItem label="Tổng chi:">
                 {totalSpending !== null ? formatCurrency(totalSpending) : "Chưa cập nhật"}
               </DataItem>

@@ -11,14 +11,24 @@ const StyledToday = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2.4rem;
-  /* Loại bỏ grid-column để tự động mở rộng */
-  min-width: 400px; /* Đặt chiều rộng tối thiểu để ô không quá hẹp */
+  min-width: 300px;
   padding-top: 2.4rem;
+  min-height: 300px;
+  width: 100%;
+
+  @media (max-width: 1024px) {
+    min-height: 250px;
+  }
+
+  @media (max-width: 768px) {
+    min-height: 200px;
+  }
 `;
 
 const TodayList = styled.ul`
   overflow: scroll;
   overflow-x: hidden;
+  flex: 1;
   &::-webkit-scrollbar {
     width: 0 !important;
   }
@@ -30,7 +40,11 @@ const NoActivity = styled.p`
   text-align: center;
   font-size: 1.8rem;
   font-weight: 500;
-  margin-top: 0.8rem;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-grey-500);
 `;
 
 const StyledHeading = styled.div`
@@ -60,12 +74,10 @@ function RightRanking() {
   const { brand, isLoading: isLoadingBrand } = useBrand();
   const { data: studentRanking, isLoading: isLoadingStudentRanking, isError: isErrorStudent } = useStudentRankingBrand(brand?.id);
 
-  // Kiểm tra trạng thái loading
   if (isLoadingBrand || isLoadingStudentRanking) {
     return <NoActivity>Đang tải...</NoActivity>;
   }
 
-  // Kiểm tra lỗi
   if (isErrorStudent) {
     return <NoActivity>Có lỗi xảy ra khi tải dữ liệu xếp hạng sinh viên</NoActivity>;
   }

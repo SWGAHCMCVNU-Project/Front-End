@@ -177,14 +177,6 @@ function VoucherCreateBox({ onCloseModal }) {
     return true;
   };
 
-  const validateRate = (value) => {
-    if (!value) return "Hãy nhập tỉ lệ chuyển đổi";
-    if (isNaN(value) || parseFloat(value) < 1) return "Số lớn hơn hoặc bằng 1";
-    if (!/^\d+(\.\d{0,2})?$/.test(value))
-      return "Tỉ lệ chuyển đổi chỉ được nhập số thập phân sau dấu phẩy 2 chữ số";
-    return true;
-  };
-
   const handleImageChange = (event) => {
     const selectedFile = event.target.files[0];
     setFileImageVoucherType(selectedFile);
@@ -210,7 +202,6 @@ function VoucherCreateBox({ onCloseModal }) {
       "condition",
       "typeId",
       "price",
-      "rate",
       "state",
     ];
 
@@ -239,6 +230,7 @@ function VoucherCreateBox({ onCloseModal }) {
       ...data,
       image: fileImageVoucherType || (isEditSession ? editValues.image : null),
       state: isEditSession ? data.state : true,
+      ...(isEditSession ? {} : { rate: 1 }), // Set rate to 1 for new vouchers only
     };
 
     if (isEditSession) {
@@ -249,7 +241,10 @@ function VoucherCreateBox({ onCloseModal }) {
         return;
       }
 
-      updateVoucher(editId, voucherData, {
+      // Exclude rate from update payload to prevent modification
+      const { rate, ...updateData } = voucherData;
+
+      updateVoucher(editId, updateData, {
         onSuccess: () => {
           toast.success("Cập nhật voucher thành công!");
           reset();
@@ -375,24 +370,10 @@ function VoucherCreateBox({ onCloseModal }) {
                   type="number"
                   id="price"
                   disabled={isWorking}
-                  readOnly={isEditSession} // Make price read-only in edit mode
+                  readOnly={isEditSession}
                   {...register("price", { validate: validatePrice })}
                 />
               </FormRowUnit>
-            </StyledStationDataBox>
-            <StyledStationDataBox>
-              <Header>
-                <div>Tỉ lệ chuyển đổi</div>
-              </Header>
-              <FormRow error={errors?.rate?.message}>
-                <Input
-                  type="text"
-                  id="rate"
-                  disabled={isWorking}
-                  readOnly={isEditSession} // Make rate read-only in edit mode
-                  {...register("rate", { validate: validateRate })}
-                />
-              </FormRow>
             </StyledStationDataBox>
             <StyledImageBox>
               <Header>

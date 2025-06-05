@@ -35,20 +35,13 @@ function CampaignInformation() {
 
             <div className="campaign-details-information">
                 <div>
-                    <label>Hạn mức: </label>
-                    <Total>
-                        {(campaign.totalIncome || 0).toLocaleString("vi-VN")}
-                        <CoinImage src={greenBean} alt="bean" />
-                    </Total>
-                </div>
-                <span className="separator">|</span>
-                <div>
                     <label>Đã chi: </label>
                     <Total>
                         {(campaign.totalSpending || 0).toLocaleString("vi-VN")}
                         <CoinImage src={greenBean} alt="bean" />
                     </Total>
                 </div>
+                
             </div>
             {/* <div className="campaign-details-participant-information">
                 <label>Lượng mã ưu đãi đã sử dụng: </label>

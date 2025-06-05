@@ -94,7 +94,7 @@ function CampaignsByBrandId({ brandId }) {
                 $ascending={sortField === "CampaignName" && sortOrder === "asc"}
                 $active={sortField === "CampaignName"}
               />
-              <div style={{ marginLeft: "80px" }}>Thời gian diễn ra</div>
+              <div >Thời gian diễn ra</div>
               <div>Tổng chi phí</div>
               <StyledHeader>Trạng thái</StyledHeader>
             </Table.Header>

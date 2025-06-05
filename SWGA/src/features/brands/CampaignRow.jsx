@@ -153,10 +153,10 @@ function CampaignRow({ campaign, displayedIndex }) {
       </StackedTime>
 
       <CostContainer>
-        <LabelValue>
+        {/* <LabelValue>
           <Label>Lợi nhuận:</Label>
           <StackedTimeFrameAbove>{totalIncome}</StackedTimeFrameAbove>
-        </LabelValue>
+        </LabelValue> */}
         <LabelValue>
           <Label>Chi tiêu:</Label>
           <StackedTimeFrameBelow>{totalSpending}</StackedTimeFrameBelow>

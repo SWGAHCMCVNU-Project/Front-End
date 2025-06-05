@@ -12,13 +12,24 @@ const StyledToday = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2.4rem;
-  min-width: 400px;
+  min-width: 300px;
   padding-top: 2.4rem;
+  min-height: 300px;
+  width: 100%;
+
+  @media (max-width: 1024px) {
+    min-height: 250px;
+  }
+
+  @media (max-width: 768px) {
+    min-height: 200px;
+  }
 `;
 
 const DataList = styled.ul`
   overflow: scroll;
   overflow-x: hidden;
+  flex: 1;
   &::-webkit-scrollbar {
     width: 0 !important;
   }
@@ -30,7 +41,11 @@ const NoActivity = styled.p`
   text-align: center;
   font-size: 1.8rem;
   font-weight: 500;
-  margin-top: 0.8rem;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-grey-500);
 `;
 
 const StyledHeading = styled.div`
@@ -60,6 +75,11 @@ const TabContainer = styled.div`
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
 `;
 
 const TabButton = styled.button`
@@ -78,6 +98,11 @@ const TabButton = styled.button`
     background-color: ${(props) =>
       props.active ? "#e89c00" : "var(--color-grey-200)"};
   }
+
+  @media (max-width: 768px) {
+    padding: 0.6rem 1.2rem;
+    font-size: 1.2rem;
+  }
 `;
 
 function TodayActivity() {
@@ -88,40 +113,37 @@ function TodayActivity() {
     isError: isErrorCampaign,
   } = useCampaignRankingByBrand(brand?.id);
 
-  const [rankingType, setRankingType] = useState("voucherUsageRatio"); // Default to voucher usage ratio
+  const [rankingType, setRankingType] = useState("voucherUsageRatio");
 
-  // Kiểm tra trạng thái loading
   if (isLoadingBrand || isLoadingCampaignRanking) {
     return <NoActivity>Đang tải...</NoActivity>;
   }
 
-  // Kiểm tra lỗi
   if (isErrorCampaign) {
     return (
       <NoActivity>Có lỗi xảy ra khi tải dữ liệu xếp hạng chiến dịch</NoActivity>
     );
   }
 
-  // Sort campaigns based on the selected ranking type and limit to 5
   const sortedCampaigns = campaignRanking
     ? [...campaignRanking]
         .sort((a, b) => {
           if (rankingType === "voucherUsageRatio") {
-            return b.voucherUsageRatio - a.voucherUsageRatio; // Sort by voucher usage ratio (descending)
+            return b.voucherUsageRatio - a.voucherUsageRatio;
           } else {
-            return b.voucherBoughtRatio - a.voucherBoughtRatio; // Sort by voucher bought ratio (descending)
+            return b.voucherBoughtRatio - a.voucherBoughtRatio;
           }
         })
         .slice(0, 5)
         .map((campaign, index) => ({
           ...campaign,
-          rank: index + 1, // Assign rank based on sorted order
+          rank: index + 1,
           name: campaign.campaignName,
           image: campaign.image,
           value:
             rankingType === "voucherUsageRatio"
               ? campaign.voucherUsageRatio * 100
-              : campaign.voucherBoughtRatio * 100, // Convert to percentage
+              : campaign.voucherBoughtRatio * 100,
         }))
     : [];
 

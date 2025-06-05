@@ -309,12 +309,12 @@ function CampaignVoucher({
         dataIndex: "VoucherName",
         key: "VoucherName",
       },
-      {
-        title: "Tỉ Lệ Chuyển Đổi",
-        dataIndex: "Rate",
-        key: "Rate",
-        align: "center",
-      },
+      // {
+      //   title: "Tỉ Lệ Chuyển Đổi",
+      //   dataIndex: "Rate",
+      //   key: "Rate",
+      //   align: "center",
+      // },
       {
         title: "Chi Phí",
         dataIndex: "Price",
