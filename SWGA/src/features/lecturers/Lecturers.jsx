@@ -248,11 +248,11 @@ function Lecturers() {
 }
 
 function filterLecturersByState(lecturers, filterValue) {
-  if (!filterValue || filterValue === "all") {
+  if (!filterValue || filterValue === "") {
     return lecturers;
   }
   return lecturers.filter(
-    (lecturer) => (lecturer.state ?? false) === (filterValue === "true")
+    (lecturer) => lecturer.state?.toString() === filterValue
   );
 }
 

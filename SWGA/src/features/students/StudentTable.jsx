@@ -147,9 +147,8 @@ function StudentTable() {
 export default StudentTable;
 
 function filterStudentsByState(students, filterValue) {
-  if (!filterValue || filterValue === "all") {
+  if (!filterValue || filterValue === "") {
     return students;
   }
-
-  return students.filter((student) => student.state === parseInt(filterValue));
+  return students.filter((student) => student.state.toString() === filterValue);
 }

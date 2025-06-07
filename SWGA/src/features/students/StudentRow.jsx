@@ -105,7 +105,6 @@ function StudentRow({ student, index, displayedIndex }) {
   };
 
   const stateToName = {
-    0: "Không xác định",
     1: "Chờ xác thực",
     2: "Hoạt động",
     3: "Không hoạt động",
@@ -124,22 +123,22 @@ function StudentRow({ student, index, displayedIndex }) {
   const stateName = stateToName[localState] || "Không xác định";
 
   // Trong StudentRow.jsx
-const handleStateChange = (checked) => {
-  const newState = checked ? 2 : 3;
-  updateStudent(
-    { accountId: student.accountId, state: newState },
-    {
-      onSuccess: (data) => {
-        console.log("Server response:", data); // Kiểm tra data trả về
-        setLocalState(newState); // Cập nhật UI ngay lập tức
-      },
-      onError: (error) => {
-        console.error("Error details:", error.response?.data);
-        setLocalState(student.state); // Rollback UI nếu có lỗi
-      },
-    }
-  );
-};
+  const handleStateChange = (checked) => {
+    const newState = checked ? 2 : 3;
+    updateStudent(
+      { accountId: student.accountId, state: newState },
+      {
+        onSuccess: (data) => {
+          console.log("Server response:", data); // Kiểm tra data trả về
+          setLocalState(newState); // Cập nhật UI ngay lập tức
+        },
+        onError: (error) => {
+          console.error("Error details:", error.response?.data);
+          setLocalState(student.state); // Rollback UI nếu có lỗi
+        },
+      }
+    );
+  };
   // Chỉ hiển thị Switch cho trạng thái 2 hoặc 3
   const showSwitch = [2, 3].includes(localState);
 
