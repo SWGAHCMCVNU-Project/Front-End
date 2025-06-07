@@ -56,7 +56,7 @@ function FilterOperations() {
   const ref = useOutsideClick(setShowFilters);
   const [selectedOptionCampus, setSelectedOptionCampus] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
-  const filterValue = searchParams.get("stateIds") || "";
+  const filterValue = searchParams.get("state") || "";
 
   const { data: campusesData, isLoading: isLoadingCampuses } = useGetAllCampuses();
 
@@ -79,22 +79,25 @@ function FilterOperations() {
   return (
     <TableOperations>
       <Filter
-        filterField="stateIds"
+        filterField="state"
         options={[
           { value: "", label: "Tất cả" },
-          { value: "1", label: "Chờ duyệt" },
+          { value: "1", label: "Chờ xác thực" },
           { value: "2", label: "Hoạt động" },
           { value: "3", label: "Không hoạt động" },
-          { value: "4", label: "Từ chối" },
         ]}
         value={filterValue}
         onChange={(selectedValue) => {
-          searchParams.set("filter", selectedValue);
+          if (selectedValue) {
+            searchParams.set("state", selectedValue);
+          } else {
+            searchParams.delete("state");
+          }
           setSearchParams(searchParams);
         }}
       />
 
-      <StyledContainer>
+      {/* <StyledContainer>
         <Button
           $variations="orange"
           onClick={() => setShowFilters(!showFilters)}
@@ -122,7 +125,7 @@ function FilterOperations() {
             </StyledSelectWrapper>
           </StyledFilterOptions>
         )}
-      </StyledContainer>
+      </StyledContainer> */}
     </TableOperations>
   );
 }

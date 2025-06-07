@@ -2,14 +2,11 @@
 import { useState } from "react";
 import { HiOutlineFunnel } from "react-icons/hi2";
 import { useSearchParams } from "react-router-dom";
-import Select from "react-select";
 import styled from "styled-components";
 import useOutsideClick from "../../hooks/useOutsideClick";
 import Button from "../../ui/Button";
 import Filter from "../../ui/Filter";
 import TableOperations from "../../ui/TableOperations";
-import useGetAllCampuses from "../../hooks/campus/useGetAllCampuses";
-import StorageService from "../../services/storageService";
 
 const StyledContainerButton = styled.div`
   display: flex;
@@ -41,7 +38,7 @@ const StyledFilterOptions = styled.div`
   position: absolute;
   top: 115%;
   left: 0;
-  width: 450px;
+  width: 200px;
   z-index: 1;
   background-color: #fff;
   border: 1px solid #ddd;
@@ -49,80 +46,29 @@ const StyledFilterOptions = styled.div`
   padding: 12px;
 `;
 
-const StyledSelectWrapper = styled.div`
-  margin-bottom: 10px;
-`;
-
-function FilterOperations({ onTabChange = () => {} }) {
-  const [showFilters, setShowFilters] = useState(false);
-  const ref = useOutsideClick(() => setShowFilters(false));
-  const [selectedOptionCampus, setSelectedOptionCampus] = useState([]);
+function FilterOperations() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const filterValue = searchParams.get("stateIds") || "";
-
-  const { data: campusesData, isLoading: isLoadingCampuses } = useGetAllCampuses({ size: 100 });
-
-  const optionsCampuses = campusesData?.data?.result?.map((campus) => ({
-    value: campus.id,
-    label: campus.campusName,
-  })) || [];
-
-  const handleSelectChangeCampus = (selectedOptionCampus) => {
-    const selectedValuesCampus = selectedOptionCampus.map((option) => option.value);
-    if (selectedValuesCampus.length) {
-      searchParams.set("campuses", selectedValuesCampus);
-    } else {
-      searchParams.delete("campuses");
-    }
-    setSearchParams(searchParams);
-    setSelectedOptionCampus(selectedOptionCampus);
-  };
+  const filterValue = searchParams.get("state") || "";
 
   return (
     <TableOperations>
       <Filter
-        filterField="stateIds"
+        filterField="state"
         options={[
           { value: "", label: "Tất cả" },
-          { value: "1", label: "Chờ duyệt" },
-          { value: "2", label: "Hoạt động" },
-          { value: "3", label: "Không hoạt động" },
-          { value: "4", label: "Từ chối" },
+          { value: "true", label: "Hoạt động" },
+          { value: "false", label: "Không hoạt động" },
         ]}
         value={filterValue}
         onChange={(selectedValue) => {
-          searchParams.set("filter", selectedValue);
+          if (selectedValue) {
+            searchParams.set("state", selectedValue);
+          } else {
+            searchParams.delete("state");
+          }
           setSearchParams(searchParams);
         }}
       />
-
-      <StyledContainer>
-        <Button $variations="orange" onClick={() => setShowFilters(!showFilters)}>
-          <StyledContainerButton>
-            <StyledButton>
-              <HiOutlineFunnel />
-            </StyledButton>
-            Bộ lọc
-          </StyledContainerButton>
-        </Button>
-
-        {showFilters && (
-          <StyledFilterOptions ref={ref}>
-            <StyledSelectWrapper>
-              <Select
-                name="select"
-                placeholder={isLoadingCampuses ? "Đang tải..." : "Campus..."}
-                options={optionsCampuses}
-                isMulti
-                value={selectedOptionCampus}
-                onChange={handleSelectChangeCampus}
-                isDisabled={isLoadingCampuses}
-              />
-            </StyledSelectWrapper>
-          </StyledFilterOptions>
-        )}
-      </StyledContainer>
-
     </TableOperations>
   );
 }
