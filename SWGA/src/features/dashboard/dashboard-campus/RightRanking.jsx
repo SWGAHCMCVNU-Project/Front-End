@@ -55,16 +55,16 @@ const Heading = styled.h1`
 function RightRanking() {
   // Fake student ranking data (updated to match screenshot)
   const fakeStudentRanking = [
-    { id: 1, rank: 3, name: "Lê Văn C", image: "", value: 85 },
-    { id: 2, rank: 4, name: "Phạm Thị D", image: "", value: 79 },
-    { id: 3, rank: 5, name: "Hoàng Văn E", image: "", value: 72 },
+    { id: 1, rank: 1, name: "Phạm Tân Tỷ", image: "", value: 550 },
+    { id: 2, rank: 2, name: "Lê Nhật Huy", image: "", value: 470 },
+    { id: 3, rank: 3, name: "Phan Hiệp Thuận", image: "", value: 340 },
   ];
 
   return (
     <StyledToday>
       <StyledHeading>
         <Heading as="h2">Bảng xếp hạng sinh viên</Heading>
-        <Heading as="h3">Số lượng: {fakeStudentRanking.length}</Heading>
+        {/* <Heading as="h3">Số lượng: {fakeStudentRanking.length}</Heading> */}
       </StyledHeading>
       {fakeStudentRanking.length > 0 ? (
         <TodayList>

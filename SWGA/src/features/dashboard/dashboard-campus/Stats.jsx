@@ -18,13 +18,7 @@ export default function Stats({ titles }) {
         value={titles?.numberOfLecturers}
       />
       <Stat
-        title="Sáng kiến"
-        color="green"
-        icon={<HiOutlineTicket />}
-        value={titles?.numberOfInitiatives}
-      />
-      <Stat
-        title="Gói điểm"
+        title="Giao dịch"
         color="yellow"
         icon={<HiOutlineCreditCard />}
         value={titles?.numberOfPointPackages}

@@ -55,16 +55,16 @@ const Heading = styled.h1`
 function TodayActivity() {
   // Fake lecturer ranking data (updated to match screenshot)
   const fakeLecturerRanking = [
-    { id: 1, rank: 1, name: "Nguyễn Văn Hùng", image: "", value: 120 },
-    { id: 2, rank: 2, name: "Trần Thị Lan", image: "", value: 110 },
-    { id: 3, rank: 3, name: "Lê Minh Tuấn", image: "", value: 105 },
+    { id: 1, rank: 1, name: "PHẠM TÂN TỶ", image: "", value: 10010 },
+    { id: 2, rank: 2, name: "Hiep Thuan", image: "", value: 8367 },
+    { id: 3, rank: 3, name: "Huy Nhat Le", image: "", value: 111 },
   ];
 
   return (
     <StyledToday>
       <StyledHeading>
         <Heading as="h2">Bảng xếp hạng giảng viên</Heading>
-        <Heading as="h3">Số lượng: {fakeLecturerRanking.length}</Heading>
+        {/* <Heading as="h3">Số lượng: {fakeLecturerRanking.length}</Heading> */}
       </StyledHeading>
       {fakeLecturerRanking.length > 0 ? (
         <DataList>
